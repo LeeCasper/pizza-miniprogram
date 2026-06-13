@@ -1,0 +1,223 @@
+/* === 设计系统 Design Tokens === */
+page {
+  /* 主色 - 番茄红 */
+  --color-primary: #D32F2F;
+  --color-primary-dark: #B02418;
+  --color-primary-light: #FFB4A8;
+  --color-on-primary: #FFFFFF;
+  --color-primary-container: #FFDAD4;
+  --color-on-primary-container: #410000;
+
+  /* 辅色 - 金黄 */
+  --color-secondary: #FBC02D;
+  --color-secondary-dark: #C79100;
+  --color-secondary-container: #FFF3C4;
+  --color-on-secondary: #FFFFFF;
+  --color-on-secondary-container: #261900;
+
+  /* 第三色 - 翠绿 */
+  --color-tertiary: #388E3C;
+  --color-tertiary-container: #C8E6C9;
+  --color-on-tertiary: #FFFFFF;
+
+  /* 表面/背景色 */
+  --color-background: #FBF9F9;
+  --color-surface: #FBF9F9;
+  --color-surface-container: #EFEDED;
+  --color-surface-container-low: #F5F3F3;
+  --color-surface-container-lowest: #FFFFFF;
+  --color-surface-container-high: #E9E8E7;
+  --color-surface-container-highest: #E3E2E2;
+  --color-surface-dim: #DBDAD9;
+  --color-surface-bright: #FBF9F9;
+
+  /* 文字色 */
+  --color-on-background: #1B1C1C;
+  --color-on-surface: #1B1C1C;
+  --color-on-surface-variant: #5A403C;
+
+  /* 描边 — 中性色，无红色调 */
+  --color-outline: #B0B0B0;
+  --color-outline-variant: #E8E8E8;
+  --color-divider: #F0F0F0;
+
+  /* 错误 */
+  --color-error: #BA1A1A;
+  --color-error-container: #FFDAD6;
+
+  /* 阴影 — 层次系统 (从浅到深) */
+  --shadow-xs: 0 1rpx 4rpx rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+  --shadow-card: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+  --shadow-button: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+  --shadow-elevated: 0 8rpx 28rpx rgba(0, 0, 0, 0.08);
+  --shadow-modal: 0 16rpx 48rpx rgba(0, 0, 0, 0.12);
+  --shadow-primary: 0 4rpx 16rpx rgba(211, 47, 47, 0.2);
+
+  /* 圆角 */
+  --radius-card: 24rpx;
+  --radius-lg: 32rpx;
+  --radius-full: 9999rpx;
+  --radius-sm: 16rpx;
+
+  /* 间距 */
+  --spacing-xs: 8rpx;
+  --spacing-sm: 24rpx;
+  --spacing-md: 32rpx;
+  --spacing-lg: 48rpx;
+  --spacing-xl: 80rpx;
+  --spacing-container: 40rpx;
+
+  /* 字体 */
+  --font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  --font-size-display: 48rpx;
+  --font-size-headline: 32rpx;
+  --font-size-headline-mobile: 28rpx;
+  --font-size-body-lg: 18rpx;
+  --font-size-body: 16rpx;
+  --font-size-body-sm: 14rpx;
+  --font-size-label: 12rpx;
+
+  --font-weight-bold: 700;
+  --font-weight-semibold: 600;
+  --font-weight-medium: 500;
+  --font-weight-regular: 400;
+
+  /* 毛玻璃 Glassmorphism Tokens */
+  /* 背景 — 不透明度足够高，Android 无 blur 也能正常显示 */
+  --glass-bg-card: rgba(255, 255, 255, 0.78);
+  --glass-bg-elevated: rgba(255, 255, 255, 0.88);
+  --glass-bg-light: rgba(255, 255, 255, 0.55);
+  --glass-bg-nav: rgba(251, 249, 249, 0.82);
+  --glass-bg-primary: rgba(211, 47, 47, 0.85);
+  --glass-bg-primary-light: rgba(211, 47, 47, 0.08);
+  --glass-bg-primary-container: rgba(255, 218, 212, 0.82);
+  --glass-bg-dark: rgba(27, 28, 28, 0.84);
+  --glass-bg-overlay: rgba(0, 0, 0, 0.55);
+  /* 模糊值 (iOS 生效，Android 静默忽略) */
+  --glass-blur-sm: saturate(180%) blur(10px);
+  --glass-blur: saturate(180%) blur(20px);
+  --glass-blur-lg: saturate(180%) blur(30px);
+  /* 玻璃边框 */
+  --glass-border: 1rpx solid rgba(255, 255, 255, 0.35);
+  --glass-border-subtle: 1rpx solid rgba(255, 255, 255, 0.18);
+  --glass-border-colored: 1rpx solid rgba(0, 0, 0, 0.06);
+  --glass-border-dark: 1rpx solid rgba(255, 255, 255, 0.08);
+  /* 玻璃阴影 */
+  --glass-shadow-card: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
+  --glass-shadow-elevated: 0 4rpx 24rpx rgba(0, 0, 0, 0.06);
+  --glass-shadow-button: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+}
+
+/* === 全局基础样式 === */
+page, view, text, image, scroll-view, swiper, swiper-item, navigator, button, input, textarea, form {
+  box-sizing: border-box;
+}
+
+page {
+  height: 100vh;
+  background-color: var(--color-background);
+  color: var(--color-on-background);
+  font-family: var(--font-family);
+  font-size: 28rpx;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+scroll-view {
+  will-change: scroll-position;
+}
+
+/* === 通用工具类 === */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.text-primary { color: var(--color-primary); }
+.text-secondary { color: var(--color-on-surface-variant); }
+.text-center { text-align: center; }
+.font-bold { font-weight: var(--font-weight-bold); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+
+/* 卡片基础样式 — 层次感 */
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+.card-cream {
+  background: var(--color-surface-container-low);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+/* 按钮样式 */
+.btn-primary {
+  background: var(--glass-bg-primary);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  color: var(--color-on-primary);
+  border-radius: var(--radius-full);
+  font-weight: var(--font-weight-bold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-primary);
+  border: 1rpx solid rgba(255, 255, 255, 0.2);
+  transition: all 0.2s;
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
+.btn-outline {
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  color: var(--color-on-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  border: 1rpx solid var(--color-outline-variant);
+  transition: all 0.2s;
+}
+
+.btn-outline:active {
+  background: var(--color-surface-container-low);
+  transform: scale(0.97);
+}
+
+/* 节标题 */
+.section-title {
+  font-size: 36rpx;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-on-background);
+}
+
+/* 页面容器 — flexbox 布局，scroll-view 自动填充剩余空间 */
+.page-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* 安全区域 */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}

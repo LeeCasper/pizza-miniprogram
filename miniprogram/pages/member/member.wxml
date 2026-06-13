@@ -1,0 +1,94 @@
+<!--pages/member/member.wxml-->
+<view class="page-container" style="padding-top: {{topBarTotalHeight}}px">
+  <!-- 顶部导航 -->
+  <view class="top-bar" style="padding-top: {{statusBarHeight}}px">
+    <text class="top-title">王姐手工披萨</text>
+  </view>
+
+  <scroll-view scroll-y class="main-scroll" style="flex: 1; height: 0;">
+    <view class="scroll-inner">
+      <!-- 数字会员卡 -->
+      <view class="member-card">
+        <view class="member-card-inner">
+          <view class="card-top">
+            <view class="card-status">
+              <text class="card-status-label">Status</text>
+              <text class="card-level">金卡会员</text>
+            </view>
+            <view class="card-badge">
+              <text class="badge-icon">👑</text>
+            </view>
+          </view>
+          <view class="card-bottom">
+            <view class="card-id-section">
+              <text class="card-id-label">Member ID</text>
+              <text class="card-id">**** **** 8294</text>
+            </view>
+            <view class="card-qr">
+              <text class="qr-icon">📱</text>
+            </view>
+          </view>
+          <view class="card-glow"></view>
+        </view>
+      </view>
+
+      <!-- 积分 & 操作 -->
+      <view class="points-section card-cream">
+        <text class="points-label">当前积分</text>
+        <view class="points-value-row">
+          <text class="points-value">2,450</text>
+          <text class="points-unit">pts</text>
+        </view>
+        <view class="points-actions">
+          <view class="points-btn primary" bindtap="onUsePoints">
+            <text>兑换好礼</text>
+          </view>
+          <view class="points-btn outline" bindtap="onEarnPoints">
+            <text>赚取积分</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 会员权益 -->
+      <view class="benefits-section">
+        <text class="section-label">会员权益</text>
+        <view class="benefits-grid">
+          <view class="benefit-item card">
+            <text class="benefit-icon">🎁</text>
+            <text class="benefit-name">生日礼</text>
+            <text class="benefit-desc">生日当月享8折</text>
+          </view>
+          <view class="benefit-item card">
+            <text class="benefit-icon">⭐</text>
+            <text class="benefit-name">积分翻倍</text>
+            <text class="benefit-desc">每周三双倍积分</text>
+          </view>
+          <view class="benefit-item card">
+            <text class="benefit-icon">🚀</text>
+            <text class="benefit-name">优先出餐</text>
+            <text class="benefit-desc">金卡会员专享</text>
+          </view>
+          <view class="benefit-item card">
+            <text class="benefit-icon">💬</text>
+            <text class="benefit-name">专属客服</text>
+            <text class="benefit-desc">1对1贴心服务</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 等级进度 -->
+      <view class="level-section card">
+        <view class="level-header">
+          <text class="level-title">升级进度</text>
+          <text class="level-next">距白金会员还差 550 pts</text>
+        </view>
+        <view class="progress-bar-wrap">
+          <view class="progress-bar">
+            <view class="progress-fill" style="width: 82%"></view>
+          </view>
+          <text class="progress-text">82%</text>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+</view>

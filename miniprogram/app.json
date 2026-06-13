@@ -1,0 +1,19 @@
+{
+  "pages": [
+    "pages/main/main",
+    "pages/store/store",
+    "pages/points/points",
+    "pages/coupons/coupons",
+    "pages/address/address",
+    "pages/settings/settings"
+  ],
+  "window": {
+    "navigationBarTitleText": "王姐手工披萨",
+    "navigationBarBackgroundColor": "#D32F2F",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#FBF9F9",
+    "backgroundTextStyle": "light"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

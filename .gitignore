@@ -1,0 +1,28 @@
+# WeChat Mini Program
+miniprogram/project.private.config.json
+
+# Dependencies (if any in future)
+node_modules/
+miniprogram_npm/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# OS files
+Desktop.ini
+
+# Claude
+.claude/
+
+# Debug screenshots & design exports
+image.png
+stitch_data/
+
+# Logs
+*.log

@@ -1,0 +1,99 @@
+<!--pages/orders/orders.wxml-->
+<view class="page-container" style="padding-top: {{topBarTotalHeight}}px">
+  <!-- 顶部导航 -->
+  <view class="top-bar" style="padding-top: {{statusBarHeight}}px">
+    <text class="top-title">订单中心</text>
+  </view>
+
+  <!-- 订单状态Tab -->
+  <view class="order-tabs">
+    <scroll-view scroll-x class="tabs-scroll" enhanced show-scrollbar="{{false}}">
+      <view class="tabs-list">
+        <view
+          wx:for="{{tabs}}"
+          wx:key="key"
+          class="tab-item {{activeTab === item.key ? 'active' : ''}}"
+          bindtap="onTabChange"
+          data-key="{{item.key}}"
+        >
+          <text>{{item.name}}</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 订单列表 -->
+  <scroll-view scroll-y class="orders-scroll" wx:if="{{filteredOrders.length > 0}}" style="flex: 1; height: 0;">
+    <view class="scroll-inner">
+      <view
+        wx:for="{{filteredOrders}}"
+        wx:key="id"
+        class="order-card card"
+      >
+        <!-- 订单头部 -->
+        <view class="order-header">
+          <view class="order-header-left">
+            <text class="order-store">🏪 {{item.store}}</text>
+            <text class="order-time">{{item.time}}</text>
+          </view>
+          <view class="order-status {{item.status}}">
+            <text>{{item.statusText}}</text>
+          </view>
+        </view>
+
+        <!-- 订单商品 -->
+        <view class="order-items">
+          <view wx:for="{{item.items}}" wx:key="name" wx:for-item="prod" class="order-item">
+            <text class="order-item-name">{{prod.name}}</text>
+            <view class="order-item-qty">
+              <text>x{{prod.qty}}</text>
+              <text class="order-item-price">¥{{prod.price}}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 取餐码 -->
+        <view class="pickup-section">
+          <block wx:if="{{item.codeRevealed}}">
+            <view class="pickup-revealed">
+              <text class="pickup-label">取餐码</text>
+              <view class="pickup-code-row">
+                <text wx:for="{{item.codeDigits}}" wx:key="*this" wx:for-item="digit" class="pickup-digit">{{digit}}</text>
+              </view>
+              <text class="pickup-hint">请向店员出示此码</text>
+              <view class="pickup-hide-btn" bindtap="onHidePickupCode" data-id="{{item.id}}">
+                <text>收起</text>
+              </view>
+            </view>
+          </block>
+          <block wx:else>
+            <view class="pickup-btn" bindtap="onShowPickupCode" data-id="{{item.id}}">
+              <image class="pickup-btn-icon" src="/images/pickup-code.png" mode="aspectFit"></image>
+              <text class="pickup-btn-text">查看取餐码</text>
+            </view>
+          </block>
+        </view>
+
+        <!-- 订单底部 -->
+        <view class="order-footer">
+          <text class="order-total">合计 <text class="total-price">¥{{item.total}}</text></text>
+          <view class="order-actions">
+            <view class="order-action-btn outline" wx:if="{{item.status === 'preparing'}}" bindtap="onCancelOrder" data-id="{{item.id}}">
+              <text>取消</text>
+            </view>
+            <view class="order-action-btn primary" bindtap="onOrderDetail" data-id="{{item.id}}">
+              <text>查看详情</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 空状态 -->
+  <view wx:else class="empty-state">
+    <text class="empty-icon">📋</text>
+    <text class="empty-text">暂无订单</text>
+    <text class="empty-sub">快去下单吧~</text>
+  </view>
+</view>

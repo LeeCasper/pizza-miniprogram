@@ -1,0 +1,113 @@
+<!--pages/main/main.wxml-->
+<view class="app-root" style="padding-top: {{topBarTotalHeight}}px">
+  <!-- 顶部导航栏（按 Tab 切换标题） -->
+  <view class="top-bar" style="padding-top: {{statusBarHeight}}px">
+    <block wx:if="{{currentTab === 0}}">
+      <view class="top-bar-left"><text class="brand-title">王姐手工披萨</text></view>
+    </block>
+    <block wx:elif="{{currentTab === 1}}">
+      <text class="top-title">订单中心</text>
+    </block>
+    <block wx:elif="{{currentTab === 2}}">
+      <text class="top-title">王姐手工披萨</text>
+    </block>
+    <block wx:else>
+      <text class="top-title">个人中心</text>
+    </block>
+  </view>
+
+  <!-- Swiper 主体 -->
+  <swiper
+    class="main-swiper"
+    current="{{currentTab}}"
+    bindchange="onSwiperChange"
+    duration="300"
+    easing-function="easeInOutCubic"
+    style="flex: 1; height: 0;"
+  >
+    <!-- Tab 0: 首页 -->
+    <swiper-item>
+      <scroll-view scroll-y class="tab-scroll" enhanced show-scrollbar="{{true}}" style="height: 100%;">
+        <include src="tpl-index.wxml"/>
+        <view style="height: 120rpx"></view>
+      </scroll-view>
+    </swiper-item>
+
+    <!-- Tab 1: 订单（含 order-tabs + scroll-view，需 flex 包裹层） -->
+    <swiper-item>
+      <view style="display: flex; flex-direction: column; height: 100%;">
+        <include src="tpl-orders.wxml"/>
+      </view>
+    </swiper-item>
+
+    <!-- Tab 2: 会员 -->
+    <swiper-item>
+      <include src="tpl-member.wxml"/>
+    </swiper-item>
+
+    <!-- Tab 3: 个人 -->
+    <swiper-item>
+      <include src="tpl-profile.wxml"/>
+    </swiper-item>
+  </swiper>
+
+  <!-- 底部导航栏（固定，永不重渲染） -->
+  <view class="tab-bar">
+    <view
+      wx:for="{{tabList}}"
+      wx:key="index"
+      class="tab-bar-item {{currentTab === index ? 'active' : ''}}"
+      data-index="{{index}}"
+      bindtap="onTabTap"
+    >
+      <image class="tab-icon-img" src="{{item.icon}}"/>
+      <text class="tab-label">{{item.text}}</text>
+    </view>
+  </view>
+
+  <!-- 购物车悬浮条 + 抽屉（仅首页显示） -->
+  <block wx:if="{{currentTab === 0}}">
+    <view class="cart-bar {{cartCount > 0 ? 'show' : ''}}" wx:if="{{cartCount > 0}}" bindtap="onCartBarTap">
+      <view class="cart-bar-inner">
+        <view class="cart-bar-left">
+          <view class="cart-icon-wrap">
+            <image class="cart-icon" src="/images/cart.png" mode="aspectFit"></image>
+            <text class="cart-badge">{{cartCount}}</text>
+          </view>
+          <text class="cart-total">¥ {{cartTotal}}</text>
+        </view>
+        <view class="cart-bar-btn"><text>去结算</text></view>
+      </view>
+    </view>
+
+    <view class="cart-overlay {{cartOpen ? 'show' : ''}}" catchtap="onCartClose">
+      <view class="cart-drawer {{cartOpen ? 'show' : ''}}" catchtap="noop">
+        <view class="cart-header">
+          <text class="cart-title">已选商品</text>
+          <view class="cart-clear" bindtap="onClearCart"><image class="cart-clear-icon" src="/images/trash.png" mode="aspectFit"></image><text>清空</text></view>
+        </view>
+        <scroll-view scroll-y class="cart-items" wx:if="{{cartItems.length > 0}}">
+          <view wx:for="{{cartItems}}" wx:key="id" class="cart-item">
+            <image class="cart-item-img" src="{{item.image}}" mode="aspectFill"></image>
+            <view class="cart-item-info">
+              <text class="cart-item-name">{{item.name}}</text>
+              <view class="cart-item-tags" wx:if="{{item.restrictions && item.restrictions.length > 0}}">
+                <text wx:for="{{item.restrictions}}" wx:key="*this" wx:for-item="r" class="cart-item-tag">{{r}}</text>
+              </view>
+              <text class="cart-item-price">¥ {{item.price * item.quantity}}</text>
+            </view>
+            <view class="qty-stepper">
+              <view class="qty-btn" bindtap="onDecrease" data-id="{{item.id}}"><text class="qty-icon">−</text></view>
+              <text class="qty-num">{{item.quantity}}</text>
+              <view class="qty-btn qty-plus" bindtap="onAddToCart" data-product="{{item}}"><text class="qty-icon">+</text></view>
+            </view>
+          </view>
+        </scroll-view>
+        <view wx:else class="cart-empty"><text>购物车是空的</text></view>
+        <view class="cart-footer" wx:if="{{cartItems.length > 0}}">
+          <view class="checkout-btn" bindtap="onCheckout"><text>确认下单 ¥{{cartTotal}}</text></view>
+        </view>
+      </view>
+    </view>
+  </block>
+</view>

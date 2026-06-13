@@ -1,0 +1,248 @@
+<!--pages/coupons/coupons.wxml-->
+<view class="page-container" style="padding-top: {{topBarTotalHeight}}px">
+  <!-- 顶部导航 -->
+  <view class="top-bar" style="padding-top: {{statusBarHeight}}px">
+    <view class="back-btn" bindtap="onBack">
+      <text>←</text>
+    </view>
+    <text class="top-title">兑换/优惠券</text>
+    <view class="top-spacer"></view>
+  </view>
+
+  <scroll-view scroll-y class="main-scroll" style="flex: 1; height: 0;">
+    <view class="scroll-inner">
+      <!-- 主分类切换：兑换券 / 优惠券 -->
+      <view class="category-tabs">
+        <view
+          class="category-tab {{activeCategory === 'redeem' ? 'active' : ''}}"
+          bindtap="onCategoryChange"
+          data-key="redeem"
+        >
+          <text class="cat-icon">🎫</text>
+          <text class="cat-label">兑换券</text>
+          <text class="cat-count">{{redeemCoupons.length}}</text>
+        </view>
+        <view
+          class="category-tab {{activeCategory === 'discount' ? 'active' : ''}}"
+          bindtap="onCategoryChange"
+          data-key="discount"
+        >
+          <text class="cat-icon">🏷️</text>
+          <text class="cat-label">优惠券</text>
+          <text class="cat-count">{{discountCoupons.length}}</text>
+        </view>
+      </view>
+
+      <!-- 状态筛选 -->
+      <view class="status-tabs">
+        <view class="status-chip {{(activeCategory === 'redeem' ? redeemTab : discountTab) === 'available' ? 'active' : ''}}" bindtap="onStatusTab" data-key="available"><text>可用</text></view>
+        <view class="status-chip {{(activeCategory === 'redeem' ? redeemTab : discountTab) === 'used' ? 'active' : ''}}" bindtap="onStatusTab" data-key="used"><text>已使用</text></view>
+        <view class="status-chip {{(activeCategory === 'redeem' ? redeemTab : discountTab) === 'expired' ? 'active' : ''}}" bindtap="onStatusTab" data-key="expired"><text>已过期</text></view>
+      </view>
+
+      <!-- ========== 兑换券列表 ========== -->
+      <view wx:if="{{activeCategory === 'redeem'}}">
+        <view wx:if="{{redeemFiltered.length > 0}}" class="coupon-list">
+          <view
+            wx:for="{{redeemFiltered}}"
+            wx:key="id"
+            class="redeem-card {{item.status !== 'available' ? 'inactive' : ''}}"
+            bindtap="onCouponTap"
+            data-item="{{item}}"
+          >
+            <image class="redeem-product-img" src="{{item.redeemProduct.image}}" mode="aspectFill"></image>
+            <view class="redeem-info">
+              <text class="redeem-name">{{item.name}}</text>
+              <text class="redeem-product-name">兑换：{{item.redeemProduct.name}}</text>
+              <view class="redeem-meta">
+                <text class="redeem-valid">有效期 {{item.validTo}}</text>
+              </view>
+            </view>
+            <view class="redeem-status">
+              <text wx:if="{{item.status === 'available'}}" class="sticker available">可兑换</text>
+              <text wx:elif="{{item.status === 'used'}}" class="sticker used">已兑换</text>
+              <text wx:else class="sticker expired">已过期</text>
+            </view>
+          </view>
+        </view>
+        <view wx:else class="empty-state">
+          <text class="empty-icon">🎫</text>
+          <text class="empty-text">暂无兑换券</text>
+          <text class="empty-hint">前往积分商城兑换心仪好礼</text>
+        </view>
+      </view>
+
+      <!-- ========== 优惠券列表 ========== -->
+      <view wx:if="{{activeCategory === 'discount'}}">
+        <view wx:if="{{discountFiltered.length > 0}}" class="coupon-list">
+          <view
+            wx:for="{{discountFiltered}}"
+            wx:key="id"
+            class="discount-card {{item.status !== 'available' ? 'inactive' : ''}}"
+            bindtap="onCouponTap"
+            data-item="{{item}}"
+          >
+            <view class="discount-left" style="background: linear-gradient(180deg, {{item.color}}, {{item.color}}66)">
+              <text class="discount-value-big">{{item.value}}</text>
+              <text class="discount-type-label">{{item.categoryLabel}}</text>
+            </view>
+            <view class="discount-right">
+              <view class="discount-info">
+                <text class="discount-name">{{item.name}}</text>
+                <text class="discount-desc">{{item.desc}}</text>
+                <view wx:if="{{item.minSpend > 0}}" class="discount-min">
+                  <text>满 ¥{{item.minSpend}} 可用</text>
+                </view>
+                <text class="discount-valid">{{item.validFrom}} ~ {{item.validTo}}</text>
+              </view>
+              <view class="discount-status">
+                <text wx:if="{{item.status === 'available'}}" class="sticker available">可用</text>
+                <text wx:elif="{{item.status === 'used'}}" class="sticker used">已使用</text>
+                <text wx:else class="sticker expired">已过期</text>
+              </view>
+            </view>
+          </view>
+        </view>
+        <view wx:else class="empty-state">
+          <text class="empty-icon">🏷️</text>
+          <text class="empty-text">暂无优惠券</text>
+          <text class="empty-hint">前往积分商城兑换超值优惠</text>
+        </view>
+      </view>
+
+      <view style="height: 100rpx; padding-bottom: env(safe-area-inset-bottom)"></view>
+    </view>
+  </scroll-view>
+
+  <!-- ========== 详情弹窗 ========== -->
+  <view class="detail-overlay {{detailOpen ? 'show' : ''}}" catchtap="onDetailClose">
+    <view class="detail-drawer {{detailOpen ? 'show' : ''}}" catchtap="noop">
+      <view class="detail-nav">
+        <view class="detail-back-btn" catchtap="onDetailClose">
+          <text class="detail-back-icon">←</text>
+        </view>
+        <text class="detail-nav-title">券详情</text>
+        <view class="detail-nav-spacer"></view>
+      </view>
+
+      <scroll-view scroll-y class="detail-body" enhanced show-scrollbar="{{false}}">
+        <!-- 兑换券详情 -->
+        <block wx:if="{{detailProduct.category === 'redeem'}}">
+          <view class="detail-coupon-preview" style="background: linear-gradient(135deg, {{detailProduct.color}}, {{detailProduct.color}}88)">
+            <text class="preview-label">{{detailProduct.categoryLabel}}</text>
+            <text class="preview-value">{{detailProduct.value}}</text>
+            <view class="preview-divider"></view>
+            <text class="preview-title">{{detailProduct.name}}</text>
+          </view>
+
+          <view class="detail-section">
+            <text class="detail-section-title">兑换商品</text>
+            <view class="redeem-product-row">
+              <image class="rp-image" src="{{detailProduct.redeemProduct.image}}" mode="aspectFill"></image>
+              <view class="rp-info">
+                <text class="rp-name">{{detailProduct.redeemProduct.name}}</text>
+                <text class="rp-price">价值 ¥{{detailProduct.redeemProduct.price}}</text>
+              </view>
+            </view>
+          </view>
+
+          <view class="detail-info-list">
+            <view class="info-item">
+              <text class="info-label">券类型</text>
+              <text class="info-value">{{detailProduct.categoryLabel}}</text>
+            </view>
+            <view class="info-item">
+              <text class="info-label">获得方式</text>
+              <text class="info-value">{{detailProduct.source}}</text>
+            </view>
+            <view class="info-item">
+              <text class="info-label">有效期</text>
+              <text class="info-value">{{detailProduct.validFrom}} ~ {{detailProduct.validTo}}</text>
+            </view>
+            <view class="info-item">
+              <text class="info-label">券码</text>
+              <text class="info-value code">{{detailProduct.code}}</text>
+            </view>
+            <view wx:if="{{detailProduct.status === 'used'}}" class="info-item">
+              <text class="info-label">使用时间</text>
+              <text class="info-value">{{detailProduct.usedAt}}</text>
+            </view>
+            <view class="info-item">
+              <text class="info-label">使用提示</text>
+              <text class="info-value tip">{{detailProduct.useTip}}</text>
+            </view>
+          </view>
+        </block>
+
+        <!-- 优惠券详情 -->
+        <block wx:if="{{detailProduct.category === 'discount'}}">
+          <view class="detail-coupon-preview" style="background: linear-gradient(135deg, {{detailProduct.color}}, {{detailProduct.color}}88)">
+            <text class="preview-label">{{detailProduct.categoryLabel}}</text>
+            <text class="preview-value">{{detailProduct.value}}</text>
+            <view class="preview-divider"></view>
+            <text class="preview-title">{{detailProduct.name}}</text>
+          </view>
+
+          <view class="detail-section">
+            <text class="detail-section-title">优惠详情</text>
+            <text class="discount-detail-desc">{{detailProduct.detailDesc}}</text>
+            <view class="discount-terms">
+              <view class="term-item">
+                <text class="term-dot">•</text>
+                <text class="term-text">优惠内容：{{detailProduct.discountValue}}</text>
+              </view>
+              <view wx:if="{{detailProduct.minSpend > 0}}" class="term-item">
+                <text class="term-dot">•</text>
+                <text class="term-text">最低消费：满 ¥{{detailProduct.minSpend}} 可用</text>
+              </view>
+              <view class="term-item">
+                <text class="term-dot">•</text>
+                <text class="term-text">{{detailProduct.useTip}}</text>
+              </view>
+            </view>
+          </view>
+
+          <view class="detail-info-list">
+            <view class="info-item">
+              <text class="info-label">券类型</text>
+              <text class="info-value">{{detailProduct.categoryLabel}}</text>
+            </view>
+            <view class="info-item">
+              <text class="info-label">获得方式</text>
+              <text class="info-value">{{detailProduct.source}}</text>
+            </view>
+            <view class="info-item">
+              <text class="info-label">有效期</text>
+              <text class="info-value">{{detailProduct.validFrom}} ~ {{detailProduct.validTo}}</text>
+            </view>
+            <view class="info-item">
+              <text class="info-label">券码</text>
+              <text class="info-value code">{{detailProduct.code}}</text>
+            </view>
+            <view wx:if="{{detailProduct.status === 'used'}}" class="info-item">
+              <text class="info-label">使用时间</text>
+              <text class="info-value">{{detailProduct.usedAt}}</text>
+            </view>
+          </view>
+        </block>
+
+        <view class="detail-bottom-spacer"></view>
+      </scroll-view>
+
+      <!-- 底部操作按钮 -->
+      <view class="detail-footer">
+        <block wx:if="{{detailProduct.status === 'available'}}">
+          <view wx:if="{{detailProduct.category === 'redeem'}}" class="detail-action-btn redeem-btn" bindtap="onRedeemUse">
+            <text>立即兑换</text>
+          </view>
+          <view wx:else class="detail-action-btn discount-btn" bindtap="onDiscountUse">
+            <text>去使用</text>
+          </view>
+        </block>
+        <view wx:else class="detail-action-btn disabled">
+          <text>{{detailProduct.status === 'used' ? '已使用' : '已过期'}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

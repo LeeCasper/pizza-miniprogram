@@ -1,0 +1,190 @@
+<!--pages/address/address.wxml-->
+<view class="page-container" style="padding-top: {{topBarTotalHeight}}px">
+  <!-- 顶部导航 -->
+  <view class="top-bar" style="padding-top: {{statusBarHeight}}px">
+    <view class="back-btn" bindtap="onBack">
+      <text>←</text>
+    </view>
+    <text class="top-title">收货地址</text>
+    <view class="top-spacer"></view>
+  </view>
+
+  <!-- ========== 列表模式 ========== -->
+  <block wx:if="{{mode === 'list'}}">
+    <scroll-view scroll-y class="main-scroll" style="flex: 1; height: 0;">
+      <view class="scroll-inner">
+        <!-- 地址卡片 -->
+        <view wx:if="{{addresses.length > 0}}" class="address-list">
+          <view
+            wx:for="{{addresses}}"
+            wx:key="id"
+            class="address-card"
+            bindtap="onEdit"
+            data-id="{{item.id}}"
+          >
+            <!-- 头部：姓名 + 手机号 -->
+            <view class="card-header">
+              <view class="card-name-row">
+                <text class="card-name">{{item.name}}</text>
+                <text wx:if="{{item.isDefault}}" class="default-badge">默认</text>
+              </view>
+              <text class="card-phone">{{item.phone}}</text>
+            </view>
+
+            <!-- 地址信息 -->
+            <view class="card-address">
+              <text class="card-region">{{item.region[0]}} {{item.region[1]}} {{item.region[2]}}</text>
+              <text class="card-detail">{{item.detail}}</text>
+            </view>
+
+            <!-- 底部：标签 + 操作 -->
+            <view class="card-footer">
+              <view class="card-tags">
+                <text wx:if="{{item.tag}}" class="tag-badge">{{item.tag}}</text>
+              </view>
+              <view class="card-actions" catchtap="noop">
+                <view class="action-btn edit-btn" catchtap="onEdit" data-id="{{item.id}}">
+                  <text>✏️</text>
+                </view>
+                <view class="action-btn delete-btn" catchtap="onDelete" data-id="{{item.id}}">
+                  <text>🗑️</text>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 空状态 -->
+        <view wx:else class="empty-state">
+          <text class="empty-icon">📍</text>
+          <text class="empty-text">暂无收货地址</text>
+          <text class="empty-hint">点击下方按钮添加新地址</text>
+        </view>
+      </view>
+    </scroll-view>
+
+    <!-- 新增地址 FAB -->
+    <view class="fab-bar">
+      <view class="fab-btn" bindtap="onAdd">
+        <text class="fab-icon">+</text>
+        <text>新增地址</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- ========== 表单模式（抽屉覆盖层） ========== -->
+  <view class="form-overlay {{mode === 'form' ? 'show' : ''}}" catchtap="onFormBack">
+    <view class="form-drawer {{mode === 'form' ? 'show' : ''}}" catchtap="noop">
+      <!-- 表单导航 -->
+      <view class="form-nav">
+        <view class="form-nav-back" catchtap="onFormBack">
+          <text>取消</text>
+        </view>
+        <text class="form-nav-title">{{editId ? '编辑地址' : '新增地址'}}</text>
+        <view class="form-nav-spacer"></view>
+      </view>
+
+      <scroll-view scroll-y class="form-body" enhanced show-scrollbar="{{false}}">
+        <!-- 所在地区 -->
+        <view class="form-section">
+          <picker mode="region" bindchange="onRegionChange" value="{{form.region}}">
+            <view class="picker-field">
+              <text class="field-label">所在地区</text>
+              <view class="picker-value-row">
+                <text class="picker-value {{form.region.length ? '' : 'placeholder'}}">
+                  {{form.region.length ? form.region[0] + ' ' + form.region[1] + ' ' + form.region[2] : '请选择地区'}}
+                </text>
+                <text class="picker-arrow">›</text>
+              </view>
+            </view>
+          </picker>
+        </view>
+
+        <!-- 收货人姓名 -->
+        <view class="form-section">
+          <view class="input-field">
+            <text class="field-label">收货人</text>
+            <input
+              class="field-input"
+              value="{{form.name}}"
+              bindinput="onInputName"
+              placeholder="请输入收货人姓名"
+              placeholder-class="field-placeholder"
+            />
+          </view>
+        </view>
+
+        <!-- 手机号 -->
+        <view class="form-section">
+          <view class="input-field">
+            <text class="field-label">手机号</text>
+            <input
+              class="field-input"
+              value="{{form.phone}}"
+              bindinput="onInputPhone"
+              type="number"
+              maxlength="11"
+              placeholder="请输入11位手机号"
+              placeholder-class="field-placeholder"
+            />
+          </view>
+        </view>
+
+        <!-- 详细地址 -->
+        <view class="form-section">
+          <view class="input-field textarea-field">
+            <text class="field-label">详细地址</text>
+            <textarea
+              class="field-textarea"
+              value="{{form.detail}}"
+              bindinput="onInputDetail"
+              placeholder="街道、门牌号、楼层等"
+              placeholder-class="field-placeholder"
+              auto-height
+            />
+          </view>
+        </view>
+
+        <!-- 地址标签 -->
+        <view class="form-section">
+          <text class="field-label section-label">地址标签</text>
+          <view class="tag-selector">
+            <view
+              wx:for="{{tagOptions}}"
+              wx:key="*this"
+              class="tag-chip {{form.tag === item ? 'active' : ''}}"
+              bindtap="onTagSelect"
+              data-tag="{{item}}"
+            >
+              <text>{{item}}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 默认地址开关 -->
+        <view class="form-section">
+          <view class="switch-row">
+            <text class="field-label">设为默认地址</text>
+            <switch
+              checked="{{form.isDefault}}"
+              bindchange="onToggleDefault"
+              color="#D32F2F"
+            />
+          </view>
+        </view>
+
+        <view class="form-body-spacer"></view>
+      </scroll-view>
+
+      <!-- 表单底部按钮 -->
+      <view class="form-footer">
+        <view wx:if="{{editId}}" class="delete-outline-btn" bindtap="onDeleteCurrent">
+          <text>删除地址</text>
+        </view>
+        <view class="save-btn" bindtap="onSave">
+          <text>保存</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

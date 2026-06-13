@@ -1,0 +1,123 @@
+<!--pages/points/points.wxml-->
+<view class="page-container" style="padding-top: {{topBarTotalHeight}}px">
+  <!-- 顶部导航 -->
+  <view class="top-bar" style="padding-top: {{statusBarHeight}}px">
+    <view class="back-btn" bindtap="onBack">
+      <text>←</text>
+    </view>
+    <text class="top-title">积分商城</text>
+    <view class="top-spacer"></view>
+  </view>
+
+  <scroll-view scroll-y class="main-scroll" style="flex: 1; height: 0;">
+    <view class="scroll-inner">
+      <!-- 积分余额 -->
+      <view class="points-header card-cream">
+        <view class="points-header-left">
+          <text class="points-header-label">可用积分</text>
+          <view class="points-header-value-row">
+            <text class="points-header-value">2,450</text>
+            <text class="points-header-unit">pts</text>
+          </view>
+        </view>
+        <view class="points-header-action" bindtap="onPointsHistory">
+          <text>积分明细 →</text>
+        </view>
+      </view>
+
+      <!-- 商品网格 -->
+      <view class="mall-grid">
+        <view
+          wx:for="{{products}}"
+          wx:key="id"
+          class="mall-card card"
+          bindtap="onProductTap"
+          data-item="{{item}}"
+        >
+          <view class="mall-image-wrap">
+            <image class="mall-image" src="{{item.image}}" mode="aspectFill"></image>
+            <view wx:if="{{item.tag}}" class="mall-tag">{{item.tag}}</view>
+          </view>
+          <view class="mall-info">
+            <text class="mall-name">{{item.name}}</text>
+            <text class="mall-desc">{{item.desc}}</text>
+            <view class="mall-bottom">
+              <view class="mall-points">
+                <text class="points-num">{{item.points}}</text>
+                <text class="points-label">积分</text>
+              </view>
+              <view class="mall-stock">
+                <text>库存 {{item.stock}}</text>
+              </view>
+            </view>
+            <view
+              class="redeem-btn {{userPoints >= item.points ? '' : 'disabled'}}"
+              catchtap="onRedeem"
+              data-item="{{item}}"
+            >
+              <text>{{userPoints >= item.points ? '立即兑换' : '积分不足'}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 产品详情弹窗 -->
+  <view class="detail-overlay {{detailOpen ? 'show' : ''}}" catchtap="onDetailClose">
+    <view class="detail-drawer {{detailOpen ? 'show' : ''}}" catchtap="noop">
+      <view class="detail-nav">
+        <view class="detail-back-btn" catchtap="onDetailClose">
+          <text class="detail-back-icon">←</text>
+        </view>
+        <text class="detail-nav-title">商品详情</text>
+        <view class="detail-nav-spacer"></view>
+      </view>
+
+      <scroll-view scroll-y class="detail-body" enhanced show-scrollbar="{{false}}">
+        <image class="detail-image" src="{{detailProduct.image}}" mode="widthFix"></image>
+
+        <view class="detail-header">
+          <view class="detail-title-row">
+            <text class="detail-name">{{detailProduct.name}}</text>
+            <view class="detail-points-badge">
+              <text class="detail-points-num">{{detailProduct.points}}</text>
+              <text class="detail-points-label">积分</text>
+            </view>
+          </view>
+          <view wx:if="{{detailProduct.tag}}" class="detail-tags">
+            <text class="detail-tag">{{detailProduct.tag}}</text>
+            <text class="detail-size">库存 {{detailProduct.stock}}</text>
+          </view>
+        </view>
+
+        <text class="detail-desc">{{detailProduct.detailDesc}}</text>
+
+        <view class="detail-highlights">
+          <text class="detail-section-label">商品亮点</text>
+          <view class="highlight-list">
+            <view wx:for="{{detailProduct.highlights}}" wx:key="*this" class="highlight-item">
+              <text class="highlight-dot">•</text>
+              <text>{{item}}</text>
+            </view>
+          </view>
+        </view>
+
+        <view class="detail-bottom-spacer"></view>
+      </scroll-view>
+
+      <view class="detail-footer">
+        <view class="detail-footer-info">
+          <text class="footer-points-num">{{detailProduct.points}}</text>
+          <text class="footer-points-label">积分兑换</text>
+        </view>
+        <view
+          class="detail-redeem-btn {{userPoints >= detailProduct.points ? '' : 'disabled'}}"
+          catchtap="onDetailRedeem"
+        >
+          <text>{{userPoints >= detailProduct.points ? '立即兑换' : '积分不足'}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

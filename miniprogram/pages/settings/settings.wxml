@@ -1,0 +1,218 @@
+<!--pages/settings/settings.wxml-->
+<view class="page-container" style="padding-top: {{topBarTotalHeight}}px">
+  <!-- 顶部导航 -->
+  <view class="top-bar" style="padding-top: {{statusBarHeight}}px">
+    <view class="back-btn" bindtap="onBack">
+      <text>←</text>
+    </view>
+    <text class="top-title">设置</text>
+    <view class="top-spacer"></view>
+  </view>
+
+  <scroll-view scroll-y class="main-scroll" style="flex: 1; height: 0;">
+    <view class="scroll-inner">
+
+      <!-- 组1：账号 + 通知 -->
+      <view class="settings-group card">
+        <!-- 账号安全 -->
+        <view class="settings-item" bindtap="onOpenDrawer" data-type="account">
+          <text class="settings-item-icon">🔒</text>
+          <text class="settings-item-label">账号安全</text>
+          <text class="settings-item-arrow">→</text>
+        </view>
+
+        <view class="settings-divider"></view>
+
+        <!-- 通知设置 -->
+        <view class="settings-item switch-item">
+          <text class="settings-item-icon">🔔</text>
+          <text class="settings-item-label">通知设置</text>
+          <switch
+            checked="{{notificationEnabled}}"
+            bindchange="onToggleNotification"
+            color="#D32F2F"
+          />
+        </view>
+      </view>
+
+      <!-- 组2：清除缓存 -->
+      <view class="settings-group card">
+        <view class="settings-item" bindtap="onClearCache">
+          <text class="settings-item-icon">🗂️</text>
+          <text class="settings-item-label">清除缓存</text>
+          <view class="settings-item-right">
+            <text class="settings-item-hint">{{cacheSize}}</text>
+            <text class="settings-item-arrow">→</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 组3：关于 + 协议 + 隐私 -->
+      <view class="settings-group card">
+        <view class="settings-item" bindtap="onOpenDrawer" data-type="about">
+          <text class="settings-item-icon">ℹ️</text>
+          <text class="settings-item-label">关于我们</text>
+          <text class="settings-item-arrow">→</text>
+        </view>
+
+        <view class="settings-divider"></view>
+
+        <view class="settings-item" bindtap="onOpenDrawer" data-type="agreement">
+          <text class="settings-item-icon">📄</text>
+          <text class="settings-item-label">用户协议</text>
+          <text class="settings-item-arrow">→</text>
+        </view>
+
+        <view class="settings-divider"></view>
+
+        <view class="settings-item" bindtap="onOpenDrawer" data-type="privacy">
+          <text class="settings-item-icon">🛡️</text>
+          <text class="settings-item-label">隐私政策</text>
+          <text class="settings-item-arrow">→</text>
+        </view>
+      </view>
+
+      <!-- 退出登录 -->
+      <view class="logout-btn" bindtap="onLogout">
+        <text>退出登录</text>
+      </view>
+
+    </view>
+  </scroll-view>
+
+  <!-- ========== 底部抽屉覆盖层 ========== -->
+  <view class="drawer-overlay {{drawerOpen ? 'show' : ''}}" catchtap="onCloseDrawer">
+    <view class="drawer-drawer {{drawerOpen ? 'show' : ''}}" catchtap="noop">
+      <!-- 抽屉导航栏 -->
+      <view class="drawer-nav">
+        <view class="drawer-nav-back" catchtap="onCloseDrawer">
+          <text>取消</text>
+        </view>
+        <text class="drawer-nav-title">{{drawerTitle}}</text>
+        <view class="drawer-nav-spacer"></view>
+      </view>
+
+      <!-- 抽屉内容区 -->
+      <scroll-view scroll-y class="drawer-body" enhanced show-scrollbar="{{false}}">
+
+        <!-- 账号安全 -->
+        <block wx:if="{{drawerType === 'account'}}">
+          <!-- 当前手机号（非编辑模式） -->
+          <view wx:if="{{!editPhoneOpen}}" class="drawer-section">
+            <view class="account-info-row">
+              <text class="account-label">绑定手机号</text>
+              <text class="account-value">{{phoneNumber}}</text>
+            </view>
+            <view class="account-hint">用于接收订单通知和配送信息</view>
+            <view class="drawer-btn-primary" bindtap="onEditPhone">
+              <text>修改手机号</text>
+            </view>
+          </view>
+
+          <!-- 编辑手机号 -->
+          <view wx:else class="drawer-section">
+            <view class="input-field">
+              <text class="field-label">新手机号</text>
+              <input
+                class="field-input"
+                value="{{editPhone}}"
+                bindinput="onPhoneInput"
+                type="number"
+                maxlength="11"
+                placeholder="请输入11位手机号"
+                placeholder-class="field-placeholder"
+                focus="{{true}}"
+              />
+            </view>
+            <view class="drawer-form-btns">
+              <view class="drawer-btn-outline" bindtap="onCancelEditPhone">
+                <text>取消</text>
+              </view>
+              <view class="drawer-btn-primary flex-1" bindtap="onSavePhone">
+                <text>保存</text>
+              </view>
+            </view>
+          </view>
+        </block>
+
+        <!-- 关于我们 -->
+        <block wx:elif="{{drawerType === 'about'}}">
+          <view class="drawer-section">
+            <view class="about-header">
+              <text class="about-name">王姐手工披萨</text>
+              <text class="about-version">版本 1.0.0</text>
+            </view>
+            <text class="drawer-text">
+              王姐手工披萨，用心做好每一张披萨。{"\n\n"}
+              创始于2018年，坚持手工现做、新鲜食材、传统工艺。每一张披萨都承载着我们对美食的热爱与执着。{"\n\n"}
+              从经典玛格丽特到至尊牛肉披萨，从招牌榴莲饼到手工凤梨酥，我们用心雕琢每一个细节，只为给您带来最纯正的手工披萨体验。{"\n\n"}
+              感谢您选择王姐手工披萨！
+            </text>
+          </view>
+        </block>
+
+        <!-- 用户协议 -->
+        <block wx:elif="{{drawerType === 'agreement'}}">
+          <view class="drawer-section">
+            <text class="drawer-text">
+              用户服务协议{"\n\n"}
+              一、总则{"\n"}
+              1.1 欢迎使用王姐手工披萨小程序（以下简称"本小程序"）。{"\n"}
+              1.2 本协议是您与王姐手工披萨之间关于使用本小程序服务所订立的协议。{"\n\n"}
+              二、账号注册与使用{"\n"}
+              2.1 用户在使用本小程序前需要注册账号，注册时应当提供真实、准确的个人信息。{"\n"}
+              2.2 用户应当对以其账号进行的所有活动和事件负法律责任。{"\n\n"}
+              三、服务内容{"\n"}
+              3.1 本小程序提供在线点单、积分兑换、优惠券使用等服务。{"\n"}
+              3.2 我们保留随时变更、中断或终止部分或全部网络服务的权利。{"\n\n"}
+              四、用户行为规范{"\n"}
+              4.1 用户不得利用本小程序从事违法违规活动。{"\n"}
+              4.2 用户不得利用技术手段恶意刷单、套取优惠。{"\n\n"}
+              五、免责声明{"\n"}
+              5.1 因不可抗力因素导致的服務中断，我们不承担责任。{"\n"}
+              5.2 对于用户个人原因造成的损失，我们不承担责任。{"\n\n"}
+              六、知识产权{"\n"}
+              6.1 本小程序所有内容的著作权、商标权等知识产权归王姐手工披萨所有。{"\n\n"}
+              七、其他{"\n"}
+              7.1 本协议的解释、效力及纠纷的解决，适用中华人民共和国法律。{"\n"}
+              7.2 如本协议中的任何条款无论因何种原因完全或部分无效，其余条款仍应有效。{"\n\n"}
+              更新日期：2024年1月1日
+            </text>
+          </view>
+        </block>
+
+        <!-- 隐私政策 -->
+        <block wx:elif="{{drawerType === 'privacy'}}">
+          <view class="drawer-section">
+            <text class="drawer-text">
+              隐私政策{"\n\n"}
+              一、信息收集{"\n"}
+              1.1 我们收集的信息包括：您提供的个人信息（姓名、手机号、收货地址）、订单信息、设备信息。{"\n"}
+              1.2 我们在您使用小程序时自动收集的信息包括：IP地址、设备型号、操作系统版本、使用日志。{"\n\n"}
+              二、信息使用{"\n"}
+              2.1 我们使用收集的信息用于：处理订单、提供客户服务、改进服务质量、发送订单通知。{"\n"}
+              2.2 我们不会将您的个人信息出售或分享给第三方，除非获得您的明确授权或法律要求。{"\n\n"}
+              三、信息存储与保护{"\n"}
+              3.1 您的个人信息存储于安全的服务器上，我们采取合理的技术手段保障信息安全。{"\n"}
+              3.2 您的账号信息采用加密传输和存储，密码使用不可逆算法加密。{"\n\n"}
+              四、您的权利{"\n"}
+              4.1 您有权查询、更正、删除您的个人信息。{"\n"}
+              4.2 您有权随时注销账号，注销后我们将删除您的个人信息。{"\n"}
+              4.3 您可以通过小程序"设置-账号安全"页面或联系客服行使上述权利。{"\n\n"}
+              五、Cookie 和同类技术{"\n"}
+              5.1 我们使用本地存储技术保存您的登录状态和偏好设置。{"\n"}
+              5.2 您可以通过清除小程序缓存来清除这些信息。{"\n\n"}
+              六、未成年人保护{"\n"}
+              6.1 我们重视未成年人个人信息的保护，未满18周岁的用户需在监护人指导下使用本服务。{"\n\n"}
+              七、政策更新{"\n"}
+              7.1 我们可能会不时更新本隐私政策，更新后的政策将在小程序内公布。{"\n\n"}
+              更新日期：2024年1月1日
+            </text>
+          </view>
+        </block>
+
+        <view class="drawer-body-spacer"></view>
+      </scroll-view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,162 @@
+<!--pages/index/index.wxml-->
+<view class="page-container" style="padding-top: {{topBarTotalHeight}}px">
+  <!-- 顶部导航栏 -->
+  <view class="top-bar" style="padding-top: {{statusBarHeight}}px">
+    <view class="top-bar-left">
+      <text class="brand-title">王姐手工披萨</text>
+    </view>
+    <view class="top-bar-right">
+      <view class="notify-btn" bindtap="onNotify">
+        <text class="iconfont icon-bell">🔔</text>
+        <view class="notify-dot"></view>
+      </view>
+    </view>
+  </view>
+
+  <scroll-view scroll-y class="main-scroll" style="flex: 1; height: 0;">
+    <!-- 取餐方式切换 -->
+    <view class="pickup-toggle">
+      <view class="toggle-pill active">
+        <image class="toggle-icon-img" src="/images/store-pickup.png" />
+        <text>门店自取</text>
+      </view>
+    </view>
+
+    <!-- 主视觉Banner -->
+    <view class="hero-banner" bindtap="onHeroTap">
+      <image class="hero-image" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWmaxqTd2O050Z_YxQSKXsT5_oVWDC06lxugCoBCFCzcZUIJBgIHrEzfVye-VzfyH7dbUZ-qVedHehug_qhNKPvDklpIekjq3ZNQ5CneDJa5ff5swVizK5TLUUrqfXGsDAuOZ0VjZP5CAxAyFcRoQbeoOVsYXcFDNuoNcl0aR72Ln48aphvlFVcJMFVoMEeLAAaKZF_AQoSS2tHk5U9-wVNEBAmlA53xjX0-GyKcZZ9Ol_EficZ5oKx7_7T_r5SsnWpdCUa3Rc78tH" mode="aspectFill"></image>
+      <view class="hero-overlay">
+        <view class="hero-tag">
+          <text>🔥 新品 (NEW)</text>
+        </view>
+        <view class="hero-text">
+          <text class="hero-title">The Calabrese Inferno</text>
+          <text class="hero-subtitle">香辣卡拉布里亚披萨</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 分类筛选 -->
+    <view class="category-section">
+      <scroll-view scroll-x class="category-scroll" enhanced show-scrollbar="{{false}}">
+        <view class="category-list">
+          <view
+            wx:for="{{categories}}"
+            wx:key="key"
+            class="category-item {{activeCategory === item.key ? 'active' : ''}}"
+            bindtap="onCategoryChange"
+            data-key="{{item.key}}"
+          >
+            <view class="category-icon-wrap {{activeCategory === item.key ? 'active' : ''}}">
+              <image class="category-icon" src="{{item.icon}}" mode="aspectFit"></image>
+            </view>
+            <text class="category-name {{activeCategory === item.key ? 'active' : ''}}">{{item.name}}</text>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 商品列表 -->
+    <view class="product-section">
+      <view class="section-header">
+        <text class="section-title">{{activeCategory === 'all' ? '全部商品' : activeCategory === 'pizza' ? '披萨' : activeCategory === 'durian' ? '榴莲饼' : '凤梨酥'}}</text>
+      </view>
+
+      <view class="product-list">
+        <view
+          wx:for="{{filteredProducts}}"
+          wx:key="id"
+          class="product-card"
+          wx:if="{{item.visible !== false}}"
+        >
+          <image class="product-image" src="{{item.image}}" mode="aspectFill"></image>
+          <view class="product-info">
+            <view class="product-meta">
+              <text class="product-name">{{item.name}}</text>
+              <text class="product-desc">{{item.desc}}</text>
+            </view>
+            <view class="product-bottom">
+              <text class="product-price">¥ {{item.price}}</text>
+              <!-- 未加入购物车 -->
+              <view
+                wx:if="{{!item.quantity}}"
+                class="add-btn"
+                bindtap="onAddToCart"
+                data-product="{{item}}"
+              >
+                <text class="add-icon">+</text>
+              </view>
+              <!-- 已加入购物车 - 数量调节 -->
+              <view wx:else class="qty-stepper">
+                <view class="qty-btn" bindtap="onDecrease" data-id="{{item.id}}">
+                  <text class="qty-icon">−</text>
+                </view>
+                <text class="qty-num">{{item.quantity}}</text>
+                <view class="qty-btn qty-plus" bindtap="onAddToCart" data-product="{{item}}">
+                  <text class="qty-icon">+</text>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view style="height: 64rpx"></view>
+    </view>
+  </scroll-view>
+</view>
+
+<!-- 购物车悬浮条 -->
+<view class="cart-bar {{cartCount > 0 ? 'show' : ''}}" wx:if="{{cartCount > 0}}" bindtap="onCartBarTap">
+  <view class="cart-bar-inner">
+    <view class="cart-bar-left">
+      <view class="cart-icon-wrap">
+        <image class="cart-icon" src="/images/cart.png" mode="aspectFit"></image>
+        <text class="cart-badge">{{cartCount}}</text>
+      </view>
+      <text class="cart-total">¥ {{cartTotal}}</text>
+    </view>
+    <view class="cart-bar-btn">
+      <text>去结算</text>
+    </view>
+  </view>
+</view>
+
+<!-- 购物车抽屉 -->
+<view class="cart-overlay {{cartOpen ? 'show' : ''}}" catchtap="onCartClose">
+  <view class="cart-drawer {{cartOpen ? 'show' : ''}}" catchtap="noop">
+    <view class="cart-header">
+      <text class="cart-title">已选商品</text>
+      <view class="cart-clear" bindtap="onClearCart">
+        <text>🗑️ 清空</text>
+      </view>
+    </view>
+
+    <scroll-view scroll-y class="cart-items" wx:if="{{cartItems.length > 0}}">
+      <view wx:for="{{cartItems}}" wx:key="id" class="cart-item">
+        <view class="cart-item-info">
+          <text class="cart-item-name">{{item.name}}</text>
+          <text class="cart-item-price">¥ {{item.price * item.quantity}}</text>
+        </view>
+        <view class="qty-stepper">
+          <view class="qty-btn" bindtap="onDecrease" data-id="{{item.id}}">
+            <text class="qty-icon">−</text>
+          </view>
+          <text class="qty-num">{{item.quantity}}</text>
+          <view class="qty-btn qty-plus" bindtap="onAddToCart" data-product="{{item}}">
+            <text class="qty-icon">+</text>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+
+    <view wx:else class="cart-empty">
+      <text>购物车是空的</text>
+    </view>
+
+    <view class="cart-footer" wx:if="{{cartItems.length > 0}}">
+      <view class="checkout-btn" bindtap="onCheckout">
+        <text>确认下单 ¥{{cartTotal}}</text>
+      </view>
+    </view>
+  </view>
+</view>
