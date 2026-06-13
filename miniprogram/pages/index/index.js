@@ -1,12 +1,12 @@
 // pages/index/index.js
-const { products, categories } = require('../../utils/data');
+const { api } = require('../../utils/api');
 const app = getApp();
 
 Page({
   data: {
     statusBarHeight: 44,
     topBarTotalHeight: 80,
-    categories,
+    categories: [],
     products: [],
     filteredProducts: [],
     activeCategory: 'all',
@@ -15,45 +15,66 @@ Page({
     cartCount: 0,
     cartTotal: 0,
     cartOpen: false,
-    currentTab: 0
+    currentTab: 0,
+    loading: true,
+    error: null,
   },
 
   onLoad() {
     const sh = app.globalData.statusBarHeight;
-    // 首次加载：一次性完成所有数据初始化，避免多次 setData 闪烁
-    const cart = app.globalData.cart;
-    const cartItems = Object.values(cart);
-    const initialProducts = products.map(p => ({
-      ...p,
-      quantity: cart[p.id] ? cart[p.id].quantity : 0
-    }));
     this.setData({
       statusBarHeight: sh,
       topBarTotalHeight: sh + 36,
-      products: initialProducts,
-      filteredProducts: initialProducts,
-      cartItems,
-      cartCount: app.globalData.cartCount,
-      cartTotal: app.globalData.cartTotal
     });
-    this._cartReady = true;
+    this.fetchData();
   },
 
   onShow() {
-    // 仅在需要时更新 TabBar 选中态（tabBar 已在点击时立即更新）
     const tabBar = this.getTabBar();
     if (tabBar && tabBar.data.selected !== 0) {
       tabBar.setData({ selected: 0 });
     }
-    // 避免首次加载时重复同步（onLoad 已完成）
-    if (this._cartReady) {
-      this.syncCart();
-    } else {
-      this._cartReady = true;
-    }
+    this.syncCart();
   },
 
-  // 同步购物车（单次 setData，避免多次渲染闪烁）
+  // ── 数据加载 ─────────────────────────────────
+
+  fetchData() {
+    this.setData({ loading: true, error: null });
+
+    Promise.all([
+      api.get('/products'),
+      api.get('/categories'),
+    ]).then(([prodRes, catRes]) => {
+      if (prodRes.code === 0 && catRes.code === 0) {
+        const products = (prodRes.data || []).map(p => ({
+          ...p,
+          quantity: 0,
+        }));
+        this.setData({
+          products,
+          filteredProducts: products,
+          categories: catRes.data || [],
+          loading: false,
+        });
+        this.syncCart();
+      } else {
+        this.setData({ error: '数据加载失败', loading: false });
+      }
+    }).catch(() => {
+      this.setData({ error: '网络异常，请下拉重试', loading: false });
+    });
+  },
+
+  // ── 下拉刷新 ─────────────────────────────────
+
+  onPullDownRefresh() {
+    this.fetchData();
+    wx.stopPullDownRefresh();
+  },
+
+  // ── 购物车同步 ──────────────────────────────
+
   syncCart() {
     const cart = app.globalData.cart;
     const { activeCategory } = this.data;
@@ -63,7 +84,8 @@ Page({
     }));
     const filtered = activeCategory === 'all'
       ? updatedProducts
-      : updatedProducts.filter(p => p.category === activeCategory);
+      : updatedProducts.filter(p => p.category === activeCategory ||
+        (p.category_key && p.category_key === activeCategory));
     const cartItems = Object.values(cart);
     this.setData({
       products: updatedProducts,
@@ -78,7 +100,8 @@ Page({
     this.syncCart();
   },
 
-  // 分类筛选
+  // ── 分类筛选 ────────────────────────────────
+
   onCategoryChange(e) {
     const { key } = e.currentTarget.dataset;
     this.setData({ activeCategory: key });
@@ -91,30 +114,29 @@ Page({
     if (activeCategory === 'all') {
       filtered = products;
     } else {
-      filtered = products.filter(p => p.category === activeCategory);
+      filtered = products.filter(p => p.category === activeCategory ||
+        (p.category_key && p.category_key === activeCategory));
     }
     this.setData({ filteredProducts: filtered });
   },
 
-  // 加入购物车
+  // ── 购物车操作 ──────────────────────────────
+
   onAddToCart(e) {
     const { product } = e.currentTarget.dataset;
     app.addToCart(product);
   },
 
-  // 减少数量
   onDecrease(e) {
     const { id } = e.currentTarget.dataset;
     app.decreaseQuantity(id);
   },
 
-  // 清空购物车
   onClearCart() {
     app.clearCart();
     this.setData({ cartOpen: false });
   },
 
-  // 打开/关闭购物车
   onCartBarTap() {
     this.setData({ cartOpen: true });
   },
@@ -123,23 +145,35 @@ Page({
     this.setData({ cartOpen: false });
   },
 
-  // 结账
+  // ── 结账 ────────────────────────────────────
+
   onCheckout() {
-    wx.showToast({
-      title: '订单已提交!',
-      icon: 'success',
-      duration: 2000
+    const { cartCount } = this.data;
+    if (cartCount === 0) {
+      wx.showToast({ title: '购物车为空', icon: 'none' });
+      return;
+    }
+
+    wx.showLoading({ title: '提交中...' });
+    api.post('/orders', {}).then(res => {
+      wx.hideLoading();
+      if (res.code === 0) {
+        wx.showToast({ title: res.message || '订单已提交！', icon: 'success' });
+        app.clearCart();
+        this.setData({ cartOpen: false });
+      }
+    }).catch(() => {
+      wx.hideLoading();
+      wx.showToast({ title: '下单失败，请重试', icon: 'none' });
     });
-    app.clearCart();
-    this.setData({ cartOpen: false });
   },
 
-  // 通知
+  // ── 通知 ────────────────────────────────────
+
   onNotify() {
     wx.showToast({ title: '暂无新消息', icon: 'none' });
   },
 
-  // Banner点击
   onHeroTap() {
     wx.showToast({ title: '新品推荐即将上线', icon: 'none' });
   },

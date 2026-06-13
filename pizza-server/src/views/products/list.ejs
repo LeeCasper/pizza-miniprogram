@@ -1,0 +1,48 @@
+<div class="page-header with-action">
+  <h2>商品管理</h2>
+  <a href="/admin/products/create" class="btn btn-primary">➕ 新增商品</a>
+</div>
+
+<% if (products.length === 0) { %>
+  <div class="empty-state">暂无商品</div>
+<% } else { %>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>图片</th>
+          <th>名称</th>
+          <th>分类</th>
+          <th>价格</th>
+          <th>标签</th>
+          <th>状态</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% products.forEach(p => { %>
+          <tr>
+            <td><%= p.id %></td>
+            <td>
+              <% if (p.image) { %>
+                <img src="<%= p.image %>" alt="" class="thumb">
+              <% } %>
+            </td>
+            <td><strong><%= p.name %></strong></td>
+            <td><%= p.category_key %></td>
+            <td>¥<%= p.price %></td>
+            <td><span class="badge"><%= p.tag %></span></td>
+            <td><span class="status-dot <%= p.is_available ? 'on' : 'off' %>"></span> <%= p.is_available ? '在售' : '下架' %></td>
+            <td>
+              <a href="/admin/products/<%= p.id %>/edit" class="btn btn-sm">编辑</a>
+              <form method="POST" action="/admin/api/products/<%= p.id %>/delete" style="display:inline" onsubmit="return confirm('确认下架该商品？')">
+                <button class="btn btn-sm btn-outline">下架</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>

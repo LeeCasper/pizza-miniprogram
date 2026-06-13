@@ -1,0 +1,125 @@
+<%
+// Normalize product for form display
+const pp = product || {};
+%>
+<div class="page-header">
+  <h2><%= product ? '编辑积分商品' : '新增积分商品' %></h2>
+</div>
+
+<% if (error) { %>
+  <div class="alert alert-error"><%= error %></div>
+<% } %>
+
+<form method="POST" action="/admin/api/points<%= product ? '/' + product.id : '' %>" class="admin-form">
+  <div class="form-row">
+    <div class="form-group">
+      <label>商品名称 *</label>
+      <input type="text" name="name" value="<%= pp.name || '' %>" required>
+    </div>
+    <div class="form-group">
+      <label>所需积分 *</label>
+      <input type="number" name="points" value="<%= pp.points || '' %>" required>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label>类型</label>
+      <select name="redeem_type">
+        <option value="coupon" <%= (pp.redeem_type || pp.redeemType || 'coupon') === 'coupon' ? 'selected' : '' %>>生成兑换券</option>
+        <option value="physical" <%= (pp.redeem_type || pp.redeemType) === 'physical' ? 'selected' : '' %>>实物商品</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>库存 (-1=不限)</label>
+      <input type="number" name="stock" value="<%= pp.stock ?? -1 %>">
+    </div>
+    <div class="form-group">
+      <label>标签</label>
+      <input type="text" name="tag" value="<%= pp.tag || '' %>" placeholder="热门 / 超值 / 限量">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>简短描述</label>
+    <input type="text" name="desc" value="<%= pp.desc || '' %>">
+  </div>
+  <div class="form-group">
+    <label>详细描述</label>
+    <textarea name="detail_desc" rows="3"><%= pp.detail_desc || pp.detailDesc || '' %></textarea>
+  </div>
+  <div class="form-group">
+    <label>图片 URL</label>
+    <input type="text" name="image" value="<%= pp.image || '' %>">
+  </div>
+  <div class="form-group">
+    <label>亮点 (逗号分隔)</label>
+    <input type="text" name="highlights" value="<%= pp.highlights ? (Array.isArray(pp.highlights) ? pp.highlights.join(', ') : pp.highlights) : '' %>" placeholder="价值 ¥68, 经典玛格丽特披萨 ×1">
+  </div>
+
+  <fieldset class="form-fieldset">
+    <legend>兑换券模板 (redeem_type=coupon 时生效)</legend>
+    <div class="form-row">
+      <div class="form-group">
+        <label>券名称</label>
+        <input type="text" name="coupon_name" value="<%= pp.coupon_name || pp.couponName || '' %>">
+      </div>
+      <div class="form-group">
+        <label>券价值描述</label>
+        <input type="text" name="coupon_value" value="<%= pp.coupon_value || pp.couponValue || '' %>" placeholder="经典玛格丽特披萨 ×1">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>券类别</label>
+        <select name="coupon_category">
+          <option value="redeem" <%= (pp.coupon_category || pp.couponCategory) === 'redeem' ? 'selected' : '' %>>兑换券</option>
+          <option value="discount" <%= (pp.coupon_category || pp.couponCategory) === 'discount' ? 'selected' : '' %>>优惠券</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>折扣类型 (discount时)</label>
+        <select name="coupon_discount_type">
+          <option value="">无</option>
+          <option value="free_redeem" <%= (pp.coupon_discount_type || pp.couponDiscountType) === 'free_redeem' ? 'selected' : '' %>>免费兑换</option>
+          <option value="buy_one_get_one" <%= (pp.coupon_discount_type || pp.couponDiscountType) === 'buy_one_get_one' ? 'selected' : '' %>>买一送一</option>
+          <option value="half_price" <%= (pp.coupon_discount_type || pp.couponDiscountType) === 'half_price' ? 'selected' : '' %>>半价</option>
+          <option value="fixed_amount" <%= (pp.coupon_discount_type || pp.couponDiscountType) === 'fixed_amount' ? 'selected' : '' %>>固定金额</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>折扣值</label>
+        <input type="text" name="coupon_discount_value" value="<%= pp.coupon_discount_value || pp.couponDiscountValue || '' %>">
+      </div>
+      <div class="form-group">
+        <label>最低消费 (¥)</label>
+        <input type="number" step="0.01" name="coupon_min_spend" value="<%= pp.coupon_min_spend || pp.couponMinSpend || 0 %>">
+      </div>
+      <div class="form-group">
+        <label>有效期 (天)</label>
+        <input type="number" name="coupon_valid_days" value="<%= pp.coupon_valid_days || pp.couponValidDays || 30 %>">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>使用提示</label>
+      <input type="text" name="use_tip" value="<%= pp.use_tip || pp.useTip || '' %>">
+    </div>
+  </fieldset>
+
+  <% if (product) { %>
+    <div class="form-group">
+      <label>状态</label>
+      <select name="is_active">
+        <option value="1" <%= pp.is_active || pp.isActive ? 'selected' : '' %>>上架</option>
+        <option value="0" <%= !(pp.is_active || pp.isActive) ? 'selected' : '' %>>下架</option>
+      </select>
+    </div>
+  <% } %>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">保存</button>
+    <a href="/admin/points" class="btn btn-outline">取消</a>
+  </div>
+</form>

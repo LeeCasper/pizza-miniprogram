@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登录 - 管理后台</title>
+  <link rel="stylesheet" href="/admin/assets/css/admin.css">
+</head>
+<body class="login-page">
+  <div class="login-card">
+    <div class="login-header">
+      <span class="login-icon">🍕</span>
+      <h1>王姐手工披萨</h1>
+      <p>管理后台</p>
+    </div>
+    <% if (error) { %>
+      <div class="alert alert-error"><%= error %></div>
+    <% } %>
+    <form method="POST" action="/admin/api/login" class="login-form">
+      <div class="form-group">
+        <label>用户名</label>
+        <input type="text" name="username" required autofocus placeholder="admin">
+      </div>
+      <div class="form-group">
+        <label>密码</label>
+        <input type="password" name="password" required placeholder="••••••">
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">登 录</button>
+    </form>
+  </div>
+</body>
+</html>

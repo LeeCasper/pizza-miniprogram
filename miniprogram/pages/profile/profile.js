@@ -1,4 +1,5 @@
 // pages/profile/profile.js
+const { api } = require('../../utils/api');
 const app = getApp();
 
 const TIERS = [
@@ -143,9 +144,9 @@ Page({
 
   loadUserData() {
     const ui = app.globalData.userInfo;
-    const { tierIndex, pointsToNext, tierProgress, isMax } = computeTier(ui.points);
+    const { tierIndex, pointsToNext, tierProgress, isMax } = computeTier(ui.points || 0);
 
-    // Precompute growth text for each tier card (WXML doesn't support string concat)
+    // Precompute growth text for each tier card
     const tierGrowthTexts = TIERS.map((t, i) => {
       if (i === tierIndex) {
         if (isMax) return '已达顶级';
@@ -153,7 +154,7 @@ Page({
       } else if (i < tierIndex) {
         return '已达成';
       } else {
-        const needed = TIER_THRESHOLDS[i] - ui.points;
+        const needed = TIER_THRESHOLDS[i] - (ui.points || 0);
         return '还需' + needed + '升级';
       }
     });
@@ -162,7 +163,7 @@ Page({
       userInfo: {
         ...ui,
         memberLevel: TIERS[tierIndex].name,
-        balanceText: '¥' + ui.balance.toFixed(2),
+        balanceText: '¥' + ((ui.balance || 0)).toFixed(2),
         cardCount: ui.cardCount || 0,
         bio: ui.bio || '享受美味每一天'
       },
@@ -175,6 +176,15 @@ Page({
       pointsToNext,
       tierProgress
     });
+
+    // 后台刷新用户数据
+    api.get('/user/profile').then(res => {
+      if (res.code === 0) {
+        app.globalData.userInfo = res.data;
+        wx.setStorageSync('userInfo', res.data);
+        this.loadUserData();
+      }
+    }).catch(() => {});
   },
 
   onMenu() {
@@ -197,9 +207,39 @@ Page({
         if (that.data.editProfileOpen) {
           that.setData({ 'editForm.avatar': avatarPath });
         } else {
-          app.globalData.userInfo.avatar = avatarPath;
-          that.loadUserData();
-          wx.showToast({ title: '头像已更新', icon: 'success' });
+          // Upload to server
+          wx.showLoading({ title: '上传中...' });
+          wx.uploadFile({
+            url: 'http://localhost:3000/api/v1/upload/avatar',
+            filePath: avatarPath,
+            name: 'file',
+            header: {
+              'Authorization': 'Bearer ' + (wx.getStorageSync('token') || ''),
+            },
+            success(result) {
+              wx.hideLoading();
+              if (result.statusCode === 200) {
+                const data = JSON.parse(result.data);
+                if (data.code === 0) {
+                  app.globalData.userInfo.avatar = data.data.url;
+                  that.loadUserData();
+                  wx.showToast({ title: '头像已更新', icon: 'success' });
+                }
+              } else {
+                // Fallback: keep local path
+                app.globalData.userInfo.avatar = avatarPath;
+                that.loadUserData();
+                wx.showToast({ title: '头像已更新', icon: 'success' });
+              }
+            },
+            fail() {
+              wx.hideLoading();
+              // Fallback: local only
+              app.globalData.userInfo.avatar = avatarPath;
+              that.loadUserData();
+              wx.showToast({ title: '头像已更新（本地）', icon: 'success' });
+            },
+          });
         }
       }
     });
@@ -244,7 +284,16 @@ Page({
     }
     this.setData({ editProfileOpen: false });
     this.loadUserData();
-    wx.showToast({ title: '保存成功', icon: 'success' });
+
+    // Sync to server
+    api.put('/user/profile', {
+      name: ui.name,
+      bio: ui.bio,
+    }).then(() => {
+      wx.showToast({ title: '保存成功', icon: 'success' });
+    }).catch(() => {
+      wx.showToast({ title: '保存成功（本地）', icon: 'success' });
+    });
   },
 
   // ========== 会员等级滑动 ==========

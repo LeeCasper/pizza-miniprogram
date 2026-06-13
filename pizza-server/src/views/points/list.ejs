@@ -1,0 +1,43 @@
+<div class="page-header with-action">
+  <h2>积分商城</h2>
+  <a href="/admin/points/create" class="btn btn-primary">➕ 新增积分商品</a>
+</div>
+
+<% if (products.length === 0) { %>
+  <div class="empty-state">暂无积分商品</div>
+<% } else { %>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>图片</th>
+          <th>名称</th>
+          <th>积分</th>
+          <th>类型</th>
+          <th>库存</th>
+          <th>状态</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% products.forEach(p => { %>
+          <tr>
+            <td><%= p.id %></td>
+            <td>
+              <% if (p.image) { %>
+                <img src="<%= p.image %>" alt="" class="thumb">
+              <% } %>
+            </td>
+            <td><strong><%= p.name %></strong></td>
+            <td>⭐ <%= p.points %></td>
+            <td><%= p.redeemType === 'coupon' ? '兑换券' : '实物' %></td>
+            <td><%= p.stock === -1 ? '不限' : p.stock %></td>
+            <td><span class="status-dot <%= p.isActive ? 'on' : 'off' %>"></span> <%= p.isActive ? '上架' : '下架' %></td>
+            <td><a href="/admin/points/<%= p.id %>/edit" class="btn btn-sm">编辑</a></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>

@@ -4,7 +4,7 @@ const app = getApp();
 Page({
   data: {
     statusBarHeight: 44,
-    topBarTotalHeight: 80
+    topBarTotalHeight: 80,
   },
 
   onLoad() {
@@ -26,5 +26,4 @@ Page({
   onEarnPoints() {
     wx.showToast({ title: '下单即可赚取积分', icon: 'none' });
   },
-
 });

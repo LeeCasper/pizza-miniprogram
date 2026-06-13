@@ -1,0 +1,36 @@
+<div class="page-header">
+  <h2>优惠券管理</h2>
+</div>
+
+<% if (coupons.length === 0) { %>
+  <div class="empty-state">暂无优惠券</div>
+<% } else { %>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>用户</th>
+          <th>名称</th>
+          <th>类型</th>
+          <th>券码</th>
+          <th>状态</th>
+          <th>有效期</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% coupons.forEach(c => { %>
+          <tr>
+            <td><%= c.id %></td>
+            <td><%= c.user_name %></td>
+            <td><%= c.name %></td>
+            <td><%= c.category === 'redeem' ? '🎫 兑换券' : '🎟️ 优惠券' %></td>
+            <td><code><%= c.code %></code></td>
+            <td><span class="badge badge-<%= c.status %>"><%= {available:'可用',used:'已用',expired:'过期'}[c.status] %></span></td>
+            <td><%= c.valid_from %> ~ <%= c.valid_to %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>

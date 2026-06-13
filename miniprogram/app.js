@@ -1,7 +1,42 @@
+const { doLogin, api } = require('./utils/api');
+
 App({
   onLaunch() {
     const systemInfo = wx.getSystemInfoSync();
     this.globalData.statusBarHeight = systemInfo.statusBarHeight;
+
+    // 尝试自动登录
+    const token = wx.getStorageSync('token');
+    const cachedUser = wx.getStorageSync('userInfo');
+    if (cachedUser) {
+      this.globalData.userInfo = cachedUser;
+    }
+
+    if (token) {
+      // 有 token，验证并刷新用户信息
+      api.get('/user/profile').then(res => {
+        if (res.code === 0) {
+          this.globalData.userInfo = res.data;
+          wx.setStorageSync('userInfo', res.data);
+        }
+      }).catch(() => {
+        // Token 无效，重新登录
+        this.doAppLogin();
+      });
+    } else {
+      // 首次启动，执行登录
+      this.doAppLogin();
+    }
+  },
+
+  doAppLogin() {
+    doLogin().then(user => {
+      this.globalData.userInfo = user;
+      wx.setStorageSync('userInfo', user);
+    }).catch(() => {
+      // 登录失败静默处理，使用离线模式
+      console.warn('[App] 登录失败，使用离线模式');
+    });
   },
 
   globalData: {
@@ -10,27 +45,27 @@ App({
     cartCount: 0,
     cartTotal: 0,
     userInfo: {
-      name: '乔丹·泰勒',
+      name: '披萨爱好者',
       avatar: '',
-      memberLevel: '黄金会员',
-      memberId: '**** **** 8294',
-      points: 2450,
-      coupons: 4,
+      memberLevel: 'normal',
+      memberId: '',
+      points: 0,
+      coupons: 0,
       cardCount: 0,
-      balance: 24,
+      balance: 0,
       bio: '享受美味每一天'
     },
     notificationEnabled: true,
-    settingsPhone: '13888888888'
+    settingsPhone: ''
   },
 
-  // 购物车管理
+  // ── 购物车管理（乐观更新：本地即时响应 + 后台同步）───
+
   addToCart(product, quantity, restrictions) {
     const cart = this.globalData.cart;
     const qty = quantity || 1;
     if (cart[product.id]) {
       cart[product.id].quantity += qty;
-      // 合并忌口信息
       if (restrictions && restrictions.length > 0) {
         const existing = cart[product.id].restrictions || [];
         const merged = [...new Set([...existing, ...restrictions])];
@@ -43,6 +78,14 @@ App({
       }
     }
     this.updateCartData();
+
+    // 后台同步到服务器
+    const item = cart[product.id];
+    api.post('/cart/items', {
+      productId: product.id,
+      quantity: item.quantity,
+      restrictions: item.restrictions || [],
+    }).catch(() => {});
   },
 
   decreaseQuantity(productId) {
@@ -50,8 +93,14 @@ App({
     if (!cart[productId]) return;
     if (cart[productId].quantity > 1) {
       cart[productId].quantity--;
+      // 同步
+      api.put('/cart/items/' + productId, {
+        quantity: cart[productId].quantity,
+        restrictions: cart[productId].restrictions || [],
+      }).catch(() => {});
     } else {
       delete cart[productId];
+      api.del('/cart/items/' + productId).catch(() => {});
     }
     this.updateCartData();
   },
@@ -59,11 +108,13 @@ App({
   removeFromCart(productId) {
     delete this.globalData.cart[productId];
     this.updateCartData();
+    api.del('/cart/items/' + productId).catch(() => {});
   },
 
   clearCart() {
     this.globalData.cart = {};
     this.updateCartData();
+    api.del('/cart').catch(() => {});
   },
 
   updateCartData() {

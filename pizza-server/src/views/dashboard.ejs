@@ -1,0 +1,43 @@
+<div class="page-header">
+  <h2>仪表盘</h2>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon">📋</div>
+    <div class="stat-value"><%= stats.todayOrders %></div>
+    <div class="stat-label">今日订单</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">👥</div>
+    <div class="stat-value"><%= stats.totalUsers %></div>
+    <div class="stat-label">用户总数</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">🎟️</div>
+    <div class="stat-value"><%= stats.activeCoupons %></div>
+    <div class="stat-label">有效优惠券</div>
+  </div>
+</div>
+
+<div class="quick-links">
+  <h3>快捷操作</h3>
+  <div class="quick-links-grid">
+    <a href="/admin/orders" class="quick-link-card">
+      <span class="ql-icon">📋</span>
+      <span>查看订单</span>
+    </a>
+    <a href="/admin/products/create" class="quick-link-card">
+      <span class="ql-icon">➕</span>
+      <span>新增商品</span>
+    </a>
+    <a href="/admin/points/create" class="quick-link-card">
+      <span class="ql-icon">⭐</span>
+      <span>新增积分商品</span>
+    </a>
+    <a href="/admin/users" class="quick-link-card">
+      <span class="ql-icon">👥</span>
+      <span>用户管理</span>
+    </a>
+  </div>
+</div>
