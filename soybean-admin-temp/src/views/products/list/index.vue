@@ -71,8 +71,14 @@ async function loadProducts() {
 }
 
 async function handleToggle(id: number, val: boolean) {
+  // Optimistic update: flip local state immediately
+  const product = products.value.find(p => p.id === id);
+  if (product) product.is_available = val ? 1 : 0;
+
   const { error } = await fetchToggleProduct(id);
   if (error) {
+    // Rollback on failure
+    if (product) product.is_available = val ? 0 : 1;
     window.$message?.error('切换状态失败');
     return;
   }

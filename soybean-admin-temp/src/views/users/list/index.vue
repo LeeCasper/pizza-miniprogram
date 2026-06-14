@@ -86,14 +86,25 @@ function handleEdit(row: any) {
 }
 
 async function handleSave() {
+  if (!editForm.value.id) {
+    window.$message?.warning('请先选择用户');
+    return;
+  }
   saving.value = true;
-  const { id, name, ...rest } = editForm.value;
-  const { error } = await fetchUpdateUser(id, { name, ...rest } as UserEditData);
-  saving.value = false;
-  if (!error) {
+  try {
+    const { id, name, ...rest } = editForm.value;
+    const { error } = await fetchUpdateUser(id, { name, ...rest } as UserEditData);
+    if (error) {
+      window.$message?.error('更新失败，请检查网络连接');
+      return;
+    }
     window.$message?.success('用户信息已更新');
     drawerOpen.value = false;
     loadUsers();
+  } catch (e: any) {
+    window.$message?.error(e?.message || '更新失败');
+  } finally {
+    saving.value = false;
   }
 }
 
