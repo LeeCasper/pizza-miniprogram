@@ -107,7 +107,7 @@ Page({
   fetchProducts() {
     Promise.all([
       api.get('/products'),
-      api.get('/categories'),
+      api.get('/products/categories'),
     ]).then(([prodRes, catRes]) => {
       if (prodRes.code === 0) {
         const cart = app.globalData.cart;
