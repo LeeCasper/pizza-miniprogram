@@ -4,6 +4,7 @@ const session = require('express-session');
 const MySQLStoreFactory = require('express-mysql-session');
 const path = require('path');
 const cron = require('node-cron');
+const ejsLayouts = require('express-ejs-layouts');
 
 const config = require('./config');
 const { errorHandler } = require('./middleware/errorHandler');
@@ -32,6 +33,12 @@ app.use(express.urlencoded({ extended: true }));
 // Static files (uploads & admin assets)
 app.use('/uploads', express.static(config.upload.dir));
 app.use('/admin/assets', express.static(path.join(__dirname, '..', 'public')));
+
+// ── View engine (EJS for admin panel) ──────────────────
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+app.set('layout', 'layouts/admin');
+app.use(ejsLayouts);
 
 // ── Session (admin panel) ──────────────────────────────
 const MySQLStore = MySQLStoreFactory(session);
