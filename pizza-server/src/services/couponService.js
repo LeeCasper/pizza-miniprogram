@@ -88,6 +88,29 @@ const couponService = {
     return this.findById(result.insertId, userId);
   },
 
+  async adminList({ status, category, page = 1, limit = 20 } = {}) {
+    let sql = `SELECT c.*, u.name AS user_name FROM coupons c
+               JOIN users u ON c.user_id = u.id`;
+    const conditions = [];
+    const params = [];
+    if (status && status !== 'all') {
+      conditions.push('c.status = ?');
+      params.push(status);
+    }
+    if (category && category !== 'all') {
+      conditions.push('c.category = ?');
+      params.push(category);
+    }
+    if (conditions.length > 0) {
+      sql += ' WHERE ' + conditions.join(' AND ');
+    }
+    sql += ' ORDER BY c.created_at DESC LIMIT ? OFFSET ?';
+    params.push(limit, (page - 1) * limit);
+
+    const [rows] = await pool.query(sql, params);
+    return rows.map(formatCoupon);
+  },
+
   async expireOverdue() {
     const [result] = await pool.query(
       "UPDATE coupons SET status = 'expired' WHERE status = 'available' AND valid_to < CURDATE()"

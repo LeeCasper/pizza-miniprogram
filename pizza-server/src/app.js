@@ -22,11 +22,13 @@ const pointsRoutes = require('./routes/points');
 const storeRoutes = require('./routes/stores');
 const uploadRoutes = require('./routes/upload');
 const adminRoutes = require('./routes/admin/index');
+const adminApiRoutes = require('./routes/adminApi');
 
 const app = express();
 
 // ── Global middleware ──────────────────────────────────
 app.use(cors());
+app.set('trust proxy', 1);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -84,6 +86,9 @@ app.use('/api/v1/coupons', couponRoutes);
 app.use('/api/v1/points', pointsRoutes);
 app.use('/api/v1/stores', storeRoutes);
 app.use('/api/v1/upload', uploadRoutes);
+
+// ── Admin API routes (JSON, JWT) ─────────────────────
+app.use('/api/v1/admin', adminApiRoutes);
 
 // ── Admin routes (EJS) ─────────────────────────────────
 app.use('/admin', adminRoutes);

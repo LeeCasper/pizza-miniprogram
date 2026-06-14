@@ -66,6 +66,36 @@ const userService = {
     return this.findById(id);
   },
 
+  async adminList({ search, page = 1, limit = 20 } = {}) {
+    let sql = `SELECT u.*, COUNT(o.id) AS order_count
+               FROM users u LEFT JOIN orders o ON u.id = o.user_id`;
+    const params = [];
+    if (search) {
+      sql += ' WHERE u.name LIKE ? OR u.phone LIKE ?';
+      params.push(`%${search}%`, `%${search}%`);
+    }
+    sql += ' GROUP BY u.id ORDER BY u.created_at DESC LIMIT ? OFFSET ?';
+    params.push(limit, (page - 1) * limit);
+
+    const [rows] = await pool.query(sql, params);
+    return rows.map(r => ({
+      id: r.id,
+      openid: r.openid,
+      name: r.name,
+      avatar: r.avatar,
+      bio: r.bio,
+      phone: r.phone,
+      points: r.points,
+      balance: parseFloat(r.balance || 0),
+      memberLevel: r.member_level,
+      notificationEnabled: !!r.notification_enabled,
+      role: r.role,
+      orderCount: r.order_count,
+      createdAt: r.created_at,
+      updatedAt: r.updated_at,
+    }));
+  },
+
   async getSettings(id) {
     const user = await this.findById(id);
     if (!user) return null;
