@@ -3,8 +3,8 @@
  * Encapsulates wx.request with JWT auth, auto-retry on 401, and error handling.
  */
 
-// Use localhost for dev; change to production domain in deployment
-const BASE_URL = 'http://localhost:3000/api/v1';
+// Production domain; change to localhost for local dev
+const BASE_URL = 'https://www.artaides.com/api/v1';
 
 let pendingLoginPromise = null;
 

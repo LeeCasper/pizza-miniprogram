@@ -303,7 +303,7 @@ Page({
         if (that.data.editProfileOpen) { that.setData({ 'editForm.avatar': avatarPath }); return; }
         wx.showLoading({ title: '上传中...' });
         wx.uploadFile({
-          url: 'http://localhost:3000/api/v1/upload/avatar', filePath: avatarPath, name: 'file',
+          url: 'https://www.artaides.com/api/v1/upload/avatar', filePath: avatarPath, name: 'file',
           header: { 'Authorization': 'Bearer ' + (wx.getStorageSync('token') || '') },
           success(result) {
             wx.hideLoading();

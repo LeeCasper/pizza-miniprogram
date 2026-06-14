@@ -210,7 +210,7 @@ Page({
           // Upload to server
           wx.showLoading({ title: '上传中...' });
           wx.uploadFile({
-            url: 'http://localhost:3000/api/v1/upload/avatar',
+            url: 'https://www.artaides.com/api/v1/upload/avatar',
             filePath: avatarPath,
             name: 'file',
             header: {
