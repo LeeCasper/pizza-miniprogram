@@ -4,7 +4,8 @@
   <view class="profile-header">
     <view class="profile-left">
       <view class="avatar-wrap" bindtap="onChooseAvatar">
-        <image class="avatar" src="{{userInfo.avatar || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAAEZEiHwnOXJszv411Aa20_gu9DfOSrrGb8dV4ZK1qqOtFmozFyNvxo0urh5eGzJCB28zeqTwZrqxfFza8imqTSJSjNMTM1H5aC-Tt3p16xSVLO1Z6KE9wCyzvfaBFF6tZKHtJ7Y2K6q-taXsXwAanHg0_ZW9HItt9ewy6YItAfk0QEDCICs2jVUZyIaZMIIsW031iwjwZkSl5Omwkq3U9_m7XtaFhHeUDV6g0nU--mPttO2VonXZOneDUjWZ9suxuQuVLHyExmJmv'}}" mode="aspectFill"></image>
+        <image class="avatar" src="{{userInfo.avatar}}" mode="aspectFill" wx:if="{{userInfo.avatar}}"></image>
+        <view class="avatar avatar-placeholder" wx:else></view>
         <view class="avatar-edit-mask">
           <text class="avatar-edit-icon">📷</text>
         </view>
@@ -172,7 +173,8 @@
       </view>
       <view class="edit-drawer-body">
         <view class="edit-avatar-section" bindtap="onChooseAvatar">
-          <image class="edit-avatar-img" src="{{editForm.avatar || userInfo.avatar || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAAEZEiHwnOXJszv411Aa20_gu9DfOSrrGb8dV4ZK1qqOtFmozFyNvxo0urh5eGzJCB28zeqTwZrqxfFza8imqTSJSjNMTM1H5aC-Tt3p16xSVLO1Z6KE9wCyzvfaBFF6tZKHtJ7Y2K6q-taXsXwAanHg0_ZW9HItt9ewy6YItAfk0QEDCICs2jVUZyIaZMIIsW031iwjwZkSl5Omwkq3U9_m7XtaFhHeUDV6g0nU--mPttO2VonXZOneDUjWZ9suxuQuVLHyExmJmv'}}" mode="aspectFill"></image>
+          <image class="edit-avatar-img" src="{{editForm.avatar || userInfo.avatar}}" mode="aspectFill" wx:if="{{editForm.avatar || userInfo.avatar}}"></image>
+          <view class="edit-avatar-img edit-avatar-placeholder" wx:else></view>
           <view class="edit-avatar-tip">
             <text class="edit-avatar-tip-text">点击更换头像</text>
           </view>

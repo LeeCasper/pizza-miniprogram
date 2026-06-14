@@ -24,7 +24,7 @@
 
     <!-- 主视觉Banner -->
     <view class="hero-banner" bindtap="onHeroTap">
-      <image class="hero-image" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWmaxqTd2O050Z_YxQSKXsT5_oVWDC06lxugCoBCFCzcZUIJBgIHrEzfVye-VzfyH7dbUZ-qVedHehug_qhNKPvDklpIekjq3ZNQ5CneDJa5ff5swVizK5TLUUrqfXGsDAuOZ0VjZP5CAxAyFcRoQbeoOVsYXcFDNuoNcl0aR72Ln48aphvlFVcJMFVoMEeLAAaKZF_AQoSS2tHk5U9-wVNEBAmlA53xjX0-GyKcZZ9Ol_EficZ5oKx7_7T_r5SsnWpdCUa3Rc78tH" mode="aspectFill"></image>
+      <image class="hero-image" src="/images/pizza.png" mode="aspectFill"></image>
       <view class="hero-overlay">
         <view class="hero-tag">
           <text>🔥 新品 (NEW)</text>

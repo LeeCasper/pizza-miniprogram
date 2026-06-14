@@ -64,7 +64,7 @@ const adminApiController = {
     try {
       const [rows] = await pool.query(
         'SELECT id, username, display_name, created_at FROM admin_users WHERE id = ?',
-        [req.user.sub]
+        [req.user.id]
       );
       if (!rows[0]) {
         return res.status(404).json({ code: 404, message: '管理员不存在' });

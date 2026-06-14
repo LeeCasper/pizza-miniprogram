@@ -2,6 +2,13 @@
 const { api } = require('../../utils/api');
 const app = getApp();
 
+// ── 分类图标本地映射（数据库存的是 emoji，WXML <image> 无法加载） ──
+const CATEGORY_ICON_MAP = {
+  pizza: '/images/pizza.png',
+  durian: '/images/durian-cake.png',
+  pineapple: '/images/pineapple-cake.png',
+};
+
 Page({
   data: {
     statusBarHeight: 44,
@@ -54,7 +61,10 @@ Page({
         this.setData({
           products,
           filteredProducts: products,
-          categories: catRes.data || [],
+          categories: (catRes.data || []).map(c => ({
+            ...c,
+            icon: CATEGORY_ICON_MAP[c.key] || c.icon,
+          })),
           loading: false,
         });
         this.syncCart();

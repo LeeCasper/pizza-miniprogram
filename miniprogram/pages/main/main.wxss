@@ -413,6 +413,7 @@
 .profile-left { display: flex; align-items: center; gap: 24rpx; }
 .avatar-wrap { width: 128rpx; height: 128rpx; border-radius: var(--radius-full); overflow: hidden; box-shadow: var(--shadow-sm); flex-shrink: 0; }
 .avatar { width: 100%; height: 100%; }
+.avatar-placeholder { border-radius: 9999rpx; background: var(--color-surface-container); }
 .profile-text { display: flex; flex-direction: column; gap: 6rpx; }
 .profile-name { font-size: 36rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); }
 .profile-bio { font-size: 24rpx; color: var(--color-on-surface-variant); }

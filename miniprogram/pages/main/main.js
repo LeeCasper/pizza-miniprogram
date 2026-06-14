@@ -2,6 +2,13 @@
 const { api } = require('../../utils/api');
 const app = getApp();
 
+// ── 分类图标本地映射（数据库存的是 emoji，WXML <image> 无法加载） ──
+const CATEGORY_ICON_MAP = {
+  pizza: '/images/pizza.png',
+  durian: '/images/durian-cake.png',
+  pineapple: '/images/pineapple-cake.png',
+};
+
 // ── 忌口选项（静态配置，来自微信小程序常量） ──────────
 const dietaryRestrictions = [
   { key: 'no_spicy', label: '不吃辣' },
@@ -118,7 +125,10 @@ Page({
         this.setData({
           products,
           filteredProducts: products,
-          categories: catRes.code === 0 ? (catRes.data || []) : [],
+          categories: (catRes.code === 0 ? (catRes.data || []) : []).map(c => ({
+            ...c,
+            icon: CATEGORY_ICON_MAP[c.key] || c.icon,
+          })),
           productsLoaded: true,
         });
       }
