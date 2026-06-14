@@ -189,5 +189,6 @@
         </view>
       </view>
     </view>
+    <view style="height: calc(120rpx + env(safe-area-inset-bottom))"></view>
   </view>
 </scroll-view>
