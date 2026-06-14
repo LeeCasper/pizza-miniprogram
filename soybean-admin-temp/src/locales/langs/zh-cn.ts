@@ -243,7 +243,9 @@ const local: App.I18n.Schema = {
     points_list: '积分商品列表',
     points_create: '新建积分商品',
     points_edit: '编辑积分商品',
-    points_form: '积分商品表单'
+    points_form: '积分商品表单',
+    files: '文件管理',
+    files_list: '文件管理'
   },
   page: {
     login: {

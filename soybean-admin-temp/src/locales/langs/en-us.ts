@@ -247,6 +247,9 @@ const local: App.I18n.Schema = {
     points_list: 'Points List',
     points_create: 'Add Points Item',
     points_edit: 'Edit Points Item',
+    points_form: 'Points Form',
+    files: 'Files',
+    files_list: 'Files',
     points_form: 'Points Form'
   },
   page: {
