@@ -100,7 +100,7 @@ Page({
     const sh = sys.statusBarHeight;
     const rpx = sys.windowWidth / 750;
     // Tab bar is 100rpx + safe-area, fixed at bottom — reserve its height from scroll area
-    const tabBarPx = 100 * rpx + (sys.safeArea ? sys.safeAreaInsets.bottom : 0);
+    const tabBarPx = 100 * rpx;
     const swiperHeight = sys.windowHeight - (sh + 36);
     const scrollViewHeight = swiperHeight - tabBarPx;
     this.setData({ statusBarHeight: sh, topBarTotalHeight: sh + 36, scrollViewHeight });
