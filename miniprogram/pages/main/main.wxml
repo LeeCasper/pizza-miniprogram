@@ -23,11 +23,11 @@
     bindchange="onSwiperChange"
     duration="300"
     easing-function="easeInOutCubic"
-    style="flex: 1; height: 0;"
+    style="height: {{scrollViewHeight}}px;"
   >
     <!-- Tab 0: 首页 -->
     <swiper-item>
-      <scroll-view scroll-y class="tab-scroll" enhanced show-scrollbar="{{true}}" style="height: 100%;">
+      <scroll-view scroll-y class="tab-scroll" enhanced show-scrollbar="{{true}}" style="height: {{scrollViewHeight}}px;">
         <include src="tpl-index.wxml"/>
         <view style="height: 120rpx"></view>
       </scroll-view>
@@ -35,7 +35,7 @@
 
     <!-- Tab 1: 订单（含 order-tabs + scroll-view，需 flex 包裹层） -->
     <swiper-item>
-      <view style="display: flex; flex-direction: column; height: 100%;">
+      <view style="display: flex; flex-direction: column; height: {{scrollViewHeight}}px;">
         <include src="tpl-orders.wxml"/>
       </view>
     </swiper-item>

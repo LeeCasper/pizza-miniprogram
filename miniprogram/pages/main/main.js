@@ -66,6 +66,7 @@ Page({
   data: {
     statusBarHeight: app.globalData.statusBarHeight,
     topBarTotalHeight: app.globalData.statusBarHeight + 36,
+    scrollViewHeight: 0,
     currentTab: 0,
     tabList: [
       { text: '点单', icon: '/images/tab-menu.png' },
@@ -95,8 +96,14 @@ Page({
   },
 
   onLoad() {
-    const sh = app.globalData.statusBarHeight;
-    this.setData({ statusBarHeight: sh, topBarTotalHeight: sh + 36 });
+    const sys = wx.getSystemInfoSync();
+    const sh = sys.statusBarHeight;
+    const rpx = sys.windowWidth / 750;
+    // Tab bar is 100rpx + safe-area, fixed at bottom — reserve its height from scroll area
+    const tabBarPx = 100 * rpx + (sys.safeArea ? sys.safeAreaInsets.bottom : 0);
+    const swiperHeight = sys.windowHeight - (sh + 36);
+    const scrollViewHeight = swiperHeight - tabBarPx;
+    this.setData({ statusBarHeight: sh, topBarTotalHeight: sh + 36, scrollViewHeight });
     this.fetchProducts();
     this.fetchOrders();
     this.loadProfileData();
