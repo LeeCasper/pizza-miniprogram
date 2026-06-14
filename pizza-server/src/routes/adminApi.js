@@ -1,7 +1,9 @@
 const { Router } = require('express');
 const ctrl = require('../controllers/adminApiController');
+const uploadCtrl = require('../controllers/uploadController');
 const { auth } = require('../middleware/auth');
 const { adminOnly } = require('../middleware/roleGuard');
+const { adminUpload } = require('../config/multer');
 
 const router = Router();
 
@@ -40,5 +42,10 @@ router.get('/points/products', ctrl.listPointsProducts);
 router.get('/points/products/:id', ctrl.getPointsProduct);
 router.post('/points/products', ctrl.createPointsProduct);
 router.put('/points/products/:id', ctrl.updatePointsProduct);
+
+// File upload & management
+router.post('/upload', adminUpload.single('file'), uploadCtrl.uploadImage);
+router.get('/files', uploadCtrl.listFiles);
+router.delete('/files/:filename', uploadCtrl.deleteFile);
 
 module.exports = router;

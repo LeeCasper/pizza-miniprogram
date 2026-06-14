@@ -78,6 +78,12 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/points/form/index.vue'),
     meta: { title: '编辑积分商品' },
   },
+  {
+    path: '/files',
+    name: 'Files',
+    component: () => import('@/views/files/index.vue'),
+    meta: { title: '文件管理' },
+  },
 ]
 
 const router = createRouter({

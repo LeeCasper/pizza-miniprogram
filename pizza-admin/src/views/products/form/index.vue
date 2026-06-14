@@ -3,7 +3,8 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { productApi, type Product } from '@/service/api/product'
 import AdminLayout from '@/components/AdminLayout.vue'
-import { NForm, NFormItem, NInput, NInputNumber, NSelect, NSpace, NButton, NCard, useMessage, NDivider, NTag, NImage } from 'naive-ui'
+import { NForm, NFormItem, NInput, NInputNumber, NSelect, NSpace, NButton, NCard, useMessage, NDivider, NTag, NCollapse, NCollapseItem } from 'naive-ui'
+import ImageUpload from '@/components/ImageUpload.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -126,9 +127,13 @@ async function handleSubmit() {
           <NInputNumber v-model:value="form.price" :min="0" :step="0.01" style="width:100%" />
         </NFormItem>
 
-        <NFormItem label="图片 URL">
-          <NInput v-model:value="form.image" placeholder="https://..." />
-          <NImage v-if="form.image" :src="form.image" width="80" height="80" style="margin-top:8px;border-radius:8px;object-fit:cover" />
+        <NFormItem label="商品图片">
+          <ImageUpload v-model="form.image" :width="160" :height="160" />
+          <NCollapse style="margin-top:8px;width:100%">
+            <NCollapseItem title="或手动输入图片 URL" name="url">
+              <NInput v-model:value="form.image" placeholder="https://..." />
+            </NCollapseItem>
+          </NCollapse>
         </NFormItem>
 
         <NFormItem label="标签">

@@ -8,7 +8,7 @@ import {
 } from 'naive-ui'
 import {
   DashboardOutlined, ShoppingOutlined, FileTextOutlined,
-  IdcardOutlined, UserOutlined, GiftOutlined,
+  IdcardOutlined, UserOutlined, GiftOutlined, FolderOpenOutlined,
   MenuOutlined, LogoutOutlined,
 } from '@vicons/antd'
 
@@ -28,6 +28,7 @@ const menuOptions = [
   { label: '优惠券', key: '/coupons', icon: renderIcon(IdcardOutlined) },
   { label: '用户管理', key: '/users', icon: renderIcon(UserOutlined) },
   { label: '积分商城', key: '/points', icon: renderIcon(GiftOutlined) },
+  { label: '文件管理', key: '/files', icon: renderIcon(FolderOpenOutlined) },
 ]
 
 function handleMenuUpdate(key: string) {

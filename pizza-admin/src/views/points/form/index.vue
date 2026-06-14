@@ -3,7 +3,8 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { pointsApi, type PointsProduct } from '@/service/api/points'
 import AdminLayout from '@/components/AdminLayout.vue'
-import { NForm, NFormItem, NInput, NInputNumber, NSelect, NSpace, NButton, NCard, NDivider, NTag, useMessage, NImage } from 'naive-ui'
+import { NForm, NFormItem, NInput, NInputNumber, NSelect, NSpace, NButton, NCard, NDivider, NTag, NCollapse, NCollapseItem, useMessage } from 'naive-ui'
+import ImageUpload from '@/components/ImageUpload.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -142,9 +143,13 @@ async function handleSubmit() {
           <NInput v-model:value="form.tag" placeholder="例：热门" />
         </NFormItem>
 
-        <NFormItem label="图片 URL">
-          <NInput v-model:value="form.image" placeholder="https://..." />
-          <NImage v-if="form.image" :src="form.image" width="80" height="80" style="margin-top:8px;border-radius:8px;object-fit:cover" />
+        <NFormItem label="商品图片">
+          <ImageUpload v-model="form.image" :width="160" :height="160" />
+          <NCollapse style="margin-top:8px;width:100%">
+            <NCollapseItem title="或手动输入图片 URL" name="url">
+              <NInput v-model:value="form.image" placeholder="https://..." />
+            </NCollapseItem>
+          </NCollapse>
         </NFormItem>
 
         <NFormItem label="简介">
