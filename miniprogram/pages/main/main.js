@@ -1,5 +1,5 @@
 // pages/main/main.js
-const { api } = require('../../utils/api');
+const { api, fixImageUrl } = require('../../utils/api');
 const app = getApp();
 
 // ── 分类图标本地映射（数据库存的是 emoji，WXML <image> 无法加载） ──
@@ -128,6 +128,7 @@ Page({
         const cart = app.globalData.cart;
         const products = (prodRes.data || []).map(p => ({
           ...p,
+          image: fixImageUrl(p.image),
           quantity: cart[p.id] ? cart[p.id].quantity : 0,
         }));
         this.setData({

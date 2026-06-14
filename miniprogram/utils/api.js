@@ -103,4 +103,15 @@ const api = {
   login()          { return doLogin(); },
 };
 
-module.exports = { api, doLogin };
+/**
+ * Fix image URL: prepend domain to relative paths so WeChat <image> loads from network.
+ * Full URLs (https://...) are returned unchanged.
+ */
+function fixImageUrl(url) {
+  if (!url) return url;
+  if (url.startsWith('https://') || url.startsWith('http://')) return url;
+  if (url.startsWith('/uploads/')) return 'https://www.artaides.com' + url;
+  return url;
+}
+
+module.exports = { api, doLogin, fixImageUrl };
