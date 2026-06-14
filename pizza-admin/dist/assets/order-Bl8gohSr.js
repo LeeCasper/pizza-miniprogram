@@ -1,0 +1,1 @@
+import{t as e}from"./index-C_OtW0i9.js";const o={list(t){return e.get("/orders",{params:t}).then(r=>r.data)},get(t){return e.get(`/orders/${t}`).then(r=>r.data)},updateStatus(t,r){return e.put(`/orders/${t}/status`,{status:r}).then(a=>a.data)}};export{o};
