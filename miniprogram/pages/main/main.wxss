@@ -417,8 +417,30 @@
 .profile-text { display: flex; flex-direction: column; gap: 6rpx; }
 .profile-name { font-size: 36rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); }
 .profile-bio { font-size: 24rpx; color: var(--color-on-surface-variant); }
-.profile-right { width: 80rpx; height: 80rpx; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-full); background: var(--color-surface-container); }
-.qr-icon { font-size: 36rpx; }
+.profile-vip-badge {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 14rpx 28rpx;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, #fceabb 0%, #f8b500 50%, #d4940a 100%);
+  box-shadow: 0 4rpx 16rpx rgba(212, 148, 10, 0.3);
+  flex-shrink: 0;
+}
+.profile-vip-badge:active {
+  transform: scale(0.94);
+  opacity: 0.9;
+}
+.vip-crown {
+  font-size: 30rpx;
+  line-height: 1;
+}
+.vip-text {
+  font-size: 24rpx;
+  font-weight: var(--font-weight-bold);
+  color: #5D3A00;
+  white-space: nowrap;
+}
 
 /* 头像编辑遮罩 */
 .avatar-wrap { position: relative; }

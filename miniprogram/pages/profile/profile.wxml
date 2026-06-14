@@ -30,8 +30,9 @@
           <text class="profile-bio">{{userInfo.bio}}</text>
         </view>
       </view>
-      <view class="profile-right" bindtap="onQrCode">
-        <text class="qr-icon">📷</text>
+      <view class="profile-vip-badge" bindtap="onActivateMember">
+        <text class="vip-crown">👑</text>
+        <text class="vip-text">开通会员</text>
       </view>
     </view>
 

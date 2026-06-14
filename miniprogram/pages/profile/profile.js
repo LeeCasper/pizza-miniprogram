@@ -195,6 +195,10 @@ Page({
     wx.showToast({ title: '扫码功能开发中', icon: 'none' });
   },
 
+  onActivateMember() {
+    wx.switchTab({ url: '/pages/member/member' });
+  },
+
   // ========== 头像 ==========
   onChooseAvatar() {
     const that = this;

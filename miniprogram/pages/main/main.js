@@ -392,5 +392,8 @@ Page({
     this.setData({ detailOpen: false, detailProduct: null });
     wx.showToast({ title: '已加入购物车', icon: 'success', duration: 1500 });
   },
+  onActivateMember() {
+    this.setData({ currentTab: 2 });
+  },
   noop() {}
 });
