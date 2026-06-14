@@ -59,7 +59,7 @@ const uploadController = {
       try {
         const entries = fs.readdirSync(dir, { withFileTypes: true });
         files = entries
-          .filter(e => e.isFile())
+          .filter(e => e.isFile() && !e.name.startsWith('.'))
           .map(e => {
             const filePath = path.join(dir, e.name);
             const stat = fs.statSync(filePath);
