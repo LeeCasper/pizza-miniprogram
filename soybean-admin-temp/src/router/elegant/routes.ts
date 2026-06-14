@@ -40,6 +40,35 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
+    name: 'banners',
+    path: '/banners',
+    component: 'layout.base',
+    meta: {
+      title: 'banners',
+      i18nKey: 'route.banners'
+    },
+    children: [
+      {
+        name: 'banners_form',
+        path: '/banners/form',
+        component: 'view.banners_form',
+        meta: {
+          title: 'banners_form',
+          i18nKey: 'route.banners_form'
+        }
+      },
+      {
+        name: 'banners_list',
+        path: '/banners/list',
+        component: 'view.banners_list',
+        meta: {
+          title: 'banners_list',
+          i18nKey: 'route.banners_list'
+        }
+      }
+    ]
+  },
+  {
     name: 'coupons',
     path: '/coupons',
     component: 'layout.base',
@@ -55,6 +84,35 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'coupons_list',
           i18nKey: 'route.coupons_list'
+        }
+      }
+    ]
+  },
+  {
+    name: 'coupontemplates',
+    path: '/coupontemplates',
+    component: 'layout.base',
+    meta: {
+      title: 'coupontemplates',
+      i18nKey: 'route.coupontemplates'
+    },
+    children: [
+      {
+        name: 'coupontemplates_form',
+        path: '/coupontemplates/form',
+        component: 'view.coupontemplates_form',
+        meta: {
+          title: 'coupontemplates_form',
+          i18nKey: 'route.coupontemplates_form'
+        }
+      },
+      {
+        name: 'coupontemplates_list',
+        path: '/coupontemplates/list',
+        component: 'view.coupontemplates_list',
+        meta: {
+          title: 'coupontemplates_list',
+          i18nKey: 'route.coupontemplates_list'
         }
       }
     ]

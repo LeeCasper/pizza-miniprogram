@@ -20,8 +20,14 @@ declare module "@elegant-router/types" {
     "403": "/403";
     "404": "/404";
     "500": "/500";
+    "banners": "/banners";
+    "banners_form": "/banners/form";
+    "banners_list": "/banners/list";
     "coupons": "/coupons";
     "coupons_list": "/coupons/list";
+    "coupontemplates": "/coupontemplates";
+    "coupontemplates_form": "/coupontemplates/form";
+    "coupontemplates_list": "/coupontemplates/list";
     "dashboard": "/dashboard";
     "files": "/files";
     "files_list": "/files/list";
@@ -73,7 +79,9 @@ declare module "@elegant-router/types" {
     | "403"
     | "404"
     | "500"
+    | "banners"
     | "coupons"
+    | "coupontemplates"
     | "dashboard"
     | "files"
     | "home"
@@ -104,6 +112,10 @@ declare module "@elegant-router/types" {
     | "500"
     | "iframe-page"
     | "login"
+    | "banners_form"
+    | "banners_list"
+    | "coupontemplates_form"
+    | "coupontemplates_list"
     | "coupons_list"
     | "dashboard"
     | "files_list"

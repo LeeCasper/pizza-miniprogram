@@ -37,3 +37,11 @@ export function fetchCreatePointsProduct(data: PointsProduct) {
 export function fetchUpdatePointsProduct(id: number, data: Partial<PointsProduct>) {
   return request<void>({ url: `/points/products/${id}`, method: 'put', data });
 }
+
+export function fetchDeletePointsProduct(id: number) {
+  return request<void>({ url: `/points/products/${id}`, method: 'delete' });
+}
+
+export function fetchTogglePointsProduct(id: number) {
+  return request<void>({ url: `/points/products/${id}/toggle`, method: 'put' });
+}

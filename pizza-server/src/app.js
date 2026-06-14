@@ -86,6 +86,7 @@ app.use('/api/v1/coupons', couponRoutes);
 app.use('/api/v1/points', pointsRoutes);
 app.use('/api/v1/stores', storeRoutes);
 app.use('/api/v1/upload', uploadRoutes);
+app.use('/api/v1/banners', require('./routes/banners'));
 
 // ── Admin API routes (JSON, JWT) ─────────────────────
 app.use('/api/v1/admin', adminApiRoutes);

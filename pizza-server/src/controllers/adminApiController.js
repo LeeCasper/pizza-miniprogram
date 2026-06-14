@@ -6,6 +6,8 @@ const orderService = require('../services/orderService');
 const couponService = require('../services/couponService');
 const userService = require('../services/userService');
 const pointsService = require('../services/pointsService');
+const bannerService = require('../services/bannerService');
+const couponTemplateService = require('../services/couponTemplateService');
 
 const adminApiController = {
   // ── Auth ────────────────────────────────────────────
@@ -198,6 +200,22 @@ const adminApiController = {
     }
   },
 
+  /**
+   * PUT /api/v1/admin/products/:id/toggle
+   */
+  async toggleProduct(req, res) {
+    try {
+      const product = await productService.toggle(req.params.id);
+      if (!product) {
+        return res.status(404).json({ code: 404, message: '商品不存在' });
+      }
+      return res.json({ code: 0, message: '商品状态已切换', data: product });
+    } catch (err) {
+      console.error('[AdminAPI] ToggleProduct error:', err);
+      return res.status(500).json({ code: 500, message: '切换商品状态失败' });
+    }
+  },
+
   // ── Orders ──────────────────────────────────────────
 
   /**
@@ -300,6 +318,35 @@ const adminApiController = {
     }
   },
 
+  /**
+   * PUT /api/v1/admin/users/:id
+   * Body: { name, phone, points, balance, memberLevel }
+   */
+  async updateUser(req, res) {
+    try {
+      const { name, phone, points, balance, memberLevel } = req.body;
+      const validLevels = ['normal', 'gold', 'platinum', 'diamond'];
+      if (memberLevel && !validLevels.includes(memberLevel)) {
+        return res.status(400).json({ code: 400, message: '无效的会员等级' });
+      }
+      const updateData = {};
+      if (name !== undefined) updateData.name = name;
+      if (phone !== undefined) updateData.phone = phone;
+      if (points !== undefined) updateData.points = points;
+      if (balance !== undefined) updateData.balance = balance;
+      if (memberLevel !== undefined) updateData.memberLevel = memberLevel;
+
+      const user = await userService.adminUpdate(req.params.id, updateData);
+      if (!user) {
+        return res.status(404).json({ code: 404, message: '用户不存在' });
+      }
+      return res.json({ code: 0, message: '用户信息已更新', data: user });
+    } catch (err) {
+      console.error('[AdminAPI] UpdateUser error:', err);
+      return res.status(500).json({ code: 500, message: err.message || '更新用户失败' });
+    }
+  },
+
   // ── Points Products CRUD ────────────────────────────
 
   /**
@@ -392,6 +439,299 @@ const adminApiController = {
     } catch (err) {
       console.error('[AdminAPI] UpdatePointsProduct error:', err);
       return res.status(500).json({ code: 500, message: err.message || '更新积分商品失败' });
+    }
+  },
+
+  /**
+   * DELETE /api/v1/admin/points/products/:id
+   */
+  async deletePointsProduct(req, res) {
+    try {
+      await pointsService.softDelete(req.params.id);
+      return res.json({ code: 0, message: '积分商品已下架' });
+    } catch (err) {
+      console.error('[AdminAPI] DeletePointsProduct error:', err);
+      return res.status(500).json({ code: 500, message: '下架积分商品失败' });
+    }
+  },
+
+  /**
+   * PUT /api/v1/admin/points/products/:id/toggle
+   */
+  async togglePointsProduct(req, res) {
+    try {
+      await pointsService.toggle(req.params.id);
+      return res.json({ code: 0, message: '积分商品状态已切换' });
+    } catch (err) {
+      console.error('[AdminAPI] TogglePointsProduct error:', err);
+      return res.status(500).json({ code: 500, message: '切换积分商品状态失败' });
+    }
+  },
+
+  // ── Banners CRUD ──────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/banners
+   */
+  async listBanners(req, res) {
+    try {
+      const banners = await bannerService.adminList();
+      return res.json({ code: 0, data: banners });
+    } catch (err) {
+      console.error('[AdminAPI] ListBanners error:', err);
+      return res.status(500).json({ code: 500, message: '获取轮播图列表失败' });
+    }
+  },
+
+  /**
+   * GET /api/v1/admin/banners/:id
+   */
+  async getBanner(req, res) {
+    try {
+      const banner = await bannerService.findById(req.params.id);
+      if (!banner) {
+        return res.status(404).json({ code: 404, message: '轮播图不存在' });
+      }
+      return res.json({ code: 0, data: banner });
+    } catch (err) {
+      console.error('[AdminAPI] GetBanner error:', err);
+      return res.status(500).json({ code: 500, message: '获取轮播图失败' });
+    }
+  },
+
+  /**
+   * POST /api/v1/admin/banners
+   */
+  async createBanner(req, res) {
+    try {
+      const { imageUrl, title, subtitle, tag, linkType, linkProductId, sortOrder } = req.body;
+      const banner = await bannerService.create({
+        image_url: imageUrl,
+        title,
+        subtitle,
+        tag,
+        link_type: linkType,
+        link_product_id: linkProductId,
+        sort_order: sortOrder,
+      });
+      return res.status(201).json({ code: 0, message: '轮播图已创建', data: banner });
+    } catch (err) {
+      console.error('[AdminAPI] CreateBanner error:', err);
+      return res.status(500).json({ code: 500, message: err.message || '创建轮播图失败' });
+    }
+  },
+
+  /**
+   * PUT /api/v1/admin/banners/:id
+   */
+  async updateBanner(req, res) {
+    try {
+      const { imageUrl, title, subtitle, tag, linkType, linkProductId, sortOrder, isActive } = req.body;
+      const updateData = {};
+      if (imageUrl !== undefined) updateData.image_url = imageUrl;
+      if (title !== undefined) updateData.title = title;
+      if (subtitle !== undefined) updateData.subtitle = subtitle;
+      if (tag !== undefined) updateData.tag = tag;
+      if (linkType !== undefined) updateData.link_type = linkType;
+      if (linkProductId !== undefined) updateData.link_product_id = linkProductId;
+      if (sortOrder !== undefined) updateData.sort_order = sortOrder;
+      if (isActive !== undefined) updateData.is_active = isActive ? 1 : 0;
+
+      const banner = await bannerService.update(req.params.id, updateData);
+      if (!banner) {
+        return res.status(404).json({ code: 404, message: '轮播图不存在' });
+      }
+      return res.json({ code: 0, message: '轮播图已更新', data: banner });
+    } catch (err) {
+      console.error('[AdminAPI] UpdateBanner error:', err);
+      return res.status(500).json({ code: 500, message: err.message || '更新轮播图失败' });
+    }
+  },
+
+  /**
+   * DELETE /api/v1/admin/banners/:id
+   */
+  async deleteBanner(req, res) {
+    try {
+      await bannerService.softDelete(req.params.id);
+      return res.json({ code: 0, message: '轮播图已下架' });
+    } catch (err) {
+      console.error('[AdminAPI] DeleteBanner error:', err);
+      return res.status(500).json({ code: 500, message: '下架轮播图失败' });
+    }
+  },
+
+  /**
+   * PUT /api/v1/admin/banners/:id/toggle
+   */
+  async toggleBanner(req, res) {
+    try {
+      const banner = await bannerService.toggle(req.params.id);
+      if (!banner) {
+        return res.status(404).json({ code: 404, message: '轮播图不存在' });
+      }
+      return res.json({ code: 0, message: '轮播图状态已切换', data: banner });
+    } catch (err) {
+      console.error('[AdminAPI] ToggleBanner error:', err);
+      return res.status(500).json({ code: 500, message: '切换轮播图状态失败' });
+    }
+  },
+
+  // ── Coupon Templates CRUD ──────────────────────────────
+
+  /**
+   * GET /api/v1/admin/coupon-templates
+   */
+  async listCouponTemplates(req, res) {
+    try {
+      const templates = await couponTemplateService.adminList();
+      return res.json({ code: 0, data: templates });
+    } catch (err) {
+      console.error('[AdminAPI] ListCouponTemplates error:', err);
+      return res.status(500).json({ code: 500, message: '获取优惠券模板列表失败' });
+    }
+  },
+
+  /**
+   * GET /api/v1/admin/coupon-templates/:id
+   */
+  async getCouponTemplate(req, res) {
+    try {
+      const template = await couponTemplateService.findById(req.params.id);
+      if (!template) {
+        return res.status(404).json({ code: 404, message: '优惠券模板不存在' });
+      }
+      return res.json({ code: 0, data: template });
+    } catch (err) {
+      console.error('[AdminAPI] GetCouponTemplate error:', err);
+      return res.status(500).json({ code: 500, message: '获取优惠券模板失败' });
+    }
+  },
+
+  /**
+   * POST /api/v1/admin/coupon-templates
+   */
+  async createCouponTemplate(req, res) {
+    try {
+      const { name, desc, category, value, discountType, discountValue,
+              minSpend, validDays, color, useTip } = req.body;
+      const template = await couponTemplateService.create({
+        name,
+        desc,
+        category,
+        value,
+        discount_type: discountType,
+        discount_value: discountValue,
+        min_spend: minSpend,
+        valid_days: validDays,
+        color,
+        use_tip: useTip,
+      });
+      return res.status(201).json({ code: 0, message: '优惠券模板已创建', data: template });
+    } catch (err) {
+      console.error('[AdminAPI] CreateCouponTemplate error:', err);
+      return res.status(500).json({ code: 500, message: err.message || '创建优惠券模板失败' });
+    }
+  },
+
+  /**
+   * PUT /api/v1/admin/coupon-templates/:id
+   */
+  async updateCouponTemplate(req, res) {
+    try {
+      const { name, desc, category, value, discountType, discountValue,
+              minSpend, validDays, color, useTip, isActive } = req.body;
+      const updateData = {};
+      if (name !== undefined) updateData.name = name;
+      if (desc !== undefined) updateData.desc = desc;
+      if (category !== undefined) updateData.category = category;
+      if (value !== undefined) updateData.value = value;
+      if (discountType !== undefined) updateData.discount_type = discountType;
+      if (discountValue !== undefined) updateData.discount_value = discountValue;
+      if (minSpend !== undefined) updateData.min_spend = minSpend;
+      if (validDays !== undefined) updateData.valid_days = validDays;
+      if (color !== undefined) updateData.color = color;
+      if (useTip !== undefined) updateData.use_tip = useTip;
+      if (isActive !== undefined) updateData.is_active = isActive ? 1 : 0;
+
+      const template = await couponTemplateService.update(req.params.id, updateData);
+      if (!template) {
+        return res.status(404).json({ code: 404, message: '优惠券模板不存在' });
+      }
+      return res.json({ code: 0, message: '优惠券模板已更新', data: template });
+    } catch (err) {
+      console.error('[AdminAPI] UpdateCouponTemplate error:', err);
+      return res.status(500).json({ code: 500, message: err.message || '更新优惠券模板失败' });
+    }
+  },
+
+  /**
+   * DELETE /api/v1/admin/coupon-templates/:id
+   */
+  async deleteCouponTemplate(req, res) {
+    try {
+      await couponTemplateService.softDelete(req.params.id);
+      return res.json({ code: 0, message: '优惠券模板已下架' });
+    } catch (err) {
+      console.error('[AdminAPI] DeleteCouponTemplate error:', err);
+      return res.status(500).json({ code: 500, message: '删除优惠券模板失败' });
+    }
+  },
+
+  /**
+   * PUT /api/v1/admin/coupon-templates/:id/toggle
+   */
+  async toggleCouponTemplate(req, res) {
+    try {
+      const template = await couponTemplateService.toggle(req.params.id);
+      if (!template) {
+        return res.status(404).json({ code: 404, message: '优惠券模板不存在' });
+      }
+      return res.json({ code: 0, message: '优惠券模板状态已切换', data: template });
+    } catch (err) {
+      console.error('[AdminAPI] ToggleCouponTemplate error:', err);
+      return res.status(500).json({ code: 500, message: '切换优惠券模板状态失败' });
+    }
+  },
+
+  /**
+   * POST /api/v1/admin/coupons/assign
+   * Body: { templateId, userIds: number[] }
+   */
+  async assignCoupon(req, res) {
+    try {
+      const { templateId, userIds } = req.body;
+      if (!templateId || !Array.isArray(userIds) || userIds.length === 0) {
+        return res.status(400).json({ code: 400, message: '请选择模板和用户' });
+      }
+
+      const template = await couponTemplateService.findById(templateId);
+      if (!template) {
+        return res.status(404).json({ code: 404, message: '优惠券模板不存在' });
+      }
+
+      const now = new Date();
+      const validFrom = now.toISOString().slice(0, 10);
+      const validTo = new Date(now.getTime() + template.validDays * 86400000).toISOString().slice(0, 10);
+      let assigned = 0;
+
+      for (const userId of userIds) {
+        const code = `CPN-${Date.now()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+        await pool.query(
+          `INSERT INTO coupons (user_id, name, \`desc\`, category, \`value\`, status, code,
+           discount_type, discount_value, min_spend, valid_from, valid_to, use_tip, color, source)
+           VALUES (?, ?, ?, ?, ?, 'available', ?, ?, ?, ?, ?, ?, ?, ?, 'admin')`,
+          [userId, template.name, template.desc, template.category, template.value,
+           code, template.discountType, template.discountValue,
+           template.minSpend, validFrom, validTo, template.useTip, template.color]
+        );
+        assigned++;
+      }
+
+      return res.json({ code: 0, message: `已成功发放 ${assigned} 张优惠券`, data: { assigned } });
+    } catch (err) {
+      console.error('[AdminAPI] AssignCoupon error:', err);
+      return res.status(500).json({ code: 500, message: err.message || '发放优惠券失败' });
     }
   },
 };

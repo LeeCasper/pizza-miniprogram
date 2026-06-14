@@ -246,7 +246,45 @@ CREATE TABLE IF NOT EXISTS admin_users (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =============================================
--- 13. dietary_restrictions
+-- 13. banners
+-- =============================================
+CREATE TABLE IF NOT EXISTS banners (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    image_url VARCHAR(500) NOT NULL,
+    title VARCHAR(100) DEFAULT '',
+    subtitle VARCHAR(200) DEFAULT '',
+    tag VARCHAR(30) DEFAULT '',
+    link_type ENUM('product','none') DEFAULT 'none',
+    link_product_id INT UNSIGNED NULL,
+    sort_order INT DEFAULT 0,
+    is_active TINYINT(1) DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_active_sort (is_active, sort_order)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =============================================
+-- 14. coupon_templates
+-- =============================================
+CREATE TABLE IF NOT EXISTS coupon_templates (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    `desc` VARCHAR(200) DEFAULT '',
+    category ENUM('redeem','discount') NOT NULL DEFAULT 'discount',
+    `value` VARCHAR(100) DEFAULT '',
+    discount_type ENUM('free_redeem','buy_one_get_one','free_delivery','half_price','fixed_amount') DEFAULT 'fixed_amount',
+    discount_value VARCHAR(100) DEFAULT '',
+    min_spend DECIMAL(10,2) DEFAULT 0.00,
+    valid_days INT DEFAULT 30,
+    color VARCHAR(7) DEFAULT '#D32F2F',
+    use_tip VARCHAR(300) DEFAULT '',
+    is_active TINYINT(1) DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =============================================
+-- 15. dietary_restrictions
 -- =============================================
 CREATE TABLE IF NOT EXISTS dietary_restrictions (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

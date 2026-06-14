@@ -104,6 +104,20 @@ const userService = {
       phone: user.phone || '',
     };
   },
+
+  async adminUpdate(id, data) {
+    const sets = [];
+    const values = [];
+    if (data.name !== undefined) { sets.push('name = ?'); values.push(data.name); }
+    if (data.phone !== undefined) { sets.push('phone = ?'); values.push(data.phone); }
+    if (data.points !== undefined) { sets.push('points = ?'); values.push(parseInt(data.points)); }
+    if (data.balance !== undefined) { sets.push('balance = ?'); values.push(parseFloat(data.balance)); }
+    if (data.memberLevel !== undefined) { sets.push('member_level = ?'); values.push(data.memberLevel); }
+    if (sets.length === 0) return this.findById(id);
+    values.push(id);
+    await pool.query(`UPDATE users SET ${sets.join(', ')} WHERE id = ?`, values);
+    return this.findById(id);
+  },
 };
 
 module.exports = userService;

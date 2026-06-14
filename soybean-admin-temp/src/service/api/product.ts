@@ -36,3 +36,7 @@ export function fetchUpdateProduct(id: number, data: Record<string, any>) {
 export function fetchDeleteProduct(id: number) {
   return request<void>({ url: `/products/${id}`, method: 'delete' });
 }
+
+export function fetchToggleProduct(id: number) {
+  return request<AdminProduct>({ url: `/products/${id}/toggle`, method: 'put' });
+}

@@ -59,6 +59,11 @@ const productService = {
   async softDelete(id) {
     await pool.query('UPDATE products SET is_available = 0 WHERE id = ?', [id]);
   },
+
+  async toggle(id) {
+    await pool.query('UPDATE products SET is_available = IF(is_available, 0, 1) WHERE id = ?', [id]);
+    return this.findById(id);
+  },
 };
 
 function formatProduct(row) {

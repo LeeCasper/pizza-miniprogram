@@ -22,6 +22,49 @@ const customRoutes: CustomRoute[] = [
     },
   },
   {
+    name: 'banners',
+    path: '/banners',
+    component: 'layout.base',
+    meta: {
+      title: '轮播图管理',
+      i18nKey: 'route.banners',
+      icon: 'mdi:image-multiple',
+      order: 4.5,
+    },
+    children: [
+      {
+        name: 'banners_list',
+        path: '/banners/list',
+        component: 'view.banners_list',
+        meta: {
+          title: '轮播图列表',
+          i18nKey: 'route.banners_list',
+        },
+      },
+      {
+        name: 'banners_create',
+        path: '/banners/create',
+        component: 'view.banners_form',
+        meta: {
+          title: '新建轮播图',
+          i18nKey: 'route.banners_create',
+          hideInMenu: true,
+        },
+      },
+      {
+        name: 'banners_edit',
+        path: '/banners/:id/edit',
+        component: 'view.banners_form',
+        props: true,
+        meta: {
+          title: '编辑轮播图',
+          i18nKey: 'route.banners_edit',
+          hideInMenu: true,
+        },
+      },
+    ],
+  },
+  {
     name: 'files',
     path: '/files',
     component: 'layout.base$view.files_list',
@@ -127,6 +170,49 @@ const customRoutes: CustomRoute[] = [
         meta: {
           title: '优惠券列表',
           i18nKey: 'route.coupons_list',
+        },
+      },
+    ],
+  },
+  {
+    name: 'couponTemplates',
+    path: '/coupon-templates',
+    component: 'layout.base',
+    meta: {
+      title: '优惠券模板',
+      i18nKey: 'route.couponTemplates',
+      icon: 'mdi:ticket-percent',
+      order: 4.2,
+    },
+    children: [
+      {
+        name: 'couponTemplates_list',
+        path: '/coupon-templates/list',
+        component: 'view.couponTemplates_list',
+        meta: {
+          title: '模板列表',
+          i18nKey: 'route.couponTemplates_list',
+        },
+      },
+      {
+        name: 'couponTemplates_create',
+        path: '/coupon-templates/create',
+        component: 'view.couponTemplates_form',
+        meta: {
+          title: '新建模板',
+          i18nKey: 'route.couponTemplates_create',
+          hideInMenu: true,
+        },
+      },
+      {
+        name: 'couponTemplates_edit',
+        path: '/coupon-templates/:id/edit',
+        component: 'view.couponTemplates_form',
+        props: true,
+        meta: {
+          title: '编辑模板',
+          i18nKey: 'route.couponTemplates_edit',
+          hideInMenu: true,
         },
       },
     ],

@@ -82,6 +82,14 @@ const pointsService = {
     values.push(id);
     await pool.query(`UPDATE points_products SET ${sets.join(', ')} WHERE id = ?`, values);
   },
+
+  async softDelete(id) {
+    await pool.query('UPDATE points_products SET is_active = 0 WHERE id = ?', [id]);
+  },
+
+  async toggle(id) {
+    await pool.query('UPDATE points_products SET is_active = IF(is_active, 0, 1) WHERE id = ?', [id]);
+  },
 };
 
 function formatProduct(row) {

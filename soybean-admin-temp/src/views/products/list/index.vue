@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { ref, onMounted, h } from 'vue';
 import { useRouter } from 'vue-router';
-import { NDataTable, NButton, NTag, NSpace, NImage, NIcon, NPopconfirm } from 'naive-ui';
+import { NDataTable, NButton, NTag, NSpace, NImage, NIcon, NSwitch, useDialog } from 'naive-ui';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@vicons/antd';
 import type { DataTableColumns } from 'naive-ui';
-import { fetchProducts, fetchDeleteProduct, type AdminProduct } from '@/service/api';
+import { fetchProducts, fetchDeleteProduct, fetchToggleProduct, type AdminProduct } from '@/service/api';
 
 defineOptions({ name: 'ProductList' });
 
 const router = useRouter();
+const dialog = useDialog();
 const products = ref<AdminProduct[]>([]);
 const loading = ref(false);
 
@@ -39,21 +40,21 @@ const columns: DataTableColumns<AdminProduct> = [
     }
   },
   {
-    title: '状态', key: 'is_available', width: 70,
+    title: '状态', key: 'is_available', width: 80,
     render(row) {
-      return h(NTag, { type: row.is_available ? 'success' : 'default', size: 'small', bordered: false }, () => row.is_available ? '上架' : '下架');
+      return h(NSwitch, {
+        value: !!row.is_available,
+        onUpdateValue: (val: boolean) => handleToggle(row.id, val),
+      });
     }
   },
   {
-    title: '操作', key: 'actions', width: 140,
+    title: '操作', key: 'actions', width: 100,
     render(row) {
       return h(NSpace, null, {
         default: () => [
           h(NButton, { size: 'small', quaternary: true, onClick: () => router.push(`/products/${row.id}/edit`) }, { icon: () => h(NIcon, null, () => h(EditOutlined)) }),
-          h(NPopconfirm, { onPositiveClick: () => handleDelete(row.id) }, {
-            trigger: () => h(NButton, { size: 'small', quaternary: true, type: 'error' }, { icon: () => h(NIcon, null, () => h(DeleteOutlined)) }),
-            default: () => '确定下架该商品？'
-          })
+          h(NButton, { size: 'small', quaternary: true, type: 'error', onClick: () => handleDelete(row.id) }, { icon: () => h(NIcon, null, () => h(DeleteOutlined)) }),
         ]
       });
     }
@@ -69,12 +70,29 @@ async function loadProducts() {
   loading.value = false;
 }
 
-async function handleDelete(id: number) {
-  const { error } = await fetchDeleteProduct(id);
-  if (!error) {
-    window.$message?.success('商品已下架');
-    loadProducts();
+async function handleToggle(id: number, val: boolean) {
+  const { error } = await fetchToggleProduct(id);
+  if (error) {
+    window.$message?.error('切换状态失败');
+    return;
   }
+  window.$message?.success(val ? '已上架' : '已下架');
+}
+
+async function handleDelete(id: number) {
+  dialog.warning({
+    title: '确认下架',
+    content: '确定下架该商品？下架后用户将不可见。',
+    positiveText: '确认下架',
+    negativeText: '取消',
+    onPositiveClick: async () => {
+      const { error } = await fetchDeleteProduct(id);
+      if (!error) {
+        window.$message?.success('商品已下架');
+        loadProducts();
+      }
+    },
+  });
 }
 
 onMounted(() => { loadProducts(); });

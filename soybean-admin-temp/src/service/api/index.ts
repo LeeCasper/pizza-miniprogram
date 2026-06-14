@@ -7,3 +7,5 @@ export * from './coupon';
 export * from './user';
 export * from './points';
 export * from './upload';
+export * from './banner';
+export * from './couponTemplate';

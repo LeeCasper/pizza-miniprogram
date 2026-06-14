@@ -1,0 +1,77 @@
+const pool = require('../config/database');
+
+const bannerService = {
+  // Public: active banners sorted by sort_order
+  async getActive() {
+    const [rows] = await pool.query(
+      'SELECT * FROM banners WHERE is_active = 1 ORDER BY sort_order ASC, id ASC'
+    );
+    return rows.map(formatBanner);
+  },
+
+  // Admin: all banners
+  async adminList() {
+    const [rows] = await pool.query('SELECT * FROM banners ORDER BY sort_order ASC, id ASC');
+    return rows.map(formatBanner);
+  },
+
+  async findById(id) {
+    const [rows] = await pool.query('SELECT * FROM banners WHERE id = ?', [id]);
+    return rows[0] ? formatBanner(rows[0]) : null;
+  },
+
+  async create(data) {
+    const { image_url, title, subtitle, tag, link_type, link_product_id, sort_order } = data;
+    const [result] = await pool.query(
+      `INSERT INTO banners (image_url, title, subtitle, tag, link_type, link_product_id, sort_order)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [image_url, title || '', subtitle || '', tag || '',
+       link_type || 'none', link_product_id || null, sort_order || 0]
+    );
+    return this.findById(result.insertId);
+  },
+
+  async update(id, data) {
+    const fields = ['image_url', 'title', 'subtitle', 'tag', 'link_type', 'link_product_id', 'sort_order', 'is_active'];
+    const sets = [];
+    const values = [];
+    for (const f of fields) {
+      if (data[f] !== undefined) {
+        sets.push(`\`${f}\` = ?`);
+        values.push(data[f]);
+      }
+    }
+    if (sets.length === 0) return this.findById(id);
+    values.push(id);
+    await pool.query(`UPDATE banners SET ${sets.join(', ')} WHERE id = ?`, values);
+    return this.findById(id);
+  },
+
+  async softDelete(id) {
+    await pool.query('UPDATE banners SET is_active = 0 WHERE id = ?', [id]);
+  },
+
+  async toggle(id) {
+    await pool.query('UPDATE banners SET is_active = IF(is_active, 0, 1) WHERE id = ?', [id]);
+    return this.findById(id);
+  },
+};
+
+function formatBanner(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    imageUrl: row.image_url,
+    title: row.title,
+    subtitle: row.subtitle,
+    tag: row.tag,
+    linkType: row.link_type,
+    linkProductId: row.link_product_id,
+    sortOrder: row.sort_order,
+    isActive: !!row.is_active,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+module.exports = bannerService;
