@@ -4,6 +4,7 @@ const app = getApp();
 
 // ── 分类图标本地映射（数据库存的是 emoji，WXML <image> 无法加载） ──
 const CATEGORY_ICON_MAP = {
+  all: '/images/all-products.png',
   pizza: '/images/pizza.png',
   durian: '/images/durian-cake.png',
   pineapple: '/images/pineapple-cake.png',
@@ -125,10 +126,13 @@ Page({
         this.setData({
           products,
           filteredProducts: products,
-          categories: (catRes.code === 0 ? (catRes.data || []) : []).map(c => ({
-            ...c,
-            icon: CATEGORY_ICON_MAP[c.key] || c.icon,
-          })),
+          categories: [
+            { key: 'all', name: '全部商品', icon: CATEGORY_ICON_MAP.all },
+            ...(catRes.code === 0 ? (catRes.data || []) : []).map(c => ({
+              ...c,
+              icon: CATEGORY_ICON_MAP[c.key] || c.icon,
+            })),
+          ],
           productsLoaded: true,
         });
       }
