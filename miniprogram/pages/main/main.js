@@ -77,6 +77,7 @@ Page({
     // 商品
     categories: [],
     products: [], filteredProducts: [], activeCategory: 'all',
+    banners: [],
     cart: {}, cartItems: [], cartCount: 0, cartTotal: 0, cartOpen: false,
     detailProduct: null, detailOpen: false, detailQuantity: 1,
     dietaryRestrictions, selectedRestrictions: {},
@@ -91,6 +92,7 @@ Page({
     arcLabels: buildArcLabels(0), trackShift: 0,
     currentTierIndex: 0, userTierIndex: 0, pointsToNext: 0, tierProgress: 0, cardCount: 0,
     editProfileOpen: false, editForm: { name: '', bio: '', avatar: '' },
+    announceOpen: false,
     // 加载态
     productsLoaded: false, ordersLoaded: false,
   },
@@ -131,9 +133,32 @@ Page({
           image: fixImageUrl(p.image),
           quantity: cart[p.id] ? cart[p.id].quantity : 0,
         }));
+        // 从产品生成轮播图数据
+        const productsWithImages = products.filter(p => p.image);
+        const banners = productsWithImages.slice(0, 3).map((p, i) => ({
+          id: i,
+          productId: p.id,
+          image: p.image,
+          tag: p.tag || '🔥 新品',
+          title: p.name,
+          subtitle: p.desc || '',
+        }));
+        // 若产品图不足，补充默认占位
+        while (banners.length < 3) {
+          banners.push({
+            id: banners.length,
+            productId: null,
+            image: '/images/pizza.png',
+            tag: '🔥 新品',
+            title: '王姐手工披萨',
+            subtitle: '新鲜食材，匠心制作',
+          });
+        }
+
         this.setData({
           products,
           filteredProducts: products,
+          banners,
           categories: [
             { key: 'all', name: '全部商品', icon: CATEGORY_ICON_MAP.all },
             ...(catRes.code === 0 ? (catRes.data || []) : []).map(c => ({
@@ -220,7 +245,26 @@ Page({
       }
     }).catch(() => { wx.hideLoading(); wx.showToast({ title: '下单失败，请重试', icon: 'none' }); });
   },
-  onHeroTap() { wx.showToast({ title: '新品推荐即将上线', icon: 'none' }); },
+  // ── Banner轮播 ──────────────────────────────
+  onBannerTap(e) {
+    const { productId } = e.currentTarget.dataset;
+    const product = this.data.products.find(p => p.id === productId);
+    if (!product) {
+      wx.showToast({ title: '商品详情加载中', icon: 'none' });
+      return;
+    }
+    const cart = app.globalData.cart;
+    const currentQty = cart[product.id] ? cart[product.id].quantity : 0;
+    this.setData({
+      detailProduct: product,
+      detailOpen: true,
+      detailQuantity: currentQty || 1,
+      selectedRestrictions: { ...this.data.selectedRestrictions, [product.id]: this.data.selectedRestrictions[product.id] || {} }
+    });
+  },
+  onBannerChange(e) {
+    // swiper change event, can track current banner index if needed
+  },
   onPickupToggle() { wx.navigateTo({ url: '/pages/store/store' }); },
 
   // ── 订单 ────────────────────────────────────
@@ -395,6 +439,21 @@ Page({
   },
   onActivateMember() {
     this.setData({ currentTab: 2 });
+  },
+  // ── 公告浮窗 ──────────────────────────────
+  onAnnounceToggle() {
+    const open = !this.data.announceOpen;
+    this.setData({ announceOpen: open });
+    if (this._announceTimer) clearTimeout(this._announceTimer);
+    if (open) {
+      this._announceTimer = setTimeout(() => {
+        this.setData({ announceOpen: false });
+      }, 8000);
+    }
+  },
+  onAnnounceClose() {
+    this.setData({ announceOpen: false });
+    if (this._announceTimer) clearTimeout(this._announceTimer);
   },
   noop() {}
 });

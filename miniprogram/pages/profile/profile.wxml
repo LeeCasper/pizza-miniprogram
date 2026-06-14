@@ -121,12 +121,22 @@
       </view>
     </view>
 
-    <!-- 公告 -->
-    <view class="announce-card" bindtap="onAnnounceTap">
-      <image class="announce-icon" src="/images/announce.png" mode="aspectFit"></image>
-      <view class="announce-badge"><text class="announce-badge-text">公告</text></view>
-      <text class="announce-text">全新手工薄脆披萨上市，限时八折体验！</text>
-      <text class="announce-arrow">›</text>
+    <!-- 公告浮窗 -->
+    <view class="announce-float {{announceOpen ? 'expanded' : ''}}" catchtap="onAnnounceToggle">
+      <view class="announce-float-tab" wx:if="{{!announceOpen}}">
+        <text class="announce-float-tab-icon">📢</text>
+        <text class="announce-float-tab-text">公告</text>
+      </view>
+      <view class="announce-float-card" wx:if="{{announceOpen}}">
+        <view class="announce-float-card-header">
+          <text class="announce-float-card-icon">📢</text>
+          <text class="announce-float-card-title">公告</text>
+          <view class="announce-float-close" catchtap="onAnnounceClose">
+            <text>✕</text>
+          </view>
+        </view>
+        <text class="announce-float-card-body">全新手工薄脆披萨上市，限时八折体验！更多新品即将推出，敬请期待～</text>
+      </view>
     </view>
 
     <!-- 金刚区 - 快捷入口 -->

@@ -22,18 +22,36 @@
       </view>
     </view>
 
-    <!-- 主视觉Banner -->
-    <view class="hero-banner" bindtap="onHeroTap">
-      <image class="hero-image" src="/images/pizza.png" mode="aspectFill"></image>
-      <view class="hero-overlay">
-        <view class="hero-tag">
-          <text>🔥 新品 (NEW)</text>
-        </view>
-        <view class="hero-text">
-          <text class="hero-title">The Calabrese Inferno</text>
-          <text class="hero-subtitle">香辣卡拉布里亚披萨</text>
-        </view>
-      </view>
+    <!-- 主视觉Banner轮播 -->
+    <view class="hero-section">
+      <swiper
+        class="hero-swiper"
+        autoplay
+        circular
+        interval="3500"
+        duration="500"
+        easing-function="easeInOutCubic"
+        indicator-dots
+        indicator-color="rgba(255,255,255,0.4)"
+        indicator-active-color="#FFFFFF"
+        bindchange="onBannerChange"
+        style="height: 320rpx;"
+      >
+        <swiper-item wx:for="{{banners}}" wx:key="id">
+          <view class="hero-slide" bindtap="onBannerTap" data-product-id="{{item.productId}}">
+            <image class="hero-image" src="{{item.image}}" mode="aspectFill"></image>
+            <view class="hero-overlay">
+              <view class="hero-tag">
+                <text>{{item.tag}}</text>
+              </view>
+              <view class="hero-text">
+                <text class="hero-title">{{item.title}}</text>
+                <text class="hero-subtitle">{{item.subtitle}}</text>
+              </view>
+            </view>
+          </view>
+        </swiper-item>
+      </swiper>
     </view>
 
     <!-- 分类筛选 -->
@@ -156,6 +174,44 @@
     <view class="cart-footer" wx:if="{{cartItems.length > 0}}">
       <view class="checkout-btn" bindtap="onCheckout">
         <text>确认下单 ¥{{cartTotal}}</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 产品详情弹窗 -->
+<view class="detail-overlay {{detailOpen ? 'show' : ''}}" catchtap="onDetailClose">
+  <view class="detail-drawer {{detailOpen ? 'show' : ''}}" catchtap="noop">
+    <view class="detail-nav">
+      <view class="detail-back-btn" catchtap="onDetailClose">
+        <text class="detail-back-icon">←</text>
+      </view>
+      <text class="detail-nav-title">产品详情</text>
+      <view class="detail-nav-spacer"></view>
+    </view>
+    <scroll-view scroll-y class="detail-body" enhanced show-scrollbar="{{false}}" wx:if="{{detailProduct}}">
+      <image class="detail-image" src="{{detailProduct.image}}" mode="widthFix"></image>
+      <view class="detail-header">
+        <view class="detail-title-row">
+          <text class="detail-name">{{detailProduct.name}}</text>
+          <text class="detail-price">¥ {{detailProduct.price}}</text>
+        </view>
+        <view class="detail-tags">
+          <text class="detail-tag" wx:if="{{detailProduct.tag}}">{{detailProduct.tag}}</text>
+          <text class="detail-size" wx:if="{{detailProduct.size}}">{{detailProduct.size}}</text>
+        </view>
+      </view>
+      <text class="detail-desc" wx:if="{{detailProduct.detailDesc}}">{{detailProduct.detailDesc}}</text>
+      <view class="detail-bottom-spacer"></view>
+    </scroll-view>
+    <view class="detail-footer">
+      <view class="detail-stepper">
+        <view class="qty-btn" catchtap="onDetailDecrease"><text class="qty-icon">−</text></view>
+        <text class="detail-qty-num">{{detailQuantity}}</text>
+        <view class="qty-btn qty-plus" catchtap="onDetailAdd"><text class="qty-icon">+</text></view>
+      </view>
+      <view class="detail-add-btn" catchtap="onDetailAddToCart">
+        <text>加入购物车 ¥{{detailProduct.price * detailQuantity}}</text>
       </view>
     </view>
   </view>

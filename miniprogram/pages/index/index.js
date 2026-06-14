@@ -26,6 +26,10 @@ Page({
     currentTab: 0,
     loading: true,
     error: null,
+    banners: [],
+    detailProduct: null,
+    detailOpen: false,
+    detailQuantity: 1,
   },
 
   onLoad() {
@@ -60,9 +64,31 @@ Page({
           image: fixImageUrl(p.image),
           quantity: 0,
         }));
+        // 从产品生成轮播图数据
+        const productsWithImages = products.filter(p => p.image);
+        const banners = productsWithImages.slice(0, 3).map((p, i) => ({
+          id: i,
+          productId: p.id,
+          image: p.image,
+          tag: p.tag || '🔥 新品',
+          title: p.name,
+          subtitle: p.desc || '',
+        }));
+        while (banners.length < 3) {
+          banners.push({
+            id: banners.length,
+            productId: null,
+            image: '/images/pizza.png',
+            tag: '🔥 新品',
+            title: '王姐手工披萨',
+            subtitle: '新鲜食材，匠心制作',
+          });
+        }
+
         this.setData({
           products,
           filteredProducts: products,
+          banners,
           categories: [
             { key: 'all', name: '全部商品', icon: CATEGORY_ICON_MAP.all },
             ...(catRes.data || []).map(c => ({
@@ -189,8 +215,28 @@ Page({
     wx.showToast({ title: '暂无新消息', icon: 'none' });
   },
 
-  onHeroTap() {
-    wx.showToast({ title: '新品推荐即将上线', icon: 'none' });
+  // ── Banner轮播 ──────────────────────────────
+  onBannerTap(e) {
+    const { productId } = e.currentTarget.dataset;
+    const product = this.data.products.find(p => p.id === productId);
+    if (!product) {
+      wx.showToast({ title: '商品详情加载中', icon: 'none' });
+      return;
+    }
+    this.setData({ detailProduct: product, detailOpen: true, detailQuantity: 1 });
+  },
+  onBannerChange(e) {},
+
+  // ── 产品详情弹窗 ────────────────────────────
+  onDetailClose() { this.setData({ detailOpen: false, detailProduct: null }); },
+  onDetailAdd() { this.setData({ detailQuantity: Math.min(this.data.detailQuantity + 1, 99) }); },
+  onDetailDecrease() { if (this.data.detailQuantity <= 1) return; this.setData({ detailQuantity: this.data.detailQuantity - 1 }); },
+  onDetailAddToCart() {
+    const { detailProduct, detailQuantity } = this.data;
+    if (!detailProduct) return;
+    app.addToCart(detailProduct, detailQuantity);
+    this.setData({ detailOpen: false, detailProduct: null });
+    wx.showToast({ title: '已加入购物车', icon: 'success', duration: 1500 });
   },
 
   noop() {}

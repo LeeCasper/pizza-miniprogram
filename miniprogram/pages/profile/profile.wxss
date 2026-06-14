@@ -433,50 +433,90 @@
   border-radius: 2rpx;
 }
 
-/* ========== 公告 ========== */
-.announce-card {
+/* ========== 公告浮窗 ========== */
+.announce-float {
+  position: fixed;
+  right: 0;
+  top: 35%;
+  z-index: 150;
+  transition: all 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.announce-float-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6rpx;
+  width: 72rpx;
+  padding: 20rpx 12rpx;
+  background: var(--color-surface);
+  border-radius: 24rpx 0 0 24rpx;
+  box-shadow: -4rpx 0 24rpx rgba(0,0,0,0.08);
+}
+.announce-float-tab:active {
+  transform: scale(0.92);
+  background: rgba(0,0,0,0.04);
+}
+.announce-float-tab-icon {
+  font-size: 32rpx;
+  line-height: 1;
+}
+.announce-float-tab-text {
+  font-size: 20rpx;
+  color: var(--color-primary);
+  font-weight: var(--font-weight-bold);
+  writing-mode: vertical-rl;
+  letter-spacing: 4rpx;
+}
+.announce-float.expanded {
+  right: 16rpx;
+  top: 28%;
+}
+.announce-float-card {
+  width: 420rpx;
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-modal);
+  overflow: hidden;
+}
+.announce-float-card-header {
   display: flex;
   align-items: center;
-  gap: 16rpx;
-  margin: 0 32rpx 24rpx;
+  gap: 12rpx;
   padding: 20rpx 24rpx;
-  border-radius: 24rpx;
-  background: var(--color-surface);
-  box-shadow: var(--shadow-card);
+  border-bottom: 1rpx solid var(--color-divider);
 }
-
-.announce-icon {
-  width: 44rpx;
-  height: 44rpx;
-  flex-shrink: 0;
+.announce-float-card-icon {
+  font-size: 28rpx;
 }
-
-.announce-badge {
-  background: rgba(211, 47, 47, 0.08);
-  padding: 4rpx 16rpx;
-  border-radius: var(--radius-full);
-  flex-shrink: 0;
-}
-
-.announce-badge-text {
-  font-size: 22rpx;
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-primary);
-}
-
-.announce-text {
+.announce-float-card-title {
   flex: 1;
+  font-size: 26rpx;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-on-surface);
+}
+.announce-float-close {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-container-low);
   font-size: 24rpx;
   color: var(--color-on-surface-variant);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.announce-arrow {
-  font-size: 32rpx;
-  color: var(--color-on-surface-variant);
   flex-shrink: 0;
+}
+.announce-float-close:active {
+  background: var(--color-surface-container-high);
+  transform: scale(0.92);
+}
+.announce-float-card-body {
+  display: block;
+  padding: 24rpx;
+  font-size: 24rpx;
+  color: var(--color-on-surface-variant);
+  line-height: 1.6;
 }
 
 /* ========== 金刚区 ========== */

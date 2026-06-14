@@ -7,16 +7,36 @@
   </view>
 </view>
 
-<!-- 主视觉Banner -->
-<view class="hero-banner" bindtap="onHeroTap">
-  <image class="hero-image" src="/images/pizza.png" mode="aspectFill"></image>
-  <view class="hero-overlay">
-    <view class="hero-tag"><text>🔥 新品 (NEW)</text></view>
-    <view class="hero-text">
-      <text class="hero-title">The Calabrese Inferno</text>
-      <text class="hero-subtitle">香辣卡拉布里亚披萨</text>
-    </view>
-  </view>
+<!-- 主视觉Banner轮播 -->
+<view class="hero-section">
+  <swiper
+    class="hero-swiper"
+    autoplay
+    circular
+    interval="3500"
+    duration="500"
+    easing-function="easeInOutCubic"
+    indicator-dots
+    indicator-color="rgba(255,255,255,0.4)"
+    indicator-active-color="#FFFFFF"
+    bindchange="onBannerChange"
+    style="height: 320rpx;"
+  >
+    <swiper-item wx:for="{{banners}}" wx:key="id">
+      <view class="hero-slide" bindtap="onBannerTap" data-product-id="{{item.productId}}">
+        <image class="hero-image" src="{{item.image}}" mode="aspectFill"></image>
+        <view class="hero-overlay">
+          <view class="hero-tag">
+            <text>{{item.tag}}</text>
+          </view>
+          <view class="hero-text">
+            <text class="hero-title">{{item.title}}</text>
+            <text class="hero-subtitle">{{item.subtitle}}</text>
+          </view>
+        </view>
+      </view>
+    </swiper-item>
+  </swiper>
 </view>
 
 <!-- 分类筛选 -->

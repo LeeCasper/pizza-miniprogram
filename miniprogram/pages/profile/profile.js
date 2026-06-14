@@ -122,7 +122,8 @@ Page({
     tierProgress: 0,
     cardCount: 0,
     editProfileOpen: false,
-    editForm: { name: '', bio: '', avatar: '' }
+    editForm: { name: '', bio: '', avatar: '' },
+    announceOpen: false,
   },
 
   onLoad() {
@@ -326,8 +327,20 @@ Page({
     wx.switchTab({ url: '/pages/index/index' });
   },
 
-  onAnnounceTap() {
-    wx.showToast({ title: '全新手工薄脆披萨上市，限时八折体验！', icon: 'none' });
+  // ── 公告浮窗 ──────────────────────────────
+  onAnnounceToggle() {
+    const open = !this.data.announceOpen;
+    this.setData({ announceOpen: open });
+    if (this._announceTimer) clearTimeout(this._announceTimer);
+    if (open) {
+      this._announceTimer = setTimeout(() => {
+        this.setData({ announceOpen: false });
+      }, 8000);
+    }
+  },
+  onAnnounceClose() {
+    this.setData({ announceOpen: false });
+    if (this._announceTimer) clearTimeout(this._announceTimer);
   },
 
   onMenuItem(e) {
