@@ -13,7 +13,7 @@
 </view>
 
 <!-- 订单列表 -->
-<scroll-view scroll-y class="orders-scroll" wx:if="{{filteredOrders.length > 0}}" style="flex: 1; height: 0;">
+<scroll-view scroll-y class="orders-scroll" enhanced show-scrollbar="{{false}}" wx:if="{{filteredOrders.length > 0}}" style="flex: 1; height: 0;">
   <view class="scroll-inner">
     <view wx:for="{{filteredOrders}}" wx:key="id" class="order-card card">
       <view class="order-header">

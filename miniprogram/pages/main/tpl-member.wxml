@@ -1,5 +1,5 @@
 <!-- 会员页内容片段 -->
-<scroll-view scroll-y class="main-scroll" style="height: 100%;">
+<scroll-view scroll-y class="main-scroll" enhanced show-scrollbar="{{false}}" style="height: 100%;">
   <view class="scroll-inner">
     <!-- 数字会员卡 -->
     <view class="member-card">
