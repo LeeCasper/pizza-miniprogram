@@ -24,5 +24,13 @@ Desktop.ini
 image.png
 stitch_data/
 
-# Logs
-*.log
+# Environment files (contain secrets)
+.env
+pizza-server/.env
+soybean-admin-temp/.env
+
+# One-off diagnostic/deploy scripts with server access
+soybean-admin-temp/fix_images.py
+soybean-admin-temp/check_mysql.py
+soybean-admin-temp/check_nginx.py
+soybean-admin-temp/check_deploy.py

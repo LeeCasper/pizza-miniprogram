@@ -4,10 +4,10 @@ import paramiko
 import os
 import sys
 
-HOST = '39.107.77.26'
-USER = 'root'
-PASS = 'licongLee2003'
-PORT = 22
+HOST = os.environ.get('PIZZA_HOST', '')
+USER = os.environ.get('PIZZA_USER', 'root')
+PASS = os.environ.get('PIZZA_PASS', '')
+PORT = int(os.environ.get('PIZZA_PORT', '22'))
 
 SERVER_BASE = '/opt/pizza-server/pizza-server'  # PM2 runs from nested dir
 ADMIN_BASE = '/opt/pizza-admin'  # Nginx alias target (no /dist subdir)

@@ -3,7 +3,12 @@ import os
 
 ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-ssh.connect('39.107.77.26', username='root', password='licongLee2003', port=22)
+ssh.connect(
+    os.environ.get('PIZZA_HOST', ''),
+    username=os.environ.get('PIZZA_USER', 'root'),
+    password=os.environ.get('PIZZA_PASS', ''),
+    port=int(os.environ.get('PIZZA_PORT', '22'))
+)
 
 sftp = ssh.open_sftp()
 REMOTE_DIR = '/opt/pizza-admin/'
