@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
+import { NMessageProvider } from 'naive-ui'
 
 const auth = useAuthStore()
 const router = useRouter()
@@ -12,5 +13,7 @@ if (!auth.token && router.currentRoute.value.path !== '/login') {
 </script>
 
 <template>
-  <router-view />
+  <NMessageProvider>
+    <router-view />
+  </NMessageProvider>
 </template>

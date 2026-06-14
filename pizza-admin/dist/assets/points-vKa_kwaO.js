@@ -1,0 +1,1 @@
+import{F as r}from"./index-BenBNlxJ.js";const n={list(){return r.get("/points/products").then(t=>t.data)},get(t){return r.get(`/points/products/${t}`).then(e=>e.data)},create(t){return r.post("/points/products",t).then(e=>e.data)},update(t,e){return r.put(`/points/products/${t}`,e).then(p=>p.data)}};export{n as p};

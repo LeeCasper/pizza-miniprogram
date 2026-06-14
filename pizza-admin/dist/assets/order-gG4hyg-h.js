@@ -1,1 +1,0 @@
-import{x as e}from"./index-CEpvOXI_.js";const o={list(t){return e.get("/orders",{params:t}).then(r=>r.data)},get(t){return e.get(`/orders/${t}`).then(r=>r.data)},updateStatus(t,r){return e.put(`/orders/${t}/status`,{status:r}).then(a=>a.data)}};export{o};
