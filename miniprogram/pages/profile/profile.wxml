@@ -38,8 +38,7 @@
         previous-margin="60rpx"
         next-margin="60rpx"
         bindchange="onTierChange"
-        current="{{activeTierIndex}}"
-        circular>
+        current="{{activeTierIndex}}">
         <swiper-item wx:for="{{tierCards}}" wx:key="level">
           <view class="tier-card tier-card-{{item.isActive ? 'active' : 'inactive'}}"
             style="background-image: linear-gradient(135deg, {{item.bgStart}}, {{item.bgEnd}})">
