@@ -44,6 +44,14 @@ router.delete('/coupon-templates/:id', ctrl.deleteCouponTemplate);
 router.put('/coupon-templates/:id/toggle', ctrl.toggleCouponTemplate);
 router.post('/coupons/assign', ctrl.assignCoupon);
 
+// Member tiers
+router.get('/member-tiers', ctrl.listMemberTiers);
+router.get('/member-tiers/:id', ctrl.getMemberTier);
+router.post('/member-tiers', ctrl.createMemberTier);
+router.put('/member-tiers/:id', ctrl.updateMemberTier);
+router.delete('/member-tiers/:id', ctrl.deleteMemberTier);
+router.put('/member-tiers/:id/toggle', ctrl.toggleMemberTier);
+
 // Users
 router.get('/users', ctrl.listUsers);
 router.put('/users/:id', ctrl.updateUser);

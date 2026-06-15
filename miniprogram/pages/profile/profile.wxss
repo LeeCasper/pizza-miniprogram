@@ -180,8 +180,10 @@
 .tier-card-badge-text { font-size: 26rpx; font-weight: 800; letter-spacing: 4rpx; z-index: 1; transform: rotate(-18deg); }
 
 /* ── 底部 ── */
-.tier-card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
-.tier-card-progress-text { font-size: 22rpx; opacity: 0.8; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 12rpx; }
+.tier-card-footer { display: flex; align-items: flex-end; justify-content: space-between; margin-top: auto; gap: 8rpx; }
+.tier-card-progress-text { font-size: 22rpx; opacity: 0.8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 12rpx; display: block; }
+.tier-benefits { display: flex; gap: 8rpx; flex-wrap: wrap; margin-top: 6rpx; }
+.tier-benefit-tag { font-size: 20rpx; padding: 2rpx 10rpx; border-radius: 6rpx; background: rgba(255,255,255,0.08); opacity: 0.85; }
 .tier-card-action { display: flex; align-items: center; gap: 4rpx; flex-shrink: 0; }
 .tier-card-action-text { font-size: 22rpx; font-weight: 600; }
 .tier-card-action-arrow { font-size: 24rpx; }

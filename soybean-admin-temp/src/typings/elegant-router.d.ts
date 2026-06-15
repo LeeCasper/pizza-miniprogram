@@ -34,6 +34,9 @@ declare module "@elegant-router/types" {
     "home": "/home";
     "iframe-page": "/iframe-page/:url";
     "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?";
+    "membertiers": "/membertiers";
+    "membertiers_form": "/membertiers/form";
+    "membertiers_list": "/membertiers/list";
     "orders": "/orders";
     "orders_detail": "/orders/detail";
     "orders_list": "/orders/list";
@@ -87,6 +90,7 @@ declare module "@elegant-router/types" {
     | "home"
     | "iframe-page"
     | "login"
+    | "membertiers"
     | "orders"
     | "points"
     | "products"
@@ -120,6 +124,8 @@ declare module "@elegant-router/types" {
     | "dashboard"
     | "files_list"
     | "home"
+    | "membertiers_form"
+    | "membertiers_list"
     | "orders_detail"
     | "orders_list"
     | "points_form"

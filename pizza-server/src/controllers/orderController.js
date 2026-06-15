@@ -150,14 +150,25 @@ const orderController = {
       // 7. Clear cart
       await conn.query('DELETE FROM cart_items WHERE user_id = ?', [userId]);
 
-      // 8. Add points
-      const earnedPoints = Math.floor(paidAmount);
-      const [userRows] = await conn.query('SELECT points FROM users WHERE id = ?', [userId]);
+      // 8. Add points based on spending and tier multiplier
+      const [userRows] = await conn.query(
+        'SELECT total_spent, points FROM users WHERE id = ?', [userId]
+      );
+      const oldTotalSpent = parseFloat(userRows[0].total_spent || 0);
       const oldPoints = userRows[0].points;
+
+      const currentTier = await computeTier(oldTotalSpent);
+      const multiplier = parseFloat(currentTier.pointsRewardRate || 1);
+      const earnedPoints = Math.floor(paidAmount * multiplier);
+
+      const newTotalSpent = oldTotalSpent + paidAmount;
       const newPoints = oldPoints + earnedPoints;
-      const newTier = getTierLevel(newPoints);
-      await conn.query('UPDATE users SET points = ?, member_level = ? WHERE id = ?',
-        [newPoints, newTier, userId]);
+      const newTier = await getTierLevel(newTotalSpent);
+
+      await conn.query(
+        'UPDATE users SET total_spent = ?, points = ?, member_level = ? WHERE id = ?',
+        [newTotalSpent.toFixed(2), newPoints, newTier, userId]
+      );
       await conn.query(
         'INSERT INTO points_history (user_id, points_change, balance_after, reason, reference_id) VALUES (?, ?, ?, ?, ?)',
         [userId, earnedPoints, newPoints, '订单消费', orderId]
@@ -167,7 +178,7 @@ const orderController = {
 
       // Build response
       const order = await orderService.findById(orderId);
-      const tier = computeTier(newPoints);
+      const tier = await computeTier(newTotalSpent);
 
       res.json({
         code: 0,

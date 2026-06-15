@@ -44,17 +44,20 @@ const pointsController = {
         return res.status(400).json({ code: 400, message: '商品已售罄' });
       }
 
-      // Check user points
-      const [userRows] = await conn.query('SELECT points FROM users WHERE id = ?', [userId]);
+      // Check user points and get spending for tier
+      const [userRows] = await conn.query(
+        'SELECT points, total_spent FROM users WHERE id = ?', [userId]
+      );
       const userPoints = userRows[0].points;
       if (userPoints < pp.points) {
         await conn.rollback();
         return res.status(400).json({ code: 400, message: '积分不足' });
       }
 
-      // Deduct points
+      // Deduct points (tier unchanged — based on total_spent, not points)
       const newPoints = userPoints - pp.points;
-      const newTier = getTierLevel(newPoints);
+      const totalSpent = parseFloat(userRows[0].total_spent || 0);
+      const newTier = await getTierLevel(totalSpent);
       await conn.query('UPDATE users SET points = ?, member_level = ? WHERE id = ?',
         [newPoints, newTier, userId]);
 
@@ -106,7 +109,7 @@ const pointsController = {
 
       await conn.commit();
 
-      const tier = computeTier(newPoints);
+      const tier = await computeTier(totalSpent);
 
       res.json({
         code: 0,

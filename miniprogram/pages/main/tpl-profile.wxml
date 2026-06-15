@@ -25,22 +25,29 @@
     <swiper class="member-swiper"
       bindchange="onTierChange"
       current="{{activeTierIndex}}">
-      <swiper-item wx:for="{{tierCards}}" wx:key="level">
+      <swiper-item wx:for="{{tierCards}}" wx:key="levelKey">
         <view class="tier-card-wrap">
-          <view class="tier-card tier-bg-{{item.level}} {{item.isActive ? 'tier-card-active' : 'tier-card-inactive'}}">
+          <view class="tier-card tier-bg-{{item.levelIndex}} {{item.isActive ? 'tier-card-active' : 'tier-card-inactive'}}">
             <view class="tier-card-content">
               <view class="tier-card-header">
                 <view>
-                  <text class="tier-card-title" style="color: {{item.accentColor}}">收藏大亨</text>
+                  <text class="tier-card-title" style="color: {{item.accentColor}}">{{item.name}}</text>
                   <view class="tier-card-accent" style="background: {{item.accentColor}}"></view>
                 </view>
               </view>
               <view class="tier-card-badge" style="border-color: {{item.accentColor}}">
-                <text class="tier-card-badge-text" style="color: {{item.accentColor}}">VIP.{{item.level}}</text>
+                <text class="tier-card-badge-text" style="color: {{item.accentColor}}">VIP.{{item.levelIndex}}</text>
               </view>
               <view class="tier-card-footer">
-                <text class="tier-card-progress-text" style="color: {{item.accentColor}}">{{item.progressText}}</text>
-                <view class="tier-card-action" catchtap="onUpgradeTier" data-level="{{item.level}}">
+                <view>
+                  <text class="tier-card-progress-text" style="color: {{item.accentColor}}">{{item.progressText}}</text>
+                  <view class="tier-benefits" wx:if="{{item.isActive}}">
+                    <text class="tier-benefit-tag" wx:if="{{item.discountRate < 1}}" style="border: 1rpx solid {{item.accentColor}}; color: {{item.accentColor}}">{{((1-item.discountRate)*100).toFixed(0)}}折</text>
+                    <text class="tier-benefit-tag" wx:if="{{item.pointsRewardRate > 1}}" style="border: 1rpx solid {{item.accentColor}}; color: {{item.accentColor}}">积分x{{item.pointsRewardRate}}</text>
+                    <text class="tier-benefit-tag" wx:if="{{item.birthdayGift}}" style="border: 1rpx solid {{item.accentColor}}; color: {{item.accentColor}}">🎂</text>
+                  </view>
+                </view>
+                <view class="tier-card-action" catchtap="onUpgradeTier" data-level-key="{{item.levelKey}}">
                   <text class="tier-card-action-text" style="color: {{item.accentColor}}">{{item.actionText}}</text>
                   <text class="tier-card-action-arrow">→</text>
                 </view>
@@ -52,7 +59,7 @@
     </swiper>
     <view class="tier-dots">
       <view class="tier-dot {{activeTierIndex === ti ? 'active' : ''}}"
-        wx:for="{{tierCards}}" wx:key="level" wx:for-index="ti"
+        wx:for="{{tierCards}}" wx:key="levelKey" wx:for-index="ti"
         style="{{activeTierIndex === ti ? 'background:' + item.accentColor + '; box-shadow: 0 0 8rpx ' + item.accentColor : ''}}">
       </view>
     </view>

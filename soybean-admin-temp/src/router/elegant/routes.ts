@@ -183,6 +183,35 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
+    name: 'membertiers',
+    path: '/membertiers',
+    component: 'layout.base',
+    meta: {
+      title: 'membertiers',
+      i18nKey: 'route.membertiers'
+    },
+    children: [
+      {
+        name: 'membertiers_form',
+        path: '/membertiers/form',
+        component: 'view.membertiers_form',
+        meta: {
+          title: 'membertiers_form',
+          i18nKey: 'route.membertiers_form'
+        }
+      },
+      {
+        name: 'membertiers_list',
+        path: '/membertiers/list',
+        component: 'view.membertiers_list',
+        meta: {
+          title: 'membertiers_list',
+          i18nKey: 'route.membertiers_list'
+        }
+      }
+    ]
+  },
+  {
     name: 'orders',
     path: '/orders',
     component: 'layout.base',

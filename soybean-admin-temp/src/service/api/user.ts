@@ -5,6 +5,7 @@ export interface UserEditData {
   phone?: string;
   points?: number;
   balance?: number;
+  totalSpent?: number;
   memberLevel?: string;
 }
 

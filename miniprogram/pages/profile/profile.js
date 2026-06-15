@@ -2,47 +2,49 @@
 const { api } = require('../../utils/api');
 const app = getApp();
 
-// ── 会员等级配置 ──────────────────────────────
-const TIERS = [
-  { level: 1, name: '银卡会员', accentColor: '#c0c0c0', bgStart: 'rgba(60,60,65,0.88)', bgEnd: 'rgba(25,25,30,0.95)', threshold: 0 },
-  { level: 2, name: '金卡会员', accentColor: '#f2ca50', bgStart: 'rgba(45,42,33,0.88)', bgEnd: 'rgba(17,14,7,0.95)', threshold: 100 },
-  { level: 3, name: '玫瑰金会员', accentColor: '#e0a2a2', bgStart: 'rgba(50,35,35,0.88)', bgEnd: 'rgba(20,15,15,0.95)', threshold: 500 },
-  { level: 4, name: '铂金会员', accentColor: '#b4bed2', bgStart: 'rgba(35,40,50,0.88)', bgEnd: 'rgba(15,17,25,0.95)', threshold: 2000 },
-  { level: 5, name: '钻石会员', accentColor: '#82c8f0', bgStart: 'rgba(20,35,50,0.88)', bgEnd: 'rgba(10,15,25,0.95)', threshold: 10000 },
+// ── 会员等级（API 驱动 + 本地回退）─────────────
+const FALLBACK_TIERS = [
+  { levelKey: 'silver',    name: '银卡会员',   levelIndex: 1, minSpent:     0, discountRate: 1.00, pointsRewardRate: 1.00, birthdayGift: '生日当月享9折优惠一次',       couponValue:  0, accentColor: '#c0c0c0', bgStartColor: 'rgba(60,60,65,0.88)',  bgEndColor: 'rgba(25,25,30,0.95)' },
+  { levelKey: 'gold',      name: '金卡会员',   levelIndex: 2, minSpent:   200, discountRate: 0.98, pointsRewardRate: 1.00, birthdayGift: '生日当月享8折优惠一次',       couponValue:  5, accentColor: '#f2ca50', bgStartColor: 'rgba(45,42,33,0.88)',  bgEndColor: 'rgba(17,14,7,0.95)' },
+  { levelKey: 'rose_gold', name: '玫瑰金会员', levelIndex: 3, minSpent:  1000, discountRate: 0.95, pointsRewardRate: 1.20, birthdayGift: '生日当月享7折优惠+专属礼物',  couponValue: 10, accentColor: '#e0a2a2', bgStartColor: 'rgba(50,35,35,0.88)',  bgEndColor: 'rgba(20,15,15,0.95)' },
+  { levelKey: 'platinum',  name: '铂金会员',   levelIndex: 4, minSpent:  3000, discountRate: 0.90, pointsRewardRate: 1.50, birthdayGift: '生日当月享6折优惠+上门配送',  couponValue: 20, accentColor: '#b4bed2', bgStartColor: 'rgba(35,40,50,0.88)',  bgEndColor: 'rgba(15,17,25,0.95)' },
+  { levelKey: 'diamond',   name: '钻石会员',   levelIndex: 5, minSpent: 10000, discountRate: 0.85, pointsRewardRate: 2.00, birthdayGift: '生日当月享5折优惠+专属客服',  couponValue: 50, accentColor: '#82c8f0', bgStartColor: 'rgba(20,35,50,0.88)',  bgEndColor: 'rgba(10,15,25,0.95)' },
 ];
 
-function computeTier(points) {
-  let current = TIERS[0], next = TIERS[1];
-  for (let i = TIERS.length - 1; i >= 0; i--) {
-    if (points >= TIERS[i].threshold) { current = TIERS[i]; next = TIERS[i + 1] || null; break; }
+function computeTier(totalSpent, tiers) {
+  let current = tiers[0], next = tiers[1];
+  for (let i = tiers.length - 1; i >= 0; i--) {
+    if (totalSpent >= tiers[i].minSpent) { current = tiers[i]; next = tiers[i + 1] || null; break; }
   }
   return { current, next };
 }
 
-function buildTierCards(userTier) {
-  return TIERS.map(t => {
-    const isActive = t.level === userTier.level;
+function buildTierCards(apiTiers, userTier) {
+  return apiTiers.map(t => {
+    const isActive = t.levelKey === userTier.current.levelKey;
     let progressText = '', actionText = '';
-    if (t.level < userTier.level) {
+    if (t.levelIndex < userTier.current.levelIndex) {
       progressText = '已达成';
-      actionText = '查看特权';
-    } else if (t.level === userTier.level) {
+      actionText = t.discountRate < 1 ? '享' + ((1 - t.discountRate) * 100).toFixed(0) + '%折扣' : '查看特权';
+    } else if (isActive) {
       if (userTier.next) {
-        const diff = userTier.next.threshold - (userTier._points || 0);
-        progressText = '还差' + diff + '泡泡值升级V' + userTier.next.level;
-        actionText = '去升级';
+        const diff = (userTier.next.minSpent - (userTier._totalSpent || 0)).toFixed(2);
+        progressText = '还差¥' + diff + '升级' + userTier.next.name;
+        actionText = '去消费';
       } else {
         progressText = '已达最高等级';
-        actionText = '查看特权';
+        actionText = '尊享特权';
       }
     } else {
-      const diff = t.threshold - (userTier._points || 0);
-      progressText = '还差' + diff + '泡泡值升级V' + t.level;
-      actionText = '去升级';
+      const diff = (t.minSpent - (userTier._totalSpent || 0)).toFixed(2);
+      progressText = '消费满¥' + t.minSpent + '解锁';
+      actionText = '去消费';
     }
     return {
-      level: t.level, name: t.name, accentColor: t.accentColor,
-      bgStart: t.bgStart, bgEnd: t.bgEnd,
+      levelKey: t.levelKey, levelIndex: t.levelIndex, name: t.name,
+      accentColor: t.accentColor, bgStartColor: t.bgStartColor, bgEndColor: t.bgEndColor,
+      discountRate: t.discountRate, pointsRewardRate: t.pointsRewardRate,
+      birthdayGift: t.birthdayGift,
       isActive, progressText, actionText,
     };
   });
@@ -80,22 +82,24 @@ Page({
 
   loadUserData() {
     const ui = app.globalData.userInfo;
-    const points = ui.points || ui.bubbleValue || 0;
+    const totalSpent = ui.totalSpent || 0;
 
-    const tierInfo = computeTier(points);
-    tierInfo._points = points;
-    const tierCards = buildTierCards(tierInfo);
-    const activeTierIndex = tierInfo.level - 1;
+    this._ensureTiersLoaded().then(apiTiers => {
+      const tierInfo = computeTier(totalSpent, apiTiers);
+      tierInfo._totalSpent = totalSpent;
+      const tierCards = buildTierCards(apiTiers, tierInfo);
+      const activeTierIndex = tierInfo.current.levelIndex - 1;
 
-    this.setData({
-      userInfo: {
-        ...ui,
-        balanceText: '¥' + ((ui.balance || 0)).toFixed(2),
-        cardCount: ui.cardCount || 0,
-        bio: ui.bio || '享受美味每一天'
-      },
-      tierCards,
-      activeTierIndex,
+      this.setData({
+        userInfo: {
+          ...ui,
+          balanceText: '¥' + ((ui.balance || 0)).toFixed(2),
+          cardCount: ui.cardCount || 0,
+          bio: ui.bio || '享受美味每一天'
+        },
+        tierCards,
+        activeTierIndex,
+      });
     });
 
     // 后台刷新用户数据
@@ -106,6 +110,17 @@ Page({
         this.loadUserData();
       }
     }).catch(() => {});
+  },
+
+  _ensureTiersLoaded() {
+    if (this._apiTiers) return Promise.resolve(this._apiTiers);
+    return api.get('/user/member-tiers').then(res => {
+      this._apiTiers = (res && res.code === 0 && res.data && res.data.length) ? res.data : FALLBACK_TIERS;
+      return this._apiTiers;
+    }).catch(() => {
+      this._apiTiers = FALLBACK_TIERS;
+      return this._apiTiers;
+    });
   },
 
   onMenu() {
@@ -223,15 +238,21 @@ Page({
   },
 
   onUpgradeTier(e) {
-    const level = e.currentTarget.dataset.level;
-    const tierInfo = computeTier(app.globalData.userInfo.points || app.globalData.userInfo.bubbleValue || 0);
-    if (level < tierInfo.level) {
-      wx.showToast({ title: '您已是更高等级会员！', icon: 'none' });
-    } else if (level === tierInfo.level && !tierInfo.next) {
-      wx.showToast({ title: '已达成最高等级 🎉', icon: 'none' });
-    } else {
-      wx.showToast({ title: '多做任务获取泡泡值！', icon: 'none', duration: 2000 });
-    }
+    const levelKey = e.currentTarget.dataset.levelKey;
+    const totalSpent = app.globalData.userInfo.totalSpent || 0;
+    this._ensureTiersLoaded().then(apiTiers => {
+      const tierInfo = computeTier(totalSpent, apiTiers);
+      if (!tierInfo || !tierInfo.current) return;
+      if (levelKey === tierInfo.current.levelKey && !tierInfo.next) {
+        wx.showToast({ title: '已达成最高等级 🎉', icon: 'none' });
+      } else if (levelKey === tierInfo.current.levelKey) {
+        wx.showToast({ title: '继续消费升级吧！', icon: 'none', duration: 2000 });
+      } else {
+        wx.showToast({ title: '查看等级特权', icon: 'none' });
+      }
+    }).catch(() => {
+      wx.showToast({ title: '继续消费升级吧！', icon: 'none', duration: 2000 });
+    });
   },
 
   // ── 公告浮窗 ──────────────────────────────

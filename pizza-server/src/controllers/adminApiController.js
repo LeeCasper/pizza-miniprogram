@@ -8,6 +8,8 @@ const userService = require('../services/userService');
 const pointsService = require('../services/pointsService');
 const bannerService = require('../services/bannerService');
 const couponTemplateService = require('../services/couponTemplateService');
+const memberTierService = require('../services/memberTierService');
+const { invalidateCache } = require('../utils/memberTier');
 
 const adminApiController = {
   // ── Auth ────────────────────────────────────────────
@@ -320,20 +322,24 @@ const adminApiController = {
 
   /**
    * PUT /api/v1/admin/users/:id
-   * Body: { name, phone, points, balance, memberLevel }
+   * Body: { name, phone, points, balance, totalSpent, memberLevel }
    */
   async updateUser(req, res) {
     try {
-      const { name, phone, points, balance, memberLevel } = req.body;
-      const validLevels = ['normal', 'gold', 'platinum', 'diamond'];
-      if (memberLevel && !validLevels.includes(memberLevel)) {
-        return res.status(400).json({ code: 400, message: '无效的会员等级' });
+      const { name, phone, points, balance, totalSpent, memberLevel } = req.body;
+      if (memberLevel) {
+        const tiers = await memberTierService.getActive();
+        const validKeys = tiers.map(t => t.levelKey);
+        if (!validKeys.includes(memberLevel)) {
+          return res.status(400).json({ code: 400, message: '无效的会员等级' });
+        }
       }
       const updateData = {};
       if (name !== undefined) updateData.name = name;
       if (phone !== undefined) updateData.phone = phone;
       if (points !== undefined) updateData.points = points;
       if (balance !== undefined) updateData.balance = balance;
+      if (totalSpent !== undefined) updateData.totalSpent = totalSpent;
       if (memberLevel !== undefined) updateData.memberLevel = memberLevel;
 
       const user = await userService.adminUpdate(req.params.id, updateData);
@@ -691,6 +697,152 @@ const adminApiController = {
     } catch (err) {
       console.error('[AdminAPI] ToggleCouponTemplate error:', err);
       return res.status(500).json({ code: 500, message: '切换优惠券模板状态失败' });
+    }
+  },
+
+  // ── Member Tiers CRUD ──────────────────────────────
+
+  /**
+   * GET /api/v1/admin/member-tiers
+   */
+  async listMemberTiers(req, res) {
+    try {
+      const tiers = await memberTierService.getAll();
+      return res.json({ code: 0, data: tiers });
+    } catch (err) {
+      console.error('[AdminAPI] ListMemberTiers error:', err);
+      return res.status(500).json({ code: 500, message: '获取会员等级列表失败' });
+    }
+  },
+
+  /**
+   * GET /api/v1/admin/member-tiers/:id
+   */
+  async getMemberTier(req, res) {
+    try {
+      const tier = await memberTierService.getById(req.params.id);
+      if (!tier) {
+        return res.status(404).json({ code: 404, message: '会员等级不存在' });
+      }
+      return res.json({ code: 0, data: tier });
+    } catch (err) {
+      console.error('[AdminAPI] GetMemberTier error:', err);
+      return res.status(500).json({ code: 500, message: '获取会员等级失败' });
+    }
+  },
+
+  /**
+   * POST /api/v1/admin/member-tiers
+   */
+  async createMemberTier(req, res) {
+    try {
+      const { levelKey, name, levelIndex, minSpent, discountRate,
+              pointsRewardRate, birthdayGift, couponValue,
+              accentColor, bgStartColor, bgEndColor } = req.body;
+
+      if (!levelKey || !name || levelIndex === undefined) {
+        return res.status(400).json({ code: 400, message: '等级标识、名称、序号为必填项' });
+      }
+      if (discountRate !== undefined && (discountRate < 0 || discountRate > 1)) {
+        return res.status(400).json({ code: 400, message: '折扣率需在 0-1 之间' });
+      }
+      if (pointsRewardRate !== undefined && pointsRewardRate < 1) {
+        return res.status(400).json({ code: 400, message: '积分倍率不能低于 1' });
+      }
+
+      const tier = await memberTierService.create({
+        level_key: levelKey,
+        name,
+        level_index: levelIndex,
+        min_spent: minSpent,
+        discount_rate: discountRate,
+        points_reward_rate: pointsRewardRate,
+        birthday_gift: birthdayGift,
+        coupon_value: couponValue,
+        accent_color: accentColor,
+        bg_start_color: bgStartColor,
+        bg_end_color: bgEndColor,
+      });
+      invalidateCache();
+      return res.status(201).json({ code: 0, message: '会员等级已创建', data: tier });
+    } catch (err) {
+      console.error('[AdminAPI] CreateMemberTier error:', err);
+      return res.status(500).json({ code: 500, message: err.message || '创建会员等级失败' });
+    }
+  },
+
+  /**
+   * PUT /api/v1/admin/member-tiers/:id
+   */
+  async updateMemberTier(req, res) {
+    try {
+      const { levelKey, name, levelIndex, minSpent, discountRate,
+              pointsRewardRate, birthdayGift, couponValue,
+              accentColor, bgStartColor, bgEndColor, isActive } = req.body;
+      const updateData = {};
+      if (levelKey !== undefined) updateData.level_key = levelKey;
+      if (name !== undefined) updateData.name = name;
+      if (levelIndex !== undefined) updateData.level_index = levelIndex;
+      if (minSpent !== undefined) updateData.min_spent = minSpent;
+      if (discountRate !== undefined) {
+        if (discountRate < 0 || discountRate > 1) {
+          return res.status(400).json({ code: 400, message: '折扣率需在 0-1 之间' });
+        }
+        updateData.discount_rate = discountRate;
+      }
+      if (pointsRewardRate !== undefined) {
+        if (pointsRewardRate < 1) {
+          return res.status(400).json({ code: 400, message: '积分倍率不能低于 1' });
+        }
+        updateData.points_reward_rate = pointsRewardRate;
+      }
+      if (birthdayGift !== undefined) updateData.birthday_gift = birthdayGift;
+      if (couponValue !== undefined) updateData.coupon_value = couponValue;
+      if (accentColor !== undefined) updateData.accent_color = accentColor;
+      if (bgStartColor !== undefined) updateData.bg_start_color = bgStartColor;
+      if (bgEndColor !== undefined) updateData.bg_end_color = bgEndColor;
+      if (isActive !== undefined) updateData.is_active = isActive ? 1 : 0;
+
+      const tier = await memberTierService.update(req.params.id, updateData);
+      if (!tier) {
+        return res.status(404).json({ code: 404, message: '会员等级不存在' });
+      }
+      invalidateCache();
+      return res.json({ code: 0, message: '会员等级已更新', data: tier });
+    } catch (err) {
+      console.error('[AdminAPI] UpdateMemberTier error:', err);
+      return res.status(500).json({ code: 500, message: err.message || '更新会员等级失败' });
+    }
+  },
+
+  /**
+   * DELETE /api/v1/admin/member-tiers/:id
+   */
+  async deleteMemberTier(req, res) {
+    try {
+      await memberTierService.softDelete(req.params.id);
+      invalidateCache();
+      return res.json({ code: 0, message: '会员等级已下架' });
+    } catch (err) {
+      console.error('[AdminAPI] DeleteMemberTier error:', err);
+      return res.status(500).json({ code: 500, message: '删除会员等级失败' });
+    }
+  },
+
+  /**
+   * PUT /api/v1/admin/member-tiers/:id/toggle
+   */
+  async toggleMemberTier(req, res) {
+    try {
+      const tier = await memberTierService.toggle(req.params.id);
+      if (!tier) {
+        return res.status(404).json({ code: 404, message: '会员等级不存在' });
+      }
+      invalidateCache();
+      return res.json({ code: 0, message: '会员等级状态已切换', data: tier });
+    } catch (err) {
+      console.error('[AdminAPI] ToggleMemberTier error:', err);
+      return res.status(500).json({ code: 500, message: '切换会员等级状态失败' });
     }
   },
 

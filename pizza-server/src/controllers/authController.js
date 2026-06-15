@@ -1,6 +1,7 @@
 const userService = require('../services/userService');
 const { code2session } = require('../utils/wechat');
 const { signToken } = require('../utils/jwt');
+const { computeTier } = require('../utils/memberTier');
 
 const authController = {
   async login(req, res, next) {
@@ -34,6 +35,7 @@ const authController = {
       }
 
       const token = signToken({ sub: user.id, role: user.role });
+      const tier = await computeTier(parseFloat(user.total_spent || 0));
 
       res.json({
         code: 0,
@@ -46,10 +48,12 @@ const authController = {
             memberLevel: user.member_level,
             memberId: String(user.id).padStart(6, '0'),
             points: user.points,
+            totalSpent: parseFloat(user.total_spent || 0),
             coupons: 0, // populated separately
             cardCount: 0,
             balance: parseFloat(user.balance),
             bio: user.bio,
+            tier,
           },
         },
       });

@@ -47,7 +47,8 @@ App({
     userInfo: {
       name: '披萨爱好者',
       avatar: '',
-      memberLevel: 'normal',
+      totalSpent: 0,
+      memberLevel: 'silver',
       memberId: '',
       points: 0,
       coupons: 0,

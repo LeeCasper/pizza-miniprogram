@@ -8,7 +8,7 @@ const userService = {
 
   async findById(id) {
     const [rows] = await pool.query(
-      'SELECT id, openid, name, avatar, bio, phone, points, balance, member_level, notification_enabled, role, created_at, updated_at FROM users WHERE id = ?',
+      'SELECT id, openid, name, avatar, bio, phone, points, balance, total_spent, member_level, notification_enabled, role, created_at, updated_at FROM users WHERE id = ?',
       [id]
     );
     return rows[0] || null;
@@ -87,6 +87,7 @@ const userService = {
       phone: r.phone,
       points: r.points,
       balance: parseFloat(r.balance || 0),
+      totalSpent: parseFloat(r.total_spent || 0),
       memberLevel: r.member_level,
       notificationEnabled: !!r.notification_enabled,
       role: r.role,
@@ -112,6 +113,7 @@ const userService = {
     if (data.phone !== undefined) { sets.push('phone = ?'); values.push(data.phone); }
     if (data.points !== undefined) { sets.push('points = ?'); values.push(parseInt(data.points)); }
     if (data.balance !== undefined) { sets.push('balance = ?'); values.push(parseFloat(data.balance)); }
+    if (data.totalSpent !== undefined) { sets.push('total_spent = ?'); values.push(parseFloat(data.totalSpent)); }
     if (data.memberLevel !== undefined) { sets.push('member_level = ?'); values.push(data.memberLevel); }
     if (sets.length === 0) return this.findById(id);
     values.push(id);

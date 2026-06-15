@@ -23,14 +23,16 @@ CREATE TABLE IF NOT EXISTS users (
     phone VARCHAR(20) DEFAULT '',
     points INT UNSIGNED DEFAULT 0,
     balance DECIMAL(10,2) DEFAULT 0.00,
-    member_level ENUM('normal','gold','platinum','diamond') DEFAULT 'normal',
+    total_spent DECIMAL(10,2) DEFAULT 0.00 COMMENT '累计消费金额',
+    member_level VARCHAR(50) DEFAULT 'silver' COMMENT '会员等级key,关联member_tiers.level_key',
     notification_enabled TINYINT(1) DEFAULT 1,
     role ENUM('customer','admin') DEFAULT 'customer',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_openid (openid),
     INDEX idx_member_level (member_level),
-    INDEX idx_points (points)
+    INDEX idx_points (points),
+    INDEX idx_total_spent (total_spent)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =============================================
@@ -284,7 +286,38 @@ CREATE TABLE IF NOT EXISTS coupon_templates (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =============================================
--- 15. dietary_restrictions
+-- 15. member_tiers
+-- =============================================
+CREATE TABLE IF NOT EXISTS member_tiers (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    level_key VARCHAR(50) NOT NULL UNIQUE COMMENT '唯一标识,如 silver/gold/rose_gold/platinum/diamond',
+    name VARCHAR(50) NOT NULL COMMENT '等级名称,如 银卡会员',
+    level_index INT UNSIGNED NOT NULL UNIQUE COMMENT '等级序号,升序排列 1-5',
+    min_spent DECIMAL(10,2) NOT NULL DEFAULT 0.00 COMMENT '最低累计消费金额(元)',
+    discount_rate DECIMAL(4,2) NOT NULL DEFAULT 1.00 COMMENT '折扣率,0.95=95折',
+    points_reward_rate DECIMAL(4,2) NOT NULL DEFAULT 1.00 COMMENT '积分倍率,1.00=1元1分',
+    birthday_gift VARCHAR(200) DEFAULT '' COMMENT '生日礼物描述',
+    coupon_value DECIMAL(10,2) DEFAULT 0.00 COMMENT '升级奖励优惠券面值(元)',
+    accent_color VARCHAR(7) DEFAULT '#c0c0c0' COMMENT '等级主题色 hex',
+    bg_start_color VARCHAR(30) DEFAULT 'rgba(60,60,65,0.88)' COMMENT '卡片渐变起始色',
+    bg_end_color VARCHAR(30) DEFAULT 'rgba(25,25,30,0.95)' COMMENT '卡片渐变结束色',
+    is_active TINYINT(1) DEFAULT 1 COMMENT '是否启用',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_level_index (level_index),
+    INDEX idx_min_spent (min_spent),
+    INDEX idx_is_active (is_active)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO member_tiers (level_key, name, level_index, min_spent, discount_rate, points_reward_rate, birthday_gift, coupon_value, accent_color, bg_start_color, bg_end_color) VALUES
+('silver',    '银卡会员',   1,     0.00, 1.00, 1.00, '生日当月享9折优惠一次',         0.00, '#c0c0c0', 'rgba(60,60,65,0.88)',  'rgba(25,25,30,0.95)'),
+('gold',      '金卡会员',   2,   200.00, 0.98, 1.00, '生日当月享8折优惠一次',         5.00, '#f2ca50', 'rgba(45,42,33,0.88)',  'rgba(17,14,7,0.95)'),
+('rose_gold', '玫瑰金会员', 3,  1000.00, 0.95, 1.20, '生日当月享7折优惠+专属礼物',   10.00, '#e0a2a2', 'rgba(50,35,35,0.88)',  'rgba(20,15,15,0.95)'),
+('platinum',  '铂金会员',   4,  3000.00, 0.90, 1.50, '生日当月享6折优惠+上门配送',   20.00, '#b4bed2', 'rgba(35,40,50,0.88)',  'rgba(15,17,25,0.95)'),
+('diamond',   '钻石会员',   5, 10000.00, 0.85, 2.00, '生日当月享5折优惠+专属客服',   50.00, '#82c8f0', 'rgba(20,35,50,0.88)',  'rgba(10,15,25,0.95)');
+
+-- =============================================
+-- 16. dietary_restrictions
 -- =============================================
 CREATE TABLE IF NOT EXISTS dietary_restrictions (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

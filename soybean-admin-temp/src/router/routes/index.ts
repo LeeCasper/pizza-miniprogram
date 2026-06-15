@@ -218,6 +218,49 @@ const customRoutes: CustomRoute[] = [
     ],
   },
   {
+    name: 'memberTiers',
+    path: '/member-tiers',
+    component: 'layout.base',
+    meta: {
+      title: '会员等级',
+      i18nKey: 'route.memberTiers',
+      icon: 'mdi:account-star',
+      order: 5.5,
+    },
+    children: [
+      {
+        name: 'memberTiers_list',
+        path: '/member-tiers/list',
+        component: 'view.memberTiers_list',
+        meta: {
+          title: '等级列表',
+          i18nKey: 'route.memberTiers_list',
+        },
+      },
+      {
+        name: 'memberTiers_create',
+        path: '/member-tiers/create',
+        component: 'view.memberTiers_form',
+        meta: {
+          title: '新建等级',
+          i18nKey: 'route.memberTiers_create',
+          hideInMenu: true,
+        },
+      },
+      {
+        name: 'memberTiers_edit',
+        path: '/member-tiers/:id/edit',
+        component: 'view.memberTiers_form',
+        props: true,
+        meta: {
+          title: '编辑等级',
+          i18nKey: 'route.memberTiers_edit',
+          hideInMenu: true,
+        },
+      },
+    ],
+  },
+  {
     name: 'users',
     path: '/users',
     component: 'layout.base',

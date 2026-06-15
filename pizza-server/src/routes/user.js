@@ -5,6 +5,9 @@ const { validate } = require('../middleware/validation');
 
 const router = Router();
 
+// Public tier config
+router.get('/member-tiers', controller.getMemberTiers);
+
 router.get('/profile', auth, controller.getProfile);
 router.put('/profile', auth, validate('updateProfile'), controller.updateProfile);
 router.get('/settings', auth, controller.getSettings);

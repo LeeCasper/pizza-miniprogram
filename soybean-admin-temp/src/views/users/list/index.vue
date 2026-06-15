@@ -3,7 +3,7 @@ import { ref, onMounted, h } from 'vue';
 import { NDataTable, NTag, NAvatar, NButton, NSpace, NIcon, NDrawer, NDrawerContent, NForm, NFormItem, NInput, NInputNumber, NSelect } from 'naive-ui';
 import { EditOutlined } from '@vicons/antd';
 import type { DataTableColumns } from 'naive-ui';
-import { fetchUsers, fetchUpdateUser, type UserEditData } from '@/service/api';
+import { fetchUsers, fetchUpdateUser, fetchMemberTiers, type UserEditData } from '@/service/api';
 
 defineOptions({ name: 'UserList' });
 
@@ -16,16 +16,25 @@ const editForm = ref<UserEditData & { id: number; name: string }>({
   phone: '',
   points: 0,
   balance: 0,
-  memberLevel: 'normal',
+  totalSpent: 0,
+  memberLevel: 'silver',
 });
 const saving = ref(false);
 
-const memberLevelOptions = [
-  { label: '普通', value: 'normal' },
-  { label: '黄金', value: 'gold' },
+const memberLevelOptions = ref<{ label: string; value: string }[]>([
+  { label: '银卡', value: 'silver' },
+  { label: '金卡', value: 'gold' },
+  { label: '玫瑰金', value: 'rose_gold' },
   { label: '铂金', value: 'platinum' },
   { label: '钻石', value: 'diamond' },
-];
+]);
+
+async function loadMemberTierOptions() {
+  const { data } = await fetchMemberTiers();
+  if (data && Array.isArray(data) && data.length > 0) {
+    memberLevelOptions.value = data.map(t => ({ label: t.name, value: t.levelKey }));
+  }
+}
 
 const columns: DataTableColumns<any> = [
   { title: 'ID', key: 'id', width: 60 },
@@ -42,17 +51,22 @@ const columns: DataTableColumns<any> = [
     title: '等级', key: 'memberLevel', width: 80,
     render(row) {
       const map: Record<string, { label: string; type: 'info' | 'warning' | 'error' | 'default' }> = {
-        gold: { label: '黄金', type: 'warning' },
+        silver: { label: '银卡', type: 'default' },
+        gold: { label: '金卡', type: 'warning' },
+        rose_gold: { label: '玫瑰金', type: 'info' },
         platinum: { label: '铂金', type: 'info' },
         diamond: { label: '钻石', type: 'error' },
       };
-      const m = map[row.memberLevel] || { label: row.memberLevel || '普通', type: 'default' as const };
+      const m = map[row.memberLevel] || { label: row.memberLevel || '—', type: 'default' as const };
       return h(NTag, { type: m.type, size: 'small', bordered: false }, () => m.label);
     }
   },
   { title: '积分', key: 'points', width: 80 },
   { title: '余额', key: 'balance', width: 80,
     render(row) { return `¥${Number(row.balance || 0).toFixed(2)}`; }
+  },
+  { title: '累计消费', key: 'totalSpent', width: 100,
+    render(row) { return `¥${Number(row.totalSpent || 0).toFixed(2)}`; }
   },
   { title: '订单数', key: 'orderCount', width: 80 },
   { title: '注册时间', key: 'createdAt', width: 160 },
@@ -80,7 +94,8 @@ function handleEdit(row: any) {
     phone: row.phone || '',
     points: row.points || 0,
     balance: Number(row.balance || 0),
-    memberLevel: row.memberLevel || 'normal',
+    totalSpent: Number(row.totalSpent || 0),
+    memberLevel: row.memberLevel || 'silver',
   };
   drawerOpen.value = true;
 }
@@ -108,7 +123,7 @@ async function handleSave() {
   }
 }
 
-onMounted(() => { loadUsers(); });
+onMounted(() => { loadUsers(); loadMemberTierOptions(); });
 </script>
 
 <template>
@@ -130,6 +145,9 @@ onMounted(() => { loadUsers(); });
           </NFormItem>
           <NFormItem label="余额">
             <NInputNumber v-model:value="editForm.balance" :min="0" :step="0.01" style="width: 100%" />
+          </NFormItem>
+          <NFormItem label="累计消费">
+            <NInputNumber v-model:value="editForm.totalSpent" :min="0" :step="0.01" style="width: 100%" />
           </NFormItem>
           <NFormItem label="会员等级">
             <NSelect v-model:value="editForm.memberLevel" :options="memberLevelOptions" />
