@@ -1,13 +1,22 @@
 /* pages/tiers/tiers.wxss */
 
+/* ── 页面底色 ── */
+.page-container {
+  background: #f3efe7;
+  min-height: 100vh;
+}
+
 /* ── 顶部导航 ── */
 .top-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 32rpx 20rpx;
-  background: #fcf8f2;
-  border-bottom: 1rpx solid rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.92);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1rpx solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2rpx 20rpx rgba(0, 0, 0, 0.06);
   position: fixed;
   top: 0;
   left: 0;
@@ -50,17 +59,23 @@
   align-items: center;
   gap: 12rpx;
   margin-bottom: 20rpx;
-  margin-top: 8rpx;
+  margin-top: 36rpx;
+  padding-left: 4rpx;
 }
 
 .section-title {
   font-size: 34rpx;
   font-weight: 800;
   color: #1a1a1a;
+  position: relative;
+  padding-left: 20rpx;
+  border-left: 6rpx solid var(--color-primary);
+  border-radius: 3rpx;
 }
 
 .section-icon {
   font-size: 24rpx;
+  margin-left: -8rpx;
 }
 
 /* ==============================
@@ -296,22 +311,25 @@
 .benefits-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 16rpx;
+  gap: 12rpx;
   margin-bottom: 40rpx;
-  background: rgba(255, 255, 255, 0.55);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
+  background: #ffffff;
   border-radius: 28rpx;
-  padding: 20rpx;
+  padding: 16rpx;
+  box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.08);
+  border: 1rpx solid rgba(0, 0, 0, 0.05);
 }
 
 .benefit-grid-item {
   display: flex;
   align-items: center;
   gap: 16rpx;
-  width: calc(50% - 8rpx);
+  width: calc(50% - 6rpx);
   padding: 18rpx 16rpx;
   box-sizing: border-box;
+  background: #fafaf7;
+  border-radius: 20rpx;
+  border: 1rpx solid rgba(0, 0, 0, 0.04);
 }
 
 .benefit-grid-icon {
@@ -371,12 +389,12 @@
    等级规则卡片
    ============================== */
 .rules-card {
-  background: rgba(255, 255, 255, 0.55);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
+  background: #ffffff;
   border-radius: 28rpx;
   padding: 20rpx 28rpx;
   margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.08);
+  border: 1rpx solid rgba(0, 0, 0, 0.05);
 }
 
 .rules-row {
@@ -384,7 +402,7 @@
   align-items: center;
   gap: 20rpx;
   padding: 18rpx 0;
-  border-bottom: 1rpx solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1rpx solid rgba(0, 0, 0, 0.07);
 }
 
 .rules-row:last-child {
@@ -432,8 +450,12 @@
   align-items: center;
   justify-content: center;
   gap: 8rpx;
+  margin-top: 32rpx;
   margin-bottom: 8rpx;
-  padding: 0 20rpx;
+  padding: 16rpx 24rpx;
+  background: #fafaf7;
+  border-radius: 20rpx;
+  border: 1rpx solid rgba(0, 0, 0, 0.05);
 }
 
 .rules-footer-icon {
@@ -443,6 +465,6 @@
 
 .rules-footer-text {
   font-size: 20rpx;
-  color: #aaa;
+  color: #999;
   text-align: center;
 }
