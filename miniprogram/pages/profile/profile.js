@@ -356,11 +356,17 @@ Page({
   },
 
   // ========== 会员等级滑动 ==========
-  onTierSwiperChange(e) {
+  // 轻量同步：仅更新 currentTierIndex，让 swiper 的 current 属性跟随手动滑动
+  onTierSwiperSync(e) {
     const idx = e.detail.current;
     if (idx === this.data.currentTierIndex) return;
+    this.setData({ currentTierIndex: idx });
+  },
+
+  // 动画结束后更新视觉效果（卡片下沉、弧线偏移），避免与 swiper 动画竞争
+  onTierSwiperAnimDone(e) {
+    const idx = e.detail.current;
     this.setData({
-      currentTierIndex: idx,
       tierCards: buildTierCards(idx),
       arcLabels: buildArcLabels(idx),
       trackShift: getTrackShift(idx, TIERS.length)
@@ -370,12 +376,7 @@ Page({
   onSelectTier(e) {
     const idx = e.currentTarget.dataset.index;
     if (idx === this.data.currentTierIndex) return;
-    this.setData({
-      currentTierIndex: idx,
-      tierCards: buildTierCards(idx),
-      arcLabels: buildArcLabels(idx),
-      trackShift: getTrackShift(idx, TIERS.length)
-    });
+    this.setData({ currentTierIndex: idx });
   },
 
   onCart() {

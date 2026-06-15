@@ -434,15 +434,19 @@ Page({
       if (res.code === 0) { app.globalData.userInfo = res.data; wx.setStorageSync('userInfo', res.data); this.loadProfileData(); }
     }).catch(() => {});
   },
-  onTierSwiperChange(e) {
+  onTierSwiperSync(e) {
     const idx = e.detail.current;
     if (idx === this.data.currentTierIndex) return;
-    this.setData({ currentTierIndex: idx, tierCards: buildTierCards(idx), arcLabels: buildArcLabels(idx), trackShift: getTrackShift(idx, TIERS.length) });
+    this.setData({ currentTierIndex: idx });
+  },
+  onTierSwiperAnimDone(e) {
+    const idx = e.detail.current;
+    this.setData({ tierCards: buildTierCards(idx), arcLabels: buildArcLabels(idx), trackShift: getTrackShift(idx, TIERS.length) });
   },
   onSelectTier(e) {
     const idx = e.currentTarget.dataset.index;
     if (idx === this.data.currentTierIndex) return;
-    this.setData({ currentTierIndex: idx, tierCards: buildTierCards(idx), arcLabels: buildArcLabels(idx), trackShift: getTrackShift(idx, TIERS.length) });
+    this.setData({ currentTierIndex: idx });
   },
   onMenuItem(e) {
     const { action } = e.currentTarget.dataset;
