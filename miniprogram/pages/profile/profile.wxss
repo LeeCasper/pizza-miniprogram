@@ -191,7 +191,16 @@
   justify-content: space-between;
   box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
   white-space: normal;
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tier-card-high {
+  transform: translateY(0);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tier-card-low {
+  transform: translateY(28rpx);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ── 卡片内元素 ── */

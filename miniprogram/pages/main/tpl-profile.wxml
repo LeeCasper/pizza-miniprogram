@@ -36,11 +36,11 @@
     >
       <view class="tier-cards-row">
         <view
-          class="tier-card"
+          class="tier-card {{item.active ? 'tier-card-high' : 'tier-card-low'}}"
           wx:for="{{tierCards}}"
           wx:key="key"
           wx:for-index="idx"
-          style="background: {{item.gradient}}; color: {{item.textColor}}; transform: translateY({{item.offsetY}}rpx)"
+          style="background: {{item.gradient}}; color: {{item.textColor}}"
           bindtap="onTierCardTap"
           data-index="{{idx}}"
         >

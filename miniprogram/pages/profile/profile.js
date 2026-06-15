@@ -27,8 +27,6 @@ function computeTier(points) {
   return { tierIndex, pointsToNext, tierProgress, isMax };
 }
 
-const SINK_RPX = 28; // 未选中卡片统一下沉量
-
 function buildTierCards(userTierIndex, userPoints, activeIndex) {
   const ai = activeIndex !== undefined ? activeIndex : userTierIndex;
   return TIERS.map((t, i) => {
@@ -59,25 +57,13 @@ function buildTierCards(userTierIndex, userPoints, activeIndex) {
       isCurrent, isLocked, isUnlocked,
       growthText, progressPercent,
       lv: 'Lv' + i,
-      offsetY: i === ai ? 0 : SINK_RPX
+      active: i === ai
     };
   });
 }
 
-function applyCardOffsets(cards, activeIndex) {
-  return cards.map((c, i) => ({ ...c, offsetY: i === activeIndex ? 0 : SINK_RPX }));
-}
-
-function snapCardToCenter(swiperWidth, index) {
-  const win = wx.getWindowInfo();
-  const rpx = win.windowWidth / 750;
-  const cw = (swiperWidth || win.windowWidth) * 0.85;
-  const gap = 32 * rpx;
-  const pad = 32 * rpx;
-  const target = pad + index * (cw + gap) - ((swiperWidth || win.windowWidth) - cw) / 2;
-  wx.createSelectorQuery().select('#tierCardsScroll').node((res) => {
-    if (res && res[0]) res[0].scrollTo({ left: Math.max(0, target), animated: true });
-  }).exec();
+function applyCardActive(cards, activeIndex) {
+  return cards.map((c, i) => ({ ...c, active: i === activeIndex }));
 }
 
 Page({
@@ -309,9 +295,8 @@ Page({
     });
   },
 
-  // ── 会员卡片横向滚动 + 高低吸附 ────────────
+  // ── 会员卡片横向滚动 + 高低选中 ────────────
   onTierCardsScroll(e) {
-    if (this._snapping) return;
     if (this._scrollTimer) clearTimeout(this._scrollTimer);
     this._scrollTimer = setTimeout(() => {
       const sl = e.detail.scrollLeft;
@@ -325,14 +310,10 @@ Page({
       if (activeIndex !== this.data.activeTierIndex) {
         this.setData({
           activeTierIndex: activeIndex,
-          tierCards: applyCardOffsets(this.data.tierCards, activeIndex)
+          tierCards: applyCardActive(this.data.tierCards, activeIndex)
         });
       }
-      // 吸附：自动居中
-      this._snapping = true;
-      snapCardToCenter(this._swiperWidth, activeIndex);
-      setTimeout(() => { this._snapping = false; }, 400);
-    }, 150);
+    }, 100);
   },
 
   onTierCardTap(e) {
@@ -340,11 +321,18 @@ Page({
     if (idx === this.data.activeTierIndex) return;
     this.setData({
       activeTierIndex: idx,
-      tierCards: applyCardOffsets(this.data.tierCards, idx)
+      tierCards: applyCardActive(this.data.tierCards, idx)
     });
-    this._snapping = true;
-    snapCardToCenter(this._swiperWidth, idx);
-    setTimeout(() => { this._snapping = false; }, 400);
+    // 点击吸附到正中间
+    const win = wx.getWindowInfo();
+    const rpx = win.windowWidth / 750;
+    const cw = (this._swiperWidth || win.windowWidth) * 0.85;
+    const gap = 32 * rpx;
+    const pad = 32 * rpx;
+    const target = pad + idx * (cw + gap) - ((this._swiperWidth || win.windowWidth) - cw) / 2;
+    wx.createSelectorQuery().select('#tierCardsScroll').node((res) => {
+      if (res && res[0]) res[0].scrollTo({ left: Math.max(0, target), animated: true });
+    }).exec();
   },
 
   onMemberSwiperReady() {
