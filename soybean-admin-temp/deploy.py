@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Deploy file-management feature to production server."""
+"""Deploy to production server."""
 import paramiko
 import os
 import sys
@@ -9,67 +9,65 @@ USER = os.environ.get('PIZZA_USER', 'root')
 PASS = os.environ.get('PIZZA_PASS', '')
 PORT = int(os.environ.get('PIZZA_PORT', '22'))
 
-SERVER_BASE = '/opt/pizza-server/pizza-server'  # PM2 runs from nested dir
+SERVER_REPO = '/opt/pizza-server'  # Git repo root
 ADMIN_BASE = '/opt/pizza-admin'  # Nginx alias target (no /dist subdir)
-LOCAL_SERVER = r'D:\Code\Pizza\pizza-server'
 LOCAL_ADMIN_DIST = r'D:\Code\Pizza\soybean-admin-temp\dist'
-
-# ── Backend files to upload ──────────────────────────
-BACKEND_FILES = [
-    'src/config/multer.js',
-    'src/routes/upload.js',
-    'src/controllers/uploadController.js',
-    'src/routes/adminApi.js',
-]
 
 ssh = None
 
 def deploy_backend():
+    """Full backend deploy: git pull -> npm install -> run migrations -> pm2 restart"""
     print("=" * 60)
-    print("Deploying BACKEND files...")
+    print("Deploying BACKEND (git pull + migrate + restart)...")
     print("=" * 60)
 
     global ssh
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh.connect(HOST, username=USER, password=PASS, port=PORT, timeout=15)
-    sftp = ssh.open_sftp()
 
-    for rel_path in BACKEND_FILES:
-        local_path = os.path.join(LOCAL_SERVER, rel_path)
-        remote_path = os.path.join(SERVER_BASE, rel_path).replace('\\', '/')
+    def run_cmd(cmd, desc=''):
+        if desc:
+            print(f"  {desc}...")
+        stdin, stdout, stderr = ssh.exec_command(f'{cmd} 2>&1', get_pty=False)
+        output = stdout.read().decode('utf-8', errors='replace')
+        for line in output.strip().split('\n'):
+            print(f"    {line}")
+        exit_code = stdout.channel.recv_exit_status()
+        if exit_code != 0:
+            print(f"  WARN: Exit code: {exit_code}")
+        return output
 
-        if not os.path.exists(local_path):
-            print(f"  SKIP (not found): {rel_path}")
-            continue
+    # 1. Git pull
+    run_cmd(f'cd {SERVER_REPO} && git pull origin master', '[1/5] Git pull')
 
-        # Ensure remote directory exists
-        remote_dir = os.path.dirname(remote_path).replace('\\', '/')
-        try:
-            sftp.lstat(remote_dir)
-        except FileNotFoundError:
-            # Create directory recursively
-            stdin, stdout, stderr = ssh.exec_command(
-                f'mkdir -p {remote_dir} 2>&1', get_pty=False
-            )
-            stdout.read()
+    # 2. Install dependencies
+    run_cmd(f'cd {SERVER_REPO}/pizza-server && npm install --production', '[2/5] npm install')
 
-        sftp.put(local_path, remote_path)
-        local_size = os.path.getsize(local_path)
-        remote_size = sftp.stat(remote_path).st_size
-        status = "OK" if local_size == remote_size else "SIZE MISMATCH"
-        print(f"  {status}  {rel_path}  ({local_size} bytes)")
-
-    sftp.close()
-
-    # ── Restart PM2 ───────────────────────────────────
-    print("\nRestarting pizza-server via PM2...")
+    # 3. Run membership migration
+    print("  [3/5] Running DB migrations...")
     stdin, stdout, stderr = ssh.exec_command(
-        'pm2 restart pizza-server 2>&1',
+        f'cd {SERVER_REPO} && '
+        f'source pizza-server/.env 2>/dev/null; '
+        f'mysql -u "$DB_USER" -p"$DB_PASSWORD" "$DB_NAME" < pizza-server/db/migrate_membership.sql 2>&1',
         get_pty=False
     )
     output = stdout.read().decode('utf-8', errors='replace')
-    print("  " + output.strip())
+    if output.strip():
+        print("    " + output.strip())
+    exit_code = stdout.channel.recv_exit_status()
+    if exit_code == 0:
+        print("    Migration OK")
+    else:
+        print(f"  WARN: Migration exit code: {exit_code} (may already be applied)")
+
+    # 4. Verify .env exists
+    run_cmd(f'test -f {SERVER_REPO}/pizza-server/.env && echo "OK" || echo "MISSING"', '[4/5] .env check')
+
+    # 5. Restart PM2
+    run_cmd('pm2 restart pizza-server', '[5/5] PM2 restart')
+
+    print("\n  Backend deploy complete")
 
 
 def deploy_frontend():
@@ -79,7 +77,7 @@ def deploy_frontend():
 
     if not os.path.exists(LOCAL_ADMIN_DIST):
         print(f"  ERROR: dist not found at {LOCAL_ADMIN_DIST}")
-        print("  Run: cd pizza-admin && npm run build")
+        print("  Run: cd soybean-admin-temp && pnpm build")
         return
 
     global ssh
@@ -131,14 +129,6 @@ def deploy_frontend():
     )
     output = stdout.read().decode('utf-8', errors='replace')
     print(f"  Verify index.html: {'OK' if 'index.html' in output else 'MISSING'}")
-
-    # Check for new files page chunk
-    stdin, stdout, stderr = ssh.exec_command(
-        f'ls {ADMIN_BASE}/assets/ | grep -i "imageupload\|upload\|files" 2>&1',
-        get_pty=False
-    )
-    output = stdout.read().decode('utf-8', errors='replace')
-    print(f"  New modules found:\n    {output.strip()}")
 
 
 if __name__ == '__main__':
