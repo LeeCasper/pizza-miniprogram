@@ -36,32 +36,63 @@
       </view>
     </view>
 
-    <!-- 会员等级卡片轮播 -->
+    <!-- 会员等级卡片 — Stitch 设计稿 1:1 -->
     <view class="member-tier-section">
-      <swiper
-        class="member-swiper"
-        current="{{currentTierIndex}}"
-        bindchange="onTierSwiperSync"
-        duration="250"
-        easing-function="easeInOutCubic"
-        style="height: 460rpx"
+      <!-- 横向滑动卡片 (snap) -->
+      <scroll-view
+        id="tierCardsScroll"
+        class="tier-cards-scroll"
+        scroll-x
+        enhanced
+        show-scrollbar="{{false}}"
+        bindscroll="onTierCardsScroll"
       >
-        <swiper-item wx:for="{{tierCards}}" wx:key="key" wx:for-index="idx">
-          <view class="tier-card" style="background: {{item.gradient}}; color: {{item.textColor}}">
-            <view class="tier-card-inner">
-              <view class="tier-card-header">
-                <view class="tier-status-badge" style="background: {{item.badgeBg}}">
-                  <text class="tier-status-text">{{item.isCurrent ? '当前等级' : (item.isLocked ? '升级解锁' : '已解锁')}}</text>
-                </view>
+        <view class="tier-cards-row">
+          <view
+            class="tier-card"
+            wx:for="{{tierCards}}"
+            wx:key="key"
+            style="background: {{item.gradient}}; color: {{item.textColor}}"
+          >
+            <view class="tier-card-badge" style="background: {{item.badgeBg}}">
+              <text class="tier-card-badge-text">{{item.isCurrent ? '当前等级' : (item.isUnlocked ? '已解锁' : '未解锁')}}</text>
+            </view>
+            <view class="tier-card-body">
+              <text class="tier-card-name">{{item.name}}</text>
+              <text class="tier-card-growth">{{item.growthText}}</text>
+            </view>
+            <view class="tier-card-footer">
+              <text class="tier-card-lv">{{item.lv}}</text>
+              <view class="tier-progress-bar" style="background: {{item.progressTrack}}">
+                <view class="tier-progress-fill" style="width: {{item.progressPercent}}%; background: {{item.progressFill}}"></view>
               </view>
-              <view class="tier-card-body">
-                <text class="tier-name">{{item.name}}</text>
-              </view>
-              <text class="tier-benefits-text">{{item.benefitsText}}</text>
             </view>
           </view>
-        </swiper-item>
-      </swiper>
+        </view>
+      </scroll-view>
+
+      <!-- 弧线指示器 -->
+      <view class="arc-container">
+        <view class="arc-curve-wrap">
+          <view class="arc-curve"></view>
+        </view>
+        <view class="arc-labels-clip">
+          <view class="arc-labels-row" style="transform: translateX({{arcOffset}}rpx)">
+            <view
+              class="arc-label-item"
+              wx:for="{{arcLabels}}"
+              wx:key="key"
+              wx:for-index="idx"
+              style="transform: translateY({{item.offsetY}}rpx)"
+              bindtap="onArcLabelTap"
+              data-index="{{idx}}"
+            >
+              <text class="arc-label-text {{item.active ? 'arc-label-active' : ''}}">{{item.label}}</text>
+              <view class="arc-dot {{item.active ? 'arc-dot-active' : ''}}"></view>
+            </view>
+          </view>
+        </view>
+      </view>
 
       <!-- 资产统计 -->
       <view class="stats-row">

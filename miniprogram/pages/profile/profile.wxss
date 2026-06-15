@@ -166,83 +166,164 @@
   margin: 0 0 24rpx;
 }
 
-/* --- 轮播卡片 --- */
-.member-swiper {
-  height: 460rpx;
+/* ── 横向滑动卡片 (Stitch: snap-x snap-mandatory) ── */
+.tier-cards-scroll {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.tier-cards-row {
+  display: flex;
+  gap: 32rpx;
+  padding: 0 32rpx;
 }
 
 .tier-card {
-  height: 100%;
-  margin: 0 32rpx;
+  width: 85vw;
+  max-width: 640rpx;
+  flex-shrink: 0;
   border-radius: 24rpx;
-  padding: 32rpx 32rpx 36rpx;
+  padding: 40rpx 40rpx 48rpx;
   position: relative;
-  z-index: 1;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
-  display: flex;
-  flex-direction: column;
+  white-space: normal;
 }
 
-.tier-card-inner {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.tier-card-header {
-  margin-bottom: 16rpx;
-}
-
-.tier-status-badge {
+/* ── 卡片内元素 ── */
+.tier-card-badge {
   display: inline-flex;
   padding: 6rpx 24rpx;
   border-radius: var(--radius-full);
+  margin-bottom: 24rpx;
+  align-self: flex-start;
 }
 
-.tier-status-text {
+.tier-card-badge-text {
   font-size: 20rpx;
   font-weight: var(--font-weight-semibold);
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
-/* --- 卡片主体 --- */
 .tier-card-body {
-  margin-bottom: 16rpx;
-  flex-shrink: 0;
+  margin-bottom: 24rpx;
 }
 
-.tier-name {
-  font-size: 40rpx;
+.tier-card-name {
+  font-size: 56rpx;
   font-weight: 800;
   line-height: 1.2;
+  display: block;
+  margin-bottom: 8rpx;
 }
 
-/* --- 权益列表（单文本块，无嵌套循环） --- */
-.tier-benefits-text {
-  flex: 1;
+.tier-card-growth {
   font-size: 24rpx;
-  font-weight: 500;
-  opacity: 0.85;
-  line-height: 1.9;
-  white-space: pre-line;
+  opacity: 0.8;
+  display: block;
 }
 
-/* --- 钻石卡片特殊样式 --- */
-.tier-card-diamond {
-  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.2);
+/* ── 卡片底部: Lv + 进度条 ── */
+.tier-card-footer {
+  margin-top: 16rpx;
 }
 
-.tier-card-diamond::before {
-  content: '';
+.tier-card-lv {
+  font-size: 22rpx;
+  font-weight: 800;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.tier-progress-bar {
+  width: 100%;
+  height: 6rpx;
+  border-radius: 3rpx;
+  overflow: hidden;
+}
+
+.tier-progress-fill {
+  height: 100%;
+  border-radius: 3rpx;
+  transition: width 0.5s ease;
+}
+
+/* ── 弧线指示器 (Stitch: arc path + sliding labels) ── */
+.arc-container {
+  margin-top: 8rpx;
+  position: relative;
+}
+
+.arc-curve-wrap {
+  width: 100%;
+  height: 60rpx;
+  overflow: hidden;
+}
+
+.arc-curve {
+  width: 140%;
+  height: 100rpx;
+  border-radius: 50%;
+  border: 2rpx solid rgba(180, 39, 27, 0.12);
   position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at top right, rgba(255,255,255,0.15), transparent 60%);
-  pointer-events: none;
-  z-index: 0;
+  left: -20%;
+  top: 10rpx;
+}
+
+.arc-labels-clip {
+  overflow: hidden;
+  height: 80rpx;
+  position: relative;
+  margin-top: -20rpx;
+}
+
+.arc-labels-row {
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  left: 50%;
+  margin-left: -200rpx;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.arc-label-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 200rpx;
+  flex-shrink: 0;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.arc-label-text {
+  font-size: 22rpx;
+  color: #5f5e5e;
+  margin-bottom: 10rpx;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.arc-label-active {
+  color: #1b1c1c;
+  font-weight: 700;
+}
+
+.arc-dot {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: #b02418;
+  opacity: 0.2;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.arc-dot-active {
+  opacity: 1;
+  width: 14rpx;
+  height: 14rpx;
 }
 
 /* ========== 资产统计 ========== */
