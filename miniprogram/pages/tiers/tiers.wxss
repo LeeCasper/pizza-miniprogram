@@ -5,12 +5,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 40rpx 24rpx;
-  background: var(--glass-bg-nav);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-  border-bottom: var(--glass-border-subtle);
-  box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
+  padding: 0 32rpx 20rpx;
+  background: #fcf8f2;
+  border-bottom: 1rpx solid rgba(0, 0, 0, 0.06);
   position: fixed;
   top: 0;
   left: 0;
@@ -19,12 +16,12 @@
 }
 
 .back-btn {
-  width: 80rpx;
-  height: 80rpx;
+  width: 72rpx;
+  height: 72rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 40rpx;
+  font-size: 36rpx;
   color: var(--color-primary);
 }
 
@@ -35,7 +32,7 @@
 }
 
 .top-spacer {
-  width: 80rpx;
+  width: 72rpx;
 }
 
 .main-scroll {
@@ -44,96 +41,102 @@
 }
 
 .scroll-inner {
-  padding: 32rpx 32rpx 0;
+  padding: 28rpx 28rpx 0;
 }
 
-/* ── Hero 卡片 ── */
+/* ── 区块标题 ── */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 20rpx;
+  margin-top: 8rpx;
+}
+
+.section-title {
+  font-size: 34rpx;
+  font-weight: 800;
+  color: #1a1a1a;
+}
+
+.section-icon {
+  font-size: 24rpx;
+}
+
+/* ==============================
+   HERO 卡片
+   ============================== */
 .hero-card {
-  border-radius: var(--radius-lg);
+  border-radius: 32rpx;
   overflow: hidden;
-  margin-bottom: 24rpx;
-  box-shadow: 0 12rpx 36rpx -8rpx rgba(0, 0, 0, 0.3);
+  margin-bottom: 36rpx;
+  box-shadow: 0 12rpx 40rpx -10rpx rgba(0, 0, 0, 0.35);
+  position: relative;
 }
 
 .hero-card-content {
-  padding: 44rpx 40rpx;
+  padding: 40rpx 36rpx 32rpx;
   position: relative;
   z-index: 1;
-}
-
-.hero-label {
-  font-size: 22rpx;
-  color: rgba(255, 255, 255, 0.5);
-  text-transform: uppercase;
-  letter-spacing: 6rpx;
-  display: block;
-  margin-bottom: 12rpx;
 }
 
 .hero-name-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16rpx;
+  margin-bottom: 6rpx;
 }
 
 .hero-tier-name {
   font-size: 48rpx;
   font-weight: 800;
   letter-spacing: -1rpx;
-  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.2);
+  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.15);
 }
 
 .hero-vip-badge {
   border: 2rpx solid;
   border-radius: 16rpx;
   padding: 8rpx 20rpx;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.25);
 }
 
 .hero-vip-text {
-  font-size: 24rpx;
+  font-size: 22rpx;
   font-weight: 700;
   letter-spacing: 3rpx;
 }
 
-.hero-accent-bar {
-  width: 64rpx;
-  height: 6rpx;
-  border-radius: 999rpx;
-  margin-bottom: 24rpx;
-  opacity: 0.8;
-}
-
-.hero-spent-row {
-  display: flex;
-  align-items: baseline;
-  gap: 16rpx;
-  margin-bottom: 20rpx;
-}
-
-.hero-spent-label {
+.hero-subtitle {
   font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.hero-spent-value {
-  font-size: 40rpx;
-  font-weight: 800;
-  color: #fff;
-  letter-spacing: -1rpx;
+  color: rgba(255, 255, 255, 0.5);
+  display: block;
+  margin-bottom: 36rpx;
 }
 
 /* Hero 进度条 */
 .hero-progress-section {
-  margin-top: 8rpx;
+  margin-top: 0;
+}
+
+.hero-progress-text {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.6);
+  display: block;
+  margin-bottom: 14rpx;
+}
+
+.hero-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
 }
 
 .hero-progress-bar-bg {
-  height: 10rpx;
+  flex: 1;
+  height: 8rpx;
   border-radius: 999rpx;
-  background: rgba(255, 255, 255, 0.18);
-  margin-bottom: 12rpx;
+  background: rgba(255, 255, 255, 0.15);
   overflow: hidden;
 }
 
@@ -143,16 +146,18 @@
   transition: width 0.6s ease;
 }
 
-.hero-progress-text {
-  font-size: 22rpx;
-  color: rgba(255, 255, 255, 0.65);
+.hero-progress-fraction {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  white-space: nowrap;
 }
 
 .hero-max-badge {
-  margin-top: 12rpx;
+  margin-top: 0;
   padding: 10rpx 24rpx;
   border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
   display: inline-block;
 }
 
@@ -163,215 +168,272 @@
   letter-spacing: 2rpx;
 }
 
-/* ── Hero 快捷权益 ── */
-.hero-quick-benefits {
+/* 装饰性 VIP 卡片（右上角） */
+.hero-decorative-card {
+  position: absolute;
+  right: -16rpx;
+  top: -12rpx;
+  width: 180rpx;
+  height: 200rpx;
+  border-radius: 24rpx;
+  border: 2rpx solid;
+  transform: rotate(12deg);
   display: flex;
-  justify-content: space-around;
-  padding: 28rpx 20rpx;
-  margin-bottom: 40rpx;
-  background: var(--glass-bg-card);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-  border-radius: var(--radius-card);
-  border: var(--glass-border-subtle);
-  box-shadow: var(--glass-shadow-card);
-}
-
-.quick-item {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 6rpx;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.3);
+  box-shadow: 0 12rpx 28rpx rgba(0, 0, 0, 0.4);
 }
 
-.quick-icon {
-  font-size: 36rpx;
+.hero-decorative-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
 }
 
-.quick-value {
-  font-size: 26rpx;
-  font-weight: var(--font-weight-bold);
-  color: var(--color-on-surface);
+.hero-decorative-text {
+  font-size: 24rpx;
+  font-weight: 800;
+  font-style: italic;
+  letter-spacing: 4rpx;
+  opacity: 0.7;
 }
 
-.quick-label {
-  font-size: 20rpx;
-  color: var(--color-on-surface-variant);
+/* ==============================
+   等级对比 - 横向滚动卡片
+   ============================== */
+.tier-compare-scroll {
+  width: 100%;
+  white-space: nowrap;
+  margin-bottom: 40rpx;
 }
 
-/* ── 全部等级标题 ── */
-.section-title {
-  font-size: 36rpx;
-  font-weight: var(--font-weight-bold);
-  color: var(--color-on-background);
-  margin-bottom: 24rpx;
+.tier-compare-list {
+  display: inline-flex;
+  gap: 20rpx;
+  padding-bottom: 8rpx;
 }
 
-/* ── 等级详情卡片 ── */
-.tier-detail-card {
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin-bottom: 28rpx;
-  box-shadow: var(--glass-shadow-card);
-  border: var(--glass-border-subtle);
-  transition: opacity 0.3s;
+.tier-compare-card {
+  display: inline-flex;
+  flex-direction: column;
+  width: 260rpx;
+  min-width: 260rpx;
+  padding: 28rpx 24rpx 24rpx;
+  border-radius: 24rpx;
+  position: relative;
+  white-space: normal;
+  box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.2);
 }
 
-.tier-detail-card.tier-card-highlight {
-  box-shadow: 0 4rpx 24rpx rgba(211, 47, 47, 0.12);
-  border: 2rpx solid var(--color-primary);
+.tier-compare-card.compare-card-active {
+  box-shadow: 0 8rpx 28rpx rgba(0, 0, 0, 0.35);
+  transform: scale(1.02);
 }
 
-.tier-detail-card.tier-card-dimmed {
+.tier-compare-card.compare-card-dimmed {
   opacity: 0.55;
 }
 
-/* 等级头部 */
-.tier-detail-header {
-  overflow: hidden;
-}
-
-.tier-detail-header-inner {
-  padding: 32rpx 36rpx;
-  position: relative;
-  z-index: 1;
-}
-
-.tier-detail-name-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8rpx;
-}
-
-.tier-detail-name {
-  font-size: 36rpx;
+.compare-card-name {
+  font-size: 30rpx;
   font-weight: 800;
-  letter-spacing: -1rpx;
-  text-shadow: 0 1rpx 6rpx rgba(0, 0, 0, 0.2);
+  margin-bottom: 10rpx;
 }
 
-.tier-detail-mini-badge {
-  border: 1rpx solid;
-  border-radius: 10rpx;
-  padding: 4rpx 14rpx;
-  background: rgba(0, 0, 0, 0.25);
+.compare-card-badge {
+  font-size: 18rpx;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 16rpx;
+  display: inline-block;
 }
 
-.tier-detail-mini-badge-text {
-  font-size: 20rpx;
+.compare-card-badge-text {
+  font-size: 18rpx;
   font-weight: 700;
   letter-spacing: 2rpx;
 }
 
-.tier-detail-threshold {
-  font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.6);
-  display: block;
-  margin-bottom: 12rpx;
-}
-
-/* 状态芯片 */
-.tier-status-chip {
-  display: inline-block;
-  padding: 6rpx 22rpx;
-  border-radius: var(--radius-full);
+.compare-card-range {
   font-size: 22rpx;
-  font-weight: var(--font-weight-semibold);
-}
-
-.tier-status-achieved {
-  background: rgba(56, 142, 60, 0.25);
-  color: #81c784;
-}
-
-.tier-status-current {
-  background: rgba(211, 47, 47, 0.2);
-  color: #ef9a9a;
-}
-
-.tier-status-upcoming {
-  background: rgba(127, 127, 127, 0.15);
   color: rgba(255, 255, 255, 0.5);
+  margin-top: auto;
 }
 
-/* 权益明细 */
-.tier-detail-body {
-  padding: 16rpx 0;
-  background: var(--color-surface);
-}
-
-.benefit-row {
+/* 已达成对勾 */
+.compare-card-check {
+  position: absolute;
+  bottom: 16rpx;
+  right: 16rpx;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
   display: flex;
   align-items: center;
-  gap: 24rpx;
-  padding: 20rpx 36rpx;
-  border-bottom: 1rpx solid var(--color-divider);
+  justify-content: center;
 }
 
-.benefit-row-last {
-  border-bottom: none;
+.compare-card-check-text {
+  color: #fff;
+  font-size: 22rpx;
+  font-weight: 800;
 }
 
-.benefit-icon-wrap {
-  width: 68rpx;
-  height: 68rpx;
-  border-radius: 18rpx;
+/* ==============================
+   权益网格 - 2列
+   ============================== */
+.benefits-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-bottom: 40rpx;
+  background: rgba(255, 255, 255, 0.55);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  border-radius: 28rpx;
+  padding: 20rpx;
+}
+
+.benefit-grid-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  width: calc(50% - 8rpx);
+  padding: 18rpx 16rpx;
+  box-sizing: border-box;
+}
+
+.benefit-grid-icon {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
-.benefit-icon {
-  font-size: 32rpx;
+.benefit-grid-emoji {
+  font-size: 30rpx;
 }
 
-.benefit-icon-discount { background: rgba(211, 47, 47, 0.08); }
-.benefit-icon-points  { background: rgba(251, 192, 45, 0.12); }
-.benefit-icon-birthday { background: rgba(56, 142, 60, 0.08); }
-.benefit-icon-coupon  { background: rgba(132, 85, 239, 0.1); }
-
-.benefit-info {
+.benefit-grid-info {
   flex: 1;
   min-width: 0;
 }
 
-.benefit-label {
-  font-size: 22rpx;
-  color: var(--color-on-surface-variant);
+.benefit-grid-label {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #1a1a1a;
   display: block;
-  margin-bottom: 4rpx;
+  margin-bottom: 2rpx;
 }
 
-.benefit-value {
-  font-size: 28rpx;
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-on-surface);
-}
-
-/* 卡片底部进度条 */
-.tier-progress-wrap {
-  padding: 20rpx 36rpx 28rpx;
-  background: var(--color-surface);
-  border-top: 1rpx solid var(--color-divider);
-}
-
-.tier-progress-bar-bg {
-  height: 8rpx;
-  border-radius: 999rpx;
-  background: var(--color-surface-container-high);
-  margin-bottom: 10rpx;
+.benefit-grid-desc {
+  font-size: 18rpx;
+  color: #999;
+  display: block;
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.tier-progress-bar-fill {
-  height: 100%;
-  border-radius: 999rpx;
-  transition: width 0.6s ease;
+.benefit-grid-value {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #b87333;
+  flex-shrink: 0;
 }
 
-.tier-progress-label {
+/* 权益图标背景色 */
+.benefit-icon-discount { background: #fcead7; }
+.benefit-icon-points   { background: #fdf2d7; }
+.benefit-icon-cashback { background: #e6f0fa; }
+.benefit-icon-birthday { background: #e8f2e9; }
+.benefit-icon-coupon   { background: #f4e6ec; }
+.benefit-icon-shipping { background: #fae8db; }
+.benefit-icon-service  { background: #e6f3f5; }
+.benefit-icon-new      { background: #f0e6fa; }
+
+/* ==============================
+   等级规则卡片
+   ============================== */
+.rules-card {
+  background: rgba(255, 255, 255, 0.55);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  border-radius: 28rpx;
+  padding: 20rpx 28rpx;
+  margin-bottom: 24rpx;
+}
+
+.rules-row {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid rgba(0, 0, 0, 0.05);
+}
+
+.rules-row:last-child {
+  border-bottom: none;
+}
+
+.rules-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.rules-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.rules-tier-name {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1a1a1a;
+  display: block;
+  margin-bottom: 2rpx;
+}
+
+.rules-tier-range {
   font-size: 22rpx;
-  color: var(--color-on-surface-variant);
+  color: #999;
+}
+
+.rules-discount {
+  flex-shrink: 0;
+}
+
+.rules-discount-text {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #b87333;
+}
+
+/* 规则底部说明 */
+.rules-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  margin-bottom: 8rpx;
+  padding: 0 20rpx;
+}
+
+.rules-footer-icon {
+  font-size: 20rpx;
+  flex-shrink: 0;
+}
+
+.rules-footer-text {
+  font-size: 20rpx;
+  color: #aaa;
+  text-align: center;
 }

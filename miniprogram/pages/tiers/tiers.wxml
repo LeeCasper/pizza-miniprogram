@@ -3,7 +3,7 @@
   <!-- 顶部导航 -->
   <view class="top-bar" style="padding-top: {{statusBarHeight}}px">
     <view class="back-btn" bindtap="onBack"><text>←</text></view>
-    <text class="top-title">会员等级权益</text>
+    <text class="top-title">会员权益</text>
     <view class="top-spacer"></view>
   </view>
 
@@ -12,139 +12,104 @@
       style="flex: 1; height: 0;">
     <view class="scroll-inner">
 
-      <!-- ====== HERO: 当前等级 ====== -->
-      <view class="hero-card tier-bg-{{currentTier.levelIndex}}">
+      <!-- ====== HERO: 当前等级卡片 ====== -->
+      <view class="hero-card tier-bg-{{currentTier.levelIndex}}" wx:if="{{currentTier}}">
         <view class="hero-card-content">
-          <text class="hero-label">CURRENT TIER</text>
           <view class="hero-name-row">
             <text class="hero-tier-name" style="color: {{currentTier.accentColor}}">{{currentTier.name}}</text>
             <view class="hero-vip-badge" style="border-color: {{currentTier.accentColor}}">
               <text class="hero-vip-text" style="color: {{currentTier.accentColor}}">VIP.{{currentTier.levelIndex}}</text>
             </view>
           </view>
-          <view class="hero-accent-bar" style="background: {{currentTier.accentColor}}"></view>
-          <view class="hero-spent-row">
-            <text class="hero-spent-label">累计消费</text>
-            <text class="hero-spent-value">¥{{totalSpentText}}</text>
-          </view>
+          <text class="hero-subtitle">当前等级</text>
+
           <!-- 进度条 -->
           <view class="hero-progress-section" wx:if="{{hasNext}}">
-            <view class="hero-progress-bar-bg">
-              <view class="hero-progress-bar-fill" style="width: {{progressPercent}}%; background: {{currentTier.accentColor}}"></view>
+            <text class="hero-progress-text">还差¥{{spentToNext}}升级{{nextTier.name}}</text>
+            <view class="hero-progress-row">
+              <view class="hero-progress-bar-bg">
+                <view class="hero-progress-bar-fill" style="width: {{progressPercent}}%; background: {{currentTier.accentColor}}"></view>
+              </view>
+              <text class="hero-progress-fraction">{{progressFraction}}</text>
             </view>
-            <text class="hero-progress-text">还差 ¥{{spentToNext}} 升级 {{nextTier.name}}</text>
           </view>
           <view class="hero-max-badge" wx:else>
             <text class="hero-max-text">✦ 已达最高等级 ✦</text>
           </view>
         </view>
-      </view>
 
-      <!-- Hero 快捷权益 -->
-      <view class="hero-quick-benefits" wx:if="{{currentTier}}">
-        <view class="quick-item" wx:if="{{currentTier.discountRate < 1}}">
-          <text class="quick-icon">🏷️</text>
-          <text class="quick-value">{{heroDiscountText}}</text>
-          <text class="quick-label">折扣</text>
-        </view>
-        <view class="quick-item" wx:if="{{currentTier.pointsRewardRate > 1}}">
-          <text class="quick-icon">⭐</text>
-          <text class="quick-value">{{heroPointsText}}</text>
-          <text class="quick-label">积分</text>
-        </view>
-        <view class="quick-item" wx:if="{{currentTier.birthdayGift}}">
-          <text class="quick-icon">🎂</text>
-          <text class="quick-value">专属</text>
-          <text class="quick-label">生日礼</text>
-        </view>
-        <view class="quick-item" wx:if="{{currentTier.couponValue > 0}}">
-          <text class="quick-icon">🎫</text>
-          <text class="quick-value">¥{{currentTier.couponValue}}</text>
-          <text class="quick-label">升级礼券</text>
+        <!-- 装饰性 VIP 卡片 -->
+        <view class="hero-decorative-card" style="border-color: {{currentTier.accentColor}}20">
+          <view class="hero-decorative-inner">
+            <text class="hero-decorative-text" style="color: {{currentTier.accentColor}}">VIP.{{currentTier.levelIndex}}</text>
+          </view>
         </view>
       </view>
 
-      <!-- ====== 全部等级列表 ====== -->
-      <text class="section-title">全部等级</text>
+      <!-- ====== 等级对比横向滚动 ====== -->
+      <view class="section-header">
+        <text class="section-title">会员等级对比</text>
+        <text class="section-icon">💎</text>
+      </view>
 
-      <view class="tier-detail-card {{item.status === 'current' ? 'tier-card-highlight' : ''}} {{item.status === 'upcoming' ? 'tier-card-dimmed' : ''}}"
-          wx:for="{{tiers}}" wx:key="levelKey" id="tier-{{item.levelKey}}">
-
-        <!-- 等级头部 -->
-        <view class="tier-detail-header tier-bg-{{item.levelIndex}}">
-          <view class="tier-detail-header-inner">
-            <view class="tier-detail-name-row">
-              <text class="tier-detail-name" style="color: {{item.accentColor}}">{{item.name}}</text>
-              <view class="tier-detail-mini-badge" style="border-color: {{item.accentColor}}">
-                <text class="tier-detail-mini-badge-text" style="color: {{item.accentColor}}">VIP.{{item.levelIndex}}</text>
-              </view>
+      <scroll-view scroll-x class="tier-compare-scroll" enhanced show-scrollbar="{{false}}">
+        <view class="tier-compare-list">
+          <view class="tier-compare-card tier-bg-{{item.levelIndex}} {{item.status === 'current' ? 'compare-card-active' : ''}} {{item.status === 'upcoming' ? 'compare-card-dimmed' : ''}}"
+              wx:for="{{tiers}}" wx:key="levelKey" id="tier-{{item.levelKey}}">
+            <text class="compare-card-name" style="color: {{item.accentColor}}">{{item.name}}</text>
+            <view class="compare-card-badge" wx:if="{{item.status === 'current'}}" style="border-color: {{item.accentColor}}">
+              <text class="compare-card-badge-text" style="color: {{item.accentColor}}">VIP.{{item.levelIndex}}</text>
             </view>
-            <text class="tier-detail-threshold">累计消费满 ¥{{item.minSpent}}</text>
-            <!-- 状态标签 -->
-            <view class="tier-status-chip tier-status-{{item.status}}">
-              <text wx:if="{{item.status === 'achieved'}}">✓ 已达成</text>
-              <text wx:elif="{{item.status === 'current'}}">★ 当前等级</text>
-              <text wx:else>🔒 未解锁</text>
+            <text class="compare-card-badge" wx:else>VIP.{{item.levelIndex}}</text>
+            <text class="compare-card-range">{{item.rangeText}}</text>
+            <!-- 已达成对勾 -->
+            <view class="compare-card-check" wx:if="{{item.status === 'achieved'}}" style="background: {{item.accentColor}}">
+              <text class="compare-card-check-text">✓</text>
             </view>
           </view>
         </view>
+      </scroll-view>
 
-        <!-- 权益明细 -->
-        <view class="tier-detail-body">
-          <view class="benefit-row" wx:if="{{item.discountRate < 1}}">
-            <view class="benefit-icon-wrap benefit-icon-discount">
-              <text class="benefit-icon">🏷️</text>
-            </view>
-            <view class="benefit-info">
-              <text class="benefit-label">折扣优惠</text>
-              <text class="benefit-value">{{item.discountText}}</text>
-            </view>
+      <!-- ====== 当前等级专属权益 ====== -->
+      <view class="section-header" wx:if="{{currentTier}}">
+        <text class="section-title">{{currentTier.name}}专属权益</text>
+      </view>
+
+      <view class="benefits-grid" wx:if="{{currentTier}}">
+        <view class="benefit-grid-item" wx:for="{{currentTier.benefitItems}}" wx:key="label" wx:for-item="b">
+          <view class="benefit-grid-icon {{b.iconBg}}">
+            <text class="benefit-grid-emoji">{{b.icon}}</text>
           </view>
-          <view class="benefit-row" wx:if="{{item.pointsRewardRate > 1}}">
-            <view class="benefit-icon-wrap benefit-icon-points">
-              <text class="benefit-icon">⭐</text>
-            </view>
-            <view class="benefit-info">
-              <text class="benefit-label">积分倍率</text>
-              <text class="benefit-value">消费积分 x{{item.pointsText}}</text>
-            </view>
+          <view class="benefit-grid-info">
+            <text class="benefit-grid-label">{{b.label}}</text>
+            <text class="benefit-grid-desc">{{b.desc}}</text>
           </view>
-          <view class="benefit-row" wx:if="{{item.pointsRewardRate === 1}}">
-            <view class="benefit-icon-wrap benefit-icon-points">
-              <text class="benefit-icon">⭐</text>
-            </view>
-            <view class="benefit-info">
-              <text class="benefit-label">积分倍率</text>
-              <text class="benefit-value">基础积分</text>
-            </view>
+          <text class="benefit-grid-value">{{b.value}}</text>
+        </view>
+      </view>
+
+      <!-- ====== 等级规则 ====== -->
+      <view class="section-header">
+        <text class="section-title">等级规则</text>
+        <text class="section-icon">✍️</text>
+      </view>
+
+      <view class="rules-card">
+        <view class="rules-row" wx:for="{{tiers}}" wx:key="levelKey" wx:for-item="rule">
+          <view class="rules-dot" style="background: {{rule.accentColor}}"></view>
+          <view class="rules-info">
+            <text class="rules-tier-name">{{rule.name}}</text>
+            <text class="rules-tier-range">{{rule.rangeText}}</text>
           </view>
-          <view class="benefit-row">
-            <view class="benefit-icon-wrap benefit-icon-birthday">
-              <text class="benefit-icon">🎂</text>
-            </view>
-            <view class="benefit-info">
-              <text class="benefit-label">生日特权</text>
-              <text class="benefit-value">{{item.birthdayGift}}</text>
-            </view>
-          </view>
-          <view class="benefit-row benefit-row-last" wx:if="{{item.couponValue > 0}}">
-            <view class="benefit-icon-wrap benefit-icon-coupon">
-              <text class="benefit-icon">🎫</text>
-            </view>
-            <view class="benefit-info">
-              <text class="benefit-label">升级礼券</text>
-              <text class="benefit-value">¥{{item.couponValue}} 优惠券</text>
-            </view>
+          <view class="rules-discount" wx:if="{{rule.discountRate < 1}}">
+            <text class="rules-discount-text">{{rule.discountText}}</text>
           </view>
         </view>
+      </view>
 
-        <!-- 等级内进度条（仅当前等级且有下一级时） -->
-        <view class="tier-progress-wrap" wx:if="{{item.status === 'current' && hasNext}}">
-          <view class="tier-progress-bar-bg">
-            <view class="tier-progress-bar-fill" style="width: {{progressPercent}}%; background: {{item.accentColor}}"></view>
-          </view>
-          <text class="tier-progress-label">还需 ¥{{spentToNext}} 升级 {{nextTier.name}}</text>
-        </view>
+      <view class="rules-footer">
+        <text class="rules-footer-icon">ℹ️</text>
+        <text class="rules-footer-text">会员权益长期有效，等级规则如有调整以公告为准</text>
       </view>
 
       <view style="height: calc(120rpx + env(safe-area-inset-bottom))"></view>
