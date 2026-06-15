@@ -54,8 +54,9 @@
 
       <scroll-view scroll-x class="tier-compare-scroll" enhanced show-scrollbar="{{false}}">
         <view class="tier-compare-list">
-          <view class="tier-compare-card tier-bg-{{item.levelIndex}} {{item.status === 'current' ? 'compare-card-active' : ''}} {{item.status === 'upcoming' ? 'compare-card-dimmed' : ''}}"
-              wx:for="{{tiers}}" wx:key="levelKey" id="tier-{{item.levelKey}}">
+          <view class="tier-compare-card tier-bg-{{item.levelIndex}} {{item.status === 'current' ? 'compare-card-active' : ''}} {{item.status === 'upcoming' ? 'compare-card-dimmed' : ''}} {{item.levelKey === selectedTierKey ? 'compare-card-selected' : ''}}"
+              wx:for="{{tiers}}" wx:key="levelKey" id="tier-{{item.levelKey}}"
+              bindtap="onSelectTier" data-level-key="{{item.levelKey}}">
             <text class="compare-card-name" style="color: {{item.accentColor}}">{{item.name}}</text>
             <view class="compare-card-badge" wx:if="{{item.status === 'current'}}" style="border-color: {{item.accentColor}}">
               <text class="compare-card-badge-text" style="color: {{item.accentColor}}">VIP.{{item.levelIndex}}</text>
@@ -70,13 +71,13 @@
         </view>
       </scroll-view>
 
-      <!-- ====== 当前等级专属权益 ====== -->
-      <view class="section-header" wx:if="{{currentTier}}">
-        <text class="section-title">{{currentTier.name}}专属权益</text>
+      <!-- ====== 选中等级专属权益 ====== -->
+      <view class="section-header" wx:if="{{selectedTier}}">
+        <text class="section-title">{{selectedTier.name}}专属权益</text>
       </view>
 
-      <view class="benefits-grid" wx:if="{{currentTier}}">
-        <view class="benefit-grid-item" wx:for="{{currentTier.benefitItems}}" wx:key="label" wx:for-item="b">
+      <view class="benefits-grid" wx:if="{{selectedTier}}">
+        <view class="benefit-grid-item" wx:for="{{selectedTier.benefitItems}}" wx:key="label" wx:for-item="b">
           <view class="benefit-grid-icon {{b.iconBg}}">
             <text class="benefit-grid-emoji">{{b.icon}}</text>
           </view>

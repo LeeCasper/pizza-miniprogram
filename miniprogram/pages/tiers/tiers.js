@@ -180,6 +180,8 @@ Page({
     topBarTotalHeight: 80,
     tiers: [],
     currentTier: null,
+    selectedTier: null,
+    selectedTierKey: '',
     nextTier: null,
     totalSpent: 0,
     totalSpentText: '0.00',
@@ -227,6 +229,9 @@ Page({
       const targetKey = scrollToKey || tierInfo.current.levelKey;
       const scrollToView = 'tier-' + targetKey;
 
+      // Initial selected tier (the one navigated to, or current)
+      const selectedTier = tiers.find(t => t.levelKey === targetKey) || currentTier;
+
       // Pre-compute hero display values (WXML can't call .toFixed)
       const heroDiscountText = currentTier.discountRate < 1 ? (currentTier.discountRate * 10).toFixed(1) + '折' : '';
       const heroPointsText = currentTier.pointsRewardRate > 1 ? 'x' + currentTier.pointsRewardRate : '';
@@ -234,6 +239,8 @@ Page({
       this.setData({
         tiers,
         currentTier,
+        selectedTier,
+        selectedTierKey: selectedTier.levelKey,
         heroDiscountText,
         heroPointsText,
         nextTier,
@@ -271,6 +278,24 @@ Page({
 
   onBack() {
     wx.navigateBack();
+  },
+
+  // ── 点击横向对比卡片切换权益展示 ──
+  onSelectTier(e) {
+    const levelKey = e.currentTarget.dataset.levelKey;
+    if (!levelKey || levelKey === this.data.selectedTierKey) return;
+    const tier = this.data.tiers.find(t => t.levelKey === levelKey);
+    if (tier) {
+      this.setData({
+        selectedTier: tier,
+        selectedTierKey: levelKey,
+        scrollToView: '',
+      });
+      // Scroll to the tapped card
+      setTimeout(() => {
+        this.setData({ scrollToView: 'tier-' + levelKey });
+      }, 100);
+    }
   },
 
   noop() {},

@@ -208,12 +208,13 @@
   width: 100%;
   white-space: nowrap;
   margin-bottom: 40rpx;
+  -webkit-overflow-scrolling: touch;
 }
 
 .tier-compare-list {
   display: inline-flex;
   gap: 20rpx;
-  padding-bottom: 8rpx;
+  padding: 4rpx 4rpx 12rpx 4rpx;
 }
 
 .tier-compare-card {
@@ -226,6 +227,8 @@
   position: relative;
   white-space: normal;
   box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.2);
+  border: 4rpx solid transparent;
+  transition: all 0.25s ease;
 }
 
 .tier-compare-card.compare-card-active {
@@ -235,6 +238,12 @@
 
 .tier-compare-card.compare-card-dimmed {
   opacity: 0.55;
+}
+
+.tier-compare-card.compare-card-selected {
+  border-color: var(--color-primary);
+  transform: scale(1.04);
+  box-shadow: 0 0 0 4rpx rgba(211, 47, 47, 0.18), 0 8rpx 28rpx rgba(0, 0, 0, 0.3);
 }
 
 .compare-card-name {
