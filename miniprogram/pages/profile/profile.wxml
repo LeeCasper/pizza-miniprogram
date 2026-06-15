@@ -32,6 +32,47 @@
       </view>
     </view>
 
+    <!-- 会员卡轮播 -->
+    <view class="member-cards-section" wx:if="{{tierCards.length}}">
+      <swiper class="member-swiper"
+        previous-margin="60rpx"
+        next-margin="60rpx"
+        bindchange="onTierChange"
+        current="{{activeTierIndex}}"
+        circular>
+        <swiper-item wx:for="{{tierCards}}" wx:key="level">
+          <view class="tier-card tier-card-{{item.isActive ? 'active' : 'inactive'}}"
+            style="background-image: linear-gradient(135deg, {{item.bgStart}}, {{item.bgEnd}})">
+            <view class="tier-card-glass" style="border-color: {{item.accentColor}}"></view>
+            <view class="tier-card-content">
+              <view class="tier-card-header">
+                <view>
+                  <text class="tier-card-title" style="color: {{item.accentColor}}">收藏大亨</text>
+                  <view class="tier-card-accent" style="background: {{item.accentColor}}"></view>
+                </view>
+              </view>
+              <view class="tier-card-badge" style="border-color: {{item.accentColor}}">
+                <text class="tier-card-badge-text" style="color: {{item.accentColor}}">VIP.{{item.level}}</text>
+              </view>
+              <view class="tier-card-footer">
+                <text class="tier-card-progress-text" style="color: {{item.accentColor}}">{{item.progressText}}</text>
+                <view class="tier-card-action" catchtap="onUpgradeTier" data-level="{{item.level}}">
+                  <text class="tier-card-action-text" style="color: {{item.accentColor}}">{{item.actionText}}</text>
+                  <text class="tier-card-action-arrow">→</text>
+                </view>
+              </view>
+            </view>
+          </view>
+        </swiper-item>
+      </swiper>
+      <view class="tier-dots">
+        <view class="tier-dot {{activeTierIndex === ti ? 'active' : ''}}"
+          wx:for="{{tierCards}}" wx:key="level" wx:for-index="ti"
+          style="{{activeTierIndex === ti ? 'background:' + item.accentColor + '; box-shadow: 0 0 8rpx ' + item.accentColor : ''}}">
+        </view>
+      </view>
+    </view>
+
     <!-- 公告浮窗 -->
     <view class="announce-float {{announceOpen ? 'expanded' : ''}}" catchtap="onAnnounceToggle">
       <view class="announce-float-tab" wx:if="{{!announceOpen}}">

@@ -22,6 +22,52 @@ const dietaryRestrictions = [
   { key: 'seafood_allergy', label: '海鲜过敏' },
   { key: 'gluten_allergy', label: '麸质过敏' }
 ];
+
+// ── 会员等级配置 ──────────────────────────────
+const TIERS = [
+  { level: 1, name: '银卡会员', accentColor: '#c0c0c0', bgStart: 'rgba(60,60,65,0.88)', bgEnd: 'rgba(25,25,30,0.95)', threshold: 0 },
+  { level: 2, name: '金卡会员', accentColor: '#f2ca50', bgStart: 'rgba(45,42,33,0.88)', bgEnd: 'rgba(17,14,7,0.95)', threshold: 100 },
+  { level: 3, name: '玫瑰金会员', accentColor: '#e0a2a2', bgStart: 'rgba(50,35,35,0.88)', bgEnd: 'rgba(20,15,15,0.95)', threshold: 500 },
+  { level: 4, name: '铂金会员', accentColor: '#b4bed2', bgStart: 'rgba(35,40,50,0.88)', bgEnd: 'rgba(15,17,25,0.95)', threshold: 2000 },
+  { level: 5, name: '钻石会员', accentColor: '#82c8f0', bgStart: 'rgba(20,35,50,0.88)', bgEnd: 'rgba(10,15,25,0.95)', threshold: 10000 },
+];
+
+function computeTier(points) {
+  let current = TIERS[0], next = TIERS[1];
+  for (let i = TIERS.length - 1; i >= 0; i--) {
+    if (points >= TIERS[i].threshold) { current = TIERS[i]; next = TIERS[i + 1] || null; break; }
+  }
+  return { current, next };
+}
+
+function buildTierCards(userTier) {
+  return TIERS.map(t => {
+    const isActive = t.level === userTier.level;
+    let progressText = '', actionText = '';
+    if (t.level < userTier.level) {
+      progressText = '已达成';
+      actionText = '查看特权';
+    } else if (t.level === userTier.level) {
+      if (userTier.next) {
+        const diff = userTier.next.threshold - (userTier._points || 0);
+        progressText = '还差' + diff + '泡泡值升级V' + userTier.next.level;
+        actionText = '去升级';
+      } else {
+        progressText = '已达最高等级';
+        actionText = '查看特权';
+      }
+    } else {
+      const diff = t.threshold - (userTier._points || 0);
+      progressText = '还差' + diff + '泡泡值升级V' + t.level;
+      actionText = '去升级';
+    }
+    return {
+      level: t.level, name: t.name, accentColor: t.accentColor,
+      bgStart: t.bgStart, bgEnd: t.bgEnd,
+      isActive, progressText, actionText,
+    };
+  });
+}
 Page({
   data: {
     statusBarHeight: app.globalData.statusBarHeight,
@@ -51,6 +97,7 @@ Page({
     userInfo: {}, cardCount: 0,
     editProfileOpen: false, editForm: { name: '', bio: '', avatar: '' },
     announceOpen: false,
+    tierCards: [], activeTierIndex: 0,
     // 会员订阅（商城 tab 会员弹窗）
     selectedPlan: 'monthly',
     memberOverlayOpen: false,
@@ -380,8 +427,17 @@ Page({
 
   loadProfileData() {
     const ui = app.globalData.userInfo;
+    const points = ui.points || ui.bubbleValue || 0;
+
+    const tierInfo = computeTier(points);
+    tierInfo._points = points;
+    const tierCards = buildTierCards(tierInfo);
+    const activeTierIndex = tierInfo.level - 1;
+
     this.setData({
       userInfo: { ...ui, balanceText: '¥' + ((ui.balance || 0)).toFixed(2), cardCount: ui.cardCount || 0, bio: ui.bio || '享受美味每一天' },
+      tierCards,
+      activeTierIndex,
     });
     // Background refresh
     api.get('/user/profile').then(res => {
@@ -410,6 +466,24 @@ Page({
       title: '确认退出', content: '确定要退出登录吗？',
       success: (res) => { if (res.confirm) { wx.removeStorageSync('token'); wx.removeStorageSync('userInfo'); wx.showToast({ title: '已退出', icon: 'success' }); } }
     });
+  },
+
+  // ── 会员卡轮播 ──────────────────────────────
+  onTierChange(e) {
+    this.setData({ activeTierIndex: e.detail.current });
+  },
+
+  onUpgradeTier(e) {
+    const level = e.currentTarget.dataset.level;
+    const points = app.globalData.userInfo.points || app.globalData.userInfo.bubbleValue || 0;
+    const tierInfo = computeTier(points);
+    if (level < tierInfo.level) {
+      wx.showToast({ title: '您已是更高等级会员！', icon: 'none' });
+    } else if (level === tierInfo.level && !tierInfo.next) {
+      wx.showToast({ title: '已达成最高等级 🎉', icon: 'none' });
+    } else {
+      wx.showToast({ title: '多做任务获取泡泡值！', icon: 'none', duration: 2000 });
+    }
   },
 
   // ── 编辑个人信息 ────────────────────────────
