@@ -358,6 +358,7 @@ Page({
   // ========== 会员等级滑动 ==========
   onTierSwiperChange(e) {
     const idx = e.detail.current;
+    if (idx === this.data.currentTierIndex) return;
     this.setData({
       currentTierIndex: idx,
       tierCards: buildTierCards(idx),

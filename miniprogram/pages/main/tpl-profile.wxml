@@ -29,7 +29,7 @@
     <swiper
       class="member-swiper"
       current="{{currentTierIndex}}"
-      bindchange="onTierSwiperChange"
+      bindanimationfinish="onTierSwiperChange"
       duration="300"
       easing-function="easeInOutCubic"
       previous-margin="56rpx"
