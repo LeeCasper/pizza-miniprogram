@@ -1,78 +1,15 @@
 // pages/profile/profile.js
 const { api } = require('../../utils/api');
 const app = getApp();
-
-// ── 会员等级（Stitch 设计稿 1:1） ──────────────────
-const TIERS = [
-  { key: 'normal',   name: '普通', gradient: 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)', textColor: '#1f2937', badgeBg: 'rgba(0,0,0,0.08)',    threshold: 0,    progressTrack: 'rgba(0,0,0,0.1)',   progressFill: 'rgba(0,0,0,0.5)' },
-  { key: 'gold',     name: '黄金', gradient: 'linear-gradient(135deg, #fceabb 0%, #f8b500 100%)', textColor: '#451a03', badgeBg: 'rgba(255,255,255,0.4)', threshold: 1000, progressTrack: 'rgba(120,53,15,0.1)', progressFill: 'rgba(120,53,15,0.8)' },
-  { key: 'platinum', name: '铂金', gradient: 'linear-gradient(135deg, #e2e8f0 0%, #f8fafc 50%, #cbd5e1 100%)', textColor: '#1e293b', badgeBg: 'rgba(255,255,255,0.5)', threshold: 3000, progressTrack: 'rgba(30,41,59,0.1)', progressFill: 'rgba(30,41,59,0.7)' },
-  { key: 'diamond',  name: '钻石', gradient: 'linear-gradient(135deg, #111827 0%, #000000 100%)', textColor: '#ffffff', badgeBg: 'rgba(255,255,255,0.2)', threshold: 6000, progressTrack: 'rgba(255,255,255,0.2)', progressFill: 'rgba(255,255,255,0.8)' }
-];
-const TIER_THRESHOLDS = [0, 1000, 3000, 6000];
-
-function computeTier(points) {
-  let tierIndex = 0;
-  for (let i = TIER_THRESHOLDS.length - 1; i >= 0; i--) {
-    if (points >= TIER_THRESHOLDS[i]) { tierIndex = i; break; }
-  }
-  const isMax = tierIndex >= TIERS.length - 1;
-  const pointsToNext = isMax ? 0 : TIER_THRESHOLDS[tierIndex + 1] - points;
-  let tierProgress = 100;
-  if (!isMax) {
-    const lo = TIER_THRESHOLDS[tierIndex];
-    const hi = TIER_THRESHOLDS[tierIndex + 1];
-    tierProgress = Math.round(((points - lo) / (hi - lo)) * 100);
-  }
-  return { tierIndex, pointsToNext, tierProgress, isMax };
-}
-
-function buildTierCards(userTierIndex, userPoints) {
-  return TIERS.map((t, i) => {
-    const isCurrent = i === userTierIndex;
-    const isLocked = i > userTierIndex;
-    const isUnlocked = i < userTierIndex;
-    let growthText = '';
-    if (isCurrent && i < TIERS.length - 1) {
-      growthText = '成长值' + userPoints + ' 还需' + (TIER_THRESHOLDS[i + 1] - userPoints) + '升级';
-    } else if (isCurrent) {
-      growthText = '成长值' + userPoints + ' 已达最高等级';
-    } else if (isLocked) {
-      growthText = '成长值0 还需' + (TIER_THRESHOLDS[i] - (i > 0 ? TIER_THRESHOLDS[i - 1] : 0)) + '升级';
-    } else {
-      growthText = '已解锁全部权益';
-    }
-    let progressPercent = 100;
-    if (isCurrent && i < TIERS.length - 1) {
-      const lo = TIER_THRESHOLDS[i], hi = TIER_THRESHOLDS[i + 1];
-      progressPercent = Math.round(((userPoints - lo) / (hi - lo)) * 100);
-    } else if (isLocked) {
-      progressPercent = 0;
-    }
-    return {
-      key: t.key, name: t.name, gradient: t.gradient, textColor: t.textColor,
-      badgeBg: t.badgeBg, threshold: t.threshold, progressTrack: t.progressTrack,
-      progressFill: t.progressFill,
-      isCurrent, isLocked, isUnlocked,
-      growthText, progressPercent,
-      lv: 'Lv' + i
-    };
-  });
-}
-
 Page({
   data: {
     statusBarHeight: 44,
     topBarTotalHeight: 80,
     userInfo: {},
-    tierCards: buildTierCards(0, 0),
-    activeTierIndex: 0,
     cardCount: 0,
     editProfileOpen: false,
     editForm: { name: '', bio: '', avatar: '' },
     announceOpen: false,
-    memberOverlayOpen: false,
-    selectedPlan: 'monthly',
   },
 
   onLoad() {
@@ -94,18 +31,14 @@ Page({
 
   loadUserData() {
     const ui = app.globalData.userInfo;
-    const { tierIndex } = computeTier(ui.points || 0);
 
     this.setData({
       userInfo: {
         ...ui,
-        memberLevel: TIERS[tierIndex].name,
         balanceText: '¥' + ((ui.balance || 0)).toFixed(2),
         cardCount: ui.cardCount || 0,
         bio: ui.bio || '享受美味每一天'
       },
-      tierCards: buildTierCards(tierIndex, ui.points || 0),
-      activeTierIndex: tierIndex
     });
 
     // 后台刷新用户数据
@@ -124,62 +57,6 @@ Page({
 
   onQrCode() {
     wx.showToast({ title: '扫码功能开发中', icon: 'none' });
-  },
-
-  onActivateMember() {
-    this.setData({ memberOverlayOpen: true });
-  },
-
-  onMemberOverlayClose() {
-    this.setData({ memberOverlayOpen: false });
-  },
-
-  onSelectPlan(e) {
-    const { plan } = e.currentTarget.dataset;
-    this.setData({ selectedPlan: plan });
-  },
-
-  onMemberSubscribe() {
-    const plan = this.data.selectedPlan;
-    const planNames = { annual: '连续包年 ¥199', monthly: '连续包月 ¥19.9' };
-    wx.showModal({
-      title: '开通会员',
-      content: '确认开通' + (planNames[plan] || '会员') + '？',
-      success: (res) => {
-        if (res.confirm) {
-          wx.showLoading({ title: '开通中...' });
-          api.post('/member/subscribe', { plan }).then(result => {
-            wx.hideLoading();
-            if (result.code === 0) {
-              wx.showToast({ title: '开通成功！', icon: 'success' });
-              this.setData({ memberOverlayOpen: false });
-              this.loadUserData();
-            } else {
-              wx.showToast({ title: result.message || '开通失败', icon: 'none' });
-            }
-          }).catch(() => {
-            wx.hideLoading();
-            wx.showToast({ title: '开通失败，请重试', icon: 'none' });
-          });
-        }
-      }
-    });
-  },
-
-  onMemberHelp() {
-    wx.showToast({ title: '优惠券每周一自动发放至您的账户', icon: 'none', duration: 2000 });
-  },
-
-  onMemberTerms() {
-    wx.showToast({ title: '会员使用条款', icon: 'none' });
-  },
-
-  onMemberPrivacy() {
-    wx.showToast({ title: '隐私政策', icon: 'none' });
-  },
-
-  onMemberRestore() {
-    wx.showToast({ title: '正在恢复购买...', icon: 'none' });
   },
 
   // ========== 头像 ==========
@@ -283,18 +160,6 @@ Page({
     });
   },
 
-  // ── 会员卡片滑动（swiper 原生吸附） ──────────
-  onTierChange(e) {
-    const idx = e.detail.current;
-    if (idx !== this.data.activeTierIndex) {
-      this.setData({ activeTierIndex: idx });
-    }
-  },
-
-  onCart() {
-    wx.switchTab({ url: '/pages/index/index' });
-  },
-
   // ── 公告浮窗 ──────────────────────────────
   onAnnounceToggle() {
     const open = !this.data.announceOpen;
@@ -316,7 +181,7 @@ Page({
     const actions = {
       orders: '/pages/orders/orders',
       store: '/pages/store/store',
-      member: '__member__',
+      member: '__toast__',
       points: '/pages/points/points',
       coupons: '/pages/coupons/coupons',
       address: '/pages/address/address',
@@ -334,10 +199,6 @@ Page({
           service: '客服热线: 400-888-8888'
         };
         wx.showToast({ title: messages[action] || '功能开发中', icon: 'none', duration: 2000 });
-        return;
-      }
-      if (actions[action] === '__member__') {
-        this.setData({ memberOverlayOpen: true });
         return;
       }
       const isTab = ['/pages/orders/orders'].includes(actions[action]);

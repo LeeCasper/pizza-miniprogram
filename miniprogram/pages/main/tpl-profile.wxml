@@ -18,65 +18,6 @@
         <text class="profile-bio">{{userInfo.bio}}</text>
       </view>
     </view>
-    <view class="profile-vip-badge" bindtap="onActivateMember">
-      <text class="vip-crown">👑</text>
-      <text class="vip-text">开通会员</text>
-    </view>
-  </view>
-
-  <!-- 会员等级卡片 — 高低吸附滑动 -->
-  <view class="member-tier-section">
-    <swiper
-      class="member-swiper"
-      current="{{activeTierIndex}}"
-      bindchange="onTierChange"
-      previous-margin="64rpx"
-      next-margin="64rpx"
-      duration="300"
-      easing-function="easeInOutCubic"
-    >
-      <swiper-item wx:for="{{tierCards}}" wx:key="key" wx:for-index="idx">
-        <view class="tier-card {{idx === activeTierIndex ? 'tier-card-high' : 'tier-card-low'}}"
-              style="background: {{item.gradient}}; color: {{item.textColor}}">
-          <view class="tier-card-badge" style="background: {{item.badgeBg}}">
-            <text class="tier-card-badge-text">{{item.isCurrent ? '当前等级' : (item.isUnlocked ? '已解锁' : '未解锁')}}</text>
-          </view>
-          <view class="tier-card-body">
-            <text class="tier-card-name">{{item.name}}</text>
-            <text class="tier-card-growth">{{item.growthText}}</text>
-          </view>
-          <view class="tier-card-footer">
-            <text class="tier-card-lv">{{item.lv}}</text>
-            <view class="tier-progress-bar" style="background: {{item.progressTrack}}">
-              <view class="tier-progress-fill" style="width: {{item.progressPercent}}%; background: {{item.progressFill}}"></view>
-            </view>
-          </view>
-        </view>
-      </swiper-item>
-    </swiper>
-
-    <!-- 资产统计 -->
-    <view class="stats-row">
-      <view class="stats-item" bindtap="onMenuItem" data-action="coupons">
-        <text class="stats-value">{{userInfo.coupons}}</text>
-        <text class="stats-label">优惠券</text>
-      </view>
-      <view class="stats-divider"></view>
-      <view class="stats-item" bindtap="onMenuItem" data-action="points">
-        <text class="stats-value">{{userInfo.points}}</text>
-        <text class="stats-label">积分</text>
-      </view>
-      <view class="stats-divider"></view>
-      <view class="stats-item">
-        <text class="stats-value">{{cardCount}}</text>
-        <text class="stats-label">卡包</text>
-      </view>
-      <view class="stats-divider"></view>
-      <view class="stats-item">
-        <text class="stats-value">{{userInfo.balanceText}}</text>
-        <text class="stats-label">余额</text>
-      </view>
-    </view>
   </view>
 
   <!-- 公告浮窗 -->

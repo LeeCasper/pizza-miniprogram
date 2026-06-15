@@ -431,7 +431,6 @@
 .shop-empty-icon { font-size: 120rpx; margin-bottom: 32rpx; }
 .shop-empty-text { font-size: 32rpx; color: var(--color-on-surface-variant); margin-bottom: 12rpx; }
 .shop-empty-sub { font-size: 26rpx; color: var(--color-on-surface-variant); opacity: 0.7; }
-
 /* ===== 会员悬浮弹窗 ===== */
 .member-overlay { position: fixed; inset: 0; z-index: 2000; visibility: hidden; }
 .member-overlay.show { visibility: visible; }
@@ -466,7 +465,7 @@
 
 .member-overlay-scroll { padding: 0 32rpx 40rpx; overflow-y: auto; flex: 1; }
 
-/* 会员卡、权益、方案卡片、CTA（复用原有 member-* / privilege-* / plan-* / coupon-banner 类名） */
+/* 会员卡、权益、方案卡片、CTA */
 .member-hero { display: flex; flex-direction: column; align-items: center; padding-top: 8rpx; padding-bottom: 32rpx; }
 .member-card { width: 100%; margin-bottom: 24rpx; }
 .member-card-inner { background: linear-gradient(135deg, #1a1c1c 0%, #303031 100%); border-radius: var(--radius-lg); padding: 40rpx; position: relative; overflow: hidden; box-shadow: 0 8rpx 40rpx rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.06); width: 100%; display: flex; flex-direction: column; justify-content: space-between; min-height: 320rpx; }
@@ -544,31 +543,6 @@
 .profile-text { display: flex; flex-direction: column; gap: 6rpx; }
 .profile-name { font-size: 36rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); }
 .profile-bio { font-size: 24rpx; color: var(--color-on-surface-variant); }
-.profile-vip-badge {
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-  padding: 14rpx 28rpx;
-  border-radius: var(--radius-full);
-  background: linear-gradient(135deg, #fceabb 0%, #f8b500 50%, #d4940a 100%);
-  box-shadow: 0 4rpx 16rpx rgba(212, 148, 10, 0.3);
-  flex-shrink: 0;
-}
-.profile-vip-badge:active {
-  transform: scale(0.94);
-  opacity: 0.9;
-}
-.vip-crown {
-  font-size: 30rpx;
-  line-height: 1;
-}
-.vip-text {
-  font-size: 24rpx;
-  font-weight: var(--font-weight-bold);
-  color: #5D3A00;
-  white-space: nowrap;
-}
-
 /* 头像编辑遮罩 */
 .avatar-wrap { position: relative; }
 .avatar-edit-mask { position: absolute; inset: 0; border-radius: var(--radius-full); background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
@@ -576,28 +550,6 @@
 .avatar-edit-icon { font-size: 36rpx; color: #FFFFFF; }
 .profile-name-row { display: flex; align-items: center; gap: 10rpx; }
 .profile-edit-hint { font-size: 24rpx; color: var(--color-primary); opacity: 0.5; }
-
-/* ── 会员卡片 swiper ── */
-.member-tier-section { margin: 0 0 24rpx; }
-.member-swiper { height: 460rpx; }
-.tier-card { height: 100%; border-radius: 24rpx; padding: 40rpx 40rpx 48rpx; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.06); }
-.tier-card-high { transform: translateY(0) scale(1); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); }
-.tier-card-low { transform: translateY(24rpx) scale(0.94); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); }
-.tier-card-badge { display: inline-flex; padding: 6rpx 24rpx; border-radius: var(--radius-full); margin-bottom: 24rpx; align-self: flex-start; }
-.tier-card-badge-text { font-size: 20rpx; font-weight: var(--font-weight-semibold); letter-spacing: 0.1em; text-transform: uppercase; }
-.tier-card-body { margin-bottom: 24rpx; }
-.tier-card-name { font-size: 56rpx; font-weight: 800; line-height: 1.2; display: block; margin-bottom: 8rpx; }
-.tier-card-growth { font-size: 24rpx; opacity: 0.8; display: block; }
-.tier-card-footer { margin-top: 16rpx; }
-.tier-card-lv { font-size: 22rpx; font-weight: 800; display: block; margin-bottom: 12rpx; }
-.tier-progress-bar { width: 100%; height: 6rpx; border-radius: 3rpx; overflow: hidden; }
-.tier-progress-fill { height: 100%; border-radius: 3rpx; transition: width 0.5s ease; }
-/* 资产统计 */
-.stats-row { display: flex; align-items: center; justify-content: space-around; margin: 24rpx 32rpx 24rpx; padding: 28rpx 8rpx; border-radius: var(--radius-card); background: var(--color-surface); box-shadow: var(--shadow-card); }
-.stats-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8rpx; }
-.stats-value { font-size: 36rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); line-height: 1.2; }
-.stats-label { font-size: 22rpx; color: var(--color-on-surface-variant); font-weight: var(--font-weight-medium); }
-.stats-divider { width: 2rpx; height: 56rpx; background: var(--color-outline-variant); border-radius: 2rpx; }
 
 /* 公告浮窗 */
 .announce-float {
