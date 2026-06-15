@@ -98,12 +98,12 @@ Page({
   },
 
   onLoad() {
-    const sys = wx.getSystemInfoSync();
-    const sh = sys.statusBarHeight;
-    const rpx = sys.windowWidth / 750;
+    const win = wx.getWindowInfo();
+    const sh = win.statusBarHeight;
+    const rpx = win.windowWidth / 750;
     // Tab bar is 100rpx + safe-area, fixed at bottom — reserve its height from scroll area
     const tabBarPx = 100 * rpx;
-    const swiperHeight = sys.windowHeight - (sh + 36);
+    const swiperHeight = win.windowHeight - (sh + 36);
     const scrollViewHeight = swiperHeight - tabBarPx;
     this.setData({ statusBarHeight: sh, topBarTotalHeight: sh + 36, scrollViewHeight });
     this.fetchProducts();

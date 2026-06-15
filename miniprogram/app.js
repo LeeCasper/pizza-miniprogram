@@ -2,8 +2,8 @@ const { doLogin, api } = require('./utils/api');
 
 App({
   onLaunch() {
-    const systemInfo = wx.getSystemInfoSync();
-    this.globalData.statusBarHeight = systemInfo.statusBarHeight;
+    const windowInfo = wx.getWindowInfo();
+    this.globalData.statusBarHeight = windowInfo.statusBarHeight;
 
     // 尝试自动登录
     const token = wx.getStorageSync('token');

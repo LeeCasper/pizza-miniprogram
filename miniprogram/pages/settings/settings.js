@@ -18,8 +18,7 @@ Page({
 
   onLoad() {
     const sh = app.globalData.statusBarHeight;
-    const sys = wx.getSystemInfoSync();
-    const rpx = sys.windowWidth / 750;
+    const rpx = wx.getWindowInfo().windowWidth / 750;
     const topBarH = sh + 80 * rpx + 24 * rpx;
 
     let cacheSize = '0 KB';
