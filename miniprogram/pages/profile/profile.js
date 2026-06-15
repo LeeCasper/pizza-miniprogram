@@ -40,11 +40,13 @@ function buildTierCards(apiTiers, userTier) {
       progressText = '消费满¥' + t.minSpent + '解锁';
       actionText = '去消费';
     }
+    const discountText = t.discountRate < 1 ? ((1 - t.discountRate) * 100).toFixed(0) + '折' : '';
     return {
       levelKey: t.levelKey, levelIndex: t.levelIndex, name: t.name,
       accentColor: t.accentColor, bgStartColor: t.bgStartColor, bgEndColor: t.bgEndColor,
       discountRate: t.discountRate, pointsRewardRate: t.pointsRewardRate,
       birthdayGift: t.birthdayGift,
+      discountText,
       isActive, progressText, actionText,
     };
   });

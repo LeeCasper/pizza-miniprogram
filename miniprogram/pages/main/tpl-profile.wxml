@@ -42,7 +42,7 @@
                 <view>
                   <text class="tier-card-progress-text" style="color: {{item.accentColor}}">{{item.progressText}}</text>
                   <view class="tier-benefits" wx:if="{{item.isActive}}">
-                    <text class="tier-benefit-tag" wx:if="{{item.discountRate < 1}}" style="border: 1rpx solid {{item.accentColor}}; color: {{item.accentColor}}">{{((1-item.discountRate)*100).toFixed(0)}}折</text>
+                    <text class="tier-benefit-tag" wx:if="{{item.discountRate < 1}}" style="border: 1rpx solid {{item.accentColor}}; color: {{item.accentColor}}">{{item.discountText}}</text>
                     <text class="tier-benefit-tag" wx:if="{{item.pointsRewardRate > 1}}" style="border: 1rpx solid {{item.accentColor}}; color: {{item.accentColor}}">积分x{{item.pointsRewardRate}}</text>
                     <text class="tier-benefit-tag" wx:if="{{item.birthdayGift}}" style="border: 1rpx solid {{item.accentColor}}; color: {{item.accentColor}}">🎂</text>
                   </view>
