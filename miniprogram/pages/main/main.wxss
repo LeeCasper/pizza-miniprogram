@@ -582,7 +582,6 @@
 .member-swiper { height: 380rpx; }
 .tier-card-wrapper { height: 100%; display: flex; flex-direction: column; transition: transform 0.28s cubic-bezier(0.32,0.72,0,1); }
 .tier-card { flex: 1; margin: 0 32rpx; border-radius: 24rpx; padding: 32rpx 32rpx 36rpx; position: relative; z-index: 1; overflow: hidden; box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.06); display: flex; flex-direction: column; }
-.tier-card-arrow { width: 24rpx; height: 24rpx; transform: rotate(45deg); margin-top: -12rpx; border-radius: 4rpx; flex-shrink: 0; position: relative; z-index: 0; align-self: center; }
 .tier-card-inner { position: relative; z-index: 1; display: flex; flex-direction: column; height: 100%; }
 .tier-card-header { margin-bottom: 16rpx; }
 .tier-status-badge { display: inline-flex; padding: 6rpx 24rpx; border-radius: var(--radius-full); }

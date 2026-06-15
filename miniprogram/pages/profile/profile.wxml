@@ -72,7 +72,6 @@
                 </view>
               </view>
             </view>
-            <view class="tier-card-arrow" style="background: {{item.gradient}}"></view>
           </view>
         </swiper-item>
       </swiper>

@@ -191,19 +191,6 @@
   flex-direction: column;
 }
 
-/* Small triangle arrow extending from bottom center — rotated square with same gradient */
-.tier-card-arrow {
-  width: 24rpx;
-  height: 24rpx;
-  transform: rotate(45deg);
-  margin-top: -12rpx;
-  border-radius: 4rpx;
-  flex-shrink: 0;
-  position: relative;
-  z-index: 0;
-  align-self: center;
-}
-
 .tier-card-inner {
   position: relative;
   z-index: 1;
