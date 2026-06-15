@@ -57,10 +57,7 @@
               wx:for="{{tiers}}" wx:key="levelKey" id="tier-{{item.levelKey}}"
               bindtap="onSelectTier" data-level-key="{{item.levelKey}}">
             <text class="compare-card-name" style="color: {{item.accentColor}}">{{item.name}}</text>
-            <view class="compare-card-badge" wx:if="{{item.status === 'current'}}" style="border-color: {{item.accentColor}}">
-              <text class="compare-card-badge-text" style="color: {{item.accentColor}}">VIP.{{item.levelIndex}}</text>
-            </view>
-            <text class="compare-card-badge" wx:else>VIP.{{item.levelIndex}}</text>
+            <text class="compare-card-badge">VIP.{{item.levelIndex}}</text>
             <text class="compare-card-range">{{item.rangeText}}</text>
             <!-- 已达成对勾 -->
             <view class="compare-card-check" wx:if="{{item.status === 'achieved'}}" style="background: {{item.accentColor}}">

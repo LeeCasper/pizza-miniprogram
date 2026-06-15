@@ -268,15 +268,11 @@
 }
 
 .compare-card-badge {
-  font-size: 18rpx;
-  color: rgba(255, 255, 255, 0.55);
+  font-size: 20rpx;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
   margin-bottom: 16rpx;
   display: inline-block;
-}
-
-.compare-card-badge-text {
-  font-size: 18rpx;
-  font-weight: 700;
   letter-spacing: 2rpx;
 }
 
