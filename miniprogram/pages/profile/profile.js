@@ -322,7 +322,12 @@ Page({
   },
 
   // ========== 会员等级滑动 ==========
-  // 动画结束后更新卡片下沉效果
+  onTierSwiperSync(e) {
+    const idx = e.detail.current;
+    if (idx === this.data.currentTierIndex) return;
+    this.setData({ currentTierIndex: idx });
+  },
+
   onTierSwiperAnimDone(e) {
     const idx = e.detail.current;
     this.setData({ tierCards: buildTierCards(idx) });

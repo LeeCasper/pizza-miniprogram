@@ -41,6 +41,7 @@
       <swiper
         class="member-swiper"
         current="{{currentTierIndex}}"
+        bindchange="onTierSwiperSync"
         bindanimationfinish="onTierSwiperAnimDone"
         duration="300"
         easing-function="easeInOutCubic"
