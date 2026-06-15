@@ -47,8 +47,7 @@ function computeTier(points) {
   return { tierIndex, pointsToNext, tierProgress, isMax };
 }
 
-function buildTierCards(userTierIndex, userPoints, activeIndex) {
-  const ai = activeIndex !== undefined ? activeIndex : userTierIndex;
+function buildTierCards(userTierIndex, userPoints) {
   return TIERS.map((t, i) => {
     const isCurrent = i === userTierIndex;
     const isLocked = i > userTierIndex;
@@ -76,14 +75,9 @@ function buildTierCards(userTierIndex, userPoints, activeIndex) {
       progressFill: t.progressFill,
       isCurrent, isLocked, isUnlocked,
       growthText, progressPercent,
-      lv: 'Lv' + i,
-      active: i === ai
+      lv: 'Lv' + i
     };
   });
-}
-
-function applyCardActive(cards, activeIndex) {
-  return cards.map((c, i) => ({ ...c, active: i === activeIndex }));
 }
 
 Page({
@@ -113,7 +107,7 @@ Page({
     activeTab: 'all', orders: [], filteredOrders: [],
     // 个人中心
     userInfo: {}, tierCards: buildTierCards(0, 0),
-    activeTierIndex: 0, userTierIndex: 0, cardCount: 0,
+    activeTierIndex: 0, cardCount: 0,
     editProfileOpen: false, editForm: { name: '', bio: '', avatar: '' },
     announceOpen: false,
     // 会员订阅
@@ -156,10 +150,6 @@ Page({
     this.loadProfileData();
     // Refresh orders when showing
     this.fetchOrders();
-  },
-
-  onReady() {
-    this.onMemberSwiperReady();
   },
 
   // ── 数据加载 ─────────────────────────────────
@@ -448,56 +438,19 @@ Page({
     this.setData({
       userInfo: { ...ui, memberLevel: TIERS[tierIndex].name, balanceText: '¥' + ((ui.balance || 0)).toFixed(2), cardCount: ui.cardCount || 0, bio: ui.bio || '享受美味每一天' },
       tierCards: buildTierCards(tierIndex, ui.points || 0),
-      activeTierIndex: tierIndex, userTierIndex: tierIndex
+      activeTierIndex: tierIndex
     });
     // Background refresh
     api.get('/user/profile').then(res => {
       if (res.code === 0) { app.globalData.userInfo = res.data; wx.setStorageSync('userInfo', res.data); this.loadProfileData(); }
     }).catch(() => {});
   },
-  // ── 会员卡片横向滚动 + 高低选中 ────────────
-  onTierCardsScroll(e) {
-    if (this._scrollTimer) clearTimeout(this._scrollTimer);
-    this._scrollTimer = setTimeout(() => {
-      const sl = e.detail.scrollLeft;
-      const cardWidth = e.detail.scrollWidth / 4;
-      const centerPos = sl + (this._swiperWidth || 375) / 2;
-      let activeIndex = 0, minDist = Infinity;
-      for (let i = 0; i < 4; i++) {
-        const dist = Math.abs(centerPos - (i + 0.5) * cardWidth);
-        if (dist < minDist) { minDist = dist; activeIndex = i; }
-      }
-      if (activeIndex !== this.data.activeTierIndex) {
-        this.setData({
-          activeTierIndex: activeIndex,
-          tierCards: applyCardActive(this.data.tierCards, activeIndex)
-        });
-      }
-    }, 100);
-  },
-
-  onTierCardTap(e) {
-    const idx = parseInt(e.currentTarget.dataset.index);
-    if (idx === this.data.activeTierIndex) return;
-    this.setData({
-      activeTierIndex: idx,
-      tierCards: applyCardActive(this.data.tierCards, idx)
-    });
-    const win = wx.getWindowInfo();
-    const rpx = win.windowWidth / 750;
-    const cw = (this._swiperWidth || win.windowWidth) * 0.85;
-    const gap = 32 * rpx;
-    const pad = 32 * rpx;
-    const target = pad + idx * (cw + gap) - ((this._swiperWidth || win.windowWidth) - cw) / 2;
-    wx.createSelectorQuery().select('#tierCardsScroll').node((res) => {
-      if (res && res[0]) res[0].scrollTo({ left: Math.max(0, target), animated: true });
-    }).exec();
-  },
-
-  onMemberSwiperReady() {
-    wx.createSelectorQuery().select('.member-tier-section').boundingClientRect((rect) => {
-      if (rect) this._swiperWidth = rect.width;
-    }).exec();
+  // ── 会员卡片滑动（swiper 原生吸附） ──────────
+  onTierChange(e) {
+    const idx = e.detail.current;
+    if (idx !== this.data.activeTierIndex) {
+      this.setData({ activeTierIndex: idx });
+    }
   },
   onMenuItem(e) {
     const { action } = e.currentTarget.dataset;

@@ -36,26 +36,20 @@
       </view>
     </view>
 
-    <!-- 会员等级卡片 — 下沉选中效果 -->
+    <!-- 会员等级卡片 — 高低吸附滑动 -->
     <view class="member-tier-section">
-      <scroll-view
-        id="tierCardsScroll"
-        class="tier-cards-scroll"
-        scroll-x
-        enhanced
-        show-scrollbar="{{false}}"
-        bindscroll="onTierCardsScroll"
+      <swiper
+        class="member-swiper"
+        current="{{activeTierIndex}}"
+        bindchange="onTierChange"
+        previous-margin="64rpx"
+        next-margin="64rpx"
+        duration="300"
+        easing-function="easeInOutCubic"
       >
-        <view class="tier-cards-row">
-          <view
-            class="tier-card {{item.active ? 'tier-card-high' : 'tier-card-low'}}"
-            wx:for="{{tierCards}}"
-            wx:key="key"
-            wx:for-index="idx"
-            style="background: {{item.gradient}}; color: {{item.textColor}}"
-            bindtap="onTierCardTap"
-            data-index="{{idx}}"
-          >
+        <swiper-item wx:for="{{tierCards}}" wx:key="key" wx:for-index="idx">
+          <view class="tier-card {{idx === activeTierIndex ? 'tier-card-high' : 'tier-card-low'}}"
+                style="background: {{item.gradient}}; color: {{item.textColor}}">
             <view class="tier-card-badge" style="background: {{item.badgeBg}}">
               <text class="tier-card-badge-text">{{item.isCurrent ? '当前等级' : (item.isUnlocked ? '已解锁' : '未解锁')}}</text>
             </view>
@@ -70,8 +64,8 @@
               </view>
             </view>
           </view>
-        </view>
-      </scroll-view>
+        </swiper-item>
+      </swiper>
 
       <!-- 资产统计 -->
       <view class="stats-row">

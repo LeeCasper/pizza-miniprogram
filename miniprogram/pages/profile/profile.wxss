@@ -166,22 +166,13 @@
   margin: 0 0 24rpx;
 }
 
-/* ── 横向滑动卡片 (Stitch: snap-x snap-mandatory) ── */
-.tier-cards-scroll {
-  width: 100%;
-  white-space: nowrap;
-}
-
-.tier-cards-row {
-  display: flex;
-  gap: 32rpx;
-  padding: 0 32rpx;
+/* ── 会员卡片 swiper ── */
+.member-swiper {
+  height: 460rpx;
 }
 
 .tier-card {
-  width: 85vw;
-  max-width: 640rpx;
-  flex-shrink: 0;
+  height: 100%;
   border-radius: 24rpx;
   padding: 40rpx 40rpx 48rpx;
   position: relative;
@@ -190,16 +181,15 @@
   flex-direction: column;
   justify-content: space-between;
   box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
-  white-space: normal;
 }
 
 .tier-card-high {
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
   transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .tier-card-low {
-  transform: translateY(28rpx);
+  transform: translateY(24rpx) scale(0.94);
   transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
