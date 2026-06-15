@@ -34,37 +34,44 @@
 
     <!-- 会员卡轮播 -->
     <view class="member-cards-section" wx:if="{{tierCards.length}}">
-      <swiper class="member-swiper"
-        bindchange="onTierChange"
-        current="{{activeTierIndex}}">
-        <swiper-item wx:for="{{tierCards}}" wx:key="level">
-          <view class="tier-card-wrap">
-            <view class="tier-card tier-bg-{{item.level}} {{item.isActive ? 'tier-card-active' : 'tier-card-inactive'}}">
-              <view class="tier-card-content">
-                <view class="tier-card-header">
-                  <view>
-                    <text class="tier-card-title" style="color: {{item.accentColor}}">收藏大亨</text>
-                    <view class="tier-card-accent" style="background: {{item.accentColor}}"></view>
-                  </view>
+      <scroll-view class="member-scroll"
+        scroll-x enhanced show-scrollbar="{{false}}"
+        enable-flex
+        scroll-with-animation
+        scroll-into-view="{{'tier-' + activeTierIndex}}"
+        bindscroll="onMemberScroll">
+        <view class="member-scroll-inner">
+          <view class="member-scroll-pad"></view>
+          <view id="tier-{{index}}"
+            wx:for="{{tierCards}}" wx:key="level"
+            class="tier-card tier-bg-{{item.level}} {{activeTierIndex === index ? 'tier-card-active' : 'tier-card-inactive'}}">
+            <view class="tier-card-content">
+              <view class="tier-card-header">
+                <view>
+                  <text class="tier-card-title" style="color: {{item.accentColor}}">收藏大亨</text>
+                  <view class="tier-card-accent" style="background: {{item.accentColor}}"></view>
                 </view>
-                <view class="tier-card-badge" style="border-color: {{item.accentColor}}">
-                  <text class="tier-card-badge-text" style="color: {{item.accentColor}}">VIP.{{item.level}}</text>
-                </view>
-                <view class="tier-card-footer">
-                  <text class="tier-card-progress-text" style="color: {{item.accentColor}}">{{item.progressText}}</text>
-                  <view class="tier-card-action" catchtap="onUpgradeTier" data-level="{{item.level}}">
-                    <text class="tier-card-action-text" style="color: {{item.accentColor}}">{{item.actionText}}</text>
-                    <text class="tier-card-action-arrow">→</text>
-                  </view>
+              </view>
+              <view class="tier-card-badge" style="border-color: {{item.accentColor}}">
+                <text class="tier-card-badge-text" style="color: {{item.accentColor}}">VIP.{{item.level}}</text>
+              </view>
+              <view class="tier-card-footer">
+                <text class="tier-card-progress-text" style="color: {{item.accentColor}}">{{item.progressText}}</text>
+                <view class="tier-card-action" catchtap="onUpgradeTier" data-level="{{item.level}}">
+                  <text class="tier-card-action-text" style="color: {{item.accentColor}}">{{item.actionText}}</text>
+                  <text class="tier-card-action-arrow">→</text>
                 </view>
               </view>
             </view>
           </view>
-        </swiper-item>
-      </swiper>
+          <view class="member-scroll-pad"></view>
+        </view>
+      </scroll-view>
       <view class="tier-dots">
         <view class="tier-dot {{activeTierIndex === ti ? 'active' : ''}}"
           wx:for="{{tierCards}}" wx:key="level" wx:for-index="ti"
+          data-index="{{ti}}"
+          catchtap="onTierDotTap"
           style="{{activeTierIndex === ti ? 'background:' + item.accentColor + '; box-shadow: 0 0 8rpx ' + item.accentColor : ''}}">
         </view>
       </view>
