@@ -241,20 +241,7 @@ Page({
 
   onUpgradeTier(e) {
     const levelKey = e.currentTarget.dataset.levelKey;
-    const totalSpent = app.globalData.userInfo.totalSpent || 0;
-    this._ensureTiersLoaded().then(apiTiers => {
-      const tierInfo = computeTier(totalSpent, apiTiers);
-      if (!tierInfo || !tierInfo.current) return;
-      if (levelKey === tierInfo.current.levelKey && !tierInfo.next) {
-        wx.showToast({ title: '已达成最高等级 🎉', icon: 'none' });
-      } else if (levelKey === tierInfo.current.levelKey) {
-        wx.showToast({ title: '继续消费升级吧！', icon: 'none', duration: 2000 });
-      } else {
-        wx.showToast({ title: '查看等级特权', icon: 'none' });
-      }
-    }).catch(() => {
-      wx.showToast({ title: '继续消费升级吧！', icon: 'none', duration: 2000 });
-    });
+    wx.navigateTo({ url: '/pages/tiers/tiers?levelKey=' + levelKey });
   },
 
   // ── 公告浮窗 ──────────────────────────────

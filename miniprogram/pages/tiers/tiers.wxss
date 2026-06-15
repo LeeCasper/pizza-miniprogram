@@ -1,0 +1,377 @@
+/* pages/tiers/tiers.wxss */
+
+/* ── 顶部导航 ── */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40rpx 24rpx;
+  background: var(--glass-bg-nav);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border-bottom: var(--glass-border-subtle);
+  box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+.back-btn {
+  width: 80rpx;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  color: var(--color-primary);
+}
+
+.top-title {
+  font-size: 36rpx;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+}
+
+.top-spacer {
+  width: 80rpx;
+}
+
+.main-scroll {
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.scroll-inner {
+  padding: 32rpx 32rpx 0;
+}
+
+/* ── Hero 卡片 ── */
+.hero-card {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 24rpx;
+  box-shadow: 0 12rpx 36rpx -8rpx rgba(0, 0, 0, 0.3);
+}
+
+.hero-card-content {
+  padding: 44rpx 40rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-label {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 6rpx;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.hero-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+
+.hero-tier-name {
+  font-size: 48rpx;
+  font-weight: 800;
+  letter-spacing: -1rpx;
+  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.2);
+}
+
+.hero-vip-badge {
+  border: 2rpx solid;
+  border-radius: 16rpx;
+  padding: 8rpx 20rpx;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.hero-vip-text {
+  font-size: 24rpx;
+  font-weight: 700;
+  letter-spacing: 3rpx;
+}
+
+.hero-accent-bar {
+  width: 64rpx;
+  height: 6rpx;
+  border-radius: 999rpx;
+  margin-bottom: 24rpx;
+  opacity: 0.8;
+}
+
+.hero-spent-row {
+  display: flex;
+  align-items: baseline;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+}
+
+.hero-spent-label {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.hero-spent-value {
+  font-size: 40rpx;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -1rpx;
+}
+
+/* Hero 进度条 */
+.hero-progress-section {
+  margin-top: 8rpx;
+}
+
+.hero-progress-bar-bg {
+  height: 10rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.18);
+  margin-bottom: 12rpx;
+  overflow: hidden;
+}
+
+.hero-progress-bar-fill {
+  height: 100%;
+  border-radius: 999rpx;
+  transition: width 0.6s ease;
+}
+
+.hero-progress-text {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.hero-max-badge {
+  margin-top: 12rpx;
+  padding: 10rpx 24rpx;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.1);
+  display: inline-block;
+}
+
+.hero-max-text {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 2rpx;
+}
+
+/* ── Hero 快捷权益 ── */
+.hero-quick-benefits {
+  display: flex;
+  justify-content: space-around;
+  padding: 28rpx 20rpx;
+  margin-bottom: 40rpx;
+  background: var(--glass-bg-card);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius-card);
+  border: var(--glass-border-subtle);
+  box-shadow: var(--glass-shadow-card);
+}
+
+.quick-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+}
+
+.quick-icon {
+  font-size: 36rpx;
+}
+
+.quick-value {
+  font-size: 26rpx;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-on-surface);
+}
+
+.quick-label {
+  font-size: 20rpx;
+  color: var(--color-on-surface-variant);
+}
+
+/* ── 全部等级标题 ── */
+.section-title {
+  font-size: 36rpx;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-on-background);
+  margin-bottom: 24rpx;
+}
+
+/* ── 等级详情卡片 ── */
+.tier-detail-card {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 28rpx;
+  box-shadow: var(--glass-shadow-card);
+  border: var(--glass-border-subtle);
+  transition: opacity 0.3s;
+}
+
+.tier-detail-card.tier-card-highlight {
+  box-shadow: 0 4rpx 24rpx rgba(211, 47, 47, 0.12);
+  border: 2rpx solid var(--color-primary);
+}
+
+.tier-detail-card.tier-card-dimmed {
+  opacity: 0.55;
+}
+
+/* 等级头部 */
+.tier-detail-header {
+  overflow: hidden;
+}
+
+.tier-detail-header-inner {
+  padding: 32rpx 36rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.tier-detail-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8rpx;
+}
+
+.tier-detail-name {
+  font-size: 36rpx;
+  font-weight: 800;
+  letter-spacing: -1rpx;
+  text-shadow: 0 1rpx 6rpx rgba(0, 0, 0, 0.2);
+}
+
+.tier-detail-mini-badge {
+  border: 1rpx solid;
+  border-radius: 10rpx;
+  padding: 4rpx 14rpx;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.tier-detail-mini-badge-text {
+  font-size: 20rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+}
+
+.tier-detail-threshold {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.6);
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+/* 状态芯片 */
+.tier-status-chip {
+  display: inline-block;
+  padding: 6rpx 22rpx;
+  border-radius: var(--radius-full);
+  font-size: 22rpx;
+  font-weight: var(--font-weight-semibold);
+}
+
+.tier-status-achieved {
+  background: rgba(56, 142, 60, 0.25);
+  color: #81c784;
+}
+
+.tier-status-current {
+  background: rgba(211, 47, 47, 0.2);
+  color: #ef9a9a;
+}
+
+.tier-status-upcoming {
+  background: rgba(127, 127, 127, 0.15);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* 权益明细 */
+.tier-detail-body {
+  padding: 16rpx 0;
+  background: var(--color-surface);
+}
+
+.benefit-row {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  padding: 20rpx 36rpx;
+  border-bottom: 1rpx solid var(--color-divider);
+}
+
+.benefit-row-last {
+  border-bottom: none;
+}
+
+.benefit-icon-wrap {
+  width: 68rpx;
+  height: 68rpx;
+  border-radius: 18rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.benefit-icon {
+  font-size: 32rpx;
+}
+
+.benefit-icon-discount { background: rgba(211, 47, 47, 0.08); }
+.benefit-icon-points  { background: rgba(251, 192, 45, 0.12); }
+.benefit-icon-birthday { background: rgba(56, 142, 60, 0.08); }
+.benefit-icon-coupon  { background: rgba(132, 85, 239, 0.1); }
+
+.benefit-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.benefit-label {
+  font-size: 22rpx;
+  color: var(--color-on-surface-variant);
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.benefit-value {
+  font-size: 28rpx;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-on-surface);
+}
+
+/* 卡片底部进度条 */
+.tier-progress-wrap {
+  padding: 20rpx 36rpx 28rpx;
+  background: var(--color-surface);
+  border-top: 1rpx solid var(--color-divider);
+}
+
+.tier-progress-bar-bg {
+  height: 8rpx;
+  border-radius: 999rpx;
+  background: var(--color-surface-container-high);
+  margin-bottom: 10rpx;
+  overflow: hidden;
+}
+
+.tier-progress-bar-fill {
+  height: 100%;
+  border-radius: 999rpx;
+  transition: width 0.6s ease;
+}
+
+.tier-progress-label {
+  font-size: 22rpx;
+  color: var(--color-on-surface-variant);
+}

@@ -6,7 +6,8 @@
     "pages/points/points",
     "pages/coupons/coupons",
     "pages/address/address",
-    "pages/settings/settings"
+    "pages/settings/settings",
+    "pages/tiers/tiers"
   ],
   "window": {
     "navigationBarTitleText": "王姐手工披萨",
