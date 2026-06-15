@@ -93,6 +93,8 @@ Page({
     currentTierIndex: 0, userTierIndex: 0, pointsToNext: 0, tierProgress: 0, cardCount: 0,
     editProfileOpen: false, editForm: { name: '', bio: '', avatar: '' },
     announceOpen: false,
+    // 会员订阅
+    selectedPlan: 'monthly',
     // 加载态
     productsLoaded: false, ordersLoaded: false,
   },
@@ -299,7 +301,54 @@ Page({
     });
   },
 
-  // ── 会员 ────────────────────────────────────
+  // ── 会员订阅 ────────────────────────────────
+
+  onSelectPlan(e) {
+    const { plan } = e.currentTarget.dataset;
+    this.setData({ selectedPlan: plan });
+  },
+
+  onMemberSubscribe() {
+    const plan = this.data.selectedPlan;
+    const planNames = { annual: '连续包年 ¥199', monthly: '连续包月 ¥19.9' };
+    wx.showModal({
+      title: '开通会员',
+      content: '确认开通' + (planNames[plan] || '会员') + '？',
+      success: (res) => {
+        if (res.confirm) {
+          wx.showLoading({ title: '开通中...' });
+          api.post('/member/subscribe', { plan }).then(result => {
+            wx.hideLoading();
+            if (result.code === 0) {
+              wx.showToast({ title: '开通成功！', icon: 'success' });
+              this.loadProfileData();
+            } else {
+              wx.showToast({ title: result.message || '开通失败', icon: 'none' });
+            }
+          }).catch(() => {
+            wx.hideLoading();
+            wx.showToast({ title: '开通失败，请重试', icon: 'none' });
+          });
+        }
+      }
+    });
+  },
+
+  onMemberHelp() {
+    wx.showToast({ title: '优惠券每周一自动发放至您的账户', icon: 'none', duration: 2000 });
+  },
+
+  onMemberTerms() {
+    wx.showToast({ title: '会员使用条款', icon: 'none' });
+  },
+
+  onMemberPrivacy() {
+    wx.showToast({ title: '隐私政策', icon: 'none' });
+  },
+
+  onMemberRestore() {
+    wx.showToast({ title: '正在恢复购买...', icon: 'none' });
+  },
 
   onUsePoints() { wx.navigateTo({ url: '/pages/points/points' }); },
   onEarnPoints() { wx.showToast({ title: '下单即可赚取积分', icon: 'none' }); },

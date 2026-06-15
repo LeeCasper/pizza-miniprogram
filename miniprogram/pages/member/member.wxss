@@ -1,302 +1,208 @@
-/* pages/member/member.wxss */
+/* pages/member/member.wxss — Stitch "开通会员 (悬浮弹窗版)" 1:1 还原 */
 
+/* ── 顶部导航 ── */
 .top-bar {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 0 40rpx 24rpx;
-  background: var(--color-surface);
-  border-bottom: 1rpx solid var(--color-divider);
+  justify-content: space-between;
+  padding: 0 32rpx 20rpx;
+  background: var(--glass-bg-nav);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border-bottom: var(--glass-border-subtle);
+  box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   z-index: 100;
 }
-
+.back-btn {
+  width: 80rpx; height: 80rpx;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-full);
+  background: rgba(255,255,255,0.7);
+  -webkit-backdrop-filter: blur(24rpx);
+  backdrop-filter: blur(24rpx);
+  border: 1rpx solid rgba(255,255,255,0.5);
+  box-shadow: var(--shadow-sm);
+}
+.back-icon { font-size: 48rpx; color: var(--color-on-surface); font-weight: 300; line-height: 1; }
 .top-title {
-  font-size: 36rpx;
-  font-weight: var(--font-weight-bold);
-  color: var(--color-primary);
+  font-size: 32rpx; font-weight: 700; color: var(--color-on-surface);
+  position: absolute; left: 50%; transform: translateX(-50%);
 }
-
-.main-scroll {
-  padding: 32rpx 0 72rpx;
-  overflow-x: hidden;
-  box-sizing: border-box;
+.top-points-badge {
+  display: flex; align-items: center; gap: 12rpx;
+  background: rgba(255,255,255,0.7);
+  -webkit-backdrop-filter: blur(24rpx);
+  backdrop-filter: blur(24rpx);
+  border-radius: var(--radius-full);
+  padding: 6rpx 20rpx 6rpx 6rpx;
+  box-shadow: var(--shadow-sm);
+  border: 1rpx solid rgba(255,255,255,0.5);
 }
-
-.scroll-inner {
-  padding: 0 40rpx;
+.badge-avatar-wrap {
+  width: 56rpx; height: 56rpx; border-radius: var(--radius-full);
+  overflow: hidden; border: 2rpx solid #FFFFFF; background: var(--color-surface-container);
 }
+.badge-avatar { width: 100%; height: 100%; }
+.badge-points { font-size: 24rpx; font-weight: 700; color: var(--color-on-surface); }
 
-/* 会员卡 */
-.member-card {
-  margin-bottom: 40rpx;
-}
+/* ── 滚动区 ── */
+.member-scroll { overflow-x: hidden; box-sizing: border-box; }
+.member-scroll-inner { padding: 0 40rpx; }
 
+/* ── Hero 区域 ── */
+.member-hero { display: flex; flex-direction: column; align-items: center; padding-top: 16rpx; padding-bottom: 40rpx; }
+
+.member-card { width: 100%; margin-bottom: 32rpx; }
 .member-card-inner {
   background: linear-gradient(135deg, #1a1c1c 0%, #303031 100%);
-  border-radius: var(--radius-card);
-  padding: 48rpx;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 380rpx;
+  border-radius: var(--radius-lg); padding: 48rpx; position: relative; overflow: hidden;
+  box-shadow: 0 8rpx 40rpx rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  width: 100%; display: flex; flex-direction: column; justify-content: space-between; min-height: 380rpx;
 }
+.card-glow { position: absolute; top: -80rpx; right: -80rpx; width: 256rpx; height: 256rpx; background: rgba(255,255,255,0.05); border-radius: var(--radius-full); filter: blur(40rpx); pointer-events: none; }
+.card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.card-status-label { display: block; font-size: 22rpx; color: #C8C6C5; text-transform: uppercase; letter-spacing: 4rpx; margin-bottom: 8rpx; }
+.card-level { font-size: 48rpx; font-weight: 700; color: #FFFFFF; letter-spacing: -2rpx; }
+.card-badge { width: 88rpx; height: 88rpx; background: rgba(255,255,255,0.1); border-radius: var(--radius-card); border: 1rpx solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; -webkit-backdrop-filter: blur(20rpx); backdrop-filter: blur(20rpx); }
+.badge-icon { font-size: 48rpx; }
+.card-bottom { display: flex; justify-content: space-between; align-items: flex-end; }
+.card-id-label { display: block; font-size: 22rpx; color: #C8C6C5; margin-bottom: 8rpx; }
+.card-id { font-size: 30rpx; color: #FFFFFF; letter-spacing: 6rpx; }
+.card-qr { width: 96rpx; height: 96rpx; background: #FFFFFF; border-radius: 16rpx; display: flex; align-items: center; justify-content: center; }
+.qr-icon { font-size: 56rpx; }
 
-.card-glow {
-  position: absolute;
-  top: -80rpx;
-  right: -80rpx;
-  width: 256rpx;
-  height: 256rpx;
-  background: rgba(255,255,255,0.05);
-  border-radius: var(--radius-full);
-  filter: blur(40rpx);
+.member-hero-text { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4rpx; }
+.hero-headline { font-size: 48rpx; font-weight: 800; color: var(--color-on-surface); letter-spacing: -1rpx; line-height: 1.2; }
+.hero-subtitle { font-size: 32rpx; color: var(--color-on-surface-variant); font-weight: 400; }
+
+/* ── 权益横滑 ── */
+.privileges-section { width: 100%; margin-bottom: 32rpx; }
+.privileges-scroll { width: 100%; }
+.privileges-row { display: flex; gap: 28rpx; padding: 0 0 16rpx; }
+.privilege-item { display: flex; flex-direction: column; align-items: center; gap: 16rpx; min-width: 128rpx; flex-shrink: 0; }
+
+.privilege-icon-wrap {
+  width: 128rpx; height: 128rpx; border-radius: 32rpx;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+  box-shadow: inset 0 4rpx 8rpx rgba(255,255,255,0.8), 0 4rpx 16rpx rgba(0,0,0,0.06);
+  -webkit-backdrop-filter: blur(16rpx);
+  backdrop-filter: blur(16rpx);
+  transition: transform 0.2s;
+}
+.privilege-icon-wrap:active { transform: translateY(-4rpx); }
+.privilege-icon-shine {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.5) 0%, transparent 50%);
   pointer-events: none;
 }
+.privilege-icon { font-size: 52rpx; position: relative; z-index: 1; filter: drop-shadow(0 2rpx 4rpx rgba(0,0,0,0.1)); }
+.privilege-label { font-size: 24rpx; font-weight: 500; color: var(--color-on-surface-variant); }
 
-.card-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+.privilege-icon-purple { background: rgba(132, 85, 239, 0.2); border: 1rpx solid rgba(132, 85, 239, 0.15); }
+.privilege-icon-green { background: rgba(190, 242, 42, 0.3); border: 1rpx solid rgba(190, 242, 42, 0.2); }
+.privilege-icon-gold { background: rgba(254, 243, 199, 0.6); border: 1rpx solid rgba(251, 192, 45, 0.25); }
+.privilege-icon-pink { background: rgba(252, 231, 243, 0.6); border: 1rpx solid rgba(236, 72, 153, 0.2); }
+.privilege-icon-teal { background: rgba(190, 242, 42, 0.2); border: 1rpx solid rgba(16, 185, 129, 0.15); }
+
+/* ── 优惠券信息条 ── */
+.coupon-banner {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 24rpx 28rpx; margin-bottom: 32rpx;
+  background: rgba(233, 233, 221, 0.4);
+  -webkit-backdrop-filter: blur(24rpx);
+  backdrop-filter: blur(24rpx);
+  border-radius: 24rpx;
+  border: 1rpx solid rgba(255,255,255,0.5);
+  box-shadow: var(--shadow-sm);
 }
-
-.card-status-label {
-  display: block;
-  font-size: 22rpx;
-  color: #C8C6C5;
-  text-transform: uppercase;
-  letter-spacing: 4rpx;
-  margin-bottom: 8rpx;
+.coupon-banner-left { display: flex; align-items: center; gap: 16rpx; }
+.coupon-banner-icon { font-size: 32rpx; }
+.coupon-banner-text { font-size: 26rpx; font-weight: 600; color: var(--color-on-surface); }
+.coupon-banner-help {
+  width: 44rpx; height: 44rpx; border-radius: var(--radius-full);
+  background: var(--color-surface-container-highest);
+  display: flex; align-items: center; justify-content: center;
 }
+.coupon-help-icon { font-size: 24rpx; font-weight: 700; color: var(--color-on-surface-variant); }
 
-.card-level {
-  font-size: 48rpx;
-  font-weight: var(--font-weight-bold);
-  color: #FFFFFF;
-  letter-spacing: -2rpx;
-}
+/* ── 订阅方案卡片 ── */
+.plans-section { display: flex; flex-direction: column; gap: 20rpx; margin-bottom: 40rpx; }
 
-.card-badge {
-  width: 88rpx;
-  height: 88rpx;
-  background: rgba(255,255,255,0.08);
-  border-radius: var(--radius-card);
-  border: 2rpx solid rgba(255,255,255,0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(20rpx);
-}
-
-.badge-icon {
-  font-size: 48rpx;
-}
-
-.card-bottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-}
-
-.card-id-label {
-  display: block;
-  font-size: 22rpx;
-  color: #C8C6C5;
-  margin-bottom: 8rpx;
-}
-
-.card-id {
-  font-size: 30rpx;
-  color: #FFFFFF;
-  letter-spacing: 6rpx;
-}
-
-.card-qr {
-  width: 96rpx;
-  height: 96rpx;
-  background: #FFFFFF;
-  border-radius: 16rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.qr-icon {
-  font-size: 56rpx;
-}
-
-/* 积分区域 */
-.points-section {
-  padding: 48rpx;
-  margin-bottom: 40rpx;
-  text-align: center;
-}
-
-.points-label {
-  display: block;
-  font-size: 24rpx;
-  color: var(--color-on-surface-variant);
-  text-transform: uppercase;
-  letter-spacing: 6rpx;
-  margin-bottom: 8rpx;
-}
-
-.points-value-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 8rpx;
-  margin-bottom: 32rpx;
-}
-
-.points-value {
-  font-size: 72rpx;
-  font-weight: var(--font-weight-bold);
-  color: var(--color-on-surface);
-  letter-spacing: -2rpx;
-}
-
-.points-unit {
-  font-size: 28rpx;
-  color: var(--color-on-surface-variant);
-}
-
-.points-actions {
-  display: flex;
-  gap: 16rpx;
-}
-
-.points-btn {
-  flex: 1;
-  padding: 24rpx;
-  border-radius: var(--radius-full);
-  font-size: 28rpx;
-  font-weight: var(--font-weight-semibold);
-  text-align: center;
-}
-
-.points-btn.primary {
-  background: var(--color-primary);
-  color: var(--color-on-primary);
-}
-
-.points-btn.outline {
-  color: var(--color-on-surface);
+.plan-card {
+  border-radius: 32rpx;
+  border: 3rpx solid var(--color-surface-container-highest);
   background: var(--color-surface);
-  box-shadow: var(--shadow-elevated);
-}
-
-/* 会员权益 */
-.benefits-section {
-  margin-bottom: 40rpx;
-}
-
-.section-label {
-  display: block;
-  font-size: 24rpx;
-  color: var(--color-on-surface-variant);
-  text-transform: uppercase;
-  letter-spacing: 6rpx;
-  margin-bottom: 24rpx;
-}
-
-.benefits-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16rpx;
-}
-
-.benefit-item {
-  padding: 32rpx;
-  text-align: center;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
   overflow: hidden;
 }
+.plan-card:active { transform: scale(0.985); }
 
-.benefit-icon {
-  font-size: 48rpx;
-  display: block;
-  margin-bottom: 16rpx;
+.plan-card-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 32rpx 36rpx;
+  position: relative; z-index: 1;
 }
 
-.benefit-name {
-  font-size: 28rpx;
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-on-surface);
-  display: block;
-  margin-bottom: 8rpx;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.plan-selected {
+  border-color: var(--color-primary-container);
+  background: linear-gradient(135deg, #FFFBFB 0%, #FFF0EF 100%);
+  box-shadow: 0 0 0 1rpx var(--color-primary-container), var(--shadow-elevated);
 }
+.plan-selected .plan-card-inner { background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, transparent 100%); }
 
-.benefit-desc {
-  font-size: 22rpx;
-  color: var(--color-on-surface-variant);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.plan-left { display: flex; flex-direction: column; gap: 12rpx; }
+.plan-name-row { display: flex; align-items: center; gap: 16rpx; }
+.plan-name { font-size: 32rpx; font-weight: 700; color: var(--color-on-surface); }
+.plan-badge {
+  font-size: 20rpx; font-weight: 700; color: var(--color-on-primary-container);
+  background: var(--color-primary-container);
+  padding: 4rpx 16rpx; border-radius: var(--radius-full);
+  box-shadow: inset 0 2rpx 0 rgba(255,255,255,0.6);
 }
+.plan-price-row { display: flex; align-items: baseline; gap: 16rpx; }
+.plan-price { font-size: 44rpx; font-weight: 800; color: var(--color-on-surface); letter-spacing: -1rpx; line-height: 1; }
+.plan-original { font-size: 24rpx; font-weight: 500; color: var(--color-outline-variant); text-decoration: line-through; opacity: 0.7; }
 
-/* 等级进度 */
-.level-section {
-  padding: 40rpx;
-  margin-bottom: 48rpx;
+.plan-radio {
+  width: 52rpx; height: 52rpx; border-radius: var(--radius-full);
+  border: 3rpx solid rgba(143, 111, 108, 0.3);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
 }
-
-.level-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24rpx;
-  flex-wrap: wrap;
-  gap: 8rpx;
+.plan-radio.radio-checked {
+  border-color: var(--color-primary-container);
+  background: var(--color-primary-container);
 }
+.plan-check-icon { font-size: 28rpx; font-weight: 700; color: var(--color-on-primary-container); transition: all 0.3s ease; }
 
-.level-title {
-  font-size: 28rpx;
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-on-surface);
-  flex-shrink: 0;
-}
+/* ── CTA 区域 ── */
+.member-cta-section { display: flex; flex-direction: column; gap: 28rpx; padding-bottom: 24rpx; }
 
-.level-next {
-  font-size: 24rpx;
-  color: var(--color-on-surface-variant);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.progress-bar-wrap {
-  display: flex;
-  align-items: center;
-  gap: 24rpx;
-}
-
-.progress-bar {
-  flex: 1;
-  height: 16rpx;
-  background: var(--color-surface-container);
+.member-cta-btn {
+  width: 100%; padding: 28rpx 32rpx;
+  background: var(--color-primary-container);
   border-radius: var(--radius-full);
-  overflow: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  box-shadow: 0 12rpx 32rpx rgba(211, 47, 47, 0.2), inset 0 4rpx 0 rgba(255,255,255,0.4);
+  position: relative; overflow: hidden;
+  transition: all 0.2s;
+  border: 1rpx solid rgba(255,255,255,0.3);
 }
+.member-cta-btn:active { transform: scale(0.98); opacity: 0.95; }
+.cta-btn-shine {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.25) 0%, transparent 60%);
+  pointer-events: none;
+}
+.cta-main-text { font-size: 32rpx; font-weight: 700; color: var(--color-on-primary-container); position: relative; z-index: 1; letter-spacing: 2rpx; }
+.cta-sub-text { font-size: 22rpx; font-weight: 500; color: var(--color-on-primary-container); opacity: 0.7; position: relative; z-index: 1; margin-top: 4rpx; }
 
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
-  border-radius: var(--radius-full);
-  transition: width 0.6s ease;
-}
-
-.progress-text {
-  font-size: 28rpx;
-  font-weight: var(--font-weight-bold);
-  color: var(--color-primary);
-}
+.member-footer-links { display: flex; justify-content: center; align-items: center; gap: 24rpx; }
+.footer-link { font-size: 22rpx; color: var(--color-on-surface-variant); opacity: 0.5; }
+.footer-link:active { color: var(--color-primary); opacity: 0.8; }
+.footer-divider { font-size: 20rpx; color: var(--color-on-surface-variant); opacity: 0.2; }
