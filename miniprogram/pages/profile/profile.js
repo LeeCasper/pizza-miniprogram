@@ -322,14 +322,7 @@ Page({
   },
 
   // ========== 会员等级滑动 ==========
-  // 轻量同步：仅更新 currentTierIndex，让 swiper 的 current 属性跟随手动滑动
-  onTierSwiperSync(e) {
-    const idx = e.detail.current;
-    if (idx === this.data.currentTierIndex) return;
-    this.setData({ currentTierIndex: idx });
-  },
-
-  // 动画结束后更新卡片下沉效果，避免与 swiper 动画竞争
+  // 动画结束后更新卡片下沉效果
   onTierSwiperAnimDone(e) {
     const idx = e.detail.current;
     this.setData({ tierCards: buildTierCards(idx) });

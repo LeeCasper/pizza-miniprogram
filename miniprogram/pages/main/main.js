@@ -421,11 +421,6 @@ Page({
       if (res.code === 0) { app.globalData.userInfo = res.data; wx.setStorageSync('userInfo', res.data); this.loadProfileData(); }
     }).catch(() => {});
   },
-  onTierSwiperSync(e) {
-    const idx = e.detail.current;
-    if (idx === this.data.currentTierIndex) return;
-    this.setData({ currentTierIndex: idx });
-  },
   onTierSwiperAnimDone(e) {
     const idx = e.detail.current;
     this.setData({ tierCards: buildTierCards(idx) });
