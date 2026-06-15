@@ -45,12 +45,6 @@ const TIERS = [
   }
 ];
 const TIER_THRESHOLDS = [0, 1000, 3000, 6000];
-const ARC_LABELS = [
-  { key: 'normal', label: '普通' },
-  { key: 'gold', label: '圈内新人' },
-  { key: 'platinum', label: '资深吃货' },
-  { key: 'diamond', label: '至尊达人' }
-];
 
 function computeTier(points) {
   let tierIndex = 0;
@@ -66,30 +60,6 @@ function computeTier(points) {
     tierProgress = Math.round(((points - lo) / (hi - lo)) * 100);
   }
   return { tierIndex, pointsToNext, tierProgress, isMax };
-}
-
-function getArcOffset(index, activeIndex) {
-  const dist = Math.abs(index - activeIndex);
-  // Dots sit on the curve — farther from active = lower on the arc
-  // Calculated for 1700rpx circle (radius 850rpx), labels ~171rpx apart
-  if (dist === 0) return 0;
-  if (dist === 1) return 22;
-  if (dist === 2) return 76;
-  return 177;
-}
-
-function getTrackShift(activeIndex, total) {
-  // With space-around, label i is at (i+0.5)/total * 100% from left
-  // Shift so active label sits at 50% (center)
-  var pos = (activeIndex + 0.5) / total * 100;
-  return Math.round(50 - pos);
-}
-
-function buildArcLabels(activeIndex) {
-  return ARC_LABELS.map((item, i) => ({
-    ...item,
-    yOffset: getArcOffset(i, activeIndex)
-  }));
 }
 
 function getCardSinkOffset(index, activeIndex) {
@@ -114,8 +84,6 @@ Page({
     userInfo: {},
     tierCards: buildTierCards(0),
     tierGrowthTexts: ['', '', '', ''],
-    arcLabels: buildArcLabels(0),
-    trackShift: 0,
     currentTierIndex: 0,
     userTierIndex: 0,
     pointsToNext: 0,
@@ -172,8 +140,6 @@ Page({
       },
       tierCards: buildTierCards(tierIndex),
       tierGrowthTexts,
-      arcLabels: buildArcLabels(tierIndex),
-      trackShift: getTrackShift(tierIndex, TIERS.length),
       currentTierIndex: tierIndex,
       userTierIndex: tierIndex,
       pointsToNext,
@@ -363,20 +329,10 @@ Page({
     this.setData({ currentTierIndex: idx });
   },
 
-  // 动画结束后更新视觉效果（卡片下沉、弧线偏移），避免与 swiper 动画竞争
+  // 动画结束后更新卡片下沉效果，避免与 swiper 动画竞争
   onTierSwiperAnimDone(e) {
     const idx = e.detail.current;
-    this.setData({
-      tierCards: buildTierCards(idx),
-      arcLabels: buildArcLabels(idx),
-      trackShift: getTrackShift(idx, TIERS.length)
-    });
-  },
-
-  onSelectTier(e) {
-    const idx = e.currentTarget.dataset.index;
-    if (idx === this.data.currentTierIndex) return;
-    this.setData({ currentTierIndex: idx });
+    this.setData({ tierCards: buildTierCards(idx) });
   },
 
   onCart() {

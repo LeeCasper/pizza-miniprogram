@@ -31,11 +31,6 @@ const TIERS = [
   { key: 'diamond',  name: '钻石', gradient: 'linear-gradient(135deg, #111827 0%, #000000 100%)', textColor: '#ffffff', progressTrackBg: 'rgba(255,255,255,0.2)', progressFillBg: 'rgba(255,255,255,0.9)', badgeBg: 'rgba(255,255,255,0.2)', threshold: 6000 }
 ];
 const TIER_THRESHOLDS = [0, 1000, 3000, 6000];
-const ARC_LABELS = [
-  { key: 'normal', label: '普通' }, { key: 'gold', label: '圈内新人' },
-  { key: 'platinum', label: '资深吃货' }, { key: 'diamond', label: '至尊达人' }
-];
-
 function computeTier(points) {
   let tierIndex = 0;
   for (let i = TIER_THRESHOLDS.length - 1; i >= 0; i--) {
@@ -50,12 +45,6 @@ function computeTier(points) {
   }
   return { tierIndex, pointsToNext, tierProgress, isMax };
 }
-function getArcOffset(index, activeIndex) {
-  const dist = Math.abs(index - activeIndex);
-  if (dist === 0) return 0; if (dist === 1) return 22; if (dist === 2) return 76; return 177;
-}
-function getTrackShift(activeIndex, total) { return Math.round(50 - (activeIndex + 0.5) / total * 100); }
-function buildArcLabels(activeIndex) { return ARC_LABELS.map((item, i) => ({ ...item, yOffset: getArcOffset(i, activeIndex) })); }
 function getCardSinkOffset(index, activeIndex) {
   const dist = Math.abs(index - activeIndex);
   if (dist === 0) return 0; if (dist === 1) return 24; if (dist === 2) return 56; return 100;
@@ -89,7 +78,6 @@ Page({
     activeTab: 'all', orders: [], filteredOrders: [],
     // 个人中心
     userInfo: {}, tierCards: buildTierCards(0), tierGrowthTexts: ['', '', '', ''],
-    arcLabels: buildArcLabels(0), trackShift: 0,
     currentTierIndex: 0, userTierIndex: 0, pointsToNext: 0, tierProgress: 0, cardCount: 0,
     editProfileOpen: false, editForm: { name: '', bio: '', avatar: '' },
     announceOpen: false,
@@ -425,8 +413,7 @@ Page({
     });
     this.setData({
       userInfo: { ...ui, memberLevel: TIERS[tierIndex].name, balanceText: '¥' + ((ui.balance || 0)).toFixed(2), cardCount: ui.cardCount || 0, bio: ui.bio || '享受美味每一天' },
-      tierCards: buildTierCards(tierIndex), tierGrowthTexts, arcLabels: buildArcLabels(tierIndex),
-      trackShift: getTrackShift(tierIndex, TIERS.length),
+      tierCards: buildTierCards(tierIndex), tierGrowthTexts,
       currentTierIndex: tierIndex, userTierIndex: tierIndex, pointsToNext, tierProgress
     });
     // Background refresh
@@ -441,12 +428,7 @@ Page({
   },
   onTierSwiperAnimDone(e) {
     const idx = e.detail.current;
-    this.setData({ tierCards: buildTierCards(idx), arcLabels: buildArcLabels(idx), trackShift: getTrackShift(idx, TIERS.length) });
-  },
-  onSelectTier(e) {
-    const idx = e.currentTarget.dataset.index;
-    if (idx === this.data.currentTierIndex) return;
-    this.setData({ currentTierIndex: idx });
+    this.setData({ tierCards: buildTierCards(idx) });
   },
   onMenuItem(e) {
     const { action } = e.currentTarget.dataset;

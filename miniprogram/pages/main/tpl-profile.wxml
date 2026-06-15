@@ -65,27 +65,6 @@
       </swiper-item>
     </swiper>
 
-    <!-- 等级曲线联动指示器 -->
-    <view class="arc-indicator">
-      <view class="arc-curve-container">
-        <view class="arc-curve-bg"></view>
-        <view class="arc-labels-track" style="transform: translateX({{trackShift}}%)">
-          <view
-            wx:for="{{arcLabels}}"
-            wx:key="key"
-            wx:for-index="idx"
-            class="arc-label-col {{currentTierIndex === idx ? 'active' : ''}}"
-            style="transform: translateY({{item.yOffset}}rpx)"
-            bindtap="onSelectTier"
-            data-index="{{idx}}"
-          >
-            <text class="arc-label-text">{{item.label}}</text>
-            <view class="arc-dot {{currentTierIndex === idx ? 'active' : ''}}"></view>
-          </view>
-        </view>
-      </view>
-    </view>
-
     <!-- 资产统计 -->
     <view class="stats-row">
       <view class="stats-item" bindtap="onMenuItem" data-action="coupons">

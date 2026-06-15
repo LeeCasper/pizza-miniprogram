@@ -598,17 +598,6 @@
 .tier-card-diamond { box-shadow: 0 8rpx 32rpx rgba(0,0,0,0.2); }
 .tier-card-diamond::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at top right, rgba(255,255,255,0.15), transparent 60%); pointer-events: none; z-index: 0; }
 
-/* 等级曲线联动指示器 */
-.arc-indicator { margin: 0; padding: 0 32rpx; position: relative; }
-.arc-curve-container { position: relative; height: 148rpx; overflow: hidden; }
-.arc-curve-bg { position: absolute; bottom: -1647rpx; left: 50%; width: 1700rpx; height: 1700rpx; margin-left: -850rpx; border-top: 5rpx solid rgba(211,47,47,0.6); border-radius: 50%; -webkit-mask: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.2) 12%, rgba(0,0,0,0.6) 30%, rgba(0,0,0,1) 45%, rgba(0,0,0,1) 55%, rgba(0,0,0,0.6) 70%, rgba(0,0,0,0.2) 88%, transparent 100%); mask: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.2) 12%, rgba(0,0,0,0.6) 30%, rgba(0,0,0,1) 45%, rgba(0,0,0,1) 55%, rgba(0,0,0,0.6) 70%, rgba(0,0,0,0.2) 88%, transparent 100%); }
-.arc-labels-track { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-around; align-items: flex-start; padding-top: 45rpx; transition: transform 0.45s cubic-bezier(0.32,0.72,0,1); }
-.arc-label-col { display: flex; flex-direction: column; align-items: center; gap: 8rpx; transition: transform 0.45s cubic-bezier(0.32,0.72,0,1); min-width: 120rpx; }
-.arc-label-text { font-size: 24rpx; color: var(--color-on-surface-variant); transition: all 0.45s cubic-bezier(0.32,0.72,0,1); white-space: nowrap; }
-.arc-label-col.active .arc-label-text { color: var(--color-on-surface); font-weight: var(--font-weight-bold); }
-.arc-dot { width: 12rpx; height: 12rpx; border-radius: var(--radius-full); background: var(--color-primary); opacity: 0.5; box-shadow: 0 0 0 6rpx rgba(211,47,47,0.12); transition: all 0.45s cubic-bezier(0.32,0.72,0,1); flex-shrink: 0; }
-.arc-dot.active { opacity: 1; width: 14rpx; height: 14rpx; box-shadow: 0 0 0 8rpx rgba(211,47,47,0.14); }
-
 /* 资产统计 */
 .stats-row { display: flex; align-items: center; justify-content: space-around; margin: 24rpx 32rpx 24rpx; padding: 28rpx 8rpx; border-radius: var(--radius-card); background: var(--color-surface); box-shadow: var(--shadow-card); }
 .stats-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8rpx; }
