@@ -4,10 +4,10 @@ const app = getApp();
 
 // ── 会员等级（Stitch 设计稿 1:1） ──────────────────
 const TIERS = [
-  { key: 'normal',   name: '普通', arcLabel: '普通',     gradient: 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)', textColor: '#1f2937', badgeBg: 'rgba(0,0,0,0.08)',    threshold: 0,    progressTrack: 'rgba(0,0,0,0.1)',   progressFill: 'rgba(0,0,0,0.5)' },
-  { key: 'gold',     name: '黄金', arcLabel: '圈内新人', gradient: 'linear-gradient(135deg, #fceabb 0%, #f8b500 100%)', textColor: '#451a03', badgeBg: 'rgba(255,255,255,0.4)', threshold: 1000, progressTrack: 'rgba(120,53,15,0.1)', progressFill: 'rgba(120,53,15,0.8)' },
-  { key: 'platinum', name: '铂金', arcLabel: '资深吃货', gradient: 'linear-gradient(135deg, #e2e8f0 0%, #f8fafc 50%, #cbd5e1 100%)', textColor: '#1e293b', badgeBg: 'rgba(255,255,255,0.5)', threshold: 3000, progressTrack: 'rgba(30,41,59,0.1)', progressFill: 'rgba(30,41,59,0.7)' },
-  { key: 'diamond',  name: '钻石', arcLabel: '至尊达人', gradient: 'linear-gradient(135deg, #111827 0%, #000000 100%)', textColor: '#ffffff', badgeBg: 'rgba(255,255,255,0.2)', threshold: 6000, progressTrack: 'rgba(255,255,255,0.2)', progressFill: 'rgba(255,255,255,0.8)' }
+  { key: 'normal',   name: '普通', gradient: 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)', textColor: '#1f2937', badgeBg: 'rgba(0,0,0,0.08)',    threshold: 0,    progressTrack: 'rgba(0,0,0,0.1)',   progressFill: 'rgba(0,0,0,0.5)' },
+  { key: 'gold',     name: '黄金', gradient: 'linear-gradient(135deg, #fceabb 0%, #f8b500 100%)', textColor: '#451a03', badgeBg: 'rgba(255,255,255,0.4)', threshold: 1000, progressTrack: 'rgba(120,53,15,0.1)', progressFill: 'rgba(120,53,15,0.8)' },
+  { key: 'platinum', name: '铂金', gradient: 'linear-gradient(135deg, #e2e8f0 0%, #f8fafc 50%, #cbd5e1 100%)', textColor: '#1e293b', badgeBg: 'rgba(255,255,255,0.5)', threshold: 3000, progressTrack: 'rgba(30,41,59,0.1)', progressFill: 'rgba(30,41,59,0.7)' },
+  { key: 'diamond',  name: '钻石', gradient: 'linear-gradient(135deg, #111827 0%, #000000 100%)', textColor: '#ffffff', badgeBg: 'rgba(255,255,255,0.2)', threshold: 6000, progressTrack: 'rgba(255,255,255,0.2)', progressFill: 'rgba(255,255,255,0.8)' }
 ];
 const TIER_THRESHOLDS = [0, 1000, 3000, 6000];
 
@@ -64,32 +64,14 @@ function buildTierCards(userTierIndex, userPoints) {
   });
 }
 
-function buildArcLabels(activeIndex) {
-  return TIERS.map((t, i) => {
-    const dist = Math.abs(i - activeIndex);
-    let offsetY = 0;
-    if (dist === 1) offsetY = 16;
-    else if (dist === 2) offsetY = 36;
-    else if (dist === 3) offsetY = 48;
-    return {
-      key: t.key,
-      label: t.arcLabel,
-      active: i === activeIndex,
-      offsetY
-    };
-  });
-}
-
 Page({
   data: {
     statusBarHeight: 44,
     topBarTotalHeight: 80,
     userInfo: {},
     tierCards: buildTierCards(0, 0),
-    arcLabels: buildArcLabels(0),
     activeTierIndex: 0,
     userTierIndex: 0,
-    arcOffset: 0,
     cardCount: 0,
     editProfileOpen: false,
     editForm: { name: '', bio: '', avatar: '' },
@@ -132,10 +114,8 @@ Page({
         bio: ui.bio || '享受美味每一天'
       },
       tierCards: buildTierCards(tierIndex, ui.points || 0),
-      arcLabels: buildArcLabels(tierIndex),
       activeTierIndex: tierIndex,
-      userTierIndex: tierIndex,
-      arcOffset: -(tierIndex * 100)
+      userTierIndex: tierIndex
     });
 
     // 后台刷新用户数据
@@ -313,50 +293,23 @@ Page({
     });
   },
 
-  // ── 会员卡片横向滚动 + 弧线联动 ──────────────
+  // ── 会员卡片横向滚动 ─────────────────────────
   onTierCardsScroll(e) {
     if (this._scrollTimer) clearTimeout(this._scrollTimer);
     this._scrollTimer = setTimeout(() => {
       const scrollLeft = e.detail.scrollLeft;
-      const cardWidth = e.detail.scrollWidth / 4; // 4 cards
+      const cardWidth = e.detail.scrollWidth / 4;
       const centerPos = scrollLeft + (this._swiperWidth || 375) / 2;
-      let activeIndex = 0;
-      let minDist = Infinity;
+      let activeIndex = 0, minDist = Infinity;
       for (let i = 0; i < 4; i++) {
         const cardCenter = (i + 0.5) * cardWidth;
         const dist = Math.abs(centerPos - cardCenter);
         if (dist < minDist) { minDist = dist; activeIndex = i; }
       }
       if (activeIndex !== this.data.activeTierIndex) {
-        this.setData({
-          activeTierIndex: activeIndex,
-          arcLabels: buildArcLabels(activeIndex),
-          arcOffset: -(activeIndex * 100)
-        });
+        this.setData({ activeTierIndex: activeIndex });
       }
     }, 80);
-  },
-
-  onArcLabelTap(e) {
-    const idx = parseInt(e.currentTarget.dataset.index);
-    if (idx === this.data.activeTierIndex) return;
-    this.setData({
-      activeTierIndex: idx,
-      arcLabels: buildArcLabels(idx),
-      arcOffset: -(idx * 100)
-    });
-    // Scroll the cards container to the selected card
-    if (this._scrollTimer) clearTimeout(this._scrollTimer);
-    const cardWidth = (this._swiperWidth || 375) * 0.85;
-    const gap = 16; // matches CSS gap
-    const targetScrollLeft = idx * (cardWidth + gap);
-    // Use createSelectorQuery to scroll the view
-    const query = wx.createSelectorQuery();
-    query.select('#tierCardsScroll').node((res) => {
-      if (res && res[0]) {
-        res[0].scrollTo({ left: targetScrollLeft, animated: true });
-      }
-    }).exec();
   },
 
   onMemberSwiperReady() {

@@ -59,29 +59,6 @@
       </view>
     </scroll-view>
 
-    <!-- 弧线指示器 -->
-    <view class="arc-container">
-      <view class="arc-curve-wrap">
-        <view class="arc-curve"></view>
-      </view>
-      <view class="arc-labels-clip">
-        <view class="arc-labels-row" style="transform: translateX({{arcOffset}}rpx)">
-          <view
-            class="arc-label-item"
-            wx:for="{{arcLabels}}"
-            wx:key="key"
-            wx:for-index="idx"
-            style="transform: translateY({{item.offsetY}}rpx)"
-            bindtap="onArcLabelTap"
-            data-index="{{idx}}"
-          >
-            <text class="arc-label-text {{item.active ? 'arc-label-active' : ''}}">{{item.label}}</text>
-            <view class="arc-dot {{item.active ? 'arc-dot-active' : ''}}"></view>
-          </view>
-        </view>
-      </view>
-    </view>
-
     <!-- 资产统计 -->
     <view class="stats-row">
       <view class="stats-item" bindtap="onMenuItem" data-action="coupons">
