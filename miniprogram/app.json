@@ -1,7 +1,7 @@
 {
   "pages": [
     "pages/main/main",
-    "pages/member/member",
+    "pages/shop/shop",
     "pages/store/store",
     "pages/points/points",
     "pages/coupons/coupons",

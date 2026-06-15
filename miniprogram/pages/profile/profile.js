@@ -124,6 +124,8 @@ Page({
     editProfileOpen: false,
     editForm: { name: '', bio: '', avatar: '' },
     announceOpen: false,
+    memberOverlayOpen: false,
+    selectedPlan: 'monthly',
   },
 
   onLoad() {
@@ -197,7 +199,59 @@ Page({
   },
 
   onActivateMember() {
-    wx.switchTab({ url: '/pages/member/member' });
+    this.setData({ memberOverlayOpen: true });
+  },
+
+  onMemberOverlayClose() {
+    this.setData({ memberOverlayOpen: false });
+  },
+
+  onSelectPlan(e) {
+    const { plan } = e.currentTarget.dataset;
+    this.setData({ selectedPlan: plan });
+  },
+
+  onMemberSubscribe() {
+    const plan = this.data.selectedPlan;
+    const planNames = { annual: '连续包年 ¥199', monthly: '连续包月 ¥19.9' };
+    wx.showModal({
+      title: '开通会员',
+      content: '确认开通' + (planNames[plan] || '会员') + '？',
+      success: (res) => {
+        if (res.confirm) {
+          wx.showLoading({ title: '开通中...' });
+          api.post('/member/subscribe', { plan }).then(result => {
+            wx.hideLoading();
+            if (result.code === 0) {
+              wx.showToast({ title: '开通成功！', icon: 'success' });
+              this.setData({ memberOverlayOpen: false });
+              this.loadUserData();
+            } else {
+              wx.showToast({ title: result.message || '开通失败', icon: 'none' });
+            }
+          }).catch(() => {
+            wx.hideLoading();
+            wx.showToast({ title: '开通失败，请重试', icon: 'none' });
+          });
+        }
+      }
+    });
+  },
+
+  onMemberHelp() {
+    wx.showToast({ title: '优惠券每周一自动发放至您的账户', icon: 'none', duration: 2000 });
+  },
+
+  onMemberTerms() {
+    wx.showToast({ title: '会员使用条款', icon: 'none' });
+  },
+
+  onMemberPrivacy() {
+    wx.showToast({ title: '隐私政策', icon: 'none' });
+  },
+
+  onMemberRestore() {
+    wx.showToast({ title: '正在恢复购买...', icon: 'none' });
   },
 
   // ========== 头像 ==========
@@ -348,7 +402,7 @@ Page({
     const actions = {
       orders: '/pages/orders/orders',
       store: '/pages/store/store',
-      member: '/pages/member/member',
+      member: '__member__',
       points: '/pages/points/points',
       coupons: '/pages/coupons/coupons',
       address: '/pages/address/address',
@@ -368,7 +422,11 @@ Page({
         wx.showToast({ title: messages[action] || '功能开发中', icon: 'none', duration: 2000 });
         return;
       }
-      const isTab = ['/pages/orders/orders', '/pages/member/member'].includes(actions[action]);
+      if (actions[action] === '__member__') {
+        this.setData({ memberOverlayOpen: true });
+        return;
+      }
+      const isTab = ['/pages/orders/orders'].includes(actions[action]);
       if (isTab) {
         wx.switchTab({ url: actions[action] });
       } else {
@@ -378,6 +436,8 @@ Page({
       wx.showToast({ title: '功能开发中', icon: 'none' });
     }
   },
+
+  noop() {},
 
   onLogout() {
     wx.showModal({

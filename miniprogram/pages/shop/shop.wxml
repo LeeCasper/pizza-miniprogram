@@ -1,0 +1,100 @@
+<!-- pages/shop/shop.wxml — 会员商城 -->
+<view class="shop-page" style="padding-top: {{topBarTotalHeight}}px">
+  <!-- 顶部导航 -->
+  <view class="shop-top-bar" style="padding-top: {{statusBarHeight}}px">
+    <text class="shop-top-title">会员商城</text>
+  </view>
+
+  <scroll-view scroll-y class="shop-scroll" enhanced show-scrollbar="{{false}}" style="height: {{scrollViewHeight}}px;">
+    <view class="shop-scroll-inner">
+      <!-- 促销 Banner -->
+      <view class="shop-banner-section" wx:if="{{shopBanners.length > 0}}">
+        <swiper class="shop-banner-swiper" autoplay interval="4000" circular indicator-dots indicator-color="rgba(255,255,255,0.3)" indicator-active-color="#D32F2F">
+          <swiper-item wx:for="{{shopBanners}}" wx:key="id">
+            <view class="shop-banner-slide" bindtap="onShopBannerTap" data-id="{{item.id}}">
+              <image class="shop-banner-img" src="{{item.image}}" mode="aspectFill"></image>
+              <view class="shop-banner-overlay">
+                <text class="shop-banner-title">{{item.title}}</text>
+                <text class="shop-banner-sub">{{item.subtitle}}</text>
+              </view>
+            </view>
+          </swiper-item>
+        </swiper>
+      </view>
+
+      <!-- 分类导航 -->
+      <view class="shop-categories">
+        <view
+          wx:for="{{shopCategories}}"
+          wx:key="key"
+          class="shop-cat-item"
+          bindtap="onShopCategory"
+          data-key="{{item.key}}"
+        >
+          <view class="shop-cat-icon-wrap {{shopActiveCat === item.key ? 'cat-active' : ''}}">
+            <text class="shop-cat-icon">{{item.icon}}</text>
+          </view>
+          <text class="shop-cat-name">{{item.name}}</text>
+        </view>
+      </view>
+
+      <!-- 限时优惠横条 -->
+      <view class="shop-flash-bar" wx:if="{{shopFlashDeal}}">
+        <view class="flash-bar-left">
+          <text class="flash-icon">⚡</text>
+          <text class="flash-title">限时特惠</text>
+          <text class="flash-desc">{{shopFlashDeal.desc}}</text>
+        </view>
+        <view class="flash-bar-btn" bindtap="onFlashTap">
+          <text>抢购</text>
+        </view>
+      </view>
+
+      <!-- 商品网格 -->
+      <view class="shop-products-section">
+        <view class="shop-section-header">
+          <text class="shop-section-title">{{shopActiveCat === 'all' ? '精选好物' : shopActiveCatName}}</text>
+          <text class="shop-section-count">{{shopFilteredProducts.length}}件</text>
+        </view>
+
+        <view class="shop-product-grid" wx:if="{{shopFilteredProducts.length > 0}}">
+          <view
+            wx:for="{{shopFilteredProducts}}"
+            wx:key="id"
+            class="shop-product-card"
+            bindtap="onShopProductTap"
+            data-product="{{item}}"
+          >
+            <image class="shop-product-img" src="{{item.image}}" mode="aspectFill"></image>
+            <view class="shop-product-info">
+              <text class="shop-product-name">{{item.name}}</text>
+              <text class="shop-product-desc">{{item.desc || '手工现做，新鲜食材'}}</text>
+              <view class="shop-product-bottom">
+                <view class="shop-product-price-row">
+                  <text class="shop-product-price">¥{{item.price}}</text>
+                  <text class="shop-product-original" wx:if="{{item.originalPrice}}">¥{{item.originalPrice}}</text>
+                </view>
+                <view class="shop-add-btn {{item.quantity > 0 ? 'has-qty' : ''}}" catchtap="onShopAddToCart" data-product="{{item}}">
+                  <text class="shop-add-icon" wx:if="{{item.quantity === 0}}">+</text>
+                  <view class="shop-mini-stepper" wx:else>
+                    <view class="shop-mini-btn" catchtap="onShopDecrease" data-id="{{item.id}}"><text>−</text></view>
+                    <text class="shop-mini-qty">{{item.quantity}}</text>
+                    <view class="shop-mini-btn shop-mini-plus" catchtap="onShopAddToCart" data-product="{{item}}"><text>+</text></view>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <view class="shop-empty" wx:else>
+          <text class="shop-empty-icon">🛍️</text>
+          <text class="shop-empty-text">暂无商品</text>
+          <text class="shop-empty-sub">敬请期待更多好物上架</text>
+        </view>
+      </view>
+
+      <view style="height: calc(140rpx + env(safe-area-inset-bottom))"></view>
+    </view>
+  </scroll-view>
+</view>

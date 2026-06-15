@@ -71,7 +71,7 @@ Page({
     tabList: [
       { text: '点单', icon: '/images/tab-menu.png' },
       { text: '订单', icon: '/images/tab-orders.png' },
-      { text: '会员', icon: '/images/tab-member.png' },
+      { text: '商城', icon: '/images/tab-member.png' },
       { text: '我的', icon: '/images/tab-profile.png' }
     ],
     // 商品
@@ -95,6 +95,20 @@ Page({
     announceOpen: false,
     // 会员订阅
     selectedPlan: 'monthly',
+    memberOverlayOpen: false,
+    // 商城
+    shopBanners: [], shopCategories: [
+      { key: 'all', name: '全部', icon: '🔥' },
+      { key: 'pizza', name: '披萨', icon: '🍕' },
+      { key: 'durian', name: '榴莲', icon: '🍈' },
+      { key: 'pineapple', name: '菠萝', icon: '🍍' },
+      { key: 'drink', name: '饮品', icon: '🥤' },
+      { key: 'dessert', name: '甜点', icon: '🍰' },
+      { key: 'snack', name: '小食', icon: '🍟' },
+    ],
+    shopActiveCat: 'all', shopActiveCatName: '精选好物',
+    shopProducts: [], shopFilteredProducts: [],
+    shopFlashDeal: null,
     // 加载态
     productsLoaded: false, ordersLoaded: false,
   },
@@ -169,6 +183,13 @@ Page({
             })),
           ],
           productsLoaded: true,
+          shopProducts: products,
+          shopFilteredProducts: products,
+          shopBanners: banners,
+          shopFlashDeal: (() => {
+            const fp = products.find(p => p.originalPrice);
+            return fp ? { desc: fp.name + ' 限时立减' + (fp.originalPrice - fp.price).toFixed(1) + '元', productId: fp.id } : null;
+          })(),
         });
       }
     }).catch(() => {});
@@ -210,7 +231,10 @@ Page({
     const { activeCategory } = this.data;
     const updatedProducts = this.data.products.map(p => ({ ...p, quantity: cart[p.id] ? cart[p.id].quantity : 0 }));
     const filtered = activeCategory === 'all' ? updatedProducts : updatedProducts.filter(p => p.category === activeCategory || (p.category_key && p.category_key === activeCategory));
-    this.setData({ products: updatedProducts, filteredProducts: filtered, cartItems: Object.values(cart), cartCount: app.globalData.cartCount, cartTotal: app.globalData.cartTotal });
+    // Also sync shop data
+    const updatedShopProducts = this.data.shopProducts.map(p => ({ ...p, quantity: cart[p.id] ? cart[p.id].quantity : 0 }));
+    const shopFiltered = this.data.shopActiveCat === 'all' ? updatedShopProducts : updatedShopProducts.filter(p => p.category === this.data.shopActiveCat || (p.category_key && p.category_key === this.data.shopActiveCat));
+    this.setData({ products: updatedProducts, filteredProducts: filtered, shopProducts: updatedShopProducts, shopFilteredProducts: shopFiltered, cartItems: Object.values(cart), cartCount: app.globalData.cartCount, cartTotal: app.globalData.cartTotal });
   },
   updateCart() { this.syncCart(); },
 
@@ -353,6 +377,42 @@ Page({
   onUsePoints() { wx.navigateTo({ url: '/pages/points/points' }); },
   onEarnPoints() { wx.showToast({ title: '下单即可赚取积分', icon: 'none' }); },
 
+  // ── 商城 ──────────────────────────────────────
+
+  onShopCategory(e) {
+    const { key } = e.currentTarget.dataset;
+    const cat = this.data.shopCategories.find(c => c.key === key);
+    const products = this.data.shopProducts;
+    const filtered = key === 'all' ? products : products.filter(p => p.category === key || (p.category_key && p.category_key === key));
+    this.setData({ shopActiveCat: key, shopActiveCatName: cat ? cat.name : '精选好物', shopFilteredProducts: filtered });
+  },
+  onShopAddToCart(e) { app.addToCart(e.currentTarget.dataset.product); },
+  onShopDecrease(e) { app.decreaseQuantity(e.currentTarget.dataset.id); },
+  onShopBannerTap() { wx.showToast({ title: '促销活动即将上线', icon: 'none' }); },
+  onFlashTap() {
+    const deal = this.data.shopFlashDeal;
+    if (deal && deal.productId) {
+      const product = this.data.shopProducts.find(p => p.id === deal.productId);
+      if (product) { app.addToCart(product); wx.showToast({ title: '已加入购物车', icon: 'success' }); }
+    }
+  },
+  onShopProductTap(e) {
+    const { product } = e.currentTarget.dataset;
+    const cart = app.globalData.cart;
+    const currentQty = cart[product.id] ? cart[product.id].quantity : 0;
+    this.setData({
+      detailProduct: product, detailOpen: true, detailQuantity: currentQty || 1,
+      selectedRestrictions: { ...this.data.selectedRestrictions, [product.id]: this.data.selectedRestrictions[product.id] || {} }
+    });
+  },
+  // Sync shop cart quantities
+  syncShopCart() {
+    const cart = app.globalData.cart;
+    const updated = this.data.shopProducts.map(p => ({ ...p, quantity: cart[p.id] ? cart[p.id].quantity : 0 }));
+    const filtered = this.data.shopActiveCat === 'all' ? updated : updated.filter(p => p.category === this.data.shopActiveCat || (p.category_key && p.category_key === this.data.shopActiveCat));
+    this.setData({ shopProducts: updated, shopFilteredProducts: filtered });
+  },
+
   // ── 个人中心 ────────────────────────────────
 
   loadProfileData() {
@@ -386,7 +446,7 @@ Page({
   onMenuItem(e) {
     const { action } = e.currentTarget.dataset;
     const routes = {
-      orders: { tab: 1 }, store: '/pages/store/store', member: { tab: 2 },
+      orders: { tab: 1 }, store: '/pages/store/store', shop: { tab: 2 },
       points: '/pages/points/points', coupons: '/pages/coupons/coupons',
       address: '/pages/address/address', favorites: '/pages/address/address',
       settings: '/pages/settings/settings', about: '/pages/settings/settings',
@@ -487,7 +547,10 @@ Page({
     wx.showToast({ title: '已加入购物车', icon: 'success', duration: 1500 });
   },
   onActivateMember() {
-    this.setData({ currentTab: 2 });
+    this.setData({ memberOverlayOpen: true });
+  },
+  onMemberOverlayClose() {
+    this.setData({ memberOverlayOpen: false });
   },
   // ── 公告浮窗 ──────────────────────────────
   onAnnounceToggle() {

@@ -5,7 +5,7 @@ Component({
     list: [
       { pagePath: '/pages/index/index', text: '点单', icon: '/images/tab-menu.png' },
       { pagePath: '/pages/orders/orders', text: '订单', icon: '/images/tab-orders.png' },
-      { pagePath: '/pages/member/member', text: '会员', icon: '/images/tab-member.png' },
+      { pagePath: '/pages/shop/shop', text: '商城', icon: '/images/tab-member.png' },
       { pagePath: '/pages/profile/profile', text: '我的', icon: '/images/tab-profile.png' }
     ]
   },
