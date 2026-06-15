@@ -248,7 +248,6 @@
 
 .tier-compare-card.compare-card-active {
   box-shadow: 0 8rpx 28rpx rgba(0, 0, 0, 0.35);
-  transform: scale(1.02);
 }
 
 .tier-compare-card.compare-card-dimmed {
@@ -257,7 +256,6 @@
 
 .tier-compare-card.compare-card-selected {
   border-color: var(--color-primary);
-  transform: scale(1.04);
   box-shadow: 0 0 0 4rpx rgba(211, 47, 47, 0.18), 0 8rpx 28rpx rgba(0, 0, 0, 0.3);
 }
 
