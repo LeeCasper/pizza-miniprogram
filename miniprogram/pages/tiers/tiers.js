@@ -188,7 +188,6 @@ Page({
     progressPercent: 0,
     spentToNext: '0.00',
     progressFraction: '',
-    scrollToView: '',
     hasNext: false,
     heroDiscountText: '',
     heroPointsText: '',
@@ -227,7 +226,6 @@ Page({
         : '';
 
       const targetKey = scrollToKey || tierInfo.current.levelKey;
-      const scrollToView = 'tier-' + targetKey;
 
       // Initial selected tier (the one navigated to, or current)
       const selectedTier = tiers.find(t => t.levelKey === targetKey) || currentTier;
@@ -250,14 +248,7 @@ Page({
         spentToNext,
         progressFraction,
         progressPercent,
-        scrollToView,
       });
-
-      // Re-trigger scroll after a short delay to ensure rendering is complete
-      setTimeout(() => {
-        this.setData({ scrollToView: '' });
-        setTimeout(() => this.setData({ scrollToView }), 50);
-      }, 300);
     }).catch(() => {
       wx.showToast({ title: '加载失败', icon: 'none' });
     });
@@ -289,12 +280,7 @@ Page({
       this.setData({
         selectedTier: tier,
         selectedTierKey: levelKey,
-        scrollToView: '',
       });
-      // Scroll to the tapped card
-      setTimeout(() => {
-        this.setData({ scrollToView: 'tier-' + levelKey });
-      }, 100);
     }
   },
 
