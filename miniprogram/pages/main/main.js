@@ -469,22 +469,8 @@ Page({
   },
 
   // ── 会员卡轮播 ──────────────────────────────
-  onMemberScroll(e) {
-    if (this._scrollTimer) clearTimeout(this._scrollTimer);
-    this._scrollTimer = setTimeout(() => {
-      const cardW = wx.getSystemInfoSync().windowWidth - 60;
-      const idx = Math.round(e.detail.scrollLeft / (cardW + 10));
-      if (idx >= 0 && idx < this.data.tierCards.length && idx !== this.data.activeTierIndex) {
-        this.setData({ activeTierIndex: idx });
-      }
-    }, 150);
-  },
-
-  onTierDotTap(e) {
-    const idx = e.currentTarget.dataset.index;
-    if (idx !== this.data.activeTierIndex) {
-      this.setData({ activeTierIndex: idx });
-    }
+  onTierChange(e) {
+    this.setData({ activeTierIndex: e.detail.current });
   },
 
   onUpgradeTier(e) {
