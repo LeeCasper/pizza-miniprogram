@@ -30,35 +30,22 @@
       class="member-swiper"
       current="{{currentTierIndex}}"
       bindchange="onTierSwiperSync"
-      bindanimationfinish="onTierSwiperAnimDone"
-      duration="300"
+      duration="250"
       easing-function="easeInOutCubic"
-      previous-margin="56rpx"
-      next-margin="56rpx"
-      style="height: 380rpx"
+      style="height: 460rpx"
     >
       <swiper-item wx:for="{{tierCards}}" wx:key="key" wx:for-index="idx">
-        <view class="tier-card-wrapper" style="transform: translateY({{item.cardOffset}}rpx)">
-          <view class="tier-card tier-card-{{item.key}}" style="background: {{item.gradient}}; color: {{item.textColor}}">
-            <view class="tier-card-inner">
-              <view class="tier-card-header">
-                <view class="tier-status-badge" style="background: {{item.badgeBg}}">
-                  <text class="tier-status-text">{{userTierIndex === idx ? '当前等级' : '未解锁'}}</text>
-                </view>
-              </view>
-              <view class="tier-card-body">
-                <text class="tier-name">{{item.name}}</text>
-                <text class="tier-growth-text">积分{{userInfo.points}} {{tierGrowthTexts[idx]}}</text>
-              </view>
-              <view class="tier-card-footer">
-                <view class="tier-lv-row">
-                  <text class="tier-lv">Lv{{idx}}</text>
-                </view>
-                <view class="tier-progress-wrap" style="background: {{item.progressTrackBg}}">
-                  <view class="tier-progress-fill" style="width: {{idx === userTierIndex ? tierProgress : (idx < userTierIndex ? 100 : 0)}}%; background: {{item.progressFillBg}}"></view>
-                </view>
+        <view class="tier-card" style="background: {{item.gradient}}; color: {{item.textColor}}">
+          <view class="tier-card-inner">
+            <view class="tier-card-header">
+              <view class="tier-status-badge" style="background: {{item.badgeBg}}">
+                <text class="tier-status-text">{{item.isCurrent ? '当前等级' : (item.isLocked ? '升级解锁' : '已解锁')}}</text>
               </view>
             </view>
+            <view class="tier-card-body">
+              <text class="tier-name">{{item.name}}</text>
+            </view>
+            <text class="tier-benefits-text">{{item.benefitsText}}</text>
           </view>
         </view>
       </swiper-item>

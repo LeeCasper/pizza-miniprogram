@@ -25,12 +25,45 @@ const dietaryRestrictions = [
 
 // ── 会员等级（客户端计算） ──────────────────────────
 const TIERS = [
-  { key: 'normal',   name: '普通', gradient: 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)', textColor: '#1f2937', progressTrackBg: 'rgba(0,0,0,0.1)', progressFillBg: 'rgba(0,0,0,0.5)', badgeBg: 'rgba(0,0,0,0.08)', threshold: 0 },
-  { key: 'gold',     name: '黄金', gradient: 'linear-gradient(135deg, #fceabb 0%, #f8b500 100%)', textColor: '#451a03', progressTrackBg: 'rgba(120,53,15,0.12)', progressFillBg: 'rgba(120,53,15,0.7)', badgeBg: 'rgba(255,255,255,0.4)', threshold: 1000 },
-  { key: 'platinum', name: '铂金', gradient: 'linear-gradient(135deg, #e2e8f0 0%, #f8fafc 50%, #cbd5e1 100%)', textColor: '#1e293b', progressTrackBg: 'rgba(51,65,85,0.12)', progressFillBg: 'rgba(51,65,85,0.7)', badgeBg: 'rgba(255,255,255,0.5)', threshold: 3000 },
-  { key: 'diamond',  name: '钻石', gradient: 'linear-gradient(135deg, #111827 0%, #000000 100%)', textColor: '#ffffff', progressTrackBg: 'rgba(255,255,255,0.2)', progressFillBg: 'rgba(255,255,255,0.9)', badgeBg: 'rgba(255,255,255,0.2)', threshold: 6000 }
+  { key: 'normal',   name: '普通会员', gradient: 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)', textColor: '#1f2937', badgeBg: 'rgba(0,0,0,0.08)', threshold: 0,
+    benefits: [
+      { icon: '🎫', text: '每周优惠券 ×1' },
+      { icon: '⭐', text: '消费积分 1×' },
+      { icon: '🎂', text: '生日当月 9 折' },
+      { icon: '📢', text: '新品优先通知' }
+    ] },
+  { key: 'gold',     name: '黄金会员', gradient: 'linear-gradient(135deg, #fceabb 0%, #f8b500 100%)', textColor: '#451a03', badgeBg: 'rgba(255,255,255,0.4)', threshold: 1000,
+    benefits: [
+      { icon: '🎫', text: '每周优惠券 ×2' },
+      { icon: '⭐', text: '消费积分 2×' },
+      { icon: '🎂', text: '生日当月 8 折 + 好礼' },
+      { icon: '🚀', text: '订单优先制作' },
+      { icon: '💰', text: '会员专享价' }
+    ] },
+  { key: 'platinum', name: '铂金会员', gradient: 'linear-gradient(135deg, #e2e8f0 0%, #f8fafc 50%, #cbd5e1 100%)', textColor: '#1e293b', badgeBg: 'rgba(255,255,255,0.5)', threshold: 3000,
+    benefits: [
+      { icon: '🎫', text: '每周优惠券 ×3' },
+      { icon: '⭐', text: '消费积分 3×' },
+      { icon: '🎂', text: '生日当月 7 折 + 蛋糕' },
+      { icon: '🚀', text: '订单优先制作' },
+      { icon: '🚚', text: '满额免配送费' },
+      { icon: '🆕', text: '新品免费试吃' }
+    ] },
+  { key: 'diamond',  name: '钻石会员', gradient: 'linear-gradient(135deg, #111827 0%, #000000 100%)', textColor: '#ffffff', badgeBg: 'rgba(255,255,255,0.2)', threshold: 6000,
+    benefits: [
+      { icon: '🎫', text: '每周优惠券 ×5' },
+      { icon: '⭐', text: '消费积分 5×' },
+      { icon: '🎂', text: '生日免单 + 尊享礼盒' },
+      { icon: '🚀', text: '订单极速制作' },
+      { icon: '🚚', text: '全年免配送费' },
+      { icon: '🆕', text: '新品免费试吃' },
+      { icon: '👑', text: '私人定制服务' },
+      { icon: '💬', text: 'VIP 专属客服' }
+    ] }
 ];
 const TIER_THRESHOLDS = [0, 1000, 3000, 6000];
+// Pre-compute benefits text for single-pass rendering (avoid nested wx:for)
+TIERS.forEach(t => { t.benefitsText = t.benefits.map(b => b.icon + ' ' + b.text).join('\n'); });
 function computeTier(points) {
   let tierIndex = 0;
   for (let i = TIER_THRESHOLDS.length - 1; i >= 0; i--) {
@@ -45,11 +78,7 @@ function computeTier(points) {
   }
   return { tierIndex, pointsToNext, tierProgress, isMax };
 }
-function getCardSinkOffset(index, activeIndex) {
-  const dist = Math.abs(index - activeIndex);
-  if (dist === 0) return 0; if (dist === 1) return 24; if (dist === 2) return 56; return 100;
-}
-function buildTierCards(activeIndex) { return TIERS.map((t, i) => ({ ...t, cardOffset: getCardSinkOffset(i, activeIndex) })); }
+function buildTierCards(userTierIndex) { return TIERS.map((t, i) => ({ key: t.key, name: t.name, gradient: t.gradient, textColor: t.textColor, badgeBg: t.badgeBg, threshold: t.threshold, benefitsText: t.benefitsText, isCurrent: i === userTierIndex, isLocked: i > userTierIndex })); }
 
 Page({
   data: {
@@ -77,7 +106,7 @@ Page({
     ],
     activeTab: 'all', orders: [], filteredOrders: [],
     // 个人中心
-    userInfo: {}, tierCards: buildTierCards(0), tierGrowthTexts: ['', '', '', ''],
+    userInfo: {}, tierCards: buildTierCards(0),
     currentTierIndex: 0, userTierIndex: 0, pointsToNext: 0, tierProgress: 0, cardCount: 0,
     editProfileOpen: false, editForm: { name: '', bio: '', avatar: '' },
     announceOpen: false,
@@ -406,14 +435,9 @@ Page({
   loadProfileData() {
     const ui = app.globalData.userInfo;
     const { tierIndex, pointsToNext, tierProgress, isMax } = computeTier(ui.points || 0);
-    const tierGrowthTexts = TIERS.map((t, i) => {
-      if (i === tierIndex) return isMax ? '已达顶级' : '还需' + pointsToNext + '升级';
-      if (i < tierIndex) return '已达成';
-      return '还需' + (TIER_THRESHOLDS[i] - (ui.points || 0)) + '升级';
-    });
     this.setData({
       userInfo: { ...ui, memberLevel: TIERS[tierIndex].name, balanceText: '¥' + ((ui.balance || 0)).toFixed(2), cardCount: ui.cardCount || 0, bio: ui.bio || '享受美味每一天' },
-      tierCards: buildTierCards(tierIndex), tierGrowthTexts,
+      tierCards: buildTierCards(tierIndex),
       currentTierIndex: tierIndex, userTierIndex: tierIndex, pointsToNext, tierProgress
     });
     // Background refresh
@@ -425,10 +449,6 @@ Page({
     const idx = e.detail.current;
     if (idx === this.data.currentTierIndex) return;
     this.setData({ currentTierIndex: idx });
-  },
-  onTierSwiperAnimDone(e) {
-    const idx = e.detail.current;
-    this.setData({ tierCards: buildTierCards(idx) });
   },
   onMenuItem(e) {
     const { action } = e.currentTarget.dataset;
