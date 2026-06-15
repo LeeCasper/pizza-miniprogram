@@ -27,16 +27,17 @@ function computeTier(points) {
   return { tierIndex, pointsToNext, tierProgress, isMax };
 }
 
-function buildTierCards(userTierIndex, userPoints) {
+const CARD_OFFSETS = [0, 16, 36, 48]; // distance→translateY(rpx)
+
+function buildTierCards(userTierIndex, userPoints, activeIndex) {
+  const ai = activeIndex !== undefined ? activeIndex : userTierIndex;
   return TIERS.map((t, i) => {
     const isCurrent = i === userTierIndex;
     const isLocked = i > userTierIndex;
     const isUnlocked = i < userTierIndex;
-    // Growth text
     let growthText = '';
     if (isCurrent && i < TIERS.length - 1) {
-      const remaining = TIER_THRESHOLDS[i + 1] - userPoints;
-      growthText = '成长值' + userPoints + ' 还需' + remaining + '升级';
+      growthText = '成长值' + userPoints + ' 还需' + (TIER_THRESHOLDS[i + 1] - userPoints) + '升级';
     } else if (isCurrent) {
       growthText = '成长值' + userPoints + ' 已达最高等级';
     } else if (isLocked) {
@@ -44,11 +45,9 @@ function buildTierCards(userTierIndex, userPoints) {
     } else {
       growthText = '已解锁全部权益';
     }
-    // Progress percent
     let progressPercent = 100;
     if (isCurrent && i < TIERS.length - 1) {
-      const lo = TIER_THRESHOLDS[i];
-      const hi = TIER_THRESHOLDS[i + 1];
+      const lo = TIER_THRESHOLDS[i], hi = TIER_THRESHOLDS[i + 1];
       progressPercent = Math.round(((userPoints - lo) / (hi - lo)) * 100);
     } else if (isLocked) {
       progressPercent = 0;
@@ -59,9 +58,14 @@ function buildTierCards(userTierIndex, userPoints) {
       progressFill: t.progressFill,
       isCurrent, isLocked, isUnlocked,
       growthText, progressPercent,
-      lv: 'Lv' + i
+      lv: 'Lv' + i,
+      offsetY: CARD_OFFSETS[Math.abs(i - ai)]
     };
   });
+}
+
+function applyCardOffsets(cards, activeIndex) {
+  return cards.map((c, i) => ({ ...c, offsetY: CARD_OFFSETS[Math.abs(i - activeIndex)] }));
 }
 
 Page({
@@ -293,28 +297,48 @@ Page({
     });
   },
 
-  // ── 会员卡片横向滚动 ─────────────────────────
+  // ── 会员卡片横向滚动 + 下沉选中 ────────────
   onTierCardsScroll(e) {
     if (this._scrollTimer) clearTimeout(this._scrollTimer);
     this._scrollTimer = setTimeout(() => {
-      const scrollLeft = e.detail.scrollLeft;
+      const sl = e.detail.scrollLeft;
       const cardWidth = e.detail.scrollWidth / 4;
-      const centerPos = scrollLeft + (this._swiperWidth || 375) / 2;
+      const centerPos = sl + (this._swiperWidth || 375) / 2;
       let activeIndex = 0, minDist = Infinity;
       for (let i = 0; i < 4; i++) {
-        const cardCenter = (i + 0.5) * cardWidth;
-        const dist = Math.abs(centerPos - cardCenter);
+        const dist = Math.abs(centerPos - (i + 0.5) * cardWidth);
         if (dist < minDist) { minDist = dist; activeIndex = i; }
       }
       if (activeIndex !== this.data.activeTierIndex) {
-        this.setData({ activeTierIndex: activeIndex });
+        this.setData({
+          activeTierIndex: activeIndex,
+          tierCards: applyCardOffsets(this.data.tierCards, activeIndex)
+        });
       }
     }, 80);
   },
 
+  onTierCardTap(e) {
+    const idx = parseInt(e.currentTarget.dataset.index);
+    if (idx === this.data.activeTierIndex) return;
+    this.setData({
+      activeTierIndex: idx,
+      tierCards: applyCardOffsets(this.data.tierCards, idx)
+    });
+    // 滚动到正中间
+    const win = wx.getWindowInfo();
+    const rpx = win.windowWidth / 750;
+    const cw = (this._swiperWidth || win.windowWidth) * 0.85;
+    const gap = 32 * rpx;
+    const pad = 32 * rpx;
+    const target = pad + idx * (cw + gap) - ((this._swiperWidth || win.windowWidth) - cw) / 2;
+    wx.createSelectorQuery().select('#tierCardsScroll').node((res) => {
+      if (res && res[0]) res[0].scrollTo({ left: Math.max(0, target), animated: true });
+    }).exec();
+  },
+
   onMemberSwiperReady() {
-    const query = wx.createSelectorQuery();
-    query.select('.member-tier-section').boundingClientRect((rect) => {
+    wx.createSelectorQuery().select('.member-tier-section').boundingClientRect((rect) => {
       if (rect) this._swiperWidth = rect.width;
     }).exec();
   },
