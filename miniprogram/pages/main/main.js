@@ -47,7 +47,7 @@ function computeTier(points) {
   return { tierIndex, pointsToNext, tierProgress, isMax };
 }
 
-const CARD_OFFSETS = [0, 16, 36, 48];
+const SINK_RPX = 28;
 
 function buildTierCards(userTierIndex, userPoints, activeIndex) {
   const ai = activeIndex !== undefined ? activeIndex : userTierIndex;
@@ -79,13 +79,25 @@ function buildTierCards(userTierIndex, userPoints, activeIndex) {
       isCurrent, isLocked, isUnlocked,
       growthText, progressPercent,
       lv: 'Lv' + i,
-      offsetY: CARD_OFFSETS[Math.abs(i - ai)]
+      offsetY: i === ai ? 0 : SINK_RPX
     };
   });
 }
 
 function applyCardOffsets(cards, activeIndex) {
-  return cards.map((c, i) => ({ ...c, offsetY: CARD_OFFSETS[Math.abs(i - activeIndex)] }));
+  return cards.map((c, i) => ({ ...c, offsetY: i === activeIndex ? 0 : SINK_RPX }));
+}
+
+function snapCardToCenter(swiperWidth, index) {
+  const win = wx.getWindowInfo();
+  const rpx = win.windowWidth / 750;
+  const cw = (swiperWidth || win.windowWidth) * 0.85;
+  const gap = 32 * rpx;
+  const pad = 32 * rpx;
+  const target = pad + index * (cw + gap) - ((swiperWidth || win.windowWidth) - cw) / 2;
+  wx.createSelectorQuery().select('#tierCardsScroll').node((res) => {
+    if (res && res[0]) res[0].scrollTo({ left: Math.max(0, target), animated: true });
+  }).exec();
 }
 
 Page({
@@ -457,8 +469,9 @@ Page({
       if (res.code === 0) { app.globalData.userInfo = res.data; wx.setStorageSync('userInfo', res.data); this.loadProfileData(); }
     }).catch(() => {});
   },
-  // ── 会员卡片横向滚动 + 下沉选中 ────────────
+  // ── 会员卡片横向滚动 + 高低吸附 ────────────
   onTierCardsScroll(e) {
+    if (this._snapping) return;
     if (this._scrollTimer) clearTimeout(this._scrollTimer);
     this._scrollTimer = setTimeout(() => {
       const sl = e.detail.scrollLeft;
@@ -475,7 +488,10 @@ Page({
           tierCards: applyCardOffsets(this.data.tierCards, activeIndex)
         });
       }
-    }, 80);
+      this._snapping = true;
+      snapCardToCenter(this._swiperWidth, activeIndex);
+      setTimeout(() => { this._snapping = false; }, 400);
+    }, 150);
   },
 
   onTierCardTap(e) {
@@ -485,15 +501,9 @@ Page({
       activeTierIndex: idx,
       tierCards: applyCardOffsets(this.data.tierCards, idx)
     });
-    const win = wx.getWindowInfo();
-    const rpx = win.windowWidth / 750;
-    const cw = (this._swiperWidth || win.windowWidth) * 0.85;
-    const gap = 32 * rpx;
-    const pad = 32 * rpx;
-    const target = pad + idx * (cw + gap) - ((this._swiperWidth || win.windowWidth) - cw) / 2;
-    wx.createSelectorQuery().select('#tierCardsScroll').node((res) => {
-      if (res && res[0]) res[0].scrollTo({ left: Math.max(0, target), animated: true });
-    }).exec();
+    this._snapping = true;
+    snapCardToCenter(this._swiperWidth, idx);
+    setTimeout(() => { this._snapping = false; }, 400);
   },
 
   onMemberSwiperReady() {
