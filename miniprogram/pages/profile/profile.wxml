@@ -59,7 +59,7 @@
                   </view>
                   <view class="tier-card-action" catchtap="onUpgradeTier" data-level-key="{{item.levelKey}}">
                     <text class="tier-card-action-text" style="color: {{item.accentColor}}">{{item.actionText}}</text>
-                    <text class="tier-card-action-arrow">→</text>
+                    <image class="tier-card-action-arrow" src="/images/arrow-enter.png" mode="aspectFit"></image>
                   </view>
                 </view>
               </view>
