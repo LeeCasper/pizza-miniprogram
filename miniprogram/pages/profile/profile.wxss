@@ -145,6 +145,12 @@
 .tier-card-wrap.active { padding: 0 20rpx; }
 .tier-card { width: 100%; height: 100%; border-radius: 28rpx; overflow: hidden; position: relative; box-shadow: 0 12rpx 28rpx -8rpx rgba(0,0,0,0.25); transition: opacity 0.3s ease; }
 
+/* 卡片背景图（<image>标签层） */
+.tier-card-bg-img {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+}
 .tier-card-active { opacity: 1; }
 .tier-card-inactive { opacity: 0.55; }
 
