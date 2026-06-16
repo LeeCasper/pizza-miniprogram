@@ -13,6 +13,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | `soybean-admin-temp/` | Admin SPA (production) | Vue3 + Vite8 + NaiveUI + UnoCSS |
 
 - **AppID**: `wx06b8f02feceac089`
+- **Node version**: pnpm + Soybean Admin require Node >= v22.13. Local system PATH defaults to v18 — override before building.
+- **Memory**: See `C:\Users\61778\.claude\projects\D--Code-Pizza\memory\MEMORY.md` for previously learned lessons.
 - **Production**: `https://www.artaides.com` (Nginx → Express `/api` + static `/uploads`; Admin at `/admin/` served from Soybean Admin dist)
 
 ## Key Reference — Node.js Version
@@ -70,6 +72,7 @@ src/
 ### Route Conventions
 
 - Public API routes: `/api/v1/auth`, `/api/v1/products`, etc.
+- User API routes: `/api/v1/user/*` — profile, settings, member-tiers, **balance** (history + recharge)
 - Admin API routes: `/api/v1/admin/*` — all behind `auth` + `adminOnly` middleware
 - Admin EJS routes: `/admin` — session-based, renders EJS views
 - Upload static files: `/uploads` → `config.upload.dir` (default `uploads/`)
@@ -78,6 +81,8 @@ src/
 
 - MySQL, database `pizza`, charset `utf8mb4`
 - Pool configured in `config/database.js`
+- Tables defined in `db/schema.sql` — new tables go here (not auto-migrated)
+- When adding new DB tables: run `npm run migrate` on the server after deploy
 - Cron job at 2am daily expires overdue coupons via `node-cron`
 
 ### Production
@@ -131,6 +136,24 @@ src/
 - **API calls**: `request<T>()` from `@sa/axios` returns `{ data, error }` via flat-request. See `src/service/api/upload.ts` for examples of both JSON (`request<>()`) and multipart (raw `fetch()`) patterns.
 - **Multipart upload**: Raw `fetch()` because Soybean's flat-request is JSON-only.
 - **Routes**: Uses `@elegant-router/vue` with `CustomRoute[]` and `layout.base$view.xxx` component syntax. After editing routes, run `pnpm gen-route` to regenerate types.
+### elegant-router Route Naming (CRITICAL)
+
+elegant-router auto-generates **ALL LOWERCASE** route names from `src/views/` directory structure. When adding custom routes in `routes/index.ts`, the `name` field must match the auto-generated lowercase name **exactly**, or the override won't work and you'll get duplicate menus:
+
+```ts
+// ❌ WRONG — creates duplicate menu entry
+{ name: 'couponTemplates', ... }
+{ name: 'memberTiers', ... }
+
+// ✅ CORRECT — overrides auto-generated route
+{ name: 'coupontemplates', ... }
+{ name: 'membertiers', ... }
+```
+
+Merge logic (`routes/index.ts`): `[...generatedRoutes, ...customRoutes]` — later overrides earlier **only** on exact case-sensitive name match.
+
+**Sub-menu nesting**: directory structure must mirror route hierarchy. E.g., to nest coupon templates under coupons: move `src/views/couponTemplates/` → `src/views/coupons/templates/`. The Vite plugin auto-regenerates type files on `pnpm build`.
+
 - **Adding a new page checklist**:
   1. Create view file under `src/views/<name>/list/index.vue`
   2. Add route in `src/router/routes/index.ts`
@@ -168,9 +191,11 @@ The primary entry. Uses a `<swiper>` with 4 panes (点单/订单/会员/我的),
 Each is a full Page with its own `Page()` constructor, but **they are NOT registered in `app.json`** — they exist as legacy/duplicate code or are consumed as inline templates by `main.wxml`. They share a `custom-tab-bar` Component. Profile navigates to points/coupons/address/store via `wx.navigateTo`.
 
 **Sync rule**: When adding a new page, wire it in:
+- `app.json` → `pages` array (required for `wx.navigateTo`)
 - `main.js` → `routes` object in `onMenuItem`
-- `profile.js` → `actions` object
-- `app.json` → `pages` array
+- `profile.js` → `actions` object in `onMenuItem`
+- Create `<page>.json` with `"navigationStyle": "custom"` and page title — see Common Pitfalls
+- For backend-backed features: add routes in `pizza-server/src/routes/`, controller logic, and any new DB tables to `db/schema.sql`
 
 ### API Layer
 
@@ -339,7 +364,7 @@ Uses `visibility: hidden` + `transform: translateY(100%)` for slide-up. Always a
 ```
 miniprogram/
 ├── app.js              — App lifecycle, globalData, cart methods, auto-login
-├── app.json            — Page registration (8 pages), window config
+├── app.json            — Page registration (9 pages), window config
 ├── app.wxss            — Design tokens, utility classes, global reset
 ├── utils/
 │   ├── api.js          — HTTP client (wx.request wrapper), doLogin()
@@ -357,7 +382,8 @@ miniprogram/
 │   ├── store/          — 门店信息
 │   ├── shop/           — 会员商城独立页
 │   ├── settings/       — 设置页
-│   └── tiers/          — 会员权益页 (hero card + horizontal compare + 2-col benefits grid + rules)
+│   ├── tiers/          — 会员权益页 (hero card + horizontal compare + 2-col benefits grid + rules)
+│   └── recharge/       — 余额充值 (preset amounts + custom input + confirm modal)
 └── images/             — Icons (PNG) + card background images (JPEG, ~30KB each)
 ```
 
@@ -369,7 +395,10 @@ miniprogram/
 
 - **CSS `background` shorthand with `/`**: WeChat WXSS silently drops `background: url(...) center/cover`. Use longhand `background-image`, `background-size`, `background-position`, `background-repeat` instead.
 - **`background-image: url()` unreliable**: Local image paths in CSS `url()` have limited WeChat WXSS support. Use `<image>` tag with `src` as an absolutely-positioned background layer for reliable results.
+- **Hybrid background approach**: For tier cards, use BOTH inline `style="{{item.bgStyle}}"` (works in DevTools) AND `<image>` tag (works on real devices). Neither alone covers both platforms.
+- **_ensureTiersLoaded must MERGE, not replace**: When the API returns tier data, it lacks `bgImage` (server-side `formatTier()` doesn't produce it). Always merge API data with FALLBACK_TIERS: `{ ...fb, ...t }` — so local `bgImage` survives when API doesn't provide it.
 - **Duplicate tier logic ×3**: `FALLBACK_TIERS` and `computeTier()` are copy-pasted across `profile.js`, `main.js`, and `tiers.js`. Changes to tier data must be mirrored in all three. Consider extracting to `utils/tiers.js`.
+- **New page `.json` required**: Every new page must have a `<page>.json` file with `"navigationStyle": "custom"` and `"navigationBarTitleText": "页面名称"`. Without it, the system nav bar shows "王姐手工披萨" on top of the custom top bar.
 - **2MB source size limit**: Keep images compressed. Use JPEG quality 80 for photos, PNG only for small icons. Total `images/` directory should stay well under 500KB.
 - **`form.region.length` in WXML**: Use ternary `{{form.region.length ? form.region[0] : 'placeholder'}}`. Accessing `[0]` on empty array silently renders nothing.
 - **Form validation**: Return error string or `null`; show via `wx.showToast({ title: error, icon: 'none' })`.
