@@ -78,12 +78,24 @@
   margin-left: -8rpx;
 }
 
-/* ── 等级渐变背景 ── */
-.tier-bg-1 { background: url('/images/tier-bg-silver.png') center/cover no-repeat; }
+/* ── 会员卡背景（Hero 卡片用，支持图片）── */
+.tier-bg-1 {
+  background-image: url('/images/tier-bg-silver.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
 .tier-bg-2 { background: linear-gradient(135deg, #2d2a21, #110e07); }
 .tier-bg-3 { background: linear-gradient(135deg, #322323, #140f0f); }
 .tier-bg-4 { background: linear-gradient(135deg, #232832, #0f1119); }
 .tier-bg-5 { background: linear-gradient(135deg, #142332, #0a0f19); }
+
+/* ── 对比卡片纯渐变背景（不用图片）── */
+.compare-bg-1 { background: linear-gradient(135deg, #3c3c41, #19191e); }
+.compare-bg-2 { background: linear-gradient(135deg, #2d2a21, #110e07); }
+.compare-bg-3 { background: linear-gradient(135deg, #322323, #140f0f); }
+.compare-bg-4 { background: linear-gradient(135deg, #232832, #0f1119); }
+.compare-bg-5 { background: linear-gradient(135deg, #142332, #0a0f19); }
 
 /* ==============================
    HERO 卡片
