@@ -289,6 +289,7 @@ Page({
       favorites: '/pages/address/address',
       settings: '/pages/settings/settings',
       about: '/pages/settings/settings',
+      recharge: '/pages/recharge/recharge',
       lucky: '__toast__',
       service: '__toast__'
     };

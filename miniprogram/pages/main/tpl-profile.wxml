@@ -107,6 +107,12 @@
       </view>
       <text class="grid-label">联系客服</text>
     </view>
+    <view class="grid-item" bindtap="onMenuItem" data-action="recharge">
+      <view class="grid-icon-wrap grid-icon-blue">
+        <text class="grid-icon-emoji">💰</text>
+      </view>
+      <text class="grid-label">余额充值</text>
+    </view>
   </view>
 
   <!-- 功能菜单 -->

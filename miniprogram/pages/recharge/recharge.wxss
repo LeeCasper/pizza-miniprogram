@@ -1,0 +1,201 @@
+/* pages/recharge/recharge.wxss */
+
+/* ── 顶部导航 ── */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32rpx 20rpx;
+  background: var(--color-surface);
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+.back-btn {
+  width: 72rpx;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  color: var(--color-primary);
+}
+
+.top-title {
+  font-size: 34rpx;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+}
+
+.top-spacer {
+  width: 72rpx;
+}
+
+.main-scroll {
+  overflow-x: hidden;
+  box-sizing: border-box;
+  padding: 32rpx;
+}
+
+/* ── 余额卡片 ── */
+.balance-card {
+  background: linear-gradient(135deg, var(--color-primary), #b71c1c);
+  border-radius: 24rpx;
+  padding: 40rpx 36rpx;
+  margin-bottom: 40rpx;
+  box-shadow: 0 8rpx 28rpx -6rpx rgba(211, 47, 47, 0.35);
+}
+
+.balance-label {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.7);
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.balance-value {
+  font-size: 56rpx;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 2rpx;
+}
+
+/* ── 区块标题 ── */
+.section-title {
+  font-size: 28rpx;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-on-surface);
+  margin-bottom: 24rpx;
+}
+
+/* ── 预设金额网格 ── */
+.amount-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20rpx;
+  margin-bottom: 24rpx;
+}
+
+.amount-item {
+  width: calc(33.33% - 14rpx);
+  padding: 28rpx 0;
+  border-radius: 20rpx;
+  background: var(--color-surface);
+  border: 2rpx solid var(--color-divider);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6rpx;
+  transition: all 0.2s ease;
+}
+
+.amount-item:active {
+  transform: scale(0.96);
+}
+
+.amount-selected {
+  border-color: var(--color-primary);
+  background: rgba(211, 47, 47, 0.06);
+}
+
+.amount-currency {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.amount-num {
+  font-size: 40rpx;
+  font-weight: 800;
+  color: var(--color-on-surface);
+}
+
+.amount-selected .amount-num {
+  color: var(--color-primary);
+}
+
+/* ── 自定义金额 ── */
+.custom-row {
+  padding: 20rpx 0;
+  margin-bottom: 8rpx;
+}
+
+.custom-label {
+  font-size: 26rpx;
+  color: var(--color-on-surface-variant);
+  padding: 16rpx 28rpx;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-container-low);
+  display: inline-block;
+}
+
+.custom-active {
+  color: var(--color-primary);
+  background: rgba(211, 47, 47, 0.08);
+}
+
+.custom-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 24rpx 28rpx;
+  background: var(--color-surface);
+  border-radius: 20rpx;
+  border: 2rpx solid var(--color-primary);
+  margin-bottom: 40rpx;
+}
+
+.custom-prefix {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.custom-input {
+  flex: 1;
+  font-size: 36rpx;
+  font-weight: 600;
+  color: var(--color-on-surface);
+  height: 60rpx;
+}
+
+/* ── 确认按钮 ── */
+.recharge-btn-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16rpx;
+  margin-top: 8rpx;
+}
+
+.recharge-btn {
+  width: 100%;
+  padding: 28rpx 0;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--color-primary), #b71c1c);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6rpx 20rpx rgba(211, 47, 47, 0.3);
+}
+
+.recharge-btn:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
+.recharge-btn-text {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.recharge-tip {
+  font-size: 22rpx;
+  color: var(--color-on-surface-variant);
+}

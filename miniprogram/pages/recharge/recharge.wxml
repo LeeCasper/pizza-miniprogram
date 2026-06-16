@@ -1,0 +1,49 @@
+<!-- pages/recharge/recharge.wxml -->
+<view class="page-container" style="padding-top: {{topBarTotalHeight}}px">
+  <!-- 顶部导航 -->
+  <view class="top-bar" style="padding-top: {{statusBarHeight}}px">
+    <view class="back-btn" bindtap="onBack"><text>←</text></view>
+    <text class="top-title">余额充值</text>
+    <view class="top-spacer"></view>
+  </view>
+
+  <scroll-view scroll-y class="main-scroll" enhanced show-scrollbar="{{false}}" style="flex: 1; height: 0;">
+    <!-- 当前余额卡片 -->
+    <view class="balance-card">
+      <text class="balance-label">当前余额</text>
+      <text class="balance-value">{{balanceText}}</text>
+    </view>
+
+    <!-- 预设金额 -->
+    <view class="section-title">选择充值金额</view>
+    <view class="amount-grid">
+      <view class="amount-item {{selectedAmount === item && !customMode ? 'amount-selected' : ''}}"
+        wx:for="{{presetAmounts}}" wx:key="*this"
+        bindtap="onSelectAmount" data-amount="{{item}}">
+        <text class="amount-currency">¥</text>
+        <text class="amount-num">{{item}}</text>
+      </view>
+    </view>
+
+    <!-- 自定义金额 -->
+    <view class="custom-row" bindtap="onCustomTap">
+      <text class="custom-label {{customMode ? 'custom-active' : ''}}">自定义金额</text>
+    </view>
+    <view class="custom-input-wrap" wx:if="{{customMode}}">
+      <text class="custom-prefix">¥</text>
+      <input class="custom-input" type="digit" value="{{customAmount}}"
+        bindinput="onCustomInput" placeholder="输入金额（上限¥5000）"
+        focus="{{customMode}}" maxlength="8"/>
+    </view>
+
+    <!-- 确认按钮 -->
+    <view class="recharge-btn-wrap">
+      <view class="recharge-btn" bindtap="onRecharge">
+        <text class="recharge-btn-text">确认充值</text>
+      </view>
+      <text class="recharge-tip">充值金额将直接存入账户余额</text>
+    </view>
+
+    <view style="height: calc(120rpx + env(safe-area-inset-bottom))"></view>
+  </scroll-view>
+</view>

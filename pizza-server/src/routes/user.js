@@ -12,5 +12,7 @@ router.get('/profile', auth, controller.getProfile);
 router.put('/profile', auth, validate('updateProfile'), controller.updateProfile);
 router.get('/settings', auth, controller.getSettings);
 router.put('/settings', auth, validate('updateSettings'), controller.updateSettings);
+router.get('/balance/history', auth, controller.getBalanceHistory);
+router.post('/balance/recharge', auth, controller.recharge);
 
 module.exports = router;

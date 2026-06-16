@@ -68,6 +68,34 @@ const userController = {
       next(err);
     }
   },
+
+  async recharge(req, res, next) {
+    try {
+      const { amount } = req.body;
+      const amt = parseFloat(amount);
+      if (!amt || amt <= 0) {
+        return res.status(400).json({ code: 400, message: '充值金额无效' });
+      }
+      if (amt > 5000) {
+        return res.status(400).json({ code: 400, message: '单次充值上限¥5000' });
+      }
+      const result = await userService.rechargeBalance(req.user.id, amt, req.body.remark);
+      res.json({ code: 0, data: result, message: '充值成功' });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async getBalanceHistory(req, res, next) {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = Math.min(parseInt(req.query.limit) || 20, 100);
+      const result = await userService.getBalanceHistory(req.user.id, page, limit);
+      res.json({ code: 0, data: result });
+    } catch (err) {
+      next(err);
+    }
+  },
 };
 
 module.exports = userController;

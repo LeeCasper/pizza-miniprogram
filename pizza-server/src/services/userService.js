@@ -106,6 +106,40 @@ const userService = {
     };
   },
 
+  async rechargeBalance(id, amount, remark) {
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+      const [[user]] = await conn.query('SELECT balance FROM users WHERE id = ?', [id]);
+      if (!user) throw new Error('用户不存在');
+      const balanceAfter = parseFloat(user.balance) + parseFloat(amount);
+      await conn.query('UPDATE users SET balance = ? WHERE id = ?', [balanceAfter, id]);
+      await conn.query(
+        'INSERT INTO balance_history (user_id, amount, balance_after, type, remark) VALUES (?, ?, ?, ?, ?)',
+        [id, amount, balanceAfter, 'recharge', remark || '余额充值']
+      );
+      await conn.commit();
+      return { balance: balanceAfter };
+    } catch (err) {
+      await conn.rollback();
+      throw err;
+    } finally {
+      conn.release();
+    }
+  },
+
+  async getBalanceHistory(id, page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+    const [[{ total }]] = await pool.query(
+      'SELECT COUNT(*) AS total FROM balance_history WHERE user_id = ?', [id]
+    );
+    const [rows] = await pool.query(
+      'SELECT id, amount, balance_after, type, remark, created_at FROM balance_history WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?',
+      [id, limit, offset]
+    );
+    return { total, list: rows };
+  },
+
   async adminUpdate(id, data) {
     const sets = [];
     const values = [];

@@ -485,6 +485,7 @@ Page({
       points: '/pages/points/points', coupons: '/pages/coupons/coupons',
       address: '/pages/address/address', favorites: '/pages/address/address',
       settings: '/pages/settings/settings', about: '/pages/settings/settings',
+      recharge: '/pages/recharge/recharge',
       lucky: '__toast__', service: '__toast__'
     };
     const target = routes[action];

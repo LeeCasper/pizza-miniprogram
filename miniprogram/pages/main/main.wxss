@@ -707,7 +707,9 @@
 .grid-icon-gold { background: rgba(251,192,45,0.15); }
 .grid-icon-green { background: rgba(56,142,60,0.1); }
 .grid-icon-gray { background: var(--color-surface-container); }
+.grid-icon-blue { background: rgba(25, 118, 210, 0.08); }
 .grid-icon { width: 64rpx; height: 64rpx; }
+.grid-icon-emoji { font-size: 40rpx; line-height: 1; }
 .grid-label { font-size: 22rpx; color: var(--color-on-surface); }
 
 /* 功能菜单 */
