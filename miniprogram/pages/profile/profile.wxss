@@ -190,7 +190,7 @@
   margin-top: 10rpx;
 }
 .tier-progress-bar-bg {
-  width: 50%;
+  width: 40%;
   height: 6rpx;
   border-radius: 999rpx;
   background: rgba(255, 255, 255, 0.18);
