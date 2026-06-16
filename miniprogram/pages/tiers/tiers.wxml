@@ -17,9 +17,6 @@
         <view class="hero-card-content">
           <view class="hero-name-row">
             <text class="hero-tier-name" style="color: {{currentTier.accentColor}}">{{currentTier.name}}</text>
-            <view class="hero-vip-badge" style="border-color: {{currentTier.accentColor}}">
-              <text class="hero-vip-text" style="color: {{currentTier.accentColor}}">VIP.{{currentTier.levelIndex}}</text>
-            </view>
           </view>
           <text class="hero-subtitle">当前等级</text>
 
@@ -35,13 +32,6 @@
           </view>
           <view class="hero-max-badge" wx:else>
             <text class="hero-max-text">✦ 已达最高等级 ✦</text>
-          </view>
-        </view>
-
-        <!-- 装饰性 VIP 卡片 -->
-        <view class="hero-decorative-card" style="border-color: {{currentTier.accentColor}}20">
-          <view class="hero-decorative-inner">
-            <text class="hero-decorative-text" style="color: {{currentTier.accentColor}}">VIP.{{currentTier.levelIndex}}</text>
           </view>
         </view>
       </view>
