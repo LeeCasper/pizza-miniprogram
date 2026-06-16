@@ -580,7 +580,7 @@
   margin-top: 10rpx;
 }
 .tier-progress-bar-bg {
-  width: 100%;
+  width: 50%;
   height: 6rpx;
   border-radius: 999rpx;
   background: rgba(255, 255, 255, 0.18);
