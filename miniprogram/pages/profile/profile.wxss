@@ -188,7 +188,7 @@
 /* ── 成长进度条 ── */
 .tier-progress-bar-wrap {
   margin-top: 10rpx;
-  margin-bottom: 16rpx;
+  margin-bottom: 22rpx;
 }
 .tier-progress-bar-bg {
   width: 40%;
