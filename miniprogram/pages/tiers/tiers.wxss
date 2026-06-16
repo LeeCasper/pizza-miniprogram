@@ -108,6 +108,13 @@
   position: relative;
 }
 
+/* Hero 卡片背景图（<image>标签层） */
+.hero-card-bg-img {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+}
+
 .hero-card-content {
   padding: 40rpx 36rpx 32rpx;
   position: relative;

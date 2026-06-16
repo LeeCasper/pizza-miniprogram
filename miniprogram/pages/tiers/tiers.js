@@ -67,6 +67,7 @@ function buildBenefitTiers(apiTiers, userTier, totalSpent) {
       minSpent: t.minSpent, discountRate: t.discountRate, pointsRewardRate: t.pointsRewardRate,
       birthdayGift: t.birthdayGift, couponValue: t.couponValue,
       accentColor: t.accentColor, bgStartColor: t.bgStartColor, bgEndColor: t.bgEndColor,
+      bgImage: t.bgImage || null,
       status, discountText, pointsText, progressText, progressPercent, rangeText,
       benefitItems,
     };

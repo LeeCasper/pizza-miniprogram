@@ -66,6 +66,7 @@ function buildTierCards(apiTiers, userTier) {
     return {
       levelKey: t.levelKey, levelIndex: t.levelIndex, name: t.name,
       accentColor: t.accentColor, bgStartColor: t.bgStartColor, bgEndColor: t.bgEndColor,
+      bgImage: t.bgImage || null,
       discountRate: t.discountRate, pointsRewardRate: t.pointsRewardRate,
       birthdayGift: t.birthdayGift,
       discountText,
