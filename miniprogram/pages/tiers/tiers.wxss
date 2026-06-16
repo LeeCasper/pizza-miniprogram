@@ -246,17 +246,20 @@
   transition: all 0.25s ease;
 }
 
+/* 所有卡片默认统一外观，不再区分 current/active */
 .tier-compare-card.compare-card-active {
-  box-shadow: 0 8rpx 28rpx rgba(0, 0, 0, 0.35);
+  /* 保持与默认一致的样式，不做特殊处理 */
 }
 
 .tier-compare-card.compare-card-dimmed {
   opacity: 0.55;
 }
 
+/* 选中态：红色边框 + 发光 + 微提亮 */
 .tier-compare-card.compare-card-selected {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 4rpx rgba(211, 47, 47, 0.18), 0 8rpx 28rpx rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 0 6rpx rgba(211, 47, 47, 0.22), 0 8rpx 32rpx rgba(0, 0, 0, 0.35);
+  transform: translateY(-4rpx);
 }
 
 .compare-card-name {
