@@ -78,6 +78,13 @@
   margin-left: -8rpx;
 }
 
+/* ── 等级渐变背景 ── */
+.tier-bg-1 { background: url('/images/tier-bg-silver.png') center/cover no-repeat; }
+.tier-bg-2 { background: linear-gradient(135deg, #2d2a21, #110e07); }
+.tier-bg-3 { background: linear-gradient(135deg, #322323, #140f0f); }
+.tier-bg-4 { background: linear-gradient(135deg, #232832, #0f1119); }
+.tier-bg-5 { background: linear-gradient(135deg, #142332, #0a0f19); }
+
 /* ==============================
    HERO 卡片
    ============================== */

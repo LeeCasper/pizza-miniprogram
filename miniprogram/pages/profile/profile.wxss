@@ -147,7 +147,7 @@
 .tier-card-inactive { transform: scale(0.92); opacity: 0.55; }
 
 /* 5 级渐变 — 预定义 class 避免 inline style 触发重绘 */
-.tier-bg-1 { background: linear-gradient(135deg, #3c3c41, #19191e); }
+.tier-bg-1 { background: url('/images/tier-bg-silver.png') center/cover no-repeat; }
 .tier-bg-2 { background: linear-gradient(135deg, #2d2a21, #110e07); }
 .tier-bg-3 { background: linear-gradient(135deg, #322323, #140f0f); }
 .tier-bg-4 { background: linear-gradient(135deg, #232832, #0f1119); }
