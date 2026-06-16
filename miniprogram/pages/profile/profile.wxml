@@ -55,6 +55,11 @@
                 <view class="tier-card-footer">
                   <view>
                     <text class="tier-card-progress-text" style="color: rgba(255,255,255,0.8)">{{item.progressText}}</text>
+                    <view class="tier-progress-bar-wrap">
+                      <view class="tier-progress-bar-bg">
+                        <view class="tier-progress-bar-fill" style="width: {{item.progressPercent}}%; background: {{item.accentColor}}"></view>
+                      </view>
+                    </view>
                     <view class="tier-benefits" wx:if="{{item.isActive}}">
                       <text class="tier-benefit-tag" wx:if="{{item.discountRate < 1}}" style="border: 1rpx solid rgba(255,255,255,0.4); color: #ffffff">{{item.discountText}}</text>
                       <text class="tier-benefit-tag" wx:if="{{item.pointsRewardRate > 1}}" style="border: 1rpx solid rgba(255,255,255,0.4); color: #ffffff">积分x{{item.pointsRewardRate}}</text>

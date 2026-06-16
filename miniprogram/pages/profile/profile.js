@@ -20,24 +20,31 @@ function computeTier(totalSpent, tiers) {
 }
 
 function buildTierCards(apiTiers, userTier) {
+  const totalSpent = userTier._totalSpent || 0;
   return apiTiers.map(t => {
     const isActive = t.levelKey === userTier.current.levelKey;
-    let progressText = '', actionText = '';
+    let progressText = '', actionText = '', progressPercent = 0;
     if (t.levelIndex < userTier.current.levelIndex) {
       progressText = '已达成';
+      progressPercent = 100;
       actionText = t.discountRate < 1 ? '享' + ((1 - t.discountRate) * 100).toFixed(0) + '%折扣' : '查看特权';
     } else if (isActive) {
       if (userTier.next) {
-        const diff = (userTier.next.minSpent - (userTier._totalSpent || 0)).toFixed(2);
+        const diff = (userTier.next.minSpent - totalSpent).toFixed(2);
         progressText = '还差¥' + diff + '升级' + userTier.next.name;
+        progressPercent = Math.min(100, Math.max(0,
+          ((totalSpent - userTier.current.minSpent) / (userTier.next.minSpent - userTier.current.minSpent)) * 100
+        ));
         actionText = '查看权益';
       } else {
         progressText = '已达最高等级';
+        progressPercent = 100;
         actionText = '尊享特权';
       }
     } else {
-      const diff = (t.minSpent - (userTier._totalSpent || 0)).toFixed(2);
+      const diff = (t.minSpent - totalSpent).toFixed(2);
       progressText = '消费满¥' + t.minSpent + '解锁';
+      progressPercent = 0;
       actionText = '查看权益';
     }
     const discountText = t.discountRate < 1 ? ((1 - t.discountRate) * 100).toFixed(0) + '折' : '';
@@ -48,7 +55,7 @@ function buildTierCards(apiTiers, userTier) {
       bgImage: t.bgImage || null, bgStyle,
       discountRate: t.discountRate, pointsRewardRate: t.pointsRewardRate,
       birthdayGift: t.birthdayGift,
-      discountText,
+      discountText, progressPercent,
       isActive, progressText, actionText,
     };
   });
