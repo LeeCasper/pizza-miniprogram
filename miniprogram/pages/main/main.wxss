@@ -581,7 +581,7 @@
 }
 .tier-progress-bar-bg {
   width: 40%;
-  height: 6rpx;
+  height: 10rpx;
   border-radius: 999rpx;
   background: rgba(255, 255, 255, 0.18);
   overflow: hidden;
