@@ -62,12 +62,13 @@ function buildBenefitTiers(apiTiers, userTier, totalSpent) {
     // Generate benefit items for the 2-column grid
     const benefitItems = buildBenefitItems(t);
 
+    const bgStyle = t.bgImage ? 'background-image:url(' + t.bgImage + ');background-size:cover;background-position:center;' : '';
     return {
       levelKey: t.levelKey, levelIndex: t.levelIndex, name: t.name,
       minSpent: t.minSpent, discountRate: t.discountRate, pointsRewardRate: t.pointsRewardRate,
       birthdayGift: t.birthdayGift, couponValue: t.couponValue,
       accentColor: t.accentColor, bgStartColor: t.bgStartColor, bgEndColor: t.bgEndColor,
-      bgImage: t.bgImage || null,
+      bgImage: t.bgImage || null, bgStyle,
       status, discountText, pointsText, progressText, progressPercent, rangeText,
       benefitItems,
     };

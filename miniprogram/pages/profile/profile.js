@@ -41,10 +41,11 @@ function buildTierCards(apiTiers, userTier) {
       actionText = '查看权益';
     }
     const discountText = t.discountRate < 1 ? ((1 - t.discountRate) * 100).toFixed(0) + '折' : '';
+    const bgStyle = t.bgImage ? 'background-image:url(' + t.bgImage + ');background-size:cover;background-position:center;' : '';
     return {
       levelKey: t.levelKey, levelIndex: t.levelIndex, name: t.name,
       accentColor: t.accentColor, bgStartColor: t.bgStartColor, bgEndColor: t.bgEndColor,
-      bgImage: t.bgImage || null,
+      bgImage: t.bgImage || null, bgStyle,
       discountRate: t.discountRate, pointsRewardRate: t.pointsRewardRate,
       birthdayGift: t.birthdayGift,
       discountText,
