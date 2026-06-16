@@ -48,9 +48,6 @@
                     <view class="tier-card-accent" style="background: {{item.accentColor}}"></view>
                   </view>
                 </view>
-                <view class="tier-card-badge" style="border-color: {{item.accentColor}}">
-                  <text class="tier-card-badge-text" style="color: {{item.accentColor}}">VIP.{{item.levelIndex}}</text>
-                </view>
                 <view class="tier-card-footer">
                   <view>
                     <text class="tier-card-progress-text" style="color: {{item.accentColor}}">{{item.progressText}}</text>
