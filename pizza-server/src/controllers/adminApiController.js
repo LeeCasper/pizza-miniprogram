@@ -887,11 +887,87 @@ const adminApiController = {
       return res.status(500).json({ code: 500, message: err.message || '发放优惠券失败' });
     }
   },
+
+  // ── Settings (System Config) ────────────────────────
+
+  /**
+   * GET /api/v1/admin/settings/pay
+   * Returns WeChat Pay config with sensitive fields masked.
+   */
+  async getPaySettings(req, res, next) {
+    try {
+      const cfg = await systemConfigService.getPayConfig();
+
+      // Mask sensitive fields for display
+      const masked = {
+        mchId: cfg.mchId,
+        apiV3Key: maskSensitive(cfg.apiV3Key, 4, 4),
+        certSerialNo: cfg.certSerialNo,
+        privateKey: cfg.privateKey ? '已配置' : '未配置',
+        platformCert: cfg.platformCert ? '已配置' : '未配置',
+        notifyUrl: cfg.notifyUrl,
+      };
+
+      masked._hasPrivateKey = !!cfg.privateKey;
+      masked._hasPlatformCert = !!cfg.platformCert;
+
+      res.json({ code: 0, data: masked });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * PUT /api/v1/admin/settings/pay
+   * Body: { mchId, apiV3Key, certSerialNo, privateKey, platformCert, notifyUrl }
+   *
+   * If apiV3Key === '****' (masked placeholder), keep existing value.
+   * If privateKey/platformCert is empty, keep existing value.
+   */
+  async updatePaySettings(req, res, next) {
+    try {
+      const body = req.body || {};
+      const current = await systemConfigService.getPayConfig();
+
+      const entries = {
+        mchId: body.mchId !== undefined ? body.mchId : undefined,
+        certSerialNo: body.certSerialNo !== undefined ? body.certSerialNo : undefined,
+        notifyUrl: body.notifyUrl !== undefined ? body.notifyUrl : undefined,
+      };
+
+      if (body.apiV3Key !== undefined && body.apiV3Key !== '****' && !body.apiV3Key.includes('****')) {
+        entries.apiV3Key = body.apiV3Key;
+      }
+
+      if (body.privateKey && body.privateKey !== '已配置' && body.privateKey.trim()) {
+        entries.privateKey = body.privateKey;
+      }
+
+      if (body.platformCert && body.platformCert !== '已配置' && body.platformCert.trim()) {
+        entries.platformCert = body.platformCert;
+      }
+
+      await systemConfigService.updatePayConfig(entries);
+
+      // Immediately sync to in-memory config and disk cert files
+      await systemConfigService.syncPayConfigToMemory();
+
+      res.json({ code: 0, message: '支付配置已保存' });
+    } catch (err) {
+      next(err);
+    }
+  },
 };
 
 function safeJson(val, defaultVal) {
   if (!val) return defaultVal;
   try { return typeof val === 'string' ? JSON.parse(val) : val; } catch (_) { return defaultVal; }
+}
+
+function maskSensitive(value, showPrefix, showSuffix) {
+  if (!value) return '';
+  if (value.length <= showPrefix + showSuffix) return '****';
+  return value.slice(0, showPrefix) + '****' + value.slice(-showSuffix);
 }
 
 function formatPointsProduct(row) {
@@ -916,89 +992,6 @@ function formatPointsProduct(row) {
     useTip: row.use_tip,
     isActive: !!row.is_active,
   };
-}
-
-  // ── Settings (System Config) ────────────────────────
-
-  /**
-   * GET /api/v1/admin/settings/pay
-   * Returns WeChat Pay config with sensitive fields masked.
-   */
-  async getPaySettings(req, res, next) {
-    try {
-      const cfg = await systemConfigService.getPayConfig();
-
-      // Mask sensitive fields for display
-      const masked = {
-        mchId: cfg.mchId,
-        apiV3Key: maskSensitive(cfg.apiV3Key, 4, 4),
-        certSerialNo: cfg.certSerialNo,
-        privateKey: cfg.privateKey ? '已配置' : '未配置',
-        platformCert: cfg.platformCert ? '已配置' : '未配置',
-        notifyUrl: cfg.notifyUrl,
-      };
-
-      // Also return raw values (non-masked) for the form validation
-      // but only the lengths so the form can detect if value changed
-      masked._hasPrivateKey = !!cfg.privateKey;
-      masked._hasPlatformCert = !!cfg.platformCert;
-
-      res.json({ code: 0, data: masked });
-    } catch (err) {
-      next(err);
-    }
-  },
-
-  /**
-   * PUT /api/v1/admin/settings/pay
-   * Body: { mchId, apiV3Key, certSerialNo, privateKey, platformCert, notifyUrl }
-   *
-   * If apiV3Key === '****' (masked placeholder), keep existing value.
-   * If privateKey/platformCert is empty, keep existing value.
-   */
-  async updatePaySettings(req, res, next) {
-    try {
-      const body = req.body || {};
-      const current = await systemConfigService.getPayConfig();
-
-      // Build update entries: use new value unless it's a masked placeholder
-      const entries = {
-        mchId: body.mchId !== undefined ? body.mchId : undefined,
-        certSerialNo: body.certSerialNo !== undefined ? body.certSerialNo : undefined,
-        notifyUrl: body.notifyUrl !== undefined ? body.notifyUrl : undefined,
-      };
-
-      // apiV3Key: if the client sent the masked placeholder, keep existing
-      if (body.apiV3Key !== undefined && body.apiV3Key !== '****' && !body.apiV3Key.includes('****')) {
-        entries.apiV3Key = body.apiV3Key;
-      }
-
-      // privateKey: if empty or placeholder, keep existing
-      if (body.privateKey && body.privateKey !== '已配置' && body.privateKey.trim()) {
-        entries.privateKey = body.privateKey;
-      }
-
-      // platformCert: if empty or placeholder, keep existing
-      if (body.platformCert && body.platformCert !== '已配置' && body.platformCert.trim()) {
-        entries.platformCert = body.platformCert;
-      }
-
-      await systemConfigService.updatePayConfig(entries);
-
-      // Immediately sync to in-memory config and disk cert files
-      await systemConfigService.syncPayConfigToMemory();
-
-      res.json({ code: 0, message: '支付配置已保存' });
-    } catch (err) {
-      next(err);
-    }
-  },
-};
-
-function maskSensitive(value, showPrefix, showSuffix) {
-  if (!value) return '';
-  if (value.length <= showPrefix + showSuffix) return '****';
-  return value.slice(0, showPrefix) + '****' + value.slice(-showSuffix);
 }
 
 module.exports = adminApiController;
