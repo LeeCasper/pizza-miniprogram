@@ -13,6 +13,7 @@
 
       <!-- ====== HERO: 当前等级卡片 ====== -->
       <view class="hero-card" wx:if="{{currentTier}}" style="{{currentTier.bgStyle}}">
+        <image wx:if="{{currentTier.bgImage}}" class="hero-card-bg-img" src="{{currentTier.bgImage}}" mode="aspectFill"></image>
         <view class="hero-card-content">
           <view class="hero-name-row">
             <text class="hero-tier-name" style="color: #ffffff">{{currentTier.name}}</text>
