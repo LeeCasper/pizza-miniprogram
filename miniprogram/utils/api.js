@@ -4,7 +4,7 @@
  */
 
 // Production domain; change to localhost for local dev
-const BASE_URL = 'https://www.artaides.com/api/v1';
+const BASE_URL = 'https://artaides.com/api/v1';
 
 let pendingLoginPromise = null;
 
@@ -110,7 +110,7 @@ const api = {
 function fixImageUrl(url) {
   if (!url) return url;
   if (url.startsWith('https://') || url.startsWith('http://')) return url;
-  if (url.startsWith('/uploads/')) return 'https://www.artaides.com' + url;
+  if (url.startsWith('/uploads/')) return 'https://artaides.com' + url;
   return url;
 }
 

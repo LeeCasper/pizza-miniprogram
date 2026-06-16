@@ -449,7 +449,14 @@ Page({
     });
     // Background refresh
     api.get('/user/profile').then(res => {
-      if (res.code === 0) { app.globalData.userInfo = res.data; wx.setStorageSync('userInfo', res.data); this.loadProfileData(); }
+      if (res.code === 0) {
+        app.globalData.userInfo = res.data;
+        wx.setStorageSync('userInfo', res.data);
+        const ui = res.data;
+        this.setData({
+          userInfo: { ...ui, balanceText: '¥' + ((ui.balance || 0)).toFixed(2), cardCount: ui.cardCount || 0, bio: ui.bio || '享受美味每一天' }
+        });
+      }
     }).catch(() => {});
   },
 
@@ -513,7 +520,7 @@ Page({
         if (that.data.editProfileOpen) { that.setData({ 'editForm.avatar': avatarPath }); return; }
         wx.showLoading({ title: '上传中...' });
         wx.uploadFile({
-          url: 'https://www.artaides.com/api/v1/upload/avatar', filePath: avatarPath, name: 'file',
+          url: 'https://artaides.com/api/v1/upload/avatar', filePath: avatarPath, name: 'file',
           header: { 'Authorization': 'Bearer ' + (wx.getStorageSync('token') || '') },
           success(result) {
             wx.hideLoading();

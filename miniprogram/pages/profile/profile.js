@@ -110,7 +110,10 @@ Page({
       if (res.code === 0) {
         app.globalData.userInfo = res.data;
         wx.setStorageSync('userInfo', res.data);
-        this.loadUserData();
+        const ui = res.data;
+        this.setData({
+          userInfo: { ...ui, balanceText: '¥' + ((ui.balance || 0)).toFixed(2), cardCount: ui.cardCount || 0, bio: ui.bio || '享受美味每一天' }
+        });
       }
     }).catch(() => {});
   },
@@ -149,7 +152,7 @@ Page({
           // Upload to server
           wx.showLoading({ title: '上传中...' });
           wx.uploadFile({
-            url: 'https://www.artaides.com/api/v1/upload/avatar',
+            url: 'https://artaides.com/api/v1/upload/avatar',
             filePath: avatarPath,
             name: 'file',
             header: {

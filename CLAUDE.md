@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | `pizza-server/` | Backend API + Admin EJS | Express.js + MySQL + JWT + Session |
 | `soybean-admin-temp/` | Admin SPA (production) | Vue3 + Vite8 + NaiveUI + UnoCSS |
 
-- **AppID**: `wx553c8f1d7d51e97c`
+- **AppID**: `wx06b8f02feceac089`
 - **Production**: `https://www.artaides.com` (Nginx → Express `/api` + static `/uploads`; Admin at `/admin/` served from Soybean Admin dist)
 
 ## Key Reference — Node.js Version
