@@ -80,15 +80,35 @@
 
 /* ── 会员卡背景（Hero 卡片用，支持图片）── */
 .tier-bg-1 {
-  background-image: url('/images/tier-bg-silver.png');
+  background-image: url('/images/tier-bg-silver.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
-.tier-bg-2 { background: linear-gradient(135deg, #2d2a21, #110e07); }
-.tier-bg-3 { background: linear-gradient(135deg, #322323, #140f0f); }
-.tier-bg-4 { background: linear-gradient(135deg, #232832, #0f1119); }
-.tier-bg-5 { background: linear-gradient(135deg, #142332, #0a0f19); }
+.tier-bg-2 {
+  background-image: url('/images/tier-bg-gold.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.tier-bg-3 {
+  background-image: url('/images/tier-bg-rosegold.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.tier-bg-4 {
+  background-image: url('/images/tier-bg-platinum.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.tier-bg-5 {
+  background-image: url('/images/tier-bg-diamond.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
 
 /* ── 对比卡片纯渐变背景（不用图片）── */
 .compare-bg-1 { background: linear-gradient(135deg, #3c3c41, #19191e); }

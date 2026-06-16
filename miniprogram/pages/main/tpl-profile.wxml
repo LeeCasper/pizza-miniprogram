@@ -26,14 +26,18 @@
       bindchange="onTierChange"
       current="{{activeTierIndex}}">
       <swiper-item wx:for="{{tierCards}}" wx:key="levelKey">
-        <view class="tier-card-wrap">
+        <view class="tier-card-wrap {{item.isActive ? 'active' : ''}}">
           <view class="tier-card tier-bg-{{item.levelIndex}} {{item.isActive ? 'tier-card-active' : 'tier-card-inactive'}}">
             <image wx:if="{{item.bgImage}}" class="tier-card-bg-img" src="{{item.bgImage}}" mode="aspectFill"></image>
             <view class="tier-card-content">
               <view class="tier-card-header">
                 <view>
                   <text class="tier-card-title" style="color: #ffffff">{{item.name}}</text>
-                  <view class="tier-card-accent" style="background: {{item.accentColor}}"></view>
+                  <view class="tier-card-accent" style="background: rgba(255,255,255,0.6)"></view>
+                </view>
+                <view class="tier-card-action" catchtap="onUpgradeTier" data-level-key="{{item.levelKey}}">
+                  <text class="tier-card-action-text" style="color: #ffffff">{{item.actionText}}</text>
+                  <image class="tier-card-action-arrow" src="/images/arrow-enter.png" mode="aspectFit"></image>
                 </view>
               </view>
               <view class="tier-card-footer">
@@ -44,10 +48,6 @@
                     <text class="tier-benefit-tag" wx:if="{{item.pointsRewardRate > 1}}" style="border: 1rpx solid rgba(255,255,255,0.4); color: #ffffff">积分x{{item.pointsRewardRate}}</text>
                     <text class="tier-benefit-tag" wx:if="{{item.birthdayGift}}" style="border: 1rpx solid rgba(255,255,255,0.4); color: #ffffff">🎂</text>
                   </view>
-                </view>
-                <view class="tier-card-action" catchtap="onUpgradeTier" data-level-key="{{item.levelKey}}">
-                  <text class="tier-card-action-text" style="color: #ffffff">{{item.actionText}}</text>
-                  <image class="tier-card-action-arrow" src="/images/arrow-enter.png" mode="aspectFit"></image>
                 </view>
               </view>
             </view>

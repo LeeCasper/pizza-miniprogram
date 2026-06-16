@@ -16,7 +16,7 @@
         <image wx:if="{{currentTier.bgImage}}" class="hero-card-bg-img" src="{{currentTier.bgImage}}" mode="aspectFill"></image>
         <view class="hero-card-content">
           <view class="hero-name-row">
-            <text class="hero-tier-name" style="color: {{currentTier.accentColor}}">{{currentTier.name}}</text>
+            <text class="hero-tier-name" style="color: #ffffff">{{currentTier.name}}</text>
           </view>
           <text class="hero-subtitle">当前等级</text>
 
@@ -47,7 +47,7 @@
           <view class="tier-compare-card compare-bg-{{item.levelIndex}} {{item.status === 'current' ? 'compare-card-active' : ''}} {{item.status === 'upcoming' ? 'compare-card-dimmed' : ''}} {{item.levelKey === selectedTierKey ? 'compare-card-selected' : ''}}"
               wx:for="{{tiers}}" wx:key="levelKey" id="tier-{{item.levelKey}}"
               bindtap="onSelectTier" data-level-key="{{item.levelKey}}">
-            <text class="compare-card-name" style="color: {{item.accentColor}}">{{item.name}}</text>
+            <text class="compare-card-name" style="color: #ffffff">{{item.name}}</text>
             <text class="compare-card-badge">VIP.{{item.levelIndex}}</text>
             <text class="compare-card-range">{{item.rangeText}}</text>
             <!-- 已达成对勾 -->

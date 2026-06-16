@@ -165,7 +165,7 @@ Open `miniprogram/` in WeChat Developer Tools. Enable ES6→ES5, PostCSS, minifi
 The primary entry. Uses a `<swiper>` with 4 panes (点单/订单/会员/我的), each rendered via `<include src="tpl-*.wxml"/>`. Tab bar is hand-built in `main.wxml` (not native tabBar). All swiper pane logic in `main.js`. Sub-pages (points, coupons, address, store) pushed via `wx.navigateTo`.
 
 #### 2. Standalone tab pages (`pages/index/`, `pages/orders/`, `pages/member/`, `pages/profile/`)
-Each is a full Page registered in `app.json`. They share a `custom-tab-bar` Component that calls `wx.switchTab`. Profile navigates to points/coupons/address/store via `wx.navigateTo`.
+Each is a full Page with its own `Page()` constructor, but **they are NOT registered in `app.json`** — they exist as legacy/duplicate code or are consumed as inline templates by `main.wxml`. They share a `custom-tab-bar` Component. Profile navigates to points/coupons/address/store via `wx.navigateTo`.
 
 **Sync rule**: When adding a new page, wire it in:
 - `main.js` → `routes` object in `onMenuItem`
@@ -219,11 +219,79 @@ Key rules:
 All pages use `"navigationStyle": "custom"`. Each page calculates and renders its own top bar:
 
 - **Simple title bar** (points, store, member): `topBarTotalHeight = statusBarHeight + 36`
-- **With back button** (coupons, address): use dynamic rpx formula:
+- **With back button** (coupons, address, tiers): use dynamic rpx formula:
   ```js
   const rpx = sys.windowWidth / 750;
   const topBarH = sh + 80 * rpx + 24 * rpx; // statusBar + back-btn(80rpx) + padding(24rpx)
   ```
+- **tiers page** uses a fixed top bar with back button + centered title, no rpx calculation needed since it doesn't contain a swiper.
+
+### Custom Tab Bar (NOT native)
+
+The app does NOT use WeChat's native `tabBar` config. Instead, `main.wxml` has a hand-built `<view class="tab-bar">` with 4 items (点单/订单/会员/我的) that switches `currentTab` to drive a `<swiper>`. The standalone tab pages (`index/`, `orders/`, `member/`, `profile/`) each use a `custom-tab-bar` Component that calls `wx.switchTab`-like behavior.
+
+### Membership Tier System
+
+Three pages render membership tier cards, each with their own copy of tier logic (known duplication — see "Common Pitfalls"):
+
+| Page | Builder Function | Card Type | Background Class |
+|------|-----------------|-----------|-----------------|
+| `pages/profile/` | `buildTierCards()` | Swiper cards (swipeable) | `tier-bg-{{levelIndex}}` |
+| `pages/main/` (tpl-profile) | `buildTierCards()` | Swiper cards (swipeable) | `tier-bg-{{levelIndex}}` |
+| `pages/tiers/` | `buildBenefitTiers()` | Hero card + comparison cards | Hero: `tier-bg-*`, Compare: `compare-bg-*` |
+
+**`FALLBACK_TIERS`** — defined identically in `profile.js`, `main.js`, and `tiers.js`. Each tier object has:
+```js
+{ levelKey, name, levelIndex, minSpent, discountRate, pointsRewardRate,
+  birthdayGift, couponValue, accentColor, bgStartColor, bgEndColor, bgImage }
+```
+- `levelIndex`: 1-5 (silver → diamond)
+- `bgImage`: path to card background image, or `null` for CSS gradient fallback
+- `accentColor`: used for progress bar fill, title text color (hero card), and dot indicators
+
+**`computeTier(totalSpent, tiers)`** — determines current tier and next tier from spend amount. Identical in profile.js and main.js.
+
+**`tiers.js` vs profile.js/main.js**: `tiers.js` uses `buildBenefitTiers()` which adds `benefitItems[]` (for 2-column grid), `rangeText`, and `compareBgClass`. `profile.js`/`main.js` use `buildTierCards()` which adds `isActive`, `progressText`, `discountText`, `actionText`.
+
+**Backend-configurable**: Tier data is designed to flow from API (`/user/member-tiers`) → `FALLBACK_TIERS` as fallback. Background images, tier configs, and benefit text should all come from the server when API is available.
+
+### WXSS Known Quirks
+
+- **`background` shorthand with `/` is NOT supported**: `background: url(...) center/cover no-repeat` — the `/` for `background-size` inside the `background` shorthand is silently dropped by WeChat's WXSS parser. Always use longhand properties:
+  ```css
+  /* WRONG — silently ignored */
+  .card { background: url('/img.jpg') center/cover no-repeat; }
+
+  /* CORRECT */
+  .card {
+    background-image: url('/img.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  ```
+- **`background-image: url(local-path)` is unreliable**: Even with longhand properties, local image paths in CSS `url()` have limited support in WeChat WXSS. For reliable image backgrounds, use an `<image>` tag positioned absolutely behind the content layer:
+  ```html
+  <view class="card">
+    <image class="card-bg-img" src="/images/bg.jpg" mode="aspectFill"></image>
+    <view class="card-content"><!-- z-index: 1, position: relative --></view>
+  </view>
+  ```
+  ```css
+  .card { position: relative; overflow: hidden; }
+  .card-bg-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+  ```
+  Note: `<image>` backgrounds may not render in WeChat DevTools but work correctly in Preview and on real devices.
+
+- **rpx is the primary CSS unit** (750rpx = screen width). Avoid px in WXSS unless for precise values like `1rpx` borders.
+
+### Image Constraints
+
+- **2MB source size limit**: WeChat mini program total source package must be under 2MB (error 80051). This includes all images, JS, WXML, and WXSS files.
+- **Image format tradeoffs**:
+  - PNG: lossless, good for icons/simple graphics, larger files
+  - JPEG: lossy, good for photographic backgrounds, much smaller (quality 80 is a good balance)
+- **Image dimensions**: Card background images at 1260×680px (2x retina) strike a good balance between quality and file size. Full-resolution PNGs at 1890×1020 can easily push the package over 2MB.
 
 ### Glassmorphism Design System
 
@@ -240,8 +308,6 @@ Defined in `app.wxss` as CSS custom properties on `page`. Key tokens:
 | Shadows | `--glass-shadow-card`, `--glass-shadow-button`, `--glass-shadow-elevated` |
 
 Utility classes: `.card`, `.card-cream`, `.btn-primary`, `.btn-outline`, `.section-title`, `.page-container`
-
-**rpx is the primary CSS unit** (750rpx = screen width). Avoid px in WXSS unless for precise values like `1rpx` borders.
 
 ### Data Layer
 
@@ -273,27 +339,38 @@ Uses `visibility: hidden` + `transform: translateY(100%)` for slide-up. Always a
 ```
 miniprogram/
 ├── app.js              — App lifecycle, globalData, cart methods, auto-login
-├── app.json            — Page registration, window config
+├── app.json            — Page registration (8 pages), window config
 ├── app.wxss            — Design tokens, utility classes, global reset
 ├── utils/
 │   ├── api.js          — HTTP client (wx.request wrapper), doLogin()
 │   └── data.js         — Mock/fallback data
-├── custom-tab-bar/     — Tab bar Component (for standalone pages)
+├── custom-tab-bar/     — Tab bar Component (for standalone pages; only reusable component)
 ├── pages/
-│   ├── main/           — Swiper 4-tab entry (main.js + main.wxml + tpl-*.wxml)
-│   ├── index/          — Standalone 点单 (duplicate of main tab 0 logic)
-│   ├── orders/         — Standalone 订单
-│   ├── member/         — Standalone 会员
-│   ├── profile/        — Standalone 我的
+│   ├── main/           — Swiper 4-tab entry (main.js + main.wxml + tpl-index/orders/shop/profile.wxml)
+│   ├── index/          — ⚠ Standalone 点单 (NOT in app.json; duplicate of main tab 0 logic)
+│   ├── orders/         — ⚠ Standalone 订单 (NOT in app.json)
+│   ├── member/         — ⚠ Standalone 会员 (NOT in app.json; content duplicated inline in main.wxml as modal)
+│   ├── profile/        — ⚠ Standalone 我的 (NOT in app.json)
 │   ├── points/         — 积分商城
 │   ├── coupons/        — 兑换券/优惠券
 │   ├── address/        — 收货地址 (list/form CRUD, validation)
-│   └── store/          — 门店信息
-└── images/             — PNG icons
+│   ├── store/          — 门店信息
+│   ├── shop/           — 会员商城独立页
+│   ├── settings/       — 设置页
+│   └── tiers/          — 会员权益页 (hero card + horizontal compare + 2-col benefits grid + rules)
+└── images/             — Icons (PNG) + card background images (JPEG, ~30KB each)
 ```
+
+⚠ Pages marked "NOT in app.json" exist on disk but are not registered as routes. They are either consumed as inline templates by `main.wxml` (`<include src="tpl-*.wxml"/>`) or are legacy/orphaned code. The `member/` page's UI is duplicated as a modal overlay inside `main.wxml`.
+
+**No `components/` directory exists.** All UI is built directly inside page files. The only reusable component is `custom-tab-bar/`.
 
 ### Common Pitfalls
 
+- **CSS `background` shorthand with `/`**: WeChat WXSS silently drops `background: url(...) center/cover`. Use longhand `background-image`, `background-size`, `background-position`, `background-repeat` instead.
+- **`background-image: url()` unreliable**: Local image paths in CSS `url()` have limited WeChat WXSS support. Use `<image>` tag with `src` as an absolutely-positioned background layer for reliable results.
+- **Duplicate tier logic ×3**: `FALLBACK_TIERS` and `computeTier()` are copy-pasted across `profile.js`, `main.js`, and `tiers.js`. Changes to tier data must be mirrored in all three. Consider extracting to `utils/tiers.js`.
+- **2MB source size limit**: Keep images compressed. Use JPEG quality 80 for photos, PNG only for small icons. Total `images/` directory should stay well under 500KB.
 - **`form.region.length` in WXML**: Use ternary `{{form.region.length ? form.region[0] : 'placeholder'}}`. Accessing `[0]` on empty array silently renders nothing.
 - **Form validation**: Return error string or `null`; show via `wx.showToast({ title: error, icon: 'none' })`.
 - **Default address**: When setting default, iterate all others to `false`. When deleting default, promote first remaining.

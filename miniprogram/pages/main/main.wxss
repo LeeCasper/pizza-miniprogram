@@ -554,8 +554,9 @@
 /* ── 会员卡轮播 ── */
 .member-cards-section { margin: 0 0 8rpx; position: relative; }
 .member-swiper { height: 340rpx; }
-.tier-card-wrap { padding: 0 60rpx; height: 100%; display: flex; align-items: center; box-sizing: border-box; }
-.tier-card { width: 100%; height: 100%; border-radius: 28rpx; overflow: hidden; position: relative; box-shadow: 0 12rpx 28rpx -8rpx rgba(0,0,0,0.25); }
+.tier-card-wrap { padding: 0 36rpx; height: 100%; display: flex; align-items: center; box-sizing: border-box; transition: padding 0.3s ease; }
+.tier-card-wrap.active { padding: 0 20rpx; }
+.tier-card { width: 100%; height: 100%; border-radius: 28rpx; overflow: hidden; position: relative; box-shadow: 0 12rpx 28rpx -8rpx rgba(0,0,0,0.25); transition: opacity 0.3s ease; }
 
 /* 卡片背景图（<image>标签层） */
 .tier-card-bg-img {
@@ -563,25 +564,46 @@
   width: 100%; height: 100%;
   z-index: 0;
 }
-.tier-card-active { transform: scale(1); opacity: 1; }
-.tier-card-inactive { transform: scale(0.92); opacity: 0.55; }
+.tier-card-active { opacity: 1; }
+.tier-card-inactive { opacity: 0.55; }
 .tier-bg-1 {
-  background-image: url('/images/tier-bg-silver.png');
+  background-image: url('/images/tier-bg-silver.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
-.tier-bg-2 { background: linear-gradient(135deg, #2d2a21, #110e07); }
-.tier-bg-3 { background: linear-gradient(135deg, #322323, #140f0f); }
-.tier-bg-4 { background: linear-gradient(135deg, #232832, #0f1119); }
-.tier-bg-5 { background: linear-gradient(135deg, #142332, #0a0f19); }
+.tier-bg-2 {
+  background-image: url('/images/tier-bg-gold.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.tier-bg-3 {
+  background-image: url('/images/tier-bg-rosegold.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.tier-bg-4 {
+  background-image: url('/images/tier-bg-platinum.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.tier-bg-5 {
+  background-image: url('/images/tier-bg-diamond.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
 .tier-card-content { position: relative; z-index: 1; padding: 36rpx 32rpx 9rpx; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; }
+.tier-card-header { display: flex; align-items: flex-start; justify-content: space-between; }
 .tier-card-title { font-size: 40rpx; font-weight: 800; letter-spacing: 2rpx; text-shadow: 0 2rpx 6rpx rgba(0,0,0,0.3); }
 .tier-card-accent { width: 48rpx; height: 6rpx; border-radius: 999rpx; margin-top: 12rpx; opacity: 0.7; }
 .tier-card-badge { position: absolute; right: -16rpx; top: 14%; width: 136rpx; height: 170rpx; background: rgba(45,40,30,0.9); display: flex; align-items: center; justify-content: center; transform: rotate(18deg); border: 2rpx solid; border-radius: 24rpx; box-shadow: 0 4rpx 18rpx rgba(0,0,0,0.3); overflow: hidden; }
 .tier-card-badge::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 50%); }
 .tier-card-badge-text { font-size: 26rpx; font-weight: 800; letter-spacing: 4rpx; z-index: 1; transform: rotate(-18deg); }
-.tier-card-footer { display: flex; align-items: flex-end; justify-content: space-between; margin-top: auto; gap: 8rpx; }
+.tier-card-footer { margin-top: auto; }
 .tier-card-progress-text { font-size: 22rpx; opacity: 0.8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 12rpx; display: block; }
 .tier-benefits { display: flex; gap: 8rpx; flex-wrap: wrap; margin-top: 6rpx; }
 .tier-benefit-tag { font-size: 20rpx; padding: 2rpx 10rpx; border-radius: 6rpx; background: rgba(255,255,255,0.08); opacity: 0.85; }
