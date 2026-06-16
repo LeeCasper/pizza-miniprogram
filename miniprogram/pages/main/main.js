@@ -52,7 +52,7 @@ function buildTierCards(apiTiers, userTier) {
       if (userTier.next) {
         const diff = (userTier.next.minSpent - (userTier._totalSpent || 0)).toFixed(2);
         progressText = '还差¥' + diff + '升级' + userTier.next.name;
-        actionText = '去消费';
+        actionText = '查看权益';
       } else {
         progressText = '已达最高等级';
         actionText = '尊享特权';
@@ -60,7 +60,7 @@ function buildTierCards(apiTiers, userTier) {
     } else {
       const diff = (t.minSpent - (userTier._totalSpent || 0)).toFixed(2);
       progressText = '消费满¥' + t.minSpent + '解锁';
-      actionText = '去消费';
+      actionText = '查看权益';
     }
     const discountText = t.discountRate < 1 ? ((1 - t.discountRate) * 100).toFixed(0) + '折' : '';
     return {
