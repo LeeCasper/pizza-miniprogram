@@ -172,89 +172,88 @@ const customRoutes: CustomRoute[] = [
           i18nKey: 'route.coupons_list',
         },
       },
+      {
+        name: 'coupons_templates',
+        path: '/coupons/templates',
+        component: 'layout.base',
+        meta: {
+          title: '优惠券模板',
+          i18nKey: 'route.coupons_templates',
+          icon: 'mdi:ticket-percent',
+        },
+        children: [
+          {
+            name: 'coupons_templates_list',
+            path: '/coupons/templates/list',
+            component: 'view.coupons_templates_list',
+            meta: {
+              title: '模板列表',
+              i18nKey: 'route.coupons_templates_list',
+            },
+          },
+          {
+            name: 'coupons_templates_create',
+            path: '/coupons/templates/create',
+            component: 'view.coupons_templates_form',
+            meta: {
+              title: '新建模板',
+              i18nKey: 'route.coupons_templates_create',
+              hideInMenu: true,
+            },
+          },
+          {
+            name: 'coupons_templates_edit',
+            path: '/coupons/templates/:id/edit',
+            component: 'view.coupons_templates_form',
+            props: true,
+            meta: {
+              title: '编辑模板',
+              i18nKey: 'route.coupons_templates_edit',
+              hideInMenu: true,
+            },
+          },
+        ],
+      },
     ],
   },
   {
-    name: 'couponTemplates',
-    path: '/coupon-templates',
-    component: 'layout.base',
-    meta: {
-      title: '优惠券模板',
-      i18nKey: 'route.couponTemplates',
-      icon: 'mdi:ticket-percent',
-      order: 4.2,
-    },
-    children: [
-      {
-        name: 'couponTemplates_list',
-        path: '/coupon-templates/list',
-        component: 'view.couponTemplates_list',
-        meta: {
-          title: '模板列表',
-          i18nKey: 'route.couponTemplates_list',
-        },
-      },
-      {
-        name: 'couponTemplates_create',
-        path: '/coupon-templates/create',
-        component: 'view.couponTemplates_form',
-        meta: {
-          title: '新建模板',
-          i18nKey: 'route.couponTemplates_create',
-          hideInMenu: true,
-        },
-      },
-      {
-        name: 'couponTemplates_edit',
-        path: '/coupon-templates/:id/edit',
-        component: 'view.couponTemplates_form',
-        props: true,
-        meta: {
-          title: '编辑模板',
-          i18nKey: 'route.couponTemplates_edit',
-          hideInMenu: true,
-        },
-      },
-    ],
-  },
-  {
-    name: 'memberTiers',
+    name: 'membertiers',
     path: '/member-tiers',
     component: 'layout.base',
     meta: {
       title: '会员等级',
-      i18nKey: 'route.memberTiers',
+      i18nKey: 'route.membertiers',
       icon: 'mdi:account-star',
       order: 5.5,
     },
     children: [
       {
-        name: 'memberTiers_list',
+        name: 'membertiers_list',
         path: '/member-tiers/list',
-        component: 'view.memberTiers_list',
+        component: 'view.membertiers_list',
         meta: {
           title: '等级列表',
-          i18nKey: 'route.memberTiers_list',
+          i18nKey: 'route.membertiers_list',
         },
       },
       {
-        name: 'memberTiers_create',
+        name: 'membertiers_create',
         path: '/member-tiers/create',
-        component: 'view.memberTiers_form',
+        component: 'view.membertiers_form',
         meta: {
           title: '新建等级',
-          i18nKey: 'route.memberTiers_create',
+          i18nKey: 'route.membertiers_create',
           hideInMenu: true,
         },
       },
       {
-        name: 'memberTiers_edit',
+        name: 'membertiers_edit',
         path: '/member-tiers/:id/edit',
-        component: 'view.memberTiers_form',
+        component: 'view.membertiers_form',
         props: true,
         meta: {
           title: '编辑等级',
-          i18nKey: 'route.memberTiers_edit',
+          i18nKey: 'route.membertiers_edit',
           hideInMenu: true,
         },
       },
