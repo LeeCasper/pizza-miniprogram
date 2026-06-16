@@ -3,11 +3,24 @@
 -- Run: mysql -u root -p pizza < db/migrate_payment.sql
 -- =============================================
 
--- 1. Add payment columns to orders
-ALTER TABLE orders
-  ADD COLUMN IF NOT EXISTS payment_method ENUM('wechat','balance') NULL COMMENT '支付方式(NULL=未支付)',
-  ADD COLUMN IF NOT EXISTS transaction_id VARCHAR(64) NULL COMMENT '微信支付交易号',
-  ADD COLUMN IF NOT EXISTS paid_at DATETIME NULL COMMENT '支付完成时间';
+-- 1. Add payment columns to orders (MySQL 5.7 compatible)
+DROP PROCEDURE IF EXISTS add_payment_columns;
+DELIMITER $$
+CREATE PROCEDURE add_payment_columns()
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='pizza' AND table_name='orders' AND column_name='payment_method') THEN
+    ALTER TABLE orders ADD COLUMN payment_method ENUM('wechat','balance') NULL COMMENT '支付方式(NULL=未支付)';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='pizza' AND table_name='orders' AND column_name='transaction_id') THEN
+    ALTER TABLE orders ADD COLUMN transaction_id VARCHAR(64) NULL COMMENT '微信支付交易号';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='pizza' AND table_name='orders' AND column_name='paid_at') THEN
+    ALTER TABLE orders ADD COLUMN paid_at DATETIME NULL COMMENT '支付完成时间';
+  END IF;
+END$$
+DELIMITER ;
+CALL add_payment_columns();
+DROP PROCEDURE add_payment_columns;
 
 -- 2. Create payment_records table
 CREATE TABLE IF NOT EXISTS payment_records (
