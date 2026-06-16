@@ -260,7 +260,7 @@ Page({
     if (this._apiTiers) return Promise.resolve(this._apiTiers);
     return api.get('/user/member-tiers').then(res => {
       this._apiTiers = (res && res.code === 0 && res.data && res.data.length)
-        ? res.data
+        ? res.data.map(t => { const fb = FALLBACK_TIERS.find(f => f.levelKey === t.levelKey); return fb ? { ...fb, ...t } : t; })
         : FALLBACK_TIERS;
       return this._apiTiers;
     }).catch(() => {
