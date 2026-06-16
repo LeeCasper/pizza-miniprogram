@@ -275,7 +275,8 @@ const local: App.I18n.Schema = {
     points_form: 'Points Form',
     files: 'Files',
     files_list: 'Files',
-    points_form: 'Points Form'
+    settings: 'Payment Config',
+    settings_pay: 'Payment Config',
   },
   page: {
     login: {

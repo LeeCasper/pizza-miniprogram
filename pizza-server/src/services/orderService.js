@@ -142,6 +142,9 @@ function formatOrder(row) {
     storeName: row.store_name,
     couponUsedId: row.coupon_used_id,
     note: row.note,
+    paymentMethod: row.payment_method || null,
+    transactionId: row.transaction_id || null,
+    paidAt: row.paid_at || null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   } : null;

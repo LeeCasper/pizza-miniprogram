@@ -29,6 +29,11 @@ const app = express();
 // ── Global middleware ──────────────────────────────────
 app.use(cors());
 app.set('trust proxy', 1);
+
+// WeChat Pay notify callback MUST receive raw body for signature verification.
+// Mount BEFORE express.json() so the raw parser claims the request first.
+app.use('/api/v1/pay/notify', express.raw({ type: 'application/json' }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -87,6 +92,7 @@ app.use('/api/v1/points', pointsRoutes);
 app.use('/api/v1/stores', storeRoutes);
 app.use('/api/v1/upload', uploadRoutes);
 app.use('/api/v1/banners', require('./routes/banners'));
+app.use('/api/v1/pay', require('./routes/payment'));
 
 // ── Admin API routes (JSON, JWT) ─────────────────────
 app.use('/api/v1/admin', adminApiRoutes);
@@ -124,10 +130,18 @@ cron.schedule('0 2 * * *', async () => {
 
 // ── Start ──────────────────────────────────────────────
 const PORT = config.port;
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`[Server] Pizza API running on http://localhost:${PORT}`);
   console.log(`[Server] Admin panel: http://localhost:${PORT}/admin`);
   console.log(`[Server] Environment: ${config.nodeEnv}`);
+
+  // Sync WeChat Pay config from DB (overrides .env defaults)
+  try {
+    const systemConfigService = require('./services/systemConfigService');
+    await systemConfigService.syncPayConfigToMemory();
+  } catch (err) {
+    console.warn('[Server] Could not sync pay config from DB:', err.message);
+  }
 });
 
 module.exports = app;

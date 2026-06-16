@@ -77,4 +77,8 @@ router.post('/upload', adminUpload.single('file'), uploadCtrl.uploadImage);
 router.get('/files', uploadCtrl.listFiles);
 router.delete('/files/:filename', uploadCtrl.deleteFile);
 
+// Settings (system config)
+router.get('/settings/pay', ctrl.getPaySettings);
+router.put('/settings/pay', ctrl.updatePaySettings);
+
 module.exports = router;

@@ -1,5 +1,6 @@
 // pages/index/index.js
 const { api, fixImageUrl } = require('../../utils/api');
+const pay = require('../../utils/pay');
 const app = getApp();
 
 // ── 分类图标本地映射（数据库存的是 emoji，WXML <image> 无法加载） ──
@@ -23,6 +24,7 @@ Page({
     cartCount: 0,
     cartTotal: 0,
     cartOpen: false,
+    paymentMethod: 'wechat',
     currentTab: 0,
     loading: true,
     error: null,
@@ -195,18 +197,54 @@ Page({
       return;
     }
 
+    const pm = this.data.paymentMethod;
+
+    if (pm === 'balance') {
+      const balance = parseFloat((app.globalData.userInfo && app.globalData.userInfo.balance) || 0);
+      const cartTotal = parseFloat(this.data.cartTotal);
+      if (balance < cartTotal) {
+        wx.showModal({
+          title: '余额不足',
+          content: `当前余额 ¥${balance.toFixed(2)}，订单金额 ¥${cartTotal.toFixed(2)}。\n是否切换为微信支付？`,
+          confirmText: '切换支付',
+          cancelText: '取消',
+          success: (res) => {
+            if (res.confirm) { this.setData({ paymentMethod: 'wechat' }); }
+          },
+        });
+        return;
+      }
+    }
+
     wx.showLoading({ title: '提交中...' });
-    api.post('/orders', {}).then(res => {
+    api.post('/orders', { paymentMethod: pm }).then(res => {
       wx.hideLoading();
       if (res.code === 0) {
-        wx.showToast({ title: res.message || '订单已提交！', icon: 'success' });
+        const orderData = res.data;
         app.clearCart();
         this.setData({ cartOpen: false });
+
+        if (pm === 'wechat' && orderData.paymentStatus === 'unpaid') {
+          pay.payOrder(orderData.order.id).then(() => {
+            wx.showToast({ title: '支付成功！', icon: 'success' });
+          }).catch((err) => {
+            if (!err.cancelled) {
+              wx.showToast({ title: '订单已保存，请在订单中心完成支付', icon: 'none', duration: 3000 });
+            }
+          });
+        } else {
+          wx.showToast({ title: res.message || '支付成功！', icon: 'success' });
+        }
       }
     }).catch(() => {
       wx.hideLoading();
       wx.showToast({ title: '下单失败，请重试', icon: 'none' });
     });
+  },
+
+  onSwitchPaymentMethod(e) {
+    const { method } = e.currentTarget.dataset;
+    this.setData({ paymentMethod: method });
   },
 
   // ── 通知 ────────────────────────────────────

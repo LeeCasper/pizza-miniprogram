@@ -25,6 +25,18 @@ module.exports = {
     secret: process.env.WX_SECRET || '',
   },
 
+  wxPay: {
+    mchId: process.env.WX_MCH_ID || '',
+    apiV3Key: process.env.WX_PAY_API_V3_KEY || '',
+    certSerialNo: process.env.WX_PAY_CERT_SERIAL_NO || '',
+    privateKeyPath: process.env.WX_PAY_PRIVATE_KEY_PATH || './certs/apiclient_key.pem',
+    platformCertPath: process.env.WX_PAY_PLATFORM_CERT_PATH || './certs/platform_cert.pem',
+    notifyUrl: process.env.WX_PAY_NOTIFY_URL || '',
+    // Set by systemConfigService.syncPayConfigToMemory() — DB values override .env
+    _privateKeyContent: '',
+    _platformCertContent: '',
+  },
+
   upload: {
     dir: path.join(__dirname, '..', '..', process.env.UPLOAD_DIR || 'uploads'),
     maxFileSize: parseInt(process.env.MAX_FILE_SIZE, 10) || 5 * 1024 * 1024,

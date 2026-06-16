@@ -46,6 +46,8 @@ declare module "@elegant-router/types" {
     "products": "/products";
     "products_form": "/products/form";
     "products_list": "/products/list";
+    "settings": "/settings/pay";
+    "settings_pay": "/settings/pay";
     "users": "/users";
     "users_list": "/users/list";
   };
@@ -93,6 +95,7 @@ declare module "@elegant-router/types" {
     | "orders"
     | "points"
     | "products"
+    | "settings"
     | "users"
   >;
 
@@ -131,6 +134,7 @@ declare module "@elegant-router/types" {
     | "points_list"
     | "products_form"
     | "products_list"
+    | "settings_pay"
     | "users_list"
   >;
 

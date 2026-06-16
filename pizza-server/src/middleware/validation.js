@@ -51,6 +51,7 @@ const schemas = {
   createOrder: Joi.object({
     couponId: Joi.number().integer().positive().optional(),
     note: Joi.string().max(500).optional().allow(''),
+    paymentMethod: Joi.string().valid('wechat', 'balance').optional().default('wechat'),
   }),
 
   redeemPoints: Joi.object({

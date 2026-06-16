@@ -1,0 +1,10 @@
+# Ignore certificate files — DO NOT commit
+*.pem
+*.p12
+*.key
+*.crt
+*.cer
+
+# Keep README
+!README.md
+!.gitignore

@@ -1,5 +1,6 @@
 // pages/recharge/recharge.js
 const { api } = require('../../utils/api');
+const pay = require('../../utils/pay');
 const app = getApp();
 
 const PRESET_AMOUNTS = [50, 100, 200, 300, 500, 1000];
@@ -95,25 +96,29 @@ Page({
   },
 
   doRecharge(amount) {
-    wx.showLoading({ title: '充值中...' });
-    api.post('/user/balance/recharge', { amount }).then(res => {
-      wx.hideLoading();
-      if (res.code === 0) {
-        // Update local balance
-        if (res.data && res.data.balance !== undefined) {
-          app.globalData.userInfo.balance = res.data.balance;
+    pay.rechargeBalance(amount).then(() => {
+      // Refresh balance from server (payment callback may have already updated it)
+      api.get('/user/profile').then(res => {
+        if (res.code === 0) {
+          app.globalData.userInfo = res.data;
+          wx.setStorageSync('userInfo', res.data);
+          this.loadBalance();
         } else {
+          // Fallback: update locally
           app.globalData.userInfo.balance = (app.globalData.userInfo.balance || 0) + amount;
+          wx.setStorageSync('userInfo', app.globalData.userInfo);
+          this.loadBalance();
         }
+      }).catch(() => {
+        // If network fails, update locally
+        app.globalData.userInfo.balance = (app.globalData.userInfo.balance || 0) + amount;
         wx.setStorageSync('userInfo', app.globalData.userInfo);
         this.loadBalance();
-        wx.showToast({ title: '充值成功', icon: 'success' });
-      } else {
-        wx.showToast({ title: res.message || '充值失败', icon: 'none' });
+      });
+    }).catch((err) => {
+      if (!err.cancelled) {
+        wx.showToast({ title: '充值失败，请重试', icon: 'none' });
       }
-    }).catch(() => {
-      wx.hideLoading();
-      wx.showToast({ title: '网络异常，请重试', icon: 'none' });
     });
   },
 

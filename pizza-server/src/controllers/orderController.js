@@ -36,7 +36,7 @@ const orderController = {
       await conn.beginTransaction();
 
       const userId = req.user.id;
-      const { couponId, note } = req.body;
+      const { couponId, note, paymentMethod = 'wechat' } = req.body;
 
       // 1. Get cart items with current prices
       const cartItems = await cartService.getCartWithProducts(userId);
@@ -129,15 +129,41 @@ const orderController = {
         return rows.length > 0;
       })());
 
-      // 5. Insert order
+      // 5. Handle balance payment
+      let paymentMethodValue = null;
+      let paidAt = null;
+
+      if (paymentMethod === 'balance') {
+        const [[userBal]] = await conn.query(
+          'SELECT balance FROM users WHERE id = ? FOR UPDATE', [userId]
+        );
+        const balance = parseFloat(userBal.balance);
+        if (balance < paidAmount) {
+          await conn.rollback();
+          return res.status(400).json({
+            code: 400,
+            message: `余额不足，当前余额 ¥${balance.toFixed(2)}，需支付 ¥${paidAmount.toFixed(2)}`,
+          });
+        }
+        const balanceAfter = balance - paidAmount;
+        await conn.query('UPDATE users SET balance = ? WHERE id = ?', [balanceAfter, userId]);
+        await conn.query(
+          'INSERT INTO balance_history (user_id, amount, balance_after, type, remark) VALUES (?, ?, ?, ?, ?)',
+          [userId, paidAmount, balanceAfter, 'deduct', `订单支付 ${orderId}`]
+        );
+        paymentMethodValue = 'balance';
+        paidAt = new Date();
+      }
+
+      // 6. Insert order
       await conn.query(
-        `INSERT INTO orders (id, user_id, status, total, discount_amount, paid_amount, pickup_code, store_name, coupon_used_id, note)
-         VALUES (?, ?, 'waiting', ?, ?, ?, ?, '爱家店', ?, ?)`,
+        `INSERT INTO orders (id, user_id, status, total, discount_amount, paid_amount, pickup_code, store_name, coupon_used_id, note, payment_method, paid_at)
+         VALUES (?, ?, 'waiting', ?, ?, ?, ?, '爱家店', ?, ?, ?, ?)`,
         [orderId, userId, total.toFixed(2), discountAmount.toFixed(2), paidAmount.toFixed(2),
-         pickupCode, couponUsedId, note || '']
+         pickupCode, couponUsedId, note || '', paymentMethodValue, paidAt]
       );
 
-      // 6. Insert order items
+      // 7. Insert order items
       for (const item of cartItems) {
         await conn.query(
           `INSERT INTO order_items (order_id, product_id, product_name, price, quantity, restrictions)
@@ -147,10 +173,10 @@ const orderController = {
         );
       }
 
-      // 7. Clear cart
+      // 8. Clear cart
       await conn.query('DELETE FROM cart_items WHERE user_id = ?', [userId]);
 
-      // 8. Add points based on spending and tier multiplier
+      // 9. Add points based on spending and tier multiplier
       const [userRows] = await conn.query(
         'SELECT total_spent, points FROM users WHERE id = ?', [userId]
       );
@@ -180,15 +206,20 @@ const orderController = {
       const order = await orderService.findById(orderId);
       const tier = await computeTier(newTotalSpent);
 
+      const responseData = {
+        order,
+        earnedPoints,
+        newPoints,
+        tier,
+        paymentStatus: paymentMethodValue || 'unpaid',
+      };
+
       res.json({
         code: 0,
-        data: {
-          order,
-          earnedPoints,
-          newPoints,
-          tier,
-        },
-        message: `订单已提交！获得${earnedPoints}积分`,
+        data: responseData,
+        message: paymentMethodValue === 'balance'
+          ? `订单已支付！获得${earnedPoints}积分`
+          : `订单已提交！获得${earnedPoints}积分`,
       });
     } catch (err) {
       await conn.rollback();

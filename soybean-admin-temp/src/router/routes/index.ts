@@ -75,6 +75,17 @@ const customRoutes: CustomRoute[] = [
       order: 7,
     },
   },
+  {
+    name: 'settings',
+    path: '/settings/pay',
+    component: 'layout.base$view.settings_pay',
+    meta: {
+      title: '支付配置',
+      i18nKey: 'route.settings',
+      icon: 'mdi:cog',
+      order: 8,
+    },
+  },
   // Multi-level routes — parent has layout.base, children have view.xxx
   {
     name: 'products',
