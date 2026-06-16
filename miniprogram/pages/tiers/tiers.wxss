@@ -78,13 +78,6 @@
   margin-left: -8rpx;
 }
 
-/* ── 会员卡背景（Hero 卡片用，<image> 标签为主，CSS 纯色为 fallback）── */
-.tier-bg-1 { background: rgba(60,60,65,0.88); }
-.tier-bg-2 { background: rgba(45,42,33,0.88); }
-.tier-bg-3 { background: rgba(50,35,35,0.88); }
-.tier-bg-4 { background: rgba(35,40,50,0.88); }
-.tier-bg-5 { background: rgba(20,35,50,0.88); }
-
 /* ── 对比卡片纯渐变背景（不用图片）── */
 .compare-bg-1 { background: linear-gradient(135deg, #3c3c41, #19191e); }
 .compare-bg-2 { background: linear-gradient(135deg, #2d2a21, #110e07); }
@@ -101,13 +94,6 @@
   margin-bottom: 36rpx;
   box-shadow: 0 12rpx 40rpx -10rpx rgba(0, 0, 0, 0.35);
   position: relative;
-}
-
-/* Hero 卡片背景图（<image>标签层） */
-.hero-card-bg-img {
-  position: absolute; top: 0; left: 0;
-  width: 100%; height: 100%;
-  z-index: 0;
 }
 
 .hero-card-content {

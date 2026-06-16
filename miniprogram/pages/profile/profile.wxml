@@ -39,8 +39,7 @@
         current="{{activeTierIndex}}">
         <swiper-item wx:for="{{tierCards}}" wx:key="levelKey">
           <view class="tier-card-wrap {{item.isActive ? 'active' : ''}}">
-            <view class="tier-card tier-bg-{{item.levelIndex}} {{item.isActive ? 'tier-card-active' : 'tier-card-inactive'}}">
-              <image wx:if="{{item.bgImage}}" class="tier-card-bg-img" src="{{item.bgImage}}" mode="aspectFill"></image>
+            <view class="tier-card {{item.isActive ? 'tier-card-active' : 'tier-card-inactive'}}" style="{{item.bgImage ? 'background-image:url(' + item.bgImage + ');background-size:cover;background-position:center' : ''}}">
               <view class="tier-card-content">
                 <view class="tier-card-header">
                   <view>
