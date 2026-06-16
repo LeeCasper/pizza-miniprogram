@@ -109,7 +109,7 @@
     </view>
     <view class="grid-item" bindtap="onMenuItem" data-action="recharge">
       <view class="grid-icon-wrap grid-icon-blue">
-        <text class="grid-icon-emoji">💰</text>
+        <image class="grid-icon" src="/images/grid-recharge.png" mode="aspectFit"></image>
       </view>
       <text class="grid-label">余额充值</text>
     </view>
