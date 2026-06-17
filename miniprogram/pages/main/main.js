@@ -320,13 +320,16 @@ Page({
         // If wechat payment, initiate payment flow
         if (pm === 'wechat' && orderData.paymentStatus === 'unpaid') {
           const orderPaidAmount = parseFloat(orderData.order.paidAmount || orderData.order.total || 0);
+          console.log('[onCheckout] orderPaidAmount=', orderPaidAmount, 'totalSpent before=', app.globalData.userInfo && app.globalData.userInfo.total_spent);
           // Optimistic: update growth value immediately
           if (orderPaidAmount > 0 && app.globalData.userInfo) {
             app.globalData.userInfo.total_spent = (app.globalData.userInfo.total_spent || 0) + orderPaidAmount;
+            console.log('[onCheckout] optimistic totalSpent=', app.globalData.userInfo.total_spent);
             this.loadProfileData();
           }
           pay.payOrder(orderData.order.id).then(() => {
             wx.showToast({ title: '支付成功！', icon: 'success' });
+            console.log('[onCheckout] payOrder resolved, refreshing');
             this.fetchOrders();
             this.loadProfileData();
           }).catch((err) => {
@@ -405,15 +408,20 @@ Page({
     // Get paidAmount for optimistic growth update
     const order = (this.data.orders || []).find(o => o.id === id);
     const paidAmount = order ? (order.paidAmount || 0) : 0;
+    console.log('[onPayOrder] id=', id, 'paidAmount=', paidAmount, 'totalSpent before=', app.globalData.userInfo && app.globalData.userInfo.total_spent);
 
     // Optimistic: update growth value IMMEDIATELY (before payment flow, like recharge does)
     if (paidAmount > 0 && app.globalData.userInfo) {
       app.globalData.userInfo.total_spent = (app.globalData.userInfo.total_spent || 0) + paidAmount;
+      console.log('[onPayOrder] optimistic totalSpent=', app.globalData.userInfo.total_spent);
       this.loadProfileData();
+    } else {
+      console.log('[onPayOrder] SKIP optimistic: paidAmount=', paidAmount, 'hasUserInfo=', !!app.globalData.userInfo);
     }
 
     pay.payOrder(id).then((result) => {
       wx.showToast({ title: '支付成功！', icon: 'success' });
+      console.log('[onPayOrder] payOrder resolved, refreshing');
       this.fetchOrders();
       this.loadProfileData();
       // If server hasn't confirmed callback yet, refresh again after delay
@@ -553,12 +561,14 @@ Page({
   loadProfileData() {
     const ui = app.globalData.userInfo;
     const totalSpent = ui.totalSpent || 0;
+    console.log('[loadProfileData] totalSpent from globalData=', totalSpent);
 
     this._ensureTiersLoaded().then(apiTiers => {
       const tierInfo = computeTier(totalSpent, apiTiers);
       tierInfo._totalSpent = totalSpent;
       const tierCards = buildTierCards(apiTiers, tierInfo);
       const activeTierIndex = tierInfo.current.levelIndex - 1;
+      console.log('[loadProfileData] rendering tierCards, activeIndex=', activeTierIndex, 'firstCard progressPercent=', tierCards[0] && tierCards[0].progressPercent);
 
       this.setData({
         userInfo: { ...ui, balanceText: '¥' + ((ui.balance || 0)).toFixed(2), cardCount: ui.cardCount || 0, bio: ui.bio || '享受美味每一天' },
@@ -573,7 +583,9 @@ Page({
         // Protect optimistic total_spent: never decrease with stale server data
         // (the server may not have processed the WeChat callback yet)
         const currentTotalSpent = app.globalData.userInfo.total_spent || 0;
+        console.log('[loadProfileData] API returned totalSpent=', serverData.total_spent, 'currentTotalSpent=', currentTotalSpent);
         if ((serverData.total_spent || 0) < currentTotalSpent) {
+          console.log('[loadProfileData] GUARD: server totalSpent', serverData.total_spent, '< current', currentTotalSpent, '— keeping optimistic');
           serverData.total_spent = currentTotalSpent;
         }
         app.globalData.userInfo = serverData;
