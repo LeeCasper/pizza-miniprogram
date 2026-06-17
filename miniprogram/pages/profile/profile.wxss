@@ -155,31 +155,27 @@
 .tier-card-inactive { opacity: 0.55; }
 
 /* ── 内容层 ── */
-.tier-card-content { position: relative; z-index: 1; padding: 36rpx 32rpx 9rpx; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; }
+.tier-card-content { position: relative; z-index: 1; padding: 28rpx 32rpx 9rpx; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; }
 
-/* ── 头部 ── */
-.tier-card-header { display: flex; align-items: flex-start; justify-content: space-between; }
+/* ── 顶部行：等级标识(左) + 操作按钮(右) ── */
+.tier-card-top { display: flex; align-items: center; justify-content: space-between; }
+.tier-status-pill { display: inline-flex; align-items: center; gap: 6rpx; padding: 8rpx 20rpx; border-radius: 999rpx; font-size: 22rpx; font-weight: 700; }
+.tier-status-icon { font-size: 22rpx; line-height: 1; }
+.tier-status-text { font-size: 22rpx; font-weight: 700; letter-spacing: 1rpx; }
+/* 当前等级：亮白胶囊底 + accentColor 文字(inline style) */
+.tier-status-current { box-shadow: 0 4rpx 16rpx rgba(255,255,255,0.25); }
+/* 已达成：半透明白底 */
+.tier-status-achieved { background: rgba(255,255,255,0.22); }
+.tier-status-achieved .tier-status-icon,
+.tier-status-achieved .tier-status-text { color: rgba(255,255,255,0.85); }
+/* 未解锁：微透明底 */
+.tier-status-locked { background: rgba(255,255,255,0.10); }
+.tier-status-locked .tier-status-icon,
+.tier-status-locked .tier-status-text { color: rgba(255,255,255,0.5); }
+
+/* ── 中间区域：等级名称 + 权益标签 ── */
+.tier-card-middle { display: flex; flex-direction: column; gap: 10rpx; }
 .tier-card-title { font-size: 40rpx; font-weight: 800; letter-spacing: 2rpx; text-shadow: 0 2rpx 6rpx rgba(0,0,0,0.3); }
-.tier-card-accent { width: 48rpx; height: 6rpx; border-radius: 999rpx; margin-top: 12rpx; opacity: 0.7; }
-
-/* ── VIP 徽章（圆角矩形旋转，无 clip-path） ── */
-.tier-card-badge {
-  position: absolute; right: -16rpx; top: 14%;
-  width: 136rpx; height: 170rpx;
-  background: rgba(45,40,30,0.9);
-  display: flex; align-items: center; justify-content: center;
-  transform: rotate(18deg);
-  border: 2rpx solid;
-  border-radius: 24rpx;
-  box-shadow: 0 4rpx 18rpx rgba(0,0,0,0.3);
-  overflow: hidden;
-}
-.tier-card-badge::after {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 50%);
-}
-.tier-card-badge-text { font-size: 26rpx; font-weight: 800; letter-spacing: 4rpx; z-index: 1; transform: rotate(-18deg); }
 
 /* ── 底部 ── */
 .tier-card-footer { margin-top: auto; }
@@ -203,18 +199,7 @@
   transition: width 0.6s ease;
 }
 
-/* ── 当前等级模块 ── */
-.tier-card-body { display: flex; flex-direction: column; gap: 10rpx; }
-.tier-status-badge { display: flex; align-items: center; gap: 6rpx; }
-.tier-status-icon { font-size: 26rpx; color: rgba(255,255,255,0.9); }
-.tier-status-label { font-size: 24rpx; font-weight: 700; color: rgba(255,255,255,0.9); letter-spacing: 1rpx; }
-.tier-status-current .tier-status-icon,
-.tier-status-current .tier-status-label { text-shadow: 0 0 16rpx currentColor; }
-.tier-status-achieved .tier-status-icon { color: rgba(255,255,255,0.65); }
-.tier-status-achieved .tier-status-label { color: rgba(255,255,255,0.65); }
-.tier-status-locked .tier-status-icon { font-size: 22rpx; }
-.tier-status-locked .tier-status-label { color: rgba(255,255,255,0.5); }
-
+/* ── 权益标签 ── */
 .tier-benefits { display: flex; gap: 8rpx; flex-wrap: wrap; }
 .tier-benefit-tag { font-size: 20rpx; padding: 4rpx 14rpx; border-radius: 8rpx; background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.85); line-height: 1.4; }
 .tier-card-action { display: flex; align-items: center; gap: 4rpx; flex-shrink: 0; }
