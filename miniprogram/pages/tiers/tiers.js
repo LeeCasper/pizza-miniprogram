@@ -11,8 +11,18 @@ const FALLBACK_TIERS = [
   { levelKey: 'diamond',   name: '钻石会员',   levelIndex: 5, minSpent: 10000, discountRate: 0.85, pointsRewardRate: 2.00, birthdayGift: '生日当月享5折优惠+专属客服',  couponValue: 50, accentColor: '#82c8f0', bgStartColor: 'rgba(20,35,50,0.88)',  bgEndColor: 'rgba(10,15,25,0.95)', bgImage: '/images/tier-bg-diamond.jpg' },
 ];
 
-function computeTier(totalSpent, tiers) {
+function computeTier(totalSpent, tiers, memberLevel) {
   let current = tiers[0], next = tiers[1];
+  // 优先使用服务端 memberLevel（管理员可直接修改等级）
+  if (memberLevel) {
+    const idx = tiers.findIndex(t => t.levelKey === memberLevel);
+    if (idx >= 0) {
+      current = tiers[idx];
+      next = tiers[idx + 1] || null;
+      return { current, next };
+    }
+  }
+  // 回退：从 totalSpent 计算
   for (let i = tiers.length - 1; i >= 0; i--) {
     if (totalSpent >= tiers[i].minSpent) { current = tiers[i]; next = tiers[i + 1] || null; break; }
   }
@@ -209,7 +219,7 @@ Page({
     const totalSpent = parseFloat(ui.totalSpent || 0);
 
     this._ensureTiersLoaded().then(apiTiers => {
-      const tierInfo = computeTier(totalSpent, apiTiers);
+      const tierInfo = computeTier(totalSpent, apiTiers, ui.memberLevel);
       const tiers = buildBenefitTiers(apiTiers, tierInfo, totalSpent);
 
       const currentTier = tiers.find(t => t.status === 'current') || tiers[0];
