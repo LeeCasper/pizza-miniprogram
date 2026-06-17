@@ -361,6 +361,188 @@ const paymentService = {
     };
   },
 
+  // ── 5a. Query recharge payment status ─────────────────────────────
+
+  /**
+   * Get local payment status for a recharge by out_trade_no.
+   *
+   * @param {string} outTradeNo
+   * @returns {object|null}
+   */
+  async getRechargePaymentStatus(outTradeNo) {
+    const [[record]] = await pool.query(
+      "SELECT * FROM payment_records WHERE out_trade_no = ? AND type = 'recharge'",
+      [outTradeNo]
+    );
+    if (!record) return null;
+
+    return {
+      status: record.status,
+      outTradeNo: record.out_trade_no,
+      transactionId: record.transaction_id,
+      amount: parseFloat(record.amount),
+      userId: record.user_id,
+    };
+  },
+
+  /**
+   * Sync recharge payment from a WeChat query result.
+   * Called when queryWechatOrder() returns SUCCESS for a recharge
+   * but the local DB still shows pending.
+   *
+   * @param {string} outTradeNo
+   * @param {string} transactionId - from WeChat query result
+   * @returns {{ synced: boolean, detail: string }}
+   */
+  async syncRechargeFromWechat(outTradeNo, transactionId) {
+    const [[record]] = await pool.query(
+      "SELECT * FROM payment_records WHERE out_trade_no = ? AND type = 'recharge'",
+      [outTradeNo]
+    );
+    if (!record) {
+      return { synced: false, detail: 'no_payment_record' };
+    }
+    if (record.status === 'success') {
+      return { synced: false, detail: 'already_success' };
+    }
+
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+
+      // Update payment record (with race-condition guard)
+      const [prResult] = await conn.query(
+        "UPDATE payment_records SET status = 'success', transaction_id = ?, raw_notify = ?, updated_at = NOW() WHERE id = ? AND status = 'pending'",
+        [transactionId, JSON.stringify({ syncedFromWechat: true, syncedAt: new Date().toISOString() }), record.id]
+      );
+      if (prResult.affectedRows === 0) {
+        await conn.rollback();
+        return { synced: false, detail: 'concurrent_skip' };
+      }
+
+      // Add balance to user
+      const amount = parseFloat(record.amount);
+      const [[user]] = await conn.query('SELECT balance FROM users WHERE id = ?', [record.user_id]);
+      let detail = '';
+      if (user) {
+        const oldBalance = parseFloat(user.balance);
+        const balanceAfter = oldBalance + amount;
+        await conn.query('UPDATE users SET balance = ? WHERE id = ?', [balanceAfter, record.user_id]);
+        await conn.query(
+          'INSERT INTO balance_history (user_id, amount, balance_after, type, remark) VALUES (?, ?, ?, ?, ?)',
+          [record.user_id, amount, balanceAfter, 'recharge', '微信支付充值']
+        );
+        detail = `recharge user=${record.user_id} amount=${amount} balance=${oldBalance}→${balanceAfter}`;
+      }
+
+      await conn.commit();
+      console.log(`[Payment] Synced recharge from WeChat: ${outTradeNo} — ${detail}`);
+      return { synced: true, detail };
+    } catch (err) {
+      await conn.rollback();
+      console.error(`[Payment] SyncRecharge TX error: ${outTradeNo} —`, err.message);
+      throw err;
+    } finally {
+      conn.release();
+    }
+  },
+
+  // ── 5b. Sync order payment from WeChat query result ────────────────
+
+  /**
+   * Sync order payment status from a WeChat Pay query result.
+   * Called when queryWechatOrder() returns SUCCESS but the local DB
+   * still shows pending — this fixes the race condition where the
+   * client polls before the WeChat callback arrives.
+   *
+   * Mirrors the order-handling logic in handleNotify().
+   *
+   * @param {string} orderId
+   * @param {string} outTradeNo
+   * @param {string} transactionId - from WeChat query result
+   * @returns {{ synced: boolean, detail: string }}
+   */
+  async syncOrderFromWechat(orderId, outTradeNo, transactionId) {
+    // Look up the payment record
+    const [[record]] = await pool.query(
+      'SELECT * FROM payment_records WHERE out_trade_no = ? AND type = ?',
+      [outTradeNo, 'order']
+    );
+    if (!record) {
+      return { synced: false, detail: 'no_payment_record' };
+    }
+    if (record.status === 'success') {
+      return { synced: false, detail: 'already_success' };
+    }
+
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+
+      // Update payment record (with race-condition guard)
+      const [prResult] = await conn.query(
+        "UPDATE payment_records SET status = 'success', transaction_id = ?, raw_notify = ?, updated_at = NOW() WHERE id = ? AND status = 'pending'",
+        [transactionId, JSON.stringify({ syncedFromWechat: true, syncedAt: new Date().toISOString() }), record.id]
+      );
+      if (prResult.affectedRows === 0) {
+        await conn.rollback();
+        return { synced: false, detail: 'concurrent_skip' };
+      }
+
+      // Update order
+      const [orderResult] = await conn.query(
+        "UPDATE orders SET payment_method = 'wechat', transaction_id = ?, paid_at = NOW(), updated_at = NOW() WHERE id = ? AND payment_method IS NULL",
+        [transactionId, orderId]
+      );
+
+      let detail = `order=${orderId} orderUpdated=${orderResult.affectedRows}`;
+
+      // Award points + update tier (only if order was actually updated)
+      if (orderResult.affectedRows > 0) {
+        const [[userData]] = await conn.query(
+          'SELECT total_spent, points, member_level FROM users WHERE id = ? FOR UPDATE',
+          [record.user_id]
+        );
+        if (userData) {
+          const oldTotalSpent = parseFloat(userData.total_spent || 0);
+          const oldPoints = userData.points || 0;
+          const paidAmount = parseFloat(record.amount);
+
+          const tier = await computeTier(oldTotalSpent);
+          const multiplier = parseFloat(tier.pointsRewardRate || 1);
+          const earnedPoints = Math.floor(paidAmount * multiplier);
+
+          const newTotalSpent = oldTotalSpent + paidAmount;
+          const newPoints = oldPoints + earnedPoints;
+          const newTier = await getTierLevel(newTotalSpent);
+
+          await conn.query(
+            'UPDATE users SET total_spent = ?, points = ?, member_level = ? WHERE id = ?',
+            [newTotalSpent.toFixed(2), newPoints, newTier, record.user_id]
+          );
+          await conn.query(
+            'INSERT INTO points_history (user_id, points_change, balance_after, reason, reference_id) VALUES (?, ?, ?, ?, ?)',
+            [record.user_id, earnedPoints, newPoints, '订单消费', orderId]
+          );
+
+          detail += ` points=${earnedPoints} tier=${newTier} totalSpent=${newTotalSpent.toFixed(2)}`;
+        }
+      } else {
+        detail += ' orderAlreadyPaid';
+      }
+
+      await conn.commit();
+      console.log(`[Payment] Synced from WeChat: ${outTradeNo} — ${detail}`);
+      return { synced: true, detail };
+    } catch (err) {
+      await conn.rollback();
+      console.error(`[Payment] SyncOrder TX error: ${outTradeNo} —`, err.message);
+      throw err;
+    } finally {
+      conn.release();
+    }
+  },
+
   // ── 6. Admin: list payment records ─────────────────────────────────
 
   /**

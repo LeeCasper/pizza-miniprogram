@@ -103,9 +103,16 @@ Page({
     app.globalData.userInfo.balance = optimisticBalance;
     this.loadBalance();
 
-    pay.rechargeBalance(amount).then(() => {
-      // Delay 1.5s to give WeChat callback time to arrive, then fetch latest profile
-      this._refreshBalanceAfterRecharge(oldBalance, amount, 0);
+    pay.rechargeBalance(amount).then((result) => {
+      // If server confirmed the payment, refresh once; otherwise use retry
+      if (result && result.status === 'success') {
+        // Server confirmed — single refresh is enough
+        this._refreshBalanceOnce(oldBalance);
+      } else {
+        // Polling didn't confirm (callback may be delayed) — use retry
+        console.log('[recharge] Server not yet confirmed, using retry refresh');
+        this._refreshBalanceAfterRecharge(oldBalance, amount, 0);
+      }
     }).catch((err) => {
       if (!err.cancelled) {
         // Restore old balance on failure
@@ -118,6 +125,23 @@ Page({
         this.loadBalance();
       }
     });
+  },
+
+  /**
+   * Single balance refresh (no retry) — used when server has confirmed payment.
+   */
+  _refreshBalanceOnce(oldBalance) {
+    setTimeout(() => {
+      api.get('/user/profile').then(res => {
+        if (res.code === 0 && res.data) {
+          app.globalData.userInfo = res.data;
+          wx.setStorageSync('userInfo', res.data);
+          this.loadBalance();
+        }
+      }).catch(() => {
+        // Fallback: keep optimistic value
+      });
+    }, 1000);
   },
 
   /**

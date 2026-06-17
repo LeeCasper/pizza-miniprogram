@@ -146,9 +146,56 @@ const paymentController = {
         try {
           const wxResult = await paymentService.queryWechatOrder(status.outTradeNo);
           if (wxResult.trade_state === 'SUCCESS') {
-            // State changed — re-trigger processing
-            status.status = 'success';
-            status.transactionId = wxResult.transaction_id;
+            // Sync DB state from WeChat result
+            const syncResult = await paymentService.syncOrderFromWechat(
+              orderId, status.outTradeNo, wxResult.transaction_id
+            );
+            if (syncResult.synced) {
+              status.status = 'success';
+              status.transactionId = wxResult.transaction_id;
+            }
+          }
+        } catch (_) {
+          // WeChat query failed — return local state
+        }
+      }
+
+      res.json({ code: 0, data: status });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * GET /api/v1/pay/recharge/:outTradeNo/status
+   * Query recharge payment status — used for client-side polling after
+   * wx.requestPayment succeeds.
+   */
+  async rechargePaymentStatus(req, res, next) {
+    try {
+      const { outTradeNo } = req.params;
+      const status = await paymentService.getRechargePaymentStatus(outTradeNo);
+
+      if (!status) {
+        return res.json({
+          code: 0,
+          data: { status: 'unpaid', message: '充值记录不存在' },
+        });
+      }
+
+      // If pending, try querying WeChat Pay to sync
+      if (status.status === 'pending') {
+        try {
+          const wxResult = await paymentService.queryWechatOrder(outTradeNo);
+          if (wxResult.trade_state === 'SUCCESS') {
+            // Sync DB state from WeChat result
+            const syncResult = await paymentService.syncRechargeFromWechat(
+              outTradeNo, wxResult.transaction_id
+            );
+            if (syncResult.synced) {
+              status.status = 'success';
+              status.transactionId = wxResult.transaction_id;
+            }
           }
         } catch (_) {
           // WeChat query failed — return local state

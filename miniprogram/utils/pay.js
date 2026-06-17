@@ -105,8 +105,12 @@ function pollPaymentStatus(orderId, resolve, attempt) {
 /**
  * Recharge balance via WeChat Pay.
  *
+ * After wx.requestPayment succeeds, polls the server to confirm the
+ * payment callback has been processed. This fixes the race condition
+ * where the client resolves before the WeChat callback arrives.
+ *
  * @param {number} amount - Recharge amount (RMB)
- * @returns {Promise<{ success: boolean }>}
+ * @returns {Promise<{ success: boolean, status?: string, outTradeNo?: string }>}
  */
 function rechargeBalance(amount) {
   return new Promise((resolve, reject) => {
@@ -121,7 +125,7 @@ function rechargeBalance(amount) {
           return;
         }
 
-        const { payParams } = res.data;
+        const { payParams, outTradeNo } = res.data;
 
         wx.requestPayment({
           timeStamp: payParams.timeStamp,
@@ -131,7 +135,8 @@ function rechargeBalance(amount) {
           paySign: payParams.paySign,
           success: () => {
             wx.showToast({ title: '充值成功', icon: 'success' });
-            resolve({ success: true });
+            // Poll server to confirm callback has been processed
+            pollRechargeStatus(outTradeNo, resolve);
           },
           fail: (wxErr) => {
             if (wxErr.errMsg && wxErr.errMsg.indexOf('cancel') !== -1) {
@@ -150,6 +155,39 @@ function rechargeBalance(amount) {
         reject(err);
       });
   });
+}
+
+/**
+ * Poll the server for recharge payment status after wx.requestPayment succeeds.
+ *
+ * @param {string} outTradeNo
+ * @param {Function} resolve
+ * @param {number} attempt
+ */
+function pollRechargeStatus(outTradeNo, resolve, attempt) {
+  attempt = attempt || 0;
+  if (attempt >= 3) {
+    console.warn('[pay] Recharge status poll exhausted, resolving with pending');
+    resolve({ success: true, status: 'pending', outTradeNo });
+    return;
+  }
+
+  setTimeout(() => {
+    api.get('/pay/recharge/' + outTradeNo + '/status').then(res => {
+      if (res.code === 0 && res.data) {
+        if (res.data.status === 'success') {
+          console.log('[pay] Recharge confirmed by server');
+          resolve({ success: true, status: 'success', outTradeNo });
+        } else {
+          pollRechargeStatus(outTradeNo, resolve, attempt + 1);
+        }
+      } else {
+        pollRechargeStatus(outTradeNo, resolve, attempt + 1);
+      }
+    }).catch(() => {
+      pollRechargeStatus(outTradeNo, resolve, attempt + 1);
+    });
+  }, 1500);
 }
 
 module.exports = { payOrder, rechargeBalance };
