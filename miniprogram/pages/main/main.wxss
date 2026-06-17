@@ -613,6 +613,7 @@
   width: 32rpx;
   height: 32rpx;
   flex-shrink: 0;
+  margin-top: -3rpx;
 }
 .tier-status-dot-img {
   width: 100%;
