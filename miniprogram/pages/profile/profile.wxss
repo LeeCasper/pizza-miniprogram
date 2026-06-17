@@ -166,8 +166,8 @@
   align-items: center;
   gap: 10rpx;
   padding: 10rpx 24rpx 10rpx 18rpx;
-  border-radius: 28rpx 0 16rpx 0;
-  background: rgba(0, 0, 0, 0.65);
+  border-radius: 28rpx 0 28rpx 0;
+  background: #2f3836;
 }
 .tier-status-text {
   font-size: 24rpx;
