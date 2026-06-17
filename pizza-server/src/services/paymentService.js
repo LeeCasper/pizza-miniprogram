@@ -295,10 +295,14 @@ const paymentService = {
           const oldBalance = parseFloat(user.balance);
           const balanceAfter = oldBalance + amount;
           await conn.query('UPDATE users SET balance = ? WHERE id = ?', [balanceAfter, record.user_id]);
-          await conn.query(
-            'INSERT INTO balance_history (user_id, amount, balance_after, type, remark) VALUES (?, ?, ?, ?, ?)',
-            [record.user_id, amount, balanceAfter, 'recharge', '微信支付充值']
-          );
+          try {
+            await conn.query(
+              'INSERT INTO balance_history (user_id, amount, balance_after, type, remark) VALUES (?, ?, ?, ?, ?)',
+              [record.user_id, amount, balanceAfter, 'recharge', '微信支付充值']
+            );
+          } catch (histErr) {
+            console.warn(`[Payment] balance_history insert skipped (notify): ${histErr.message}`);
+          }
           detail = `recharge user=${record.user_id} amount=${amount} balance=${oldBalance}→${balanceAfter}`;
         }
       }
@@ -382,11 +386,15 @@ const paymentService = {
     // is delayed (rare race condition).
     let balanceUpdated = false;
     if (record.status !== 'success') {
-      const [[bh]] = await pool.query(
-        "SELECT id FROM balance_history WHERE user_id = ? AND type = 'recharge' AND amount = ? ORDER BY id DESC LIMIT 1",
-        [record.user_id, parseFloat(record.amount)]
-      );
-      balanceUpdated = !!bh;
+      try {
+        const [[bh]] = await pool.query(
+          "SELECT id FROM balance_history WHERE user_id = ? AND type = 'recharge' AND amount = ? ORDER BY id DESC LIMIT 1",
+          [record.user_id, parseFloat(record.amount)]
+        );
+        balanceUpdated = !!bh;
+      } catch (_) {
+        // Table may not exist yet — ignore
+      }
     }
 
     return {
@@ -442,10 +450,15 @@ const paymentService = {
         const oldBalance = parseFloat(user.balance);
         const balanceAfter = oldBalance + amount;
         await conn.query('UPDATE users SET balance = ? WHERE id = ?', [balanceAfter, record.user_id]);
-        await conn.query(
-          'INSERT INTO balance_history (user_id, amount, balance_after, type, remark) VALUES (?, ?, ?, ?, ?)',
-          [record.user_id, amount, balanceAfter, 'recharge', '微信支付充值']
-        );
+        // balance_history insert is best-effort — won't rollback if table missing
+        try {
+          await conn.query(
+            'INSERT INTO balance_history (user_id, amount, balance_after, type, remark) VALUES (?, ?, ?, ?, ?)',
+            [record.user_id, amount, balanceAfter, 'recharge', '微信支付充值']
+          );
+        } catch (histErr) {
+          console.warn(`[Payment] balance_history insert skipped: ${histErr.message}`);
+        }
         detail = `recharge user=${record.user_id} amount=${amount} balance=${oldBalance}→${balanceAfter}`;
       }
 

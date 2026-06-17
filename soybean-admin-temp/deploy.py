@@ -39,33 +39,38 @@ def deploy_backend():
         return output
 
     # 1. Git pull
-    run_cmd(f'cd {SERVER_REPO} && git pull origin master', '[1/5] Git pull')
+    run_cmd(f'cd {SERVER_REPO} && git pull origin master', '[1/6] Git pull')
 
     # 2. Install dependencies
-    run_cmd(f'cd {SERVER_REPO}/pizza-server && npm install --production', '[2/5] npm install')
+    run_cmd(f'cd {SERVER_REPO}/pizza-server && npm install --production', '[2/6] npm install')
 
-    # 3. Run membership migration
-    print("  [3/5] Running DB migrations...")
-    stdin, stdout, stderr = ssh.exec_command(
-        f'cd {SERVER_REPO} && '
-        f'source pizza-server/.env 2>/dev/null; '
-        f'mysql -u "$DB_USER" -p"$DB_PASSWORD" "$DB_NAME" < pizza-server/db/migrate_membership.sql 2>&1',
-        get_pty=False
-    )
-    output = stdout.read().decode('utf-8', errors='replace')
-    if output.strip():
-        print("    " + output.strip())
-    exit_code = stdout.channel.recv_exit_status()
-    if exit_code == 0:
-        print("    Migration OK")
-    else:
-        print(f"  WARN: Migration exit code: {exit_code} (may already be applied)")
+    # 3. Run migrations
+    print("  [3/6] Running DB migrations...")
+    migrations = [
+        'pizza-server/db/migrate_membership.sql',
+        'pizza-server/db/migrate_balance_history.sql',
+    ]
+    for m in migrations:
+        stdin, stdout, stderr = ssh.exec_command(
+            f'cd {SERVER_REPO} && '
+            f'source pizza-server/.env 2>/dev/null; '
+            f'mysql -u "$DB_USER" -p"$DB_PASSWORD" "$DB_NAME" < {m} 2>&1',
+            get_pty=False
+        )
+        output = stdout.read().decode('utf-8', errors='replace')
+        if output.strip():
+            print("    " + output.strip())
+        exit_code = stdout.channel.recv_exit_status()
+        if exit_code == 0:
+            print(f"    {m}: OK")
+        else:
+            print(f"  WARN: {m} exit: {exit_code} (may already be applied)")
 
     # 4. Verify .env exists
-    run_cmd(f'test -f {SERVER_REPO}/pizza-server/.env && echo "OK" || echo "MISSING"', '[4/5] .env check')
+    run_cmd(f'test -f {SERVER_REPO}/pizza-server/.env && echo "OK" || echo "MISSING"', '[4/6] .env check')
 
     # 5. Restart PM2
-    run_cmd('pm2 restart pizza-server', '[5/5] PM2 restart')
+    run_cmd('pm2 restart pizza-server', '[6/6] PM2 restart')
 
     print("\n  Backend deploy complete")
 
