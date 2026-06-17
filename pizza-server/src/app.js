@@ -139,6 +139,7 @@ app.listen(PORT, async () => {
   try {
     const systemConfigService = require('./services/systemConfigService');
     await systemConfigService.syncPayConfigToMemory();
+    systemConfigService.syncPrinterConfigToMemory();
   } catch (err) {
     console.warn('[Server] Could not sync pay config from DB:', err.message);
   }

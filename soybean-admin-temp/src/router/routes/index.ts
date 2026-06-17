@@ -77,14 +77,34 @@ const customRoutes: CustomRoute[] = [
   },
   {
     name: 'settings',
-    path: '/settings/pay',
-    component: 'layout.base$view.settings_pay',
+    path: '/settings',
+    component: 'layout.base',
     meta: {
-      title: '支付配置',
+      title: '系统设置',
       i18nKey: 'route.settings',
       icon: 'mdi:cog',
       order: 8,
     },
+    children: [
+      {
+        name: 'settings_pay',
+        path: '/settings/pay',
+        component: 'view.settings_pay',
+        meta: {
+          title: '支付配置',
+          i18nKey: 'route.settings_pay',
+        },
+      },
+      {
+        name: 'settings_printer',
+        path: '/settings/printer',
+        component: 'view.settings_printer',
+        meta: {
+          title: '打印机配置',
+          i18nKey: 'route.settings_printer',
+        },
+      },
+    ],
   },
   // Multi-level routes — parent has layout.base, children have view.xxx
   {

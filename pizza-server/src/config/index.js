@@ -41,4 +41,13 @@ module.exports = {
     dir: path.join(__dirname, '..', '..', process.env.UPLOAD_DIR || 'uploads'),
     maxFileSize: parseInt(process.env.MAX_FILE_SIZE, 10) || 5 * 1024 * 1024,
   },
+
+  printer: {
+    enabled: process.env.PRINTER_ENABLED === 'true',
+    appId: process.env.PRINTER_APPID || '',
+    appSecret: process.env.PRINTER_APPSECRET || '',
+    sn: process.env.PRINTER_SN || '',
+    apiBase: process.env.PRINTER_API_BASE || 'https://www.spyun.net.cn',
+    copies: parseInt(process.env.PRINTER_COPIES, 10) || 1,
+  },
 };

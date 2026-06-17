@@ -997,6 +997,86 @@ const adminApiController = {
       next(err);
     }
   },
+
+  // ── Printer Settings ─────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/settings/printer
+   */
+  async getPrinterSettings(req, res, next) {
+    try {
+      const cfg = await systemConfigService.getPrinterConfig();
+
+      res.json({
+        code: 0,
+        data: {
+          enabled: cfg.enabled === 'true',
+          appId: cfg.appId || '',
+          appSecret: cfg.appSecret ? '****' : '',
+          sn: cfg.sn || '',
+          apiBase: cfg.apiBase || 'https://www.spyun.net.cn',
+          copies: parseInt(cfg.copies, 10) || 1,
+          _hasAppSecret: !!cfg.appSecret,
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * PUT /api/v1/admin/settings/printer
+   */
+  async updatePrinterSettings(req, res, next) {
+    try {
+      const body = req.body || {};
+      const current = await systemConfigService.getPrinterConfig();
+
+      const entries = {
+        enabled: body.enabled !== undefined ? String(body.enabled) : undefined,
+        appId: body.appId !== undefined ? body.appId : undefined,
+        sn: body.sn !== undefined ? body.sn : undefined,
+        apiBase: body.apiBase !== undefined ? body.apiBase : undefined,
+        copies: body.copies !== undefined ? String(body.copies) : undefined,
+      };
+
+      // Masked: keep existing secret unless new one provided
+      if (body.appSecret !== undefined && body.appSecret !== '****' && !body.appSecret.includes('****')) {
+        entries.appSecret = body.appSecret;
+      }
+
+      // Remove undefined entries
+      Object.keys(entries).forEach(k => {
+        if (entries[k] === undefined) delete entries[k];
+      });
+
+      if (Object.keys(entries).length > 0) {
+        await systemConfigService.updatePrinterConfig(entries);
+      }
+
+      res.json({ code: 0, message: '打印机配置已保存' });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * POST /api/v1/admin/settings/printer/test
+   */
+  async testPrinter(req, res, next) {
+    try {
+      const printerService = require('../services/printerService');
+      const result = await printerService.testPrint();
+
+      if (result.success) {
+        res.json({ code: 0, message: result.message });
+      } else {
+        res.json({ code: 500, message: result.message });
+      }
+    } catch (err) {
+      next(err);
+    }
+  },
 };
 
 function safeJson(val, defaultVal) {

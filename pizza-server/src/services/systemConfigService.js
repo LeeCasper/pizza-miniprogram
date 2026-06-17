@@ -136,4 +136,85 @@ const systemConfigService = {
   },
 };
 
+  // ── Printer Config ──────────────────────────────────
+
+  /**
+   * Get printer config from DB.
+   * @returns {Promise<{ enabled, appId, appSecret, sn, apiBase, copies }>}
+   */
+  async getPrinterConfig() {
+    try {
+      const [rows] = await pool.query(
+        "SELECT config_key, config_value FROM system_config WHERE config_key LIKE 'printer_%'"
+      );
+      const map = {};
+      rows.forEach(r => { map[r.config_key] = r.config_value || ''; });
+      return {
+        enabled: map.printer_enabled || '',
+        appId: map.printer_app_id || '',
+        appSecret: map.printer_app_secret || '',
+        sn: map.printer_sn || '',
+        apiBase: map.printer_api_base || '',
+        copies: map.printer_copies || '1',
+      };
+    } catch (_) {
+      return { enabled: '', appId: '', appSecret: '', sn: '', apiBase: '', copies: '1' };
+    }
+  },
+
+  /**
+   * Update printer config in DB (UPSERT per key).
+   * @param {object} entries — { enabled, appId, appSecret, sn, apiBase, copies }
+   */
+  async updatePrinterConfig(entries) {
+    const fieldMap = {
+      enabled: 'printer_enabled',
+      appId: 'printer_app_id',
+      appSecret: 'printer_app_secret',
+      sn: 'printer_sn',
+      apiBase: 'printer_api_base',
+      copies: 'printer_copies',
+    };
+
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+      for (const [camelKey, dbKey] of Object.entries(fieldMap)) {
+        if (entries[camelKey] !== undefined) {
+          const value = entries[camelKey] != null ? String(entries[camelKey]) : '';
+          await conn.query(
+            'INSERT INTO system_config (config_key, config_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE config_value = ?',
+            [dbKey, value, value]
+          );
+        }
+      }
+      await conn.commit();
+    } catch (err) {
+      await conn.rollback();
+      throw err;
+    } finally {
+      conn.release();
+    }
+
+    // Sync to in-memory config
+    this.syncPrinterConfigToMemory();
+  },
+
+  /**
+   * Sync printer DB config to in-memory config object.
+   */
+  syncPrinterConfigToMemory() {
+    this.getPrinterConfig().then(dbConfig => {
+      if (dbConfig.enabled !== '') config.printer.enabled = dbConfig.enabled === 'true';
+      if (dbConfig.appId) config.printer.appId = dbConfig.appId;
+      if (dbConfig.appSecret) config.printer.appSecret = dbConfig.appSecret;
+      if (dbConfig.sn) config.printer.sn = dbConfig.sn;
+      if (dbConfig.apiBase) config.printer.apiBase = dbConfig.apiBase;
+      if (dbConfig.copies) config.printer.copies = parseInt(dbConfig.copies, 10) || 1;
+    }).catch(err => {
+      console.error('[Config] Failed to sync printer config from DB:', err.message);
+    });
+  },
+};
+
 module.exports = systemConfigService;

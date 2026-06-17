@@ -273,8 +273,9 @@ const local: App.I18n.Schema = {
     points_form: '积分商品表单',
     files: '文件管理',
     files_list: '文件管理',
-    settings: '支付配置',
+    settings: '系统设置',
     settings_pay: '支付配置',
+    settings_printer: '打印机配置',
   },
   page: {
     login: {

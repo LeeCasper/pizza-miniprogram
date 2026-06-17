@@ -236,6 +236,14 @@ const orderController = {
 
       // Build response
       const order = await orderService.findById(orderId);
+
+      // 触发打印机 — 异步，不阻塞下单响应
+      if (require('../config').printer.enabled) {
+        const printerService = require('../services/printerService');
+        printerService.printOrderTicket(order).catch(err => {
+          console.error('[Printer] 打印失败:', err.message);
+        });
+      }
       const tier = await computeTier(newTotalSpent);
 
       const responseData = {

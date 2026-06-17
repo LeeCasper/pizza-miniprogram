@@ -80,6 +80,9 @@ router.delete('/files/:filename', uploadCtrl.deleteFile);
 // Settings (system config)
 router.get('/settings/pay', ctrl.getPaySettings);
 router.put('/settings/pay', ctrl.updatePaySettings);
+router.get('/settings/printer', ctrl.getPrinterSettings);
+router.put('/settings/printer', ctrl.updatePrinterSettings);
+router.post('/settings/printer/test', ctrl.testPrinter);
 
 // Payment records (transaction history)
 router.get('/payment-records', ctrl.listPaymentRecords);

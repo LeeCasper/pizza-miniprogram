@@ -36,3 +36,49 @@ export interface PaySettingsForm {
   platformCert?: string;
   notifyUrl?: string;
 }
+
+// ── Printer Settings ──────────────────────────────────
+
+/** Get printer settings (sensitive fields masked) */
+export function fetchPrinterSettings() {
+  return request<PrinterSettings>({
+    url: '/settings/printer',
+    method: 'GET',
+  });
+}
+
+/** Update printer settings */
+export function fetchUpdatePrinterSettings(data: PrinterSettingsForm) {
+  return request<null>({
+    url: '/settings/printer',
+    method: 'PUT',
+    data,
+  });
+}
+
+/** Test printer */
+export function fetchTestPrinter() {
+  return request<null>({
+    url: '/settings/printer/test',
+    method: 'POST',
+  });
+}
+
+export interface PrinterSettings {
+  enabled: boolean;
+  appId: string;
+  appSecret: string;
+  sn: string;
+  apiBase: string;
+  copies: number;
+  _hasAppSecret?: boolean;
+}
+
+export interface PrinterSettingsForm {
+  enabled?: boolean;
+  appId?: string;
+  appSecret?: string;
+  sn?: string;
+  apiBase?: string;
+  copies?: number;
+}
