@@ -103,48 +103,34 @@ Page({
   },
 
   loadUserData() {
-    const ui = app.globalData.userInfo;
-    const totalSpent = ui.totalSpent || 0;
+    const cachedUi = app.globalData.userInfo;
+    // 立即显示缓存的用户基本信息
+    this.setData({
+      userInfo: { ...cachedUi, balanceText: '¥' + ((cachedUi.balance || 0)).toFixed(2), cardCount: cachedUi.cardCount || 0, bio: cachedUi.bio || '享受美味每一天' },
+    });
 
-    this._ensureTiersLoaded().then(apiTiers => {
+    // 并行获取最新用户数据 & 等级配置，只构建一次卡片（避免 swiper 连续两次 setData 导致抖动）
+    Promise.all([
+      api.get('/user/profile').then(res => res.code === 0 ? res.data : null).catch(() => null),
+      this._ensureTiersLoaded(),
+    ]).then(([freshUi, apiTiers]) => {
+      let ui = cachedUi;
+      if (freshUi) {
+        app.globalData.userInfo = freshUi;
+        wx.setStorageSync('userInfo', freshUi);
+        ui = freshUi;
+      }
+      const totalSpent = ui.totalSpent || 0;
       const tierInfo = computeTier(totalSpent, apiTiers, ui.memberLevel);
       tierInfo._totalSpent = totalSpent;
       const tierCards = buildTierCards(apiTiers, tierInfo);
       const activeTierIndex = tierInfo.current.levelIndex - 1;
-
       this.setData({
-        userInfo: {
-          ...ui,
-          balanceText: '¥' + ((ui.balance || 0)).toFixed(2),
-          cardCount: ui.cardCount || 0,
-          bio: ui.bio || '享受美味每一天'
-        },
+        userInfo: { ...ui, balanceText: '¥' + ((ui.balance || 0)).toFixed(2), cardCount: ui.cardCount || 0, bio: ui.bio || '享受美味每一天' },
         tierCards,
         activeTierIndex,
       });
     });
-
-    // 后台刷新用户数据 — 拿到最新数据后重建会员卡片 & 自动切到当前等级
-    api.get('/user/profile').then(res => {
-      if (res.code === 0) {
-        app.globalData.userInfo = res.data;
-        wx.setStorageSync('userInfo', res.data);
-        const ui = res.data;
-        // 用最新 totalSpent 重建卡片并切换到当前等级
-        const freshSpent = ui.totalSpent || 0;
-        this._ensureTiersLoaded().then(apiTiers => {
-          const tierInfo = computeTier(freshSpent, apiTiers, ui.memberLevel);
-          tierInfo._totalSpent = freshSpent;
-          const tierCards = buildTierCards(apiTiers, tierInfo);
-          const activeTierIndex = tierInfo.current.levelIndex - 1;
-          this.setData({
-            userInfo: { ...ui, balanceText: '¥' + ((ui.balance || 0)).toFixed(2), cardCount: ui.cardCount || 0, bio: ui.bio || '享受美味每一天' },
-            tierCards,
-            activeTierIndex,
-          });
-        });
-      }
-    }).catch(() => {});
   },
 
   _ensureTiersLoaded() {
