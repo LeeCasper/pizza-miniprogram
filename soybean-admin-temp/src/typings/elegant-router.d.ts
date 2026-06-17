@@ -140,6 +140,7 @@ declare module "@elegant-router/types" {
     | "products_form"
     | "products_list"
     | "settings_pay"
+    | "settings_printer"
     | "users_list"
   >;
 

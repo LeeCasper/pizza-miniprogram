@@ -241,6 +241,26 @@ export const generatedRoutes: GeneratedRoute[] = [
     ]
   },
   {
+    name: 'payments',
+    path: '/payments',
+    component: 'layout.base',
+    meta: {
+      title: 'payments',
+      i18nKey: 'route.payments'
+    },
+    children: [
+      {
+        name: 'payments_list',
+        path: '/payments/list',
+        component: 'view.payments_list',
+        meta: {
+          title: 'payments_list',
+          i18nKey: 'route.payments_list'
+        }
+      }
+    ]
+  },
+  {
     name: 'points',
     path: '/points',
     component: 'layout.base',
@@ -314,6 +334,15 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'settings_pay',
           i18nKey: 'route.settings_pay'
+        }
+      },
+      {
+        name: 'settings_printer',
+        path: '/settings/printer',
+        component: 'view.settings_printer',
+        meta: {
+          title: 'settings_printer',
+          i18nKey: 'route.settings_printer'
         }
       }
     ]
