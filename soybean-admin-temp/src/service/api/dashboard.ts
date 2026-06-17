@@ -4,6 +4,9 @@ export interface DashboardStats {
   todayOrders: number;
   totalUsers: number;
   activeCoupons: number;
+  todayRevenue: number;
+  todayOrdersPaid: number;
+  pendingPayments: number;
 }
 
 export function fetchDashboardStats() {

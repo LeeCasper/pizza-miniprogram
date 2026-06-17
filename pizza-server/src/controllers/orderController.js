@@ -10,8 +10,8 @@ const pool = require('../config/database');
 const orderController = {
   async list(req, res, next) {
     try {
-      const { status, page = 1, limit = 10 } = req.query;
-      const orders = await orderService.findByUser(req.user.id, status, parseInt(page), parseInt(limit));
+      const { status, paymentStatus, page = 1, limit = 10 } = req.query;
+      const orders = await orderService.findByUser(req.user.id, status, parseInt(page), parseInt(limit), paymentStatus);
       res.json({ code: 0, data: orders });
     } catch (err) {
       next(err);
@@ -48,6 +48,8 @@ const orderController = {
       let total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
       let discountAmount = 0;
       let couponUsedId = null;
+      let tierDiscountAmount = 0;
+      let appliedTier = null;
 
       // 2. Process coupon if provided
       if (couponId) {
@@ -99,6 +101,20 @@ const orderController = {
         // Mark coupon as used
         await conn.query("UPDATE coupons SET status = 'used', used_at = NOW() WHERE id = ?", [couponId]);
         couponUsedId = couponId;
+      }
+
+      // 2b. Apply member tier discount (stacked after coupon)
+      const [userForTier] = await conn.query(
+        'SELECT total_spent FROM users WHERE id = ?', [userId]
+      );
+      const oldTotalSpentForDiscount = parseFloat(userForTier[0].total_spent || 0);
+      appliedTier = await computeTier(oldTotalSpentForDiscount);
+      const tierDiscountRate = parseFloat(appliedTier.discountRate || 1.0);
+
+      if (tierDiscountRate < 1.0) {
+        const afterCoupon = total - discountAmount;
+        tierDiscountAmount = Math.round((afterCoupon * (1 - tierDiscountRate)) * 100) / 100;
+        discountAmount += tierDiscountAmount;
       }
 
       const paidAmount = Math.max(0, total - discountAmount);
@@ -176,29 +192,44 @@ const orderController = {
       // 8. Clear cart
       await conn.query('DELETE FROM cart_items WHERE user_id = ?', [userId]);
 
-      // 9. Add points based on spending and tier multiplier
-      const [userRows] = await conn.query(
-        'SELECT total_spent, points FROM users WHERE id = ?', [userId]
-      );
-      const oldTotalSpent = parseFloat(userRows[0].total_spent || 0);
-      const oldPoints = userRows[0].points;
+      // 9. Award points & update tier — only for instant-settlement payments
+      let earnedPoints = 0;
+      let newPoints = 0;
+      let newTotalSpent = 0;
 
-      const currentTier = await computeTier(oldTotalSpent);
-      const multiplier = parseFloat(currentTier.pointsRewardRate || 1);
-      const earnedPoints = Math.floor(paidAmount * multiplier);
+      if (paymentMethod === 'balance') {
+        // Balance payment settles instantly — award points now
+        const [userRows] = await conn.query(
+          'SELECT total_spent, points FROM users WHERE id = ?', [userId]
+        );
+        const oldTotalSpent = parseFloat(userRows[0].total_spent || 0);
+        const oldPointsVal = userRows[0].points;
 
-      const newTotalSpent = oldTotalSpent + paidAmount;
-      const newPoints = oldPoints + earnedPoints;
-      const newTier = await getTierLevel(newTotalSpent);
+        const currentTier = await computeTier(oldTotalSpent);
+        const multiplier = parseFloat(currentTier.pointsRewardRate || 1);
+        earnedPoints = Math.floor(paidAmount * multiplier);
 
-      await conn.query(
-        'UPDATE users SET total_spent = ?, points = ?, member_level = ? WHERE id = ?',
-        [newTotalSpent.toFixed(2), newPoints, newTier, userId]
-      );
-      await conn.query(
-        'INSERT INTO points_history (user_id, points_change, balance_after, reason, reference_id) VALUES (?, ?, ?, ?, ?)',
-        [userId, earnedPoints, newPoints, '订单消费', orderId]
-      );
+        newTotalSpent = oldTotalSpent + paidAmount;
+        newPoints = oldPointsVal + earnedPoints;
+        const newTier = await getTierLevel(newTotalSpent);
+
+        await conn.query(
+          'UPDATE users SET total_spent = ?, points = ?, member_level = ? WHERE id = ?',
+          [newTotalSpent.toFixed(2), newPoints, newTier, userId]
+        );
+        await conn.query(
+          'INSERT INTO points_history (user_id, points_change, balance_after, reason, reference_id) VALUES (?, ?, ?, ?, ?)',
+          [userId, earnedPoints, newPoints, '订单消费', orderId]
+        );
+      } else {
+        // WeChat Pay — points will be awarded in the payment callback
+        // Read current values for response (total_spent won't change until paid)
+        const [userRows] = await conn.query(
+          'SELECT total_spent, points FROM users WHERE id = ?', [userId]
+        );
+        newTotalSpent = parseFloat(userRows[0].total_spent || 0);
+        newPoints = userRows[0].points;
+      }
 
       await conn.commit();
 
@@ -211,7 +242,17 @@ const orderController = {
         earnedPoints,
         newPoints,
         tier,
+        pointsAwarded: paymentMethod === 'balance',
         paymentStatus: paymentMethodValue || 'unpaid',
+        discount: {
+          coupon: Math.round((discountAmount - tierDiscountAmount) * 100) / 100,
+          tier: tierDiscountAmount,
+          total: Math.round(discountAmount * 100) / 100,
+        },
+        appliedTier: appliedTier ? {
+          name: appliedTier.name,
+          discountRate: tierDiscountRate,
+        } : null,
       };
 
       res.json({
@@ -219,7 +260,7 @@ const orderController = {
         data: responseData,
         message: paymentMethodValue === 'balance'
           ? `订单已支付！获得${earnedPoints}积分`
-          : `订单已提交！获得${earnedPoints}积分`,
+          : '订单已提交，支付成功后发放积分',
       });
     } catch (err) {
       await conn.rollback();

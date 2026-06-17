@@ -1,5 +1,6 @@
 // pages/orders/orders.js
 const { api } = require('../../utils/api');
+const pay = require('../../utils/pay');
 const app = getApp();
 
 Page({
@@ -42,10 +43,14 @@ Page({
     this.setData({ loading: true });
     api.get('/orders').then(res => {
       if (res.code === 0) {
+        const STATUS_MAP = { waiting: '待取餐', preparing: '制作中', completed: '已完成', cancelled: '已取消' };
         const ordersWithDigits = (res.data || []).map(o => ({
           ...o,
           codeDigits: String(o.pickupCode || '').split(''),
           time: o.createdAt ? o.createdAt : (o.time || ''),
+          statusText: STATUS_MAP[o.status] || o.status,
+          paymentStatusText: o.paymentMethod ? (o.paymentMethod === 'wechat' ? '微信支付' : '余额支付') : '待支付',
+          isPaid: !!o.paymentMethod,
         }));
         this.setData({ orders: ordersWithDigits, loading: false });
         this.filterOrders();
@@ -83,6 +88,18 @@ Page({
   onOrderDetail(e) {
     const { id } = e.currentTarget.dataset;
     wx.showToast({ title: '订单详情: ' + id, icon: 'none' });
+  },
+
+  onPayOrder(e) {
+    const { id } = e.currentTarget.dataset;
+    pay.payOrder(id).then(() => {
+      wx.showToast({ title: '支付成功！', icon: 'success' });
+      this.fetchOrders();
+    }).catch((err) => {
+      if (!err.cancelled) {
+        wx.showToast({ title: '支付失败，请重试', icon: 'none' });
+      }
+    });
   },
 
   onShowPickupCode(e) {

@@ -227,9 +227,10 @@ const adminApiController = {
    */
   async listOrders(req, res) {
     try {
-      const { status, page = 1, limit = 20 } = req.query;
+      const { status, paymentStatus, page = 1, limit = 20 } = req.query;
       const orders = await orderService.adminList({
         status,
+        paymentStatus,
         page: parseInt(page),
         limit: parseInt(limit),
       });

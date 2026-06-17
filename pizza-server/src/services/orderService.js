@@ -1,12 +1,17 @@
 const pool = require('../config/database');
 
 const orderService = {
-  async findByUser(userId, status, page = 1, limit = 10) {
+  async findByUser(userId, status, page = 1, limit = 10, paymentStatus) {
     let sql = 'SELECT * FROM orders WHERE user_id = ?';
     const params = [userId];
     if (status && status !== 'all') {
       sql += ' AND status = ?';
       params.push(status);
+    }
+    if (paymentStatus === 'paid') {
+      sql += ' AND payment_method IS NOT NULL';
+    } else if (paymentStatus === 'unpaid') {
+      sql += ' AND payment_method IS NULL';
     }
     sql += ' ORDER BY created_at DESC';
 
@@ -94,12 +99,21 @@ const orderService = {
   },
 
   // Admin
-  async adminList({ status, page = 1, limit = 20 }) {
+  async adminList({ status, paymentStatus, page = 1, limit = 20 }) {
     let sql = 'SELECT o.*, u.name AS user_name FROM orders o JOIN users u ON o.user_id = u.id';
+    const conditions = [];
     const params = [];
     if (status && status !== 'all') {
-      sql += ' WHERE o.status = ?';
+      conditions.push('o.status = ?');
       params.push(status);
+    }
+    if (paymentStatus === 'paid') {
+      conditions.push('o.payment_method IS NOT NULL');
+    } else if (paymentStatus === 'unpaid') {
+      conditions.push('o.payment_method IS NULL');
+    }
+    if (conditions.length > 0) {
+      sql += ' WHERE ' + conditions.join(' AND ');
     }
     sql += ' ORDER BY o.created_at DESC LIMIT ? OFFSET ?';
     params.push(limit, (page - 1) * limit);
@@ -121,10 +135,22 @@ const orderService = {
     const [activeCoupons] = await pool.query(
       "SELECT COUNT(*) AS count FROM coupons WHERE status = 'available' AND valid_to >= CURDATE()"
     );
+    const [todayRevenue] = await pool.query(
+      "SELECT COALESCE(SUM(paid_amount), 0) AS total FROM orders WHERE payment_method IS NOT NULL AND DATE(paid_at) = CURDATE()"
+    );
+    const [todayOrdersPaid] = await pool.query(
+      "SELECT COUNT(*) AS count FROM orders WHERE payment_method IS NOT NULL AND DATE(paid_at) = CURDATE()"
+    );
+    const [pendingPayments] = await pool.query(
+      "SELECT COUNT(*) AS count FROM orders WHERE payment_method IS NULL AND status != 'cancelled'"
+    );
     return {
       todayOrders: todayOrders[0].count,
       totalUsers: totalUsers[0].count,
       activeCoupons: activeCoupons[0].count,
+      todayRevenue: parseFloat(todayRevenue[0].total),
+      todayOrdersPaid: todayOrdersPaid[0].count,
+      pendingPayments: pendingPayments[0].count,
     };
   },
 };

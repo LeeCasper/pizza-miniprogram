@@ -99,14 +99,17 @@
   color: var(--color-on-surface-variant);
 }
 
+.order-header-right { display: flex; align-items: center; gap: 12rpx; flex-shrink: 0; }
 .order-status {
   padding: 8rpx 24rpx;
   border-radius: var(--radius-full);
   font-size: 24rpx;
   font-weight: var(--font-weight-semibold);
   flex-shrink: 0;
-  margin-left: 16rpx;
 }
+.payment-badge { padding: 6rpx 20rpx; border-radius: var(--radius-full); font-size: 22rpx; font-weight: var(--font-weight-semibold); flex-shrink: 0; }
+.payment-badge.paid { background: #E8F5E9; color: #2E7D32; }
+.payment-badge.unpaid { background: #FFF3E0; color: #E65100; }
 
 .order-status.completed {
   background: var(--color-tertiary-container);
@@ -302,6 +305,8 @@
   background: var(--color-primary);
   color: var(--color-on-primary);
 }
+.order-action-btn.pay-btn { background: linear-gradient(135deg, #D32F2F, #b71c1c); color: #FFFFFF; box-shadow: 0 4rpx 16rpx rgba(211, 47, 47, 0.3); }
+.order-action-btn.pay-btn:active { transform: scale(0.96); opacity: 0.9; }
 
 /* 空状态 */
 .empty-state {

@@ -1,5 +1,6 @@
 const paymentService = require('../services/paymentService');
 const userService = require('../services/userService');
+const { verifyNotifySign } = require('../utils/wechatPay');
 const pool = require('../config/database');
 
 const paymentController = {
@@ -84,6 +85,14 @@ const paymentController = {
       const rawBody = Buffer.isBuffer(req.body) ? req.body.toString('utf8') : req.body;
 
       console.log('[Payment] Received notify callback');
+
+      // Verify WeChat Pay signature before processing
+      if (!verifyNotifySign(req.headers, rawBody)) {
+        console.error('[Payment] Notify signature verification FAILED');
+        // Still return 200 to prevent WeChat Pay retry storms
+        return res.status(200).json({ code: 'FAIL', message: 'Signature verification failed' });
+      }
+      console.log('[Payment] Notify signature verification PASSED');
 
       const result = await paymentService.handleNotify(rawBody);
 

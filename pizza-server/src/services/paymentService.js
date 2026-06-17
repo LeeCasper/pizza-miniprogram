@@ -8,6 +8,7 @@
 const pool = require('../config/database');
 const config = require('../config');
 const { buildPayParams, generateOutTradeNo, payRequest, decryptNotify } = require('../utils/wechatPay');
+const { computeTier, getTierLevel } = require('../utils/memberTier');
 
 const paymentService = {
 
@@ -54,6 +55,13 @@ const paymentService = {
     let recordId;
     if (existing) {
       recordId = existing.id;
+      // Reset failed/closed records to pending for re-payment
+      if (existing.status === 'failed' || existing.status === 'closed') {
+        await pool.query(
+          "UPDATE payment_records SET status = 'pending', updated_at = NOW() WHERE id = ?",
+          [recordId]
+        );
+      }
     } else {
       const [result] = await pool.query(
         `INSERT INTO payment_records (user_id, type, reference_id, out_trade_no, amount, status)
@@ -225,10 +233,45 @@ const paymentService = {
 
       if (record.type === 'order') {
         // Update order: set payment_method and paid_at
-        await conn.query(
+        const [orderResult] = await conn.query(
           "UPDATE orders SET payment_method = 'wechat', transaction_id = ?, paid_at = NOW(), updated_at = NOW() WHERE id = ? AND payment_method IS NULL",
           [transactionId, record.reference_id]
         );
+
+        // Award points + increment total_spent + update membership tier
+        // Only if the order was actually updated (not already paid via another path)
+        if (orderResult.affectedRows > 0) {
+          // Lock user row to prevent race conditions
+          const [[userData]] = await conn.query(
+            'SELECT total_spent, points, member_level FROM users WHERE id = ? FOR UPDATE',
+            [record.user_id]
+          );
+          if (userData) {
+            const oldTotalSpent = parseFloat(userData.total_spent || 0);
+            const oldPoints = userData.points || 0;
+            const paidAmount = parseFloat(record.amount);
+
+            // Compute points based on current tier multiplier
+            const tier = await computeTier(oldTotalSpent);
+            const multiplier = parseFloat(tier.pointsRewardRate || 1);
+            const earnedPoints = Math.floor(paidAmount * multiplier);
+
+            const newTotalSpent = oldTotalSpent + paidAmount;
+            const newPoints = oldPoints + earnedPoints;
+            const newTier = await getTierLevel(newTotalSpent);
+
+            await conn.query(
+              'UPDATE users SET total_spent = ?, points = ?, member_level = ? WHERE id = ?',
+              [newTotalSpent.toFixed(2), newPoints, newTier, record.user_id]
+            );
+            await conn.query(
+              'INSERT INTO points_history (user_id, points_change, balance_after, reason, reference_id) VALUES (?, ?, ?, ?, ?)',
+              [record.user_id, earnedPoints, newPoints, '订单消费', record.reference_id]
+            );
+
+            console.log(`[Payment] Awarded ${earnedPoints} points to user ${record.user_id}, tier=${newTier}`);
+          }
+        }
       } else if (record.type === 'recharge') {
         // Add balance to user
         const amount = parseFloat(record.amount);

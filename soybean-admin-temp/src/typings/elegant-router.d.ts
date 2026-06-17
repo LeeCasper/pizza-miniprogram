@@ -46,7 +46,7 @@ declare module "@elegant-router/types" {
     "products": "/products";
     "products_form": "/products/form";
     "products_list": "/products/list";
-    "settings": "/settings/pay";
+    "settings": "/settings";
     "settings_pay": "/settings/pay";
     "users": "/users";
     "users_list": "/users/list";

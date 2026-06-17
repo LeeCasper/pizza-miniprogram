@@ -11,6 +11,7 @@ const router = useRouter();
 const orders = ref<any[]>([]);
 const loading = ref(false);
 const statusFilter = ref<string | null>(null);
+const paymentStatusFilter = ref<string | null>(null);
 
 const statusOptions = [
   { label: '全部', value: null },
@@ -18,6 +19,12 @@ const statusOptions = [
   { label: '制作中', value: 'preparing' },
   { label: '已完成', value: 'completed' },
   { label: '已取消', value: 'cancelled' },
+];
+
+const paymentStatusOptions = [
+  { label: '全部支付', value: null },
+  { label: '已支付', value: 'paid' },
+  { label: '待支付', value: 'unpaid' },
 ];
 
 const statusMap: Record<string, { label: string; type: 'warning' | 'info' | 'success' | 'error' | 'default' }> = {
@@ -39,6 +46,17 @@ const columns: DataTableColumns<any> = [
     }
   },
   {
+    title: '支付', key: 'paymentMethod', width: 90,
+    render(row) {
+      if (!row.paymentMethod) {
+        return h(NTag, { type: 'error', size: 'small', bordered: false }, () => '待支付');
+      }
+      const label = row.paymentMethod === 'wechat' ? '微信支付' : '余额支付';
+      const type = row.paymentMethod === 'wechat' ? 'info' : 'success';
+      return h(NTag, { type, size: 'small', bordered: false }, () => label);
+    }
+  },
+  {
     title: '金额', key: 'total', width: 80, align: 'right',
     render(row) { return `¥${Number(row.total).toFixed(2)}`; }
   },
@@ -55,6 +73,7 @@ async function loadOrders() {
   loading.value = true;
   const params: Record<string, any> = {};
   if (statusFilter.value) params.status = statusFilter.value;
+  if (paymentStatusFilter.value) params.paymentStatus = paymentStatusFilter.value;
   const { data, error } = await fetchOrders(params);
   if (!error && data) {
     orders.value = Array.isArray(data) ? data : data.list || [];
@@ -73,7 +92,10 @@ onMounted(() => { loadOrders(); });
   <div class="order-list">
     <div class="page-header">
       <h2 class="page-title">订单管理</h2>
-      <NSelect v-model:value="statusFilter" :options="statusOptions" style="width:140px" @update:value="onFilterChange" />
+      <NSpace>
+        <NSelect v-model:value="statusFilter" :options="statusOptions" style="width:120px" @update:value="onFilterChange" />
+        <NSelect v-model:value="paymentStatusFilter" :options="paymentStatusOptions" style="width:120px" @update:value="onFilterChange" />
+      </NSpace>
     </div>
     <NDataTable :columns="columns" :data="orders" :loading="loading" :row-key="(r: any) => r.id" />
   </div>

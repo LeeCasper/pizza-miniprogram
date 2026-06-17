@@ -21,7 +21,10 @@
           <text class="order-store">🏪 {{item.store}}</text>
           <text class="order-time">{{item.time}}</text>
         </view>
-        <view class="order-status {{item.status}}"><text>{{item.statusText}}</text></view>
+        <view class="order-header-right">
+          <text class="payment-badge {{item.isPaid ? 'paid' : 'unpaid'}}">{{item.paymentStatusText}}</text>
+          <view class="order-status {{item.status}}"><text>{{item.statusText}}</text></view>
+        </view>
       </view>
       <view class="order-items">
         <view wx:for="{{item.items}}" wx:key="name" wx:for-item="prod" class="order-item">
@@ -54,6 +57,7 @@
       <view class="order-footer">
         <text class="order-total">合计 <text class="total-price">¥{{item.total}}</text></text>
         <view class="order-actions">
+          <view class="order-action-btn pay-btn" wx:if="{{!item.isPaid && item.status !== 'cancelled'}}" bindtap="onPayOrder" data-id="{{item.id}}"><text>去支付</text></view>
           <view class="order-action-btn outline" wx:if="{{item.status === 'preparing'}}" bindtap="onCancelOrder" data-id="{{item.id}}"><text>取消</text></view>
           <view class="order-action-btn primary" bindtap="onOrderDetail" data-id="{{item.id}}"><text>查看详情</text></view>
         </view>

@@ -16,7 +16,7 @@
         <view class="points-header-left">
           <text class="points-header-label">可用积分</text>
           <view class="points-header-value-row">
-            <text class="points-header-value">2,450</text>
+            <text class="points-header-value">{{userPoints}}</text>
             <text class="points-header-unit">pts</text>
           </view>
         </view>

@@ -299,6 +299,26 @@ export const generatedRoutes: GeneratedRoute[] = [
     ]
   },
   {
+    name: 'settings',
+    path: '/settings',
+    component: 'layout.base',
+    meta: {
+      title: 'settings',
+      i18nKey: 'route.settings'
+    },
+    children: [
+      {
+        name: 'settings_pay',
+        path: '/settings/pay',
+        component: 'view.settings_pay',
+        meta: {
+          title: 'settings_pay',
+          i18nKey: 'route.settings_pay'
+        }
+      }
+    ]
+  },
+  {
     name: 'users',
     path: '/users',
     component: 'layout.base',
