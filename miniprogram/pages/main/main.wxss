@@ -615,6 +615,8 @@
   flex-shrink: 0;
 }
 
+.tier-status-current .tier-status-text { color: #f3d493; }
+
 /* ── 顶部操作按钮（右对齐） ── */
 .tier-card-top { display: flex; justify-content: flex-end; }
 
