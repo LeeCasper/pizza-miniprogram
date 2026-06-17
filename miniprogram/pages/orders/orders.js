@@ -92,8 +92,15 @@ Page({
 
   onPayOrder(e) {
     const { id } = e.currentTarget.dataset;
+    // Get paidAmount for optimistic growth update
+    const order = (this.data.orders || []).find(o => o.id === id);
+    const paidAmount = order ? (order.paidAmount || 0) : 0;
     pay.payOrder(id).then((result) => {
       wx.showToast({ title: '支付成功！', icon: 'success' });
+      // Optimistic: update growth value immediately
+      if (paidAmount > 0 && app.globalData.userInfo) {
+        app.globalData.userInfo.total_spent = (app.globalData.userInfo.total_spent || 0) + paidAmount;
+      }
       this.fetchOrders();
       // If server hasn't confirmed callback yet, refresh again after delay
       if (result && result.status === 'pending') {

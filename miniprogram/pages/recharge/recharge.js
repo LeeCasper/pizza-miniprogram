@@ -115,9 +115,10 @@ Page({
   doRecharge(amount) {
     const oldBalance = parseFloat(app.globalData.userInfo.balance || 0);
 
-    // Optimistic update: show expected balance immediately
+    // Optimistic update: show expected balance immediately + growth progress
     const optimisticBalance = oldBalance + amount;
     app.globalData.userInfo.balance = optimisticBalance;
+    app.globalData.userInfo.total_spent = (app.globalData.userInfo.total_spent || 0) + amount;
     this.loadBalance();
 
     pay.rechargeBalance(amount).then((result) => {
