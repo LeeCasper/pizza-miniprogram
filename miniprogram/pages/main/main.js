@@ -320,11 +320,11 @@ Page({
         // If wechat payment, initiate payment flow
         if (pm === 'wechat' && orderData.paymentStatus === 'unpaid') {
           const orderPaidAmount = parseFloat(orderData.order.paidAmount || orderData.order.total || 0);
-          console.log('[onCheckout] orderPaidAmount=', orderPaidAmount, 'totalSpent before=', app.globalData.userInfo && app.globalData.userInfo.total_spent);
+          console.log('[onCheckout] orderPaidAmount=', orderPaidAmount, 'totalSpent before=', app.globalData.userInfo && app.globalData.userInfo.totalSpent);
           // Optimistic: update growth value immediately
           if (orderPaidAmount > 0 && app.globalData.userInfo) {
-            app.globalData.userInfo.total_spent = (app.globalData.userInfo.total_spent || 0) + orderPaidAmount;
-            console.log('[onCheckout] optimistic totalSpent=', app.globalData.userInfo.total_spent);
+            app.globalData.userInfo.totalSpent = (app.globalData.userInfo.totalSpent || 0) + orderPaidAmount;
+            console.log('[onCheckout] optimistic totalSpent=', app.globalData.userInfo.totalSpent);
             this.loadProfileData();
           }
           pay.payOrder(orderData.order.id).then(() => {
@@ -335,13 +335,13 @@ Page({
           }).catch((err) => {
             if (!err.cancelled) {
               if (orderPaidAmount > 0 && app.globalData.userInfo) {
-                app.globalData.userInfo.total_spent = Math.max(0, (app.globalData.userInfo.total_spent || 0) - orderPaidAmount);
+                app.globalData.userInfo.totalSpent = Math.max(0, (app.globalData.userInfo.totalSpent || 0) - orderPaidAmount);
               }
               this.loadProfileData();
               wx.showToast({ title: '订单已保存，请在订单中心完成支付', icon: 'none', duration: 3000 });
             } else {
               if (orderPaidAmount > 0 && app.globalData.userInfo) {
-                app.globalData.userInfo.total_spent = Math.max(0, (app.globalData.userInfo.total_spent || 0) - orderPaidAmount);
+                app.globalData.userInfo.totalSpent = Math.max(0, (app.globalData.userInfo.totalSpent || 0) - orderPaidAmount);
               }
               this.loadProfileData();
             }
@@ -408,12 +408,12 @@ Page({
     // Get paidAmount for optimistic growth update
     const order = (this.data.orders || []).find(o => o.id === id);
     const paidAmount = order ? (order.paidAmount || 0) : 0;
-    console.log('[onPayOrder] id=', id, 'paidAmount=', paidAmount, 'totalSpent before=', app.globalData.userInfo && app.globalData.userInfo.total_spent);
+    console.log('[onPayOrder] id=', id, 'paidAmount=', paidAmount, 'totalSpent before=', app.globalData.userInfo && app.globalData.userInfo.totalSpent);
 
     // Optimistic: update growth value IMMEDIATELY (before payment flow, like recharge does)
     if (paidAmount > 0 && app.globalData.userInfo) {
-      app.globalData.userInfo.total_spent = (app.globalData.userInfo.total_spent || 0) + paidAmount;
-      console.log('[onPayOrder] optimistic totalSpent=', app.globalData.userInfo.total_spent);
+      app.globalData.userInfo.totalSpent = (app.globalData.userInfo.totalSpent || 0) + paidAmount;
+      console.log('[onPayOrder] optimistic totalSpent=', app.globalData.userInfo.totalSpent);
       this.loadProfileData();
     } else {
       console.log('[onPayOrder] SKIP optimistic: paidAmount=', paidAmount, 'hasUserInfo=', !!app.globalData.userInfo);
@@ -435,14 +435,14 @@ Page({
       if (!err.cancelled) {
         // Revert optimistic update on payment failure
         if (paidAmount > 0 && app.globalData.userInfo) {
-          app.globalData.userInfo.total_spent = Math.max(0, (app.globalData.userInfo.total_spent || 0) - paidAmount);
+          app.globalData.userInfo.totalSpent = Math.max(0, (app.globalData.userInfo.totalSpent || 0) - paidAmount);
         }
         this.loadProfileData();
         wx.showToast({ title: '支付失败，请重试', icon: 'none' });
       } else {
         // User cancelled — revert optimistic update
         if (paidAmount > 0 && app.globalData.userInfo) {
-          app.globalData.userInfo.total_spent = Math.max(0, (app.globalData.userInfo.total_spent || 0) - paidAmount);
+          app.globalData.userInfo.totalSpent = Math.max(0, (app.globalData.userInfo.totalSpent || 0) - paidAmount);
         }
         this.loadProfileData();
       }
@@ -580,13 +580,13 @@ Page({
     api.get('/user/profile').then(res => {
       if (res.code === 0) {
         const serverData = res.data;
-        // Protect optimistic total_spent: never decrease with stale server data
+        // Protect optimistic totalSpent: never decrease with stale server data
         // (the server may not have processed the WeChat callback yet)
-        const currentTotalSpent = app.globalData.userInfo.total_spent || 0;
-        console.log('[loadProfileData] API returned totalSpent=', serverData.total_spent, 'currentTotalSpent=', currentTotalSpent);
-        if ((serverData.total_spent || 0) < currentTotalSpent) {
-          console.log('[loadProfileData] GUARD: server totalSpent', serverData.total_spent, '< current', currentTotalSpent, '— keeping optimistic');
-          serverData.total_spent = currentTotalSpent;
+        const currentTotalSpent = app.globalData.userInfo.totalSpent || 0;
+        console.log('[loadProfileData] API returned totalSpent=', serverData.totalSpent, 'currentTotalSpent=', currentTotalSpent);
+        if ((serverData.totalSpent || 0) < currentTotalSpent) {
+          console.log('[loadProfileData] GUARD: server totalSpent', serverData.totalSpent, '< current', currentTotalSpent, '— keeping optimistic');
+          serverData.totalSpent = currentTotalSpent;
         }
         app.globalData.userInfo = serverData;
         wx.setStorageSync('userInfo', serverData);

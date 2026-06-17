@@ -98,7 +98,7 @@ Page({
 
     // Optimistic: update growth value IMMEDIATELY (before payment flow)
     if (paidAmount > 0 && app.globalData.userInfo) {
-      app.globalData.userInfo.total_spent = (app.globalData.userInfo.total_spent || 0) + paidAmount;
+      app.globalData.userInfo.totalSpent = (app.globalData.userInfo.totalSpent || 0) + paidAmount;
     }
 
     pay.payOrder(id).then((result) => {
@@ -112,13 +112,13 @@ Page({
       if (!err.cancelled) {
         // Revert optimistic update on payment failure
         if (paidAmount > 0 && app.globalData.userInfo) {
-          app.globalData.userInfo.total_spent = Math.max(0, (app.globalData.userInfo.total_spent || 0) - paidAmount);
+          app.globalData.userInfo.totalSpent = Math.max(0, (app.globalData.userInfo.totalSpent || 0) - paidAmount);
         }
         wx.showToast({ title: '支付失败，请重试', icon: 'none' });
       } else {
         // User cancelled — revert optimistic update
         if (paidAmount > 0 && app.globalData.userInfo) {
-          app.globalData.userInfo.total_spent = Math.max(0, (app.globalData.userInfo.total_spent || 0) - paidAmount);
+          app.globalData.userInfo.totalSpent = Math.max(0, (app.globalData.userInfo.totalSpent || 0) - paidAmount);
         }
       }
     });
