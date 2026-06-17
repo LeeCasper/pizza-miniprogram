@@ -153,6 +153,7 @@ const systemConfigService = {
         appId: map.printer_app_id || '',
         appSecret: map.printer_app_secret || '',
         sn: map.printer_sn || '',
+        pkey: map.printer_pkey || '',
         apiBase: map.printer_api_base || '',
         copies: map.printer_copies || '1',
       };
@@ -171,6 +172,7 @@ const systemConfigService = {
       appId: 'printer_app_id',
       appSecret: 'printer_app_secret',
       sn: 'printer_sn',
+      pkey: 'printer_pkey',
       apiBase: 'printer_api_base',
       copies: 'printer_copies',
     };
@@ -208,6 +210,7 @@ const systemConfigService = {
       if (dbConfig.appId) config.printer.appId = dbConfig.appId;
       if (dbConfig.appSecret) config.printer.appSecret = dbConfig.appSecret;
       if (dbConfig.sn) config.printer.sn = dbConfig.sn;
+      if (dbConfig.pkey) config.printer.pkey = dbConfig.pkey;
       if (dbConfig.apiBase) config.printer.apiBase = dbConfig.apiBase;
       if (dbConfig.copies) config.printer.copies = parseInt(dbConfig.copies, 10) || 1;
     }).catch(err => {

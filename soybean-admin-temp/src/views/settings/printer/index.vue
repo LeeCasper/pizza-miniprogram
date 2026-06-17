@@ -30,11 +30,13 @@ const form = ref({
   appId: '',
   appSecret: '',
   sn: '',
-  apiBase: 'https://www.spyun.net.cn',
+  pkey: '',
+  apiBase: 'https://open.spyun.net',
   copies: 1,
 });
 
 const appSecretModified = ref(false);
+const pkeyModified = ref(false);
 
 onMounted(async () => {
   loading.value = true;
@@ -44,7 +46,8 @@ onMounted(async () => {
     form.value.appId = data.appId || '';
     form.value.appSecret = data.appSecret || '';
     form.value.sn = data.sn || '';
-    form.value.apiBase = data.apiBase || 'https://www.spyun.net.cn';
+    form.value.pkey = data.pkey || '';
+    form.value.apiBase = data.apiBase || 'https://open.spyun.net';
     form.value.copies = data.copies || 1;
   }
   loading.value = false;
@@ -52,6 +55,10 @@ onMounted(async () => {
 
 function onAppSecretInput() {
   appSecretModified.value = true;
+}
+
+function onPkeyInput() {
+  pkeyModified.value = true;
 }
 
 async function handleSave() {
@@ -68,6 +75,10 @@ async function handleSave() {
     payload.appSecret = form.value.appSecret;
   }
 
+  if (pkeyModified.value) {
+    payload.pkey = form.value.pkey;
+  }
+
   const { error } = await fetchUpdatePrinterSettings(payload);
   if (!error) {
     message.success('打印机配置已保存');
@@ -80,12 +91,12 @@ async function handleSave() {
 
 async function handleTestPrint() {
   testing.value = true;
-  const { error, data } = await fetchTestPrinter();
-  if (!error) {
+  const { data, error } = await fetchTestPrinter();
+  if (!error && data) {
     message.success('测试打印已发送，请检查打印机');
   } else {
-    // Server returns code 500 with message in response
-    message.error('测试打印失败');
+    const errMsg = (data as any)?.message || '测试打印失败';
+    message.error(errMsg);
   }
   testing.value = false;
 }
@@ -135,6 +146,16 @@ async function handleTestPrint() {
 
         <NFormItem label="打印机 SN">
           <NInput v-model:value="form.sn" placeholder="打印机底部标签上的序列号" />
+        </NFormItem>
+
+        <NFormItem label="设备 KEY">
+          <NInput
+            v-model:value="form.pkey"
+            type="password"
+            show-password-on="click"
+            placeholder="打印机底部标签上的 KEY"
+            @input="onPkeyInput"
+          />
         </NFormItem>
 
         <NFormItem label="打印份数">

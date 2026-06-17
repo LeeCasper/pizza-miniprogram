@@ -1014,9 +1014,11 @@ const adminApiController = {
           appId: cfg.appId || '',
           appSecret: cfg.appSecret ? '****' : '',
           sn: cfg.sn || '',
-          apiBase: cfg.apiBase || 'https://www.spyun.net.cn',
+          pkey: cfg.pkey ? '****' : '',
+          apiBase: cfg.apiBase || 'https://open.spyun.net',
           copies: parseInt(cfg.copies, 10) || 1,
           _hasAppSecret: !!cfg.appSecret,
+          _hasPkey: !!cfg.pkey,
         },
       });
     } catch (err) {
@@ -1036,6 +1038,7 @@ const adminApiController = {
         enabled: body.enabled !== undefined ? String(body.enabled) : undefined,
         appId: body.appId !== undefined ? body.appId : undefined,
         sn: body.sn !== undefined ? body.sn : undefined,
+        pkey: body.pkey !== undefined ? body.pkey : undefined,
         apiBase: body.apiBase !== undefined ? body.apiBase : undefined,
         copies: body.copies !== undefined ? String(body.copies) : undefined,
       };
@@ -1043,6 +1046,11 @@ const adminApiController = {
       // Masked: keep existing secret unless new one provided
       if (body.appSecret !== undefined && body.appSecret !== '****' && !body.appSecret.includes('****')) {
         entries.appSecret = body.appSecret;
+      }
+
+      // Masked: pkey
+      if (body.pkey !== undefined && body.pkey !== '****' && !body.pkey.includes('****')) {
+        entries.pkey = body.pkey;
       }
 
       // Remove undefined entries
@@ -1066,6 +1074,17 @@ const adminApiController = {
   async testPrinter(req, res, next) {
     try {
       const printerService = require('../services/printerService');
+
+      // 先添加/绑定设备
+      if (config.printer.pkey) {
+        const addResult = await printerService.addPrinter(
+          config.printer.sn,
+          config.printer.pkey,
+          '披萨店打印机'
+        );
+        console.log('[AdminAPI] 添加设备结果:', JSON.stringify(addResult));
+      }
+
       const result = await printerService.testPrint();
 
       if (result.success) {

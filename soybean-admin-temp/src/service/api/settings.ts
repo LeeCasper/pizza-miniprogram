@@ -69,9 +69,11 @@ export interface PrinterSettings {
   appId: string;
   appSecret: string;
   sn: string;
+  pkey: string;
   apiBase: string;
   copies: number;
   _hasAppSecret?: boolean;
+  _hasPkey?: boolean;
 }
 
 export interface PrinterSettingsForm {
@@ -79,6 +81,7 @@ export interface PrinterSettingsForm {
   appId?: string;
   appSecret?: string;
   sn?: string;
+  pkey?: string;
   apiBase?: string;
   copies?: number;
 }

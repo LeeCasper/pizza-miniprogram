@@ -47,7 +47,8 @@ module.exports = {
     appId: process.env.PRINTER_APPID || '',
     appSecret: process.env.PRINTER_APPSECRET || '',
     sn: process.env.PRINTER_SN || '',
-    apiBase: process.env.PRINTER_API_BASE || 'https://www.spyun.net.cn',
+    pkey: process.env.PRINTER_PKEY || '',
+    apiBase: process.env.PRINTER_API_BASE || 'https://open.spyun.net',
     copies: parseInt(process.env.PRINTER_COPIES, 10) || 1,
   },
 };
