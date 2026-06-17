@@ -26,9 +26,9 @@ export function fetchPaymentRecords(params?: {
   page?: number;
   limit?: number;
 }) {
-  return request<PaymentListResult>({ url: '/admin/payment-records', params });
+  return request<PaymentListResult>({ url: '/payment-records', params });
 }
 
 export function fetchPaymentRecord(id: number) {
-  return request<PaymentRecord>({ url: `/admin/payment-records/${id}` });
+  return request<PaymentRecord>({ url: `/payment-records/${id}` });
 }
