@@ -45,7 +45,7 @@
                 <!-- 左上角等级标识（紧贴卡片边缘） -->
                 <view class="tier-status-pill tier-status-{{item.status}}">
                   <text class="tier-status-text">{{item.status === 'current' ? '当前等级' : item.status === 'achieved' ? '已达成' : '未解锁'}}</text>
-                  <view class="tier-status-dot" wx:if="{{item.status === 'current'}}" style="background: {{item.accentColor}}"></view>
+                  <view class="tier-status-dot" wx:if="{{item.status === 'current'}}"><image class="tier-status-dot-img" src="/images/tier-badge.png" mode="aspectFit"></image></view>
                 </view>
                 <!-- 顶部行：操作按钮 -->
                 <view class="tier-card-top">
