@@ -77,12 +77,16 @@ function payOrder(orderId) {
  */
 function pollPaymentStatus(orderId, resolve, attempt) {
   attempt = attempt || 0;
-  if (attempt >= 3) {
+  if (attempt >= 5) {
     // Give up polling — caller should still refresh UI
     console.warn('[pay] Payment status poll exhausted, resolving with pending');
     resolve({ success: true, status: 'pending' });
     return;
   }
+
+  // Increasing delay: 1.5s → 2s → 3s → 4s → 5s
+  const delays = [1500, 2000, 3000, 4000, 5000];
+  const delay = delays[attempt] || 5000;
 
   setTimeout(() => {
     api.get('/pay/order/' + orderId + '/status').then(res => {
@@ -99,7 +103,7 @@ function pollPaymentStatus(orderId, resolve, attempt) {
     }).catch(() => {
       pollPaymentStatus(orderId, resolve, attempt + 1);
     });
-  }, 1500);
+  }, delay);
 }
 
 /**
@@ -166,11 +170,15 @@ function rechargeBalance(amount) {
  */
 function pollRechargeStatus(outTradeNo, resolve, attempt) {
   attempt = attempt || 0;
-  if (attempt >= 3) {
+  if (attempt >= 5) {
     console.warn('[pay] Recharge status poll exhausted, resolving with pending');
     resolve({ success: true, status: 'pending', outTradeNo });
     return;
   }
+
+  // Increasing delay: 1.5s → 2s → 3s → 4s → 5s
+  const delays = [1500, 2000, 3000, 4000, 5000];
+  const delay = delays[attempt] || 5000;
 
   setTimeout(() => {
     api.get('/pay/recharge/' + outTradeNo + '/status').then(res => {
@@ -187,7 +195,7 @@ function pollRechargeStatus(outTradeNo, resolve, attempt) {
     }).catch(() => {
       pollRechargeStatus(outTradeNo, resolve, attempt + 1);
     });
-  }, 1500);
+  }, delay);
 }
 
 module.exports = { payOrder, rechargeBalance };

@@ -49,6 +49,7 @@ def deploy_backend():
     migrations = [
         'pizza-server/db/migrate_membership.sql',
         'pizza-server/db/migrate_balance_history.sql',
+        'pizza-server/db/fix_missed_orders_0607.sql',
     ]
     for m in migrations:
         stdin, stdout, stderr = ssh.exec_command(
