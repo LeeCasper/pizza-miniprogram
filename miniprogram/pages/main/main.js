@@ -70,15 +70,16 @@ function buildTierCards(apiTiers, userTier) {
       progressPercent = 0;
       actionText = '查看权益';
     }
-    const discountText = t.discountRate < 1 ? ((1 - t.discountRate) * 100).toFixed(0) + '折' : '';
+    const discountText = t.discountRate < 1 ? (t.discountRate * 10).toFixed(1).replace(/\.0$/, '') + '折' : '';
     const bgStyle = t.bgImage ? 'background-image:url(' + t.bgImage + ');background-size:cover;background-position:center;' : '';
+    const status = isActive ? 'current' : (t.levelIndex < userTier.current.levelIndex ? 'achieved' : 'locked');
     return {
       levelKey: t.levelKey, levelIndex: t.levelIndex, name: t.name,
       accentColor: t.accentColor, bgStartColor: t.bgStartColor, bgEndColor: t.bgEndColor,
       bgImage: t.bgImage || null, bgStyle,
       discountRate: t.discountRate, pointsRewardRate: t.pointsRewardRate,
-      birthdayGift: t.birthdayGift,
-      discountText, progressPercent,
+      birthdayGift: t.birthdayGift, couponValue: t.couponValue || 0,
+      discountText, progressPercent, status,
       isActive, progressText, actionText,
     };
   });

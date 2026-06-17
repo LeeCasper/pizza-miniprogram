@@ -52,6 +52,22 @@
                     <image class="tier-card-action-arrow" src="/images/arrow-enter.png" mode="aspectFit"></image>
                   </view>
                 </view>
+                <!-- 当前等级模块 -->
+                <view class="tier-card-body">
+                  <view class="tier-status-badge tier-status-{{item.status}}">
+                    <text class="tier-status-icon" wx:if="{{item.status === 'current'}}" style="color: {{item.accentColor}}">★</text>
+                    <text class="tier-status-icon" wx:elif="{{item.status === 'achieved'}}">✓</text>
+                    <text class="tier-status-icon" wx:else>🔒</text>
+                    <text class="tier-status-label" wx:if="{{item.status === 'current'}}" style="color: {{item.accentColor}}">当前等级</text>
+                    <text class="tier-status-label" wx:elif="{{item.status === 'achieved'}}">已达成</text>
+                    <text class="tier-status-label" wx:else>未解锁</text>
+                  </view>
+                  <view class="tier-benefits" wx:if="{{item.discountText || item.pointsRewardRate > 1 || item.couponValue > 0}}">
+                    <text class="tier-benefit-tag" wx:if="{{item.discountText}}">{{item.discountText}}</text>
+                    <text class="tier-benefit-tag" wx:if="{{item.pointsRewardRate > 1}}">{{item.pointsRewardRate}}x积分</text>
+                    <text class="tier-benefit-tag" wx:if="{{item.couponValue > 0}}">升级送¥{{item.couponValue}}券</text>
+                  </view>
+                </view>
                 <view class="tier-card-footer">
                   <view>
                     <text class="tier-card-progress-text" style="color: rgba(255,255,255,0.8)">{{item.progressText}}</text>

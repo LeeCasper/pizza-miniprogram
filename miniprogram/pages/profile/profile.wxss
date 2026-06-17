@@ -203,8 +203,20 @@
   transition: width 0.6s ease;
 }
 
-.tier-benefits { display: flex; gap: 8rpx; flex-wrap: wrap; margin-top: 6rpx; }
-.tier-benefit-tag { font-size: 20rpx; padding: 2rpx 10rpx; border-radius: 6rpx; background: rgba(255,255,255,0.08); opacity: 0.85; }
+/* ── 当前等级模块 ── */
+.tier-card-body { display: flex; flex-direction: column; gap: 10rpx; }
+.tier-status-badge { display: flex; align-items: center; gap: 6rpx; }
+.tier-status-icon { font-size: 26rpx; color: rgba(255,255,255,0.9); }
+.tier-status-label { font-size: 24rpx; font-weight: 700; color: rgba(255,255,255,0.9); letter-spacing: 1rpx; }
+.tier-status-current .tier-status-icon,
+.tier-status-current .tier-status-label { text-shadow: 0 0 16rpx currentColor; }
+.tier-status-achieved .tier-status-icon { color: rgba(255,255,255,0.65); }
+.tier-status-achieved .tier-status-label { color: rgba(255,255,255,0.65); }
+.tier-status-locked .tier-status-icon { font-size: 22rpx; }
+.tier-status-locked .tier-status-label { color: rgba(255,255,255,0.5); }
+
+.tier-benefits { display: flex; gap: 8rpx; flex-wrap: wrap; }
+.tier-benefit-tag { font-size: 20rpx; padding: 4rpx 14rpx; border-radius: 8rpx; background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.85); line-height: 1.4; }
 .tier-card-action { display: flex; align-items: center; gap: 4rpx; flex-shrink: 0; }
 .tier-card-action-text { font-size: 22rpx; font-weight: 600; }
 .tier-card-action-arrow { width: 28rpx; height: 28rpx; }
