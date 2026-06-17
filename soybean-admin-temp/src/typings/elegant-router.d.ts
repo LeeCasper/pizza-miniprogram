@@ -40,6 +40,8 @@ declare module "@elegant-router/types" {
     "orders": "/orders";
     "orders_detail": "/orders/detail";
     "orders_list": "/orders/list";
+    "payments": "/payments";
+    "payments_list": "/payments/list";
     "points": "/points";
     "points_form": "/points/form";
     "points_list": "/points/list";
@@ -93,6 +95,7 @@ declare module "@elegant-router/types" {
     | "login"
     | "membertiers"
     | "orders"
+    | "payments"
     | "points"
     | "products"
     | "settings"
@@ -130,6 +133,7 @@ declare module "@elegant-router/types" {
     | "membertiers_list"
     | "orders_detail"
     | "orders_list"
+    | "payments_list"
     | "points_form"
     | "points_list"
     | "products_form"

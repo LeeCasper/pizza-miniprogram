@@ -144,6 +144,12 @@ const orderService = {
     const [pendingPayments] = await pool.query(
       "SELECT COUNT(*) AS count FROM orders WHERE payment_method IS NULL AND status != 'cancelled'"
     );
+    const [rechargeRevenue] = await pool.query(
+      "SELECT COALESCE(SUM(amount), 0) AS total FROM payment_records WHERE type = 'recharge' AND status = 'success' AND DATE(updated_at) = CURDATE()"
+    );
+    const [rechargeCount] = await pool.query(
+      "SELECT COUNT(*) AS count FROM payment_records WHERE type = 'recharge' AND status = 'success' AND DATE(updated_at) = CURDATE()"
+    );
     return {
       todayOrders: todayOrders[0].count,
       totalUsers: totalUsers[0].count,
@@ -151,6 +157,8 @@ const orderService = {
       todayRevenue: parseFloat(todayRevenue[0].total),
       todayOrdersPaid: todayOrdersPaid[0].count,
       pendingPayments: pendingPayments[0].count,
+      rechargeRevenue: parseFloat(rechargeRevenue[0].total),
+      rechargeCount: rechargeCount[0].count,
     };
   },
 };

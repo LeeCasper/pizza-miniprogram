@@ -80,33 +80,46 @@ const paymentController = {
    * Uses express.raw() — the body is a Buffer.
    */
   async notify(req, res, next) {
+    const startTime = Date.now();
     try {
       // req.body is a Buffer when using express.raw({type: 'application/json'})
       const rawBody = Buffer.isBuffer(req.body) ? req.body.toString('utf8') : req.body;
+      const bodyLen = rawBody.length;
 
-      console.log('[Payment] Received notify callback');
+      console.log(`[Payment] === Notify callback received (${bodyLen}B) ===`);
 
       // Verify WeChat Pay signature before processing
+      const signHeaders = {
+        serial: req.headers['wechatpay-serial'] || 'MISSING',
+        timestamp: req.headers['wechatpay-timestamp'] || 'MISSING',
+        nonce: req.headers['wechatpay-nonce'] || 'MISSING',
+      };
+      console.log(`[Payment] Notify headers: serial=${signHeaders.serial}, ts=${signHeaders.timestamp}`);
+
       if (!verifyNotifySign(req.headers, rawBody)) {
-        console.error('[Payment] Notify signature verification FAILED');
+        const elapsed = Date.now() - startTime;
+        console.error(`[Payment] Notify SIGNATURE FAILED (${elapsed}ms) — headers: serial=${signHeaders.serial}, ts=${signHeaders.timestamp}, nonce=${signHeaders.nonce ? 'present' : 'MISSING'}`);
         // Still return 200 to prevent WeChat Pay retry storms
         return res.status(200).json({ code: 'FAIL', message: 'Signature verification failed' });
       }
-      console.log('[Payment] Notify signature verification PASSED');
+      console.log(`[Payment] Notify signature VERIFIED (${Date.now() - startTime}ms)`);
 
       const result = await paymentService.handleNotify(rawBody);
 
+      const totalElapsed = Date.now() - startTime;
       // Always return 200 to WeChat Pay (even on error) to prevent retry
       if (result.success) {
+        console.log(`[Payment] Notify SUCCESS (${totalElapsed}ms): ${result.detail || ''}`);
         res.status(200).json({ code: 'SUCCESS', message: 'OK' });
       } else {
         // Still 200 — WeChat requires HTTP 200, but we signal failure
         // in the response body so we can debug
-        console.error('[Payment] Notify failed:', result.reason);
+        console.error(`[Payment] Notify FAILED (${totalElapsed}ms): reason=${result.reason}`);
         res.status(200).json({ code: 'SUCCESS', message: 'OK' });
       }
     } catch (err) {
-      console.error('[Payment] Notify exception:', err.message);
+      const elapsed = Date.now() - startTime;
+      console.error(`[Payment] Notify EXCEPTION (${elapsed}ms):`, err.message, err.stack);
       // MUST return 200 to WeChat Pay regardless
       res.status(200).json({ code: 'SUCCESS', message: 'OK' });
     }

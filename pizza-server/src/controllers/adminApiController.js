@@ -10,6 +10,7 @@ const bannerService = require('../services/bannerService');
 const couponTemplateService = require('../services/couponTemplateService');
 const memberTierService = require('../services/memberTierService');
 const { invalidateCache } = require('../utils/memberTier');
+const paymentService = require('../services/paymentService');
 const systemConfigService = require('../services/systemConfigService');
 
 const adminApiController = {
@@ -886,6 +887,44 @@ const adminApiController = {
     } catch (err) {
       console.error('[AdminAPI] AssignCoupon error:', err);
       return res.status(500).json({ code: 500, message: err.message || '发放优惠券失败' });
+    }
+  },
+
+  // ── Payment Records ──────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/payment-records
+   * Query: ?type=order|recharge&status=pending|success|failed|closed&page=1&limit=20
+   */
+  async listPaymentRecords(req, res) {
+    try {
+      const { type, status, page = 1, limit = 20 } = req.query;
+      const result = await paymentService.adminList({
+        type,
+        status,
+        page: parseInt(page),
+        limit: parseInt(limit),
+      });
+      return res.json({ code: 0, data: result });
+    } catch (err) {
+      console.error('[AdminAPI] ListPaymentRecords error:', err);
+      return res.status(500).json({ code: 500, message: '获取交易记录失败' });
+    }
+  },
+
+  /**
+   * GET /api/v1/admin/payment-records/:id
+   */
+  async getPaymentRecord(req, res) {
+    try {
+      const record = await paymentService.adminGetById(req.params.id);
+      if (!record) {
+        return res.status(404).json({ code: 404, message: '交易记录不存在' });
+      }
+      return res.json({ code: 0, data: record });
+    } catch (err) {
+      console.error('[AdminAPI] GetPaymentRecord error:', err);
+      return res.status(500).json({ code: 500, message: '获取交易记录失败' });
     }
   },
 

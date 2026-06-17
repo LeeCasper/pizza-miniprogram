@@ -244,6 +244,8 @@ const local: App.I18n.Schema = {
     orders: 'Orders',
     orders_list: 'Order List',
     orders_detail: 'Order Detail',
+    payments: 'Transactions',
+    payments_list: 'Transactions',
     couponTemplates: 'Coupon Templates',
     couponTemplates_list: 'Template List',
     couponTemplates_create: 'Add Template',

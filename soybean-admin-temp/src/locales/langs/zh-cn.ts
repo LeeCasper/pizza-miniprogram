@@ -240,6 +240,8 @@ const local: App.I18n.Schema = {
     orders: '订单管理',
     orders_list: '订单列表',
     orders_detail: '订单详情',
+    payments: '交易记录',
+    payments_list: '交易记录',
     couponTemplates: '优惠券模板',
     couponTemplates_list: '模板列表',
     couponTemplates_create: '新建模板',

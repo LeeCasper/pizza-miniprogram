@@ -207,29 +207,39 @@ const paymentService = {
 
     // Idempotency: already processed
     if (record.status === 'success') {
-      console.log(`[Payment] Already processed: ${outTradeNo}`);
-      return { success: true };
+      console.log(`[Payment] Already processed: ${outTradeNo}, type=${record.type}`);
+      return { success: true, detail: `already_processed type=${record.type}` };
     }
 
     // Only process SUCCESS state
     if (tradeState !== 'SUCCESS') {
+      const newStatus = tradeState === 'CLOSED' ? 'closed' : 'failed';
       await pool.query(
         "UPDATE payment_records SET status = ?, transaction_id = ?, raw_notify = ?, updated_at = NOW() WHERE id = ?",
-        [tradeState === 'CLOSED' ? 'closed' : 'failed', transactionId, JSON.stringify(notifyData), record.id]
+        [newStatus, transactionId, JSON.stringify(notifyData), record.id]
       );
-      return { success: true, reason: `trade_state_${tradeState}` };
+      console.log(`[Payment] Non-success state: ${outTradeNo} → ${newStatus}`);
+      return { success: true, reason: `trade_state_${tradeState}`, detail: `state=${tradeState} type=${record.type}` };
     }
 
     // Begin transaction for atomic update
     const conn = await pool.getConnection();
+    const txStart = Date.now();
+    let detail = '';
     try {
       await conn.beginTransaction();
 
       // Update payment record
-      await conn.query(
+      const [prResult] = await conn.query(
         "UPDATE payment_records SET status = 'success', transaction_id = ?, raw_notify = ?, updated_at = NOW() WHERE id = ? AND status = 'pending'",
         [transactionId, JSON.stringify(notifyData), record.id]
       );
+      if (prResult.affectedRows === 0) {
+        // Another concurrent handler already processed this — idempotent exit
+        await conn.rollback();
+        console.log(`[Payment] Race: already processed by concurrent handler: ${outTradeNo}`);
+        return { success: true, detail: `concurrent_skip type=${record.type}` };
+      }
 
       if (record.type === 'order') {
         // Update order: set payment_method and paid_at
@@ -237,6 +247,8 @@ const paymentService = {
           "UPDATE orders SET payment_method = 'wechat', transaction_id = ?, paid_at = NOW(), updated_at = NOW() WHERE id = ? AND payment_method IS NULL",
           [transactionId, record.reference_id]
         );
+
+        detail = `order=${record.reference_id} orderUpdated=${orderResult.affectedRows}`;
 
         // Award points + increment total_spent + update membership tier
         // Only if the order was actually updated (not already paid via another path)
@@ -269,29 +281,35 @@ const paymentService = {
               [record.user_id, earnedPoints, newPoints, '订单消费', record.reference_id]
             );
 
-            console.log(`[Payment] Awarded ${earnedPoints} points to user ${record.user_id}, tier=${newTier}`);
+            detail += ` points=${earnedPoints} tier=${newTier} totalSpent=${newTotalSpent.toFixed(2)}`;
+            console.log(`[Payment] Order processed: user=${record.user_id} points+${earnedPoints} tier=${newTier}`);
           }
+        } else {
+          detail += ' orderAlreadyPaid';
         }
       } else if (record.type === 'recharge') {
         // Add balance to user
         const amount = parseFloat(record.amount);
         const [[user]] = await conn.query('SELECT balance FROM users WHERE id = ?', [record.user_id]);
         if (user) {
-          const balanceAfter = parseFloat(user.balance) + amount;
+          const oldBalance = parseFloat(user.balance);
+          const balanceAfter = oldBalance + amount;
           await conn.query('UPDATE users SET balance = ? WHERE id = ?', [balanceAfter, record.user_id]);
           await conn.query(
             'INSERT INTO balance_history (user_id, amount, balance_after, type, remark) VALUES (?, ?, ?, ?, ?)',
             [record.user_id, amount, balanceAfter, 'recharge', '微信支付充值']
           );
+          detail = `recharge user=${record.user_id} amount=${amount} balance=${oldBalance}→${balanceAfter}`;
         }
       }
 
       await conn.commit();
-      console.log(`[Payment] Processed: ${outTradeNo}, type=${record.type}`);
-      return { success: true };
+      const txElapsed = Date.now() - txStart;
+      console.log(`[Payment] Processed (${txElapsed}ms): ${outTradeNo}, type=${record.type} — ${detail}`);
+      return { success: true, detail };
     } catch (err) {
       await conn.rollback();
-      console.error('[Payment] Notify processing error:', err.message);
+      console.error(`[Payment] Notify TX error (${Date.now() - txStart}ms): ${outTradeNo} —`, err.message);
       throw err;
     } finally {
       conn.release();
@@ -343,7 +361,63 @@ const paymentService = {
     };
   },
 
-  // ── 6. Balance payment for order ───────────────────────────────────
+  // ── 6. Admin: list payment records ─────────────────────────────────
+
+  /**
+   * Admin query: list all payment records with user info.
+   *
+   * @param {object} opts - { type, status, page, limit }
+   * @returns {object} { list, total }
+   */
+  async adminList({ type, status, page = 1, limit = 20 } = {}) {
+    let sql = `SELECT pr.*, u.name AS user_name, u.phone AS user_phone
+               FROM payment_records pr
+               JOIN users u ON pr.user_id = u.id`;
+    const conditions = [];
+    const params = [];
+
+    if (type && type !== 'all') {
+      conditions.push('pr.type = ?');
+      params.push(type);
+    }
+    if (status && status !== 'all') {
+      conditions.push('pr.status = ?');
+      params.push(status);
+    }
+    if (conditions.length > 0) {
+      sql += ' WHERE ' + conditions.join(' AND ');
+    }
+    sql += ' ORDER BY pr.created_at DESC';
+
+    // Count total
+    const countSql = sql.replace(/SELECT .* FROM/, 'SELECT COUNT(*) AS total FROM');
+    const [[{ total }]] = await pool.query(countSql, params);
+
+    // Paginate
+    const offset = (page - 1) * limit;
+    const [rows] = await pool.query(sql + ' LIMIT ? OFFSET ?', [...params, limit, offset]);
+
+    return {
+      list: rows.map(formatPaymentRecord),
+      total,
+    };
+  },
+
+  /**
+   * Admin query: get single payment record by ID.
+   */
+  async adminGetById(id) {
+    const [[row]] = await pool.query(
+      `SELECT pr.*, u.name AS user_name, u.phone AS user_phone
+       FROM payment_records pr
+       JOIN users u ON pr.user_id = u.id
+       WHERE pr.id = ?`,
+      [id]
+    );
+    return row ? formatPaymentRecord(row) : null;
+  },
+
+  // ── 7. Balance payment for order ───────────────────────────────────
 
   /**
    * Pay an order using account balance (no WeChat Pay involved).
@@ -430,5 +504,23 @@ const paymentService = {
     }
   },
 };
+
+function formatPaymentRecord(row) {
+  return row ? {
+    id: row.id,
+    userId: row.user_id,
+    userName: row.user_name || null,
+    userPhone: row.user_phone || null,
+    type: row.type,
+    referenceId: row.reference_id,
+    outTradeNo: row.out_trade_no,
+    transactionId: row.transaction_id || null,
+    amount: parseFloat(row.amount),
+    status: row.status,
+    rawNotify: row.raw_notify || null,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  } : null;
+}
 
 module.exports = paymentService;

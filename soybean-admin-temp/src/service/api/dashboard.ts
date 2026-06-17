@@ -7,6 +7,8 @@ export interface DashboardStats {
   todayRevenue: number;
   todayOrdersPaid: number;
   pendingPayments: number;
+  rechargeRevenue: number;
+  rechargeCount: number;
 }
 
 export function fetchDashboardStats() {

@@ -81,4 +81,8 @@ router.delete('/files/:filename', uploadCtrl.deleteFile);
 router.get('/settings/pay', ctrl.getPaySettings);
 router.put('/settings/pay', ctrl.updatePaySettings);
 
+// Payment records (transaction history)
+router.get('/payment-records', ctrl.listPaymentRecords);
+router.get('/payment-records/:id', ctrl.getPaymentRecord);
+
 module.exports = router;

@@ -10,4 +10,5 @@ export * from './upload';
 export * from './banner';
 export * from './couponTemplate';
 export * from './memberTier';
+export * from './payment';
 export * from './settings';

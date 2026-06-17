@@ -15,8 +15,12 @@ const { api } = require('./api');
 /**
  * Pay for an order via WeChat Pay.
  *
+ * After wx.requestPayment succeeds, polls the server to confirm the
+ * payment callback has been processed. This fixes the race condition
+ * where the client resolves before the WeChat callback arrives.
+ *
  * @param {string} orderId
- * @returns {Promise<{ success: boolean, transactionId?: string }>}
+ * @returns {Promise<{ success: boolean, status?: string }>}
  */
 function payOrder(orderId) {
   return new Promise((resolve, reject) => {
@@ -41,7 +45,8 @@ function payOrder(orderId) {
           paySign: payParams.paySign,
           success: () => {
             wx.showToast({ title: '支付成功', icon: 'success' });
-            resolve({ success: true });
+            // Poll server to confirm callback has been processed
+            pollPaymentStatus(orderId, resolve);
           },
           fail: (wxErr) => {
             if (wxErr.errMsg && wxErr.errMsg.indexOf('cancel') !== -1) {
@@ -60,6 +65,41 @@ function payOrder(orderId) {
         reject(err);
       });
   });
+}
+
+/**
+ * Poll the server for payment status after wx.requestPayment succeeds.
+ * The server endpoint queries WeChat Pay directly to sync state.
+ *
+ * @param {string} orderId
+ * @param {Function} resolve
+ * @param {number} attempt
+ */
+function pollPaymentStatus(orderId, resolve, attempt) {
+  attempt = attempt || 0;
+  if (attempt >= 3) {
+    // Give up polling — caller should still refresh UI
+    console.warn('[pay] Payment status poll exhausted, resolving with pending');
+    resolve({ success: true, status: 'pending' });
+    return;
+  }
+
+  setTimeout(() => {
+    api.get('/pay/order/' + orderId + '/status').then(res => {
+      if (res.code === 0 && res.data) {
+        if (res.data.status === 'success' || res.data.paymentMethod) {
+          console.log('[pay] Payment confirmed by server');
+          resolve({ success: true, status: 'success' });
+        } else {
+          pollPaymentStatus(orderId, resolve, attempt + 1);
+        }
+      } else {
+        pollPaymentStatus(orderId, resolve, attempt + 1);
+      }
+    }).catch(() => {
+      pollPaymentStatus(orderId, resolve, attempt + 1);
+    });
+  }, 1500);
 }
 
 /**

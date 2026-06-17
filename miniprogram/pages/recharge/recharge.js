@@ -96,30 +96,72 @@ Page({
   },
 
   doRecharge(amount) {
+    const oldBalance = parseFloat(app.globalData.userInfo.balance || 0);
+
+    // Optimistic update: show expected balance immediately
+    const optimisticBalance = oldBalance + amount;
+    app.globalData.userInfo.balance = optimisticBalance;
+    this.loadBalance();
+
     pay.rechargeBalance(amount).then(() => {
-      // Refresh balance from server (payment callback may have already updated it)
+      // Delay 1.5s to give WeChat callback time to arrive, then fetch latest profile
+      this._refreshBalanceAfterRecharge(oldBalance, amount, 0);
+    }).catch((err) => {
+      if (!err.cancelled) {
+        // Restore old balance on failure
+        app.globalData.userInfo.balance = oldBalance;
+        this.loadBalance();
+        wx.showToast({ title: '充值失败，请重试', icon: 'none' });
+      } else {
+        // User cancelled — restore old balance
+        app.globalData.userInfo.balance = oldBalance;
+        this.loadBalance();
+      }
+    });
+  },
+
+  /**
+   * Refresh balance from server after recharge, with retry.
+   * The WeChat callback may take a few seconds to arrive, so we
+   * retry if balance hasn't changed from the old value.
+   *
+   * @param {number} oldBalance - balance before recharge
+   * @param {number} amount - recharge amount
+   * @param {number} attempt - current retry count
+   */
+  _refreshBalanceAfterRecharge(oldBalance, amount, attempt) {
+    const delay = attempt === 0 ? 1500 : 2000;
+
+    setTimeout(() => {
       api.get('/user/profile').then(res => {
-        if (res.code === 0) {
+        if (res.code === 0 && res.data) {
+          const newBalance = parseFloat(res.data.balance || 0);
           app.globalData.userInfo = res.data;
           wx.setStorageSync('userInfo', res.data);
           this.loadBalance();
-        } else {
-          // Fallback: update locally
-          app.globalData.userInfo.balance = (app.globalData.userInfo.balance || 0) + amount;
-          wx.setStorageSync('userInfo', app.globalData.userInfo);
-          this.loadBalance();
+
+          // If balance still hasn't changed and we have retries left, try again
+          if (newBalance <= oldBalance && attempt < 2) {
+            console.log('[recharge] Balance not yet updated, retrying...', attempt + 1);
+            this._refreshBalanceAfterRecharge(oldBalance, amount, attempt + 1);
+          } else if (newBalance <= oldBalance) {
+            // All retries exhausted — keep optimistic update as fallback
+            console.warn('[recharge] Balance sync failed after retries, using optimistic value');
+            app.globalData.userInfo.balance = oldBalance + amount;
+            wx.setStorageSync('userInfo', app.globalData.userInfo);
+            this.loadBalance();
+          }
+        } else if (attempt < 2) {
+          this._refreshBalanceAfterRecharge(oldBalance, amount, attempt + 1);
         }
+        // If all retries exhausted and API failed, optimistic value remains
       }).catch(() => {
-        // If network fails, update locally
-        app.globalData.userInfo.balance = (app.globalData.userInfo.balance || 0) + amount;
-        wx.setStorageSync('userInfo', app.globalData.userInfo);
-        this.loadBalance();
+        if (attempt < 2) {
+          this._refreshBalanceAfterRecharge(oldBalance, amount, attempt + 1);
+        }
+        // On final failure, optimistic value remains
       });
-    }).catch((err) => {
-      if (!err.cancelled) {
-        wx.showToast({ title: '充值失败，请重试', icon: 'none' });
-      }
-    });
+    }, delay);
   },
 
   onBack() {

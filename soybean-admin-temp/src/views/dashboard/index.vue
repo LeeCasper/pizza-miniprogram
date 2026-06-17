@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { NCard, NGrid, NGridItem, NStatistic, NIcon, NSkeleton } from 'naive-ui';
-import { ShoppingCartOutlined, UserOutlined, IdcardOutlined, DollarOutlined, CheckCircleOutlined, ExclamationCircleOutlined } from '@vicons/antd';
+import { ShoppingCartOutlined, UserOutlined, IdcardOutlined, DollarOutlined, CheckCircleOutlined, ExclamationCircleOutlined, MoneyCollectOutlined, ArrowUpOutlined } from '@vicons/antd';
 import { fetchDashboardStats } from '@/service/api';
 
 defineOptions({ name: 'Dashboard' });
@@ -13,9 +13,11 @@ interface Stats {
   todayRevenue: number;
   todayOrdersPaid: number;
   pendingPayments: number;
+  rechargeRevenue: number;
+  rechargeCount: number;
 }
 
-const stats = ref<Stats>({ todayOrders: 0, totalUsers: 0, activeCoupons: 0, todayRevenue: 0, todayOrdersPaid: 0, pendingPayments: 0 });
+const stats = ref<Stats>({ todayOrders: 0, totalUsers: 0, activeCoupons: 0, todayRevenue: 0, todayOrdersPaid: 0, pendingPayments: 0, rechargeRevenue: 0, rechargeCount: 0 });
 const loading = ref(true);
 
 const cards = [
@@ -25,6 +27,8 @@ const cards = [
   { label: '活跃优惠券', key: 'activeCoupons' as const, icon: IdcardOutlined, color: '#388E3C' },
   { label: '已支付订单', key: 'todayOrdersPaid' as const, icon: CheckCircleOutlined, color: '#7B1FA2' },
   { label: '待支付订单', key: 'pendingPayments' as const, icon: ExclamationCircleOutlined, color: '#E65100' },
+  { label: '今日充值收入', key: 'rechargeRevenue' as const, icon: MoneyCollectOutlined, color: '#00897B', prefix: '¥' },
+  { label: '今日充值笔数', key: 'rechargeCount' as const, icon: ArrowUpOutlined, color: '#5C6BC0' },
 ];
 
 onMounted(async () => {

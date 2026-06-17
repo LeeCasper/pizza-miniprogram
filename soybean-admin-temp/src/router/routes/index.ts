@@ -164,6 +164,17 @@ const customRoutes: CustomRoute[] = [
     ],
   },
   {
+    name: 'payments',
+    path: '/payments',
+    component: 'layout.base$view.payments_list',
+    meta: {
+      title: '交易记录',
+      i18nKey: 'route.payments',
+      icon: 'mdi:cash-register',
+      order: 3.5,
+    },
+  },
+  {
     name: 'coupons',
     path: '/coupons',
     component: 'layout.base',

@@ -386,10 +386,17 @@ Page({
   onPayOrder(e) {
     const { id } = e.currentTarget.dataset;
     const pay = require('../../utils/pay');
-    pay.payOrder(id).then(() => {
+    pay.payOrder(id).then((result) => {
       wx.showToast({ title: '支付成功！', icon: 'success' });
       this.fetchOrders();
       this.loadProfileData();
+      // If server hasn't confirmed callback yet, refresh again after delay
+      if (result && result.status === 'pending') {
+        setTimeout(() => {
+          this.fetchOrders();
+          this.loadProfileData();
+        }, 3000);
+      }
     }).catch((err) => {
       if (!err.cancelled) {
         wx.showToast({ title: '支付失败，请重试', icon: 'none' });
