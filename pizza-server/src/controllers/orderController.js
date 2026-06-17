@@ -209,7 +209,8 @@ const orderController = {
         const multiplier = parseFloat(currentTier.pointsRewardRate || 1);
         earnedPoints = Math.floor(paidAmount * multiplier);
 
-        newTotalSpent = oldTotalSpent + paidAmount;
+        // Balance payment does NOT count toward growth progress (total_spent)
+        newTotalSpent = oldTotalSpent;
         newPoints = oldPointsVal + earnedPoints;
         const newTier = await getTierLevel(newTotalSpent);
 

@@ -288,13 +288,21 @@ const paymentService = {
           detail += ' orderAlreadyPaid';
         }
       } else if (record.type === 'recharge') {
-        // Add balance to user
+        // Add balance to user + update growth progress (total_spent)
         const amount = parseFloat(record.amount);
-        const [[user]] = await conn.query('SELECT balance FROM users WHERE id = ?', [record.user_id]);
+        const [[user]] = await conn.query(
+          'SELECT balance, total_spent FROM users WHERE id = ?', [record.user_id]
+        );
         if (user) {
           const oldBalance = parseFloat(user.balance);
           const balanceAfter = oldBalance + amount;
           await conn.query('UPDATE users SET balance = ? WHERE id = ?', [balanceAfter, record.user_id]);
+          // Recharge amount counts toward growth progress
+          const oldTotalSpent = parseFloat(user.total_spent || 0);
+          const newTotalSpent = oldTotalSpent + amount;
+          const newTier = await getTierLevel(newTotalSpent);
+          await conn.query('UPDATE users SET total_spent = ?, member_level = ? WHERE id = ?',
+            [newTotalSpent.toFixed(2), newTier, record.user_id]);
           try {
             await conn.query(
               'INSERT INTO balance_history (user_id, amount, balance_after, type, remark) VALUES (?, ?, ?, ?, ?)',
@@ -303,7 +311,7 @@ const paymentService = {
           } catch (histErr) {
             console.warn(`[Payment] balance_history insert skipped (notify): ${histErr.message}`);
           }
-          detail = `recharge user=${record.user_id} amount=${amount} balance=${oldBalance}→${balanceAfter}`;
+          detail = `recharge user=${record.user_id} amount=${amount} balance=${oldBalance}→${balanceAfter} totalSpent=${oldTotalSpent}→${newTotalSpent.toFixed(2)} tier=${newTier}`;
         }
       }
 
@@ -442,14 +450,22 @@ const paymentService = {
         return { synced: false, detail: 'concurrent_skip' };
       }
 
-      // Add balance to user
+      // Add balance to user + update growth progress (total_spent)
       const amount = parseFloat(record.amount);
-      const [[user]] = await conn.query('SELECT balance FROM users WHERE id = ?', [record.user_id]);
+      const [[user]] = await conn.query(
+        'SELECT balance, total_spent FROM users WHERE id = ?', [record.user_id]
+      );
       let detail = '';
       if (user) {
         const oldBalance = parseFloat(user.balance);
         const balanceAfter = oldBalance + amount;
         await conn.query('UPDATE users SET balance = ? WHERE id = ?', [balanceAfter, record.user_id]);
+        // Recharge amount counts toward growth progress
+        const oldTotalSpent = parseFloat(user.total_spent || 0);
+        const newTotalSpent = oldTotalSpent + amount;
+        const newTier = await getTierLevel(newTotalSpent);
+        await conn.query('UPDATE users SET total_spent = ?, member_level = ? WHERE id = ?',
+          [newTotalSpent.toFixed(2), newTier, record.user_id]);
         // balance_history insert is best-effort — won't rollback if table missing
         try {
           await conn.query(
@@ -459,7 +475,7 @@ const paymentService = {
         } catch (histErr) {
           console.warn(`[Payment] balance_history insert skipped: ${histErr.message}`);
         }
-        detail = `recharge user=${record.user_id} amount=${amount} balance=${oldBalance}→${balanceAfter}`;
+        detail = `recharge user=${record.user_id} amount=${amount} balance=${oldBalance}→${balanceAfter} totalSpent=${oldTotalSpent}→${newTotalSpent.toFixed(2)} tier=${newTier}`;
       }
 
       await conn.commit();
