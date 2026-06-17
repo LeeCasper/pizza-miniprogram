@@ -78,16 +78,20 @@ function apiRequest(method, path, body) {
       let data = '';
       res.on('data', (chunk) => { data += chunk; });
       res.on('end', () => {
+        console.log(`[Printer] API ${method} ${path} → HTTP ${res.statusCode}, body: ${data.slice(0, 500)}`);
         try {
           const parsed = JSON.parse(data);
           resolve(parsed);
         } catch (_) {
-          resolve({ raw: data });
+          resolve({ raw: data, httpStatus: res.statusCode });
         }
       });
     });
 
-    req.on('error', (err) => reject(err));
+    req.on('error', (err) => {
+      console.error(`[Printer] API ${method} ${path} → error:`, err.message);
+      reject(err);
+    });
     req.on('timeout', () => {
       req.destroy();
       reject(new Error('Printer API request timeout'));
@@ -298,16 +302,21 @@ const printerService = {
         printData.token = token;
       }
 
+      console.log(`[Printer] 测试打印请求: ${config.printer.apiBase}/v1/print, sn=${config.printer.sn}`);
       const result = await apiRequest('POST', '/v1/print', printData);
+      console.log(`[Printer] 测试打印响应:`, JSON.stringify(result));
 
       if (result.code === 0) {
         return { success: true, message: '测试打印已发送' };
       } else if (result.code === 202) {
         return { success: true, message: '打印机离线，已加入打印队列' };
       } else {
-        return { success: false, message: result.message || '打印失败' };
+        const msg = result.message || result.msg || '打印失败';
+        console.error(`[Printer] 测试打印失败: code=${result.code}, message=${msg}, full=${JSON.stringify(result)}`);
+        return { success: false, message: msg + ` (code: ${result.code})` };
       }
     } catch (err) {
+      console.error(`[Printer] 测试打印异常:`, err.message);
       return { success: false, message: err.message };
     }
   },
