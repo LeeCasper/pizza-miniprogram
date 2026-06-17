@@ -134,7 +134,6 @@ const systemConfigService = {
       console.error('[Config] Failed to sync pay config from DB:', err.message);
     }
   },
-};
 
   // ── Printer Config ──────────────────────────────────
 
