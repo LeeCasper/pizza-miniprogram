@@ -107,11 +107,11 @@
         <view class="cart-footer" wx:if="{{cartItems.length > 0}}">
           <view class="pay-method-row">
             <view class="pay-method-item {{paymentMethod === 'wechat' ? 'active' : ''}}" bindtap="onSwitchPaymentMethod" data-method="wechat">
-              <text class="pay-method-icon">💳</text>
+              <image class="pay-method-icon" src="/images/wechat-pay.png" mode="aspectFit"></image>
               <text class="pay-method-label">微信支付</text>
             </view>
             <view class="pay-method-item {{paymentMethod === 'balance' ? 'active' : ''}}" bindtap="onSwitchPaymentMethod" data-method="balance">
-              <text class="pay-method-icon">💰</text>
+              <image class="pay-method-icon" src="/images/balance-pay.png" mode="aspectFit"></image>
               <text class="pay-method-label">余额支付</text>
             </view>
           </view>
