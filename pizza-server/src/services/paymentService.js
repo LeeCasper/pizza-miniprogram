@@ -376,12 +376,26 @@ const paymentService = {
     );
     if (!record) return null;
 
+    // Also check balance_history as secondary confirmation.
+    // If the WeChat callback arrived and processed the recharge,
+    // balance_history will have a row even if payment_records
+    // is delayed (rare race condition).
+    let balanceUpdated = false;
+    if (record.status !== 'success') {
+      const [[bh]] = await pool.query(
+        "SELECT id FROM balance_history WHERE user_id = ? AND type = 'recharge' AND amount = ? ORDER BY id DESC LIMIT 1",
+        [record.user_id, parseFloat(record.amount)]
+      );
+      balanceUpdated = !!bh;
+    }
+
     return {
       status: record.status,
       outTradeNo: record.out_trade_no,
       transactionId: record.transaction_id,
       amount: parseFloat(record.amount),
       userId: record.user_id,
+      balanceUpdated,
     };
   },
 

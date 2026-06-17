@@ -175,7 +175,7 @@ function pollRechargeStatus(outTradeNo, resolve, attempt) {
   setTimeout(() => {
     api.get('/pay/recharge/' + outTradeNo + '/status').then(res => {
       if (res.code === 0 && res.data) {
-        if (res.data.status === 'success') {
+        if (res.data.status === 'success' || res.data.transactionId || res.data.balanceUpdated) {
           console.log('[pay] Recharge confirmed by server');
           resolve({ success: true, status: 'success', outTradeNo });
         } else {

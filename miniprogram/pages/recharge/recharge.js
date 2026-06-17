@@ -31,11 +31,28 @@ Page({
   },
 
   loadBalance() {
-    const ui = app.globalData.userInfo || {};
-    const balance = parseFloat(ui.balance || 0);
+    // Show cached balance immediately, then refresh from API
+    const cached = app.globalData.userInfo || {};
+    const cachedBalance = parseFloat(cached.balance || 0);
     this.setData({
-      balance,
-      balanceText: '¥' + balance.toFixed(2),
+      balance: cachedBalance,
+      balanceText: '¥' + cachedBalance.toFixed(2),
+    });
+
+    // Always fetch latest from server — prevents stale globalData
+    // from other pages overwriting the optimistic update
+    api.get('/user/profile').then(res => {
+      if (res.code === 0 && res.data) {
+        app.globalData.userInfo = res.data;
+        wx.setStorageSync('userInfo', res.data);
+        const freshBalance = parseFloat(res.data.balance || 0);
+        this.setData({
+          balance: freshBalance,
+          balanceText: '¥' + freshBalance.toFixed(2),
+        });
+      }
+    }).catch(() => {
+      // Keep cached value — no-op
     });
   },
 
