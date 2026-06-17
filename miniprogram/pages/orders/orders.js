@@ -95,12 +95,14 @@ Page({
     // Get paidAmount for optimistic growth update
     const order = (this.data.orders || []).find(o => o.id === id);
     const paidAmount = order ? (order.paidAmount || 0) : 0;
+
+    // Optimistic: update growth value IMMEDIATELY (before payment flow)
+    if (paidAmount > 0 && app.globalData.userInfo) {
+      app.globalData.userInfo.total_spent = (app.globalData.userInfo.total_spent || 0) + paidAmount;
+    }
+
     pay.payOrder(id).then((result) => {
       wx.showToast({ title: '支付成功！', icon: 'success' });
-      // Optimistic: update growth value immediately
-      if (paidAmount > 0 && app.globalData.userInfo) {
-        app.globalData.userInfo.total_spent = (app.globalData.userInfo.total_spent || 0) + paidAmount;
-      }
       this.fetchOrders();
       // If server hasn't confirmed callback yet, refresh again after delay
       if (result && result.status === 'pending') {
@@ -108,7 +110,16 @@ Page({
       }
     }).catch((err) => {
       if (!err.cancelled) {
+        // Revert optimistic update on payment failure
+        if (paidAmount > 0 && app.globalData.userInfo) {
+          app.globalData.userInfo.total_spent = Math.max(0, (app.globalData.userInfo.total_spent || 0) - paidAmount);
+        }
         wx.showToast({ title: '支付失败，请重试', icon: 'none' });
+      } else {
+        // User cancelled — revert optimistic update
+        if (paidAmount > 0 && app.globalData.userInfo) {
+          app.globalData.userInfo.total_spent = Math.max(0, (app.globalData.userInfo.total_spent || 0) - paidAmount);
+        }
       }
     });
   },

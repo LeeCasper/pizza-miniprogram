@@ -319,12 +319,28 @@ Page({
 
         // If wechat payment, initiate payment flow
         if (pm === 'wechat' && orderData.paymentStatus === 'unpaid') {
+          const orderPaidAmount = parseFloat(orderData.order.paidAmount || orderData.order.total || 0);
+          // Optimistic: update growth value immediately
+          if (orderPaidAmount > 0 && app.globalData.userInfo) {
+            app.globalData.userInfo.total_spent = (app.globalData.userInfo.total_spent || 0) + orderPaidAmount;
+            this.loadProfileData();
+          }
           pay.payOrder(orderData.order.id).then(() => {
             wx.showToast({ title: '支付成功！', icon: 'success' });
             this.fetchOrders();
+            this.loadProfileData();
           }).catch((err) => {
             if (!err.cancelled) {
+              if (orderPaidAmount > 0 && app.globalData.userInfo) {
+                app.globalData.userInfo.total_spent = Math.max(0, (app.globalData.userInfo.total_spent || 0) - orderPaidAmount);
+              }
+              this.loadProfileData();
               wx.showToast({ title: '订单已保存，请在订单中心完成支付', icon: 'none', duration: 3000 });
+            } else {
+              if (orderPaidAmount > 0 && app.globalData.userInfo) {
+                app.globalData.userInfo.total_spent = Math.max(0, (app.globalData.userInfo.total_spent || 0) - orderPaidAmount);
+              }
+              this.loadProfileData();
             }
             this.fetchOrders();
           });
@@ -389,12 +405,15 @@ Page({
     // Get paidAmount for optimistic growth update
     const order = (this.data.orders || []).find(o => o.id === id);
     const paidAmount = order ? (order.paidAmount || 0) : 0;
+
+    // Optimistic: update growth value IMMEDIATELY (before payment flow, like recharge does)
+    if (paidAmount > 0 && app.globalData.userInfo) {
+      app.globalData.userInfo.total_spent = (app.globalData.userInfo.total_spent || 0) + paidAmount;
+      this.loadProfileData();
+    }
+
     pay.payOrder(id).then((result) => {
       wx.showToast({ title: '支付成功！', icon: 'success' });
-      // Optimistic: update growth value immediately for real-time progress bar
-      if (paidAmount > 0 && app.globalData.userInfo) {
-        app.globalData.userInfo.total_spent = (app.globalData.userInfo.total_spent || 0) + paidAmount;
-      }
       this.fetchOrders();
       this.loadProfileData();
       // If server hasn't confirmed callback yet, refresh again after delay
@@ -406,7 +425,18 @@ Page({
       }
     }).catch((err) => {
       if (!err.cancelled) {
+        // Revert optimistic update on payment failure
+        if (paidAmount > 0 && app.globalData.userInfo) {
+          app.globalData.userInfo.total_spent = Math.max(0, (app.globalData.userInfo.total_spent || 0) - paidAmount);
+        }
+        this.loadProfileData();
         wx.showToast({ title: '支付失败，请重试', icon: 'none' });
+      } else {
+        // User cancelled — revert optimistic update
+        if (paidAmount > 0 && app.globalData.userInfo) {
+          app.globalData.userInfo.total_spent = Math.max(0, (app.globalData.userInfo.total_spent || 0) - paidAmount);
+        }
+        this.loadProfileData();
       }
     });
   },
@@ -539,9 +569,16 @@ Page({
     // Background refresh
     api.get('/user/profile').then(res => {
       if (res.code === 0) {
-        app.globalData.userInfo = res.data;
-        wx.setStorageSync('userInfo', res.data);
-        const ui = res.data;
+        const serverData = res.data;
+        // Protect optimistic total_spent: never decrease with stale server data
+        // (the server may not have processed the WeChat callback yet)
+        const currentTotalSpent = app.globalData.userInfo.total_spent || 0;
+        if ((serverData.total_spent || 0) < currentTotalSpent) {
+          serverData.total_spent = currentTotalSpent;
+        }
+        app.globalData.userInfo = serverData;
+        wx.setStorageSync('userInfo', serverData);
+        const ui = serverData;
         this.setData({
           userInfo: { ...ui, balanceText: '¥' + ((ui.balance || 0)).toFixed(2), cardCount: ui.cardCount || 0, bio: ui.bio || '享受美味每一天' }
         });

@@ -45,8 +45,12 @@ function payOrder(orderId) {
           paySign: payParams.paySign,
           success: () => {
             wx.showToast({ title: '支付成功', icon: 'success' });
-            // Poll server to confirm callback has been processed
-            pollPaymentStatus(orderId, resolve);
+            // Resolve immediately so caller can update UI without waiting for polling
+            resolve({ success: true, status: 'pending' });
+            // Poll server in background to confirm callback processing
+            pollPaymentStatus(orderId, (finalResult) => {
+              console.log('[pay] Background poll result:', finalResult.status);
+            });
           },
           fail: (wxErr) => {
             if (wxErr.errMsg && wxErr.errMsg.indexOf('cancel') !== -1) {
@@ -72,15 +76,14 @@ function payOrder(orderId) {
  * The server endpoint queries WeChat Pay directly to sync state.
  *
  * @param {string} orderId
- * @param {Function} resolve
+ * @param {Function} callback
  * @param {number} attempt
  */
-function pollPaymentStatus(orderId, resolve, attempt) {
+function pollPaymentStatus(orderId, callback, attempt) {
   attempt = attempt || 0;
   if (attempt >= 5) {
-    // Give up polling — caller should still refresh UI
-    console.warn('[pay] Payment status poll exhausted, resolving with pending');
-    resolve({ success: true, status: 'pending' });
+    console.warn('[pay] Payment status poll exhausted');
+    callback({ success: true, status: 'pending' });
     return;
   }
 
@@ -93,15 +96,15 @@ function pollPaymentStatus(orderId, resolve, attempt) {
       if (res.code === 0 && res.data) {
         if (res.data.status === 'success' || res.data.paymentMethod) {
           console.log('[pay] Payment confirmed by server');
-          resolve({ success: true, status: 'success' });
+          callback({ success: true, status: 'success' });
         } else {
-          pollPaymentStatus(orderId, resolve, attempt + 1);
+          pollPaymentStatus(orderId, callback, attempt + 1);
         }
       } else {
-        pollPaymentStatus(orderId, resolve, attempt + 1);
+        pollPaymentStatus(orderId, callback, attempt + 1);
       }
     }).catch(() => {
-      pollPaymentStatus(orderId, resolve, attempt + 1);
+      pollPaymentStatus(orderId, callback, attempt + 1);
     });
   }, delay);
 }
