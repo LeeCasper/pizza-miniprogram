@@ -50,5 +50,10 @@ module.exports = {
     pkey: process.env.PRINTER_PKEY || '',
     apiBase: process.env.PRINTER_API_BASE || 'https://open.spyun.net',
     copies: parseInt(process.env.PRINTER_COPIES, 10) || 1,
+    // 小票模板（可在管理后台设置，DB 值覆盖 .env）
+    storeName: process.env.PRINTER_STORE_NAME || '王姐手工披萨',
+    footerText: process.env.PRINTER_FOOTER_TEXT || '感谢您的光临！',
+    footerTip: process.env.PRINTER_FOOTER_TIP || '请到取餐口出示取餐码',
+    audioEnabled: process.env.PRINTER_AUDIO_ENABLED !== 'false',
   },
 };

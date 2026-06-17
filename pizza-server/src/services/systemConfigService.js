@@ -156,9 +156,15 @@ const systemConfigService = {
         pkey: map.printer_pkey || '',
         apiBase: map.printer_api_base || '',
         copies: map.printer_copies || '1',
+        // 小票模板
+        storeName: map.printer_store_name || '',
+        footerText: map.printer_footer_text || '',
+        footerTip: map.printer_footer_tip || '',
+        audioEnabled: map.printer_audio_enabled || '',
       };
     } catch (_) {
-      return { enabled: '', appId: '', appSecret: '', sn: '', apiBase: '', copies: '1' };
+      return { enabled: '', appId: '', appSecret: '', sn: '', apiBase: '', copies: '1',
+        storeName: '', footerText: '', footerTip: '', audioEnabled: '' };
     }
   },
 
@@ -175,6 +181,11 @@ const systemConfigService = {
       pkey: 'printer_pkey',
       apiBase: 'printer_api_base',
       copies: 'printer_copies',
+      // 小票模板
+      storeName: 'printer_store_name',
+      footerText: 'printer_footer_text',
+      footerTip: 'printer_footer_tip',
+      audioEnabled: 'printer_audio_enabled',
     };
 
     const conn = await pool.getConnection();
@@ -211,8 +222,17 @@ const systemConfigService = {
       if (dbConfig.appSecret) config.printer.appSecret = dbConfig.appSecret;
       if (dbConfig.sn) config.printer.sn = dbConfig.sn;
       if (dbConfig.pkey) config.printer.pkey = dbConfig.pkey;
-      if (dbConfig.apiBase) config.printer.apiBase = dbConfig.apiBase;
+      // 自动纠正旧文档中的错误地址 (spyun.net.cn → open.spyun.net)
+      if (dbConfig.apiBase) {
+        const url = dbConfig.apiBase.replace('www.spyun.net.cn', 'open.spyun.net');
+        config.printer.apiBase = url;
+      }
       if (dbConfig.copies) config.printer.copies = parseInt(dbConfig.copies, 10) || 1;
+      // 小票模板字段
+      if (dbConfig.storeName) config.printer.storeName = dbConfig.storeName;
+      if (dbConfig.footerText) config.printer.footerText = dbConfig.footerText;
+      if (dbConfig.footerTip) config.printer.footerTip = dbConfig.footerTip;
+      if (dbConfig.audioEnabled !== '') config.printer.audioEnabled = dbConfig.audioEnabled !== 'false';
     }).catch(err => {
       console.error('[Config] Failed to sync printer config from DB:', err.message);
     });

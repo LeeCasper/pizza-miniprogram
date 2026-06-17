@@ -9,7 +9,6 @@
  * 添加设备: POST /v1/printer/add
  */
 
-const https = require('https');
 const crypto = require('crypto');
 const config = require('../config');
 
@@ -37,59 +36,52 @@ function buildSign(params, appSecret) {
 /**
  * 发送 application/x-www-form-urlencoded 请求到商鹏 API。
  */
-function apiRequest(path, bodyParams) {
-  return new Promise((resolve, reject) => {
-    // 构建 URL-encoded body
-    const parts = [];
-    for (const [k, v] of Object.entries(bodyParams)) {
-      if (v !== null && v !== undefined) {
-        parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(String(v)));
-      }
+async function apiRequest(path, bodyParams) {
+  // 构建 URL-encoded body
+  const parts = [];
+  for (const [k, v] of Object.entries(bodyParams)) {
+    if (v !== null && v !== undefined) {
+      parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(String(v)));
     }
-    const body = parts.join('&');
+  }
+  const body = parts.join('&');
 
-    const apiBase = config.printer.apiBase || 'https://open.spyun.net';
-    const url = new URL(path, apiBase);
-    const isHttps = url.protocol === 'https:';
+  // 强制使用商鹏云打印正确地址（防止 DB 配置了错误的旧地址）
+  const CORRECT_HOST = 'open.spyun.net';
+  let apiBase = config.printer.apiBase || 'https://open.spyun.net';
+  let url = new URL(path, apiBase);
+  if (url.hostname !== CORRECT_HOST) {
+    console.warn(`[Printer] ⚠ apiBase ${apiBase} 指向错误主机，强制纠正为 ${CORRECT_HOST}`);
+    url = new URL(path, 'https://' + CORRECT_HOST);
+  }
 
-    const options = {
-      hostname: url.hostname,
-      port: url.port || (isHttps ? 443 : 80),
-      path: url.pathname + url.search,
+  console.log('[Printer] → POST', url.href);
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
+
+  try {
+    const res = await fetch(url.href, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Content-Length': Buffer.byteLength(body, 'utf8'),
-      },
-      timeout: 15000,
-    };
-
-    const httpModule = isHttps ? https : require('http');
-    const req = httpModule.request(options, (res) => {
-      let data = '';
-      res.on('data', (chunk) => { data += chunk; });
-      res.on('end', () => {
-        console.log(`[Printer] API POST ${path} → HTTP ${res.statusCode}, body: ${data.slice(0, 500)}`);
-        try {
-          resolve(JSON.parse(data));
-        } catch (_) {
-          resolve({ raw: data, httpStatus: res.statusCode });
-        }
-      });
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body,
+      signal: controller.signal,
     });
 
-    req.on('error', (err) => {
-      console.error(`[Printer] API POST ${path} → error:`, err.message);
-      reject(err);
-    });
-    req.on('timeout', () => {
-      req.destroy();
-      reject(new Error('Printer API request timeout'));
-    });
+    const text = await res.text();
+    console.log(`[Printer] API POST ${url.href} → HTTP ${res.status}, body: ${text.slice(0, 500)}`);
 
-    req.write(body);
-    req.end();
-  });
+    try {
+      return JSON.parse(text);
+    } catch (_) {
+      return { raw: text, httpStatus: res.status };
+    }
+  } catch (err) {
+    console.error(`[Printer] API POST ${url.href} → error:`, err.message);
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 // ── 签名参数构建 ──────────────────────────────────────
@@ -118,7 +110,12 @@ function buildOrderContent(order) {
   const now = new Date();
   const timeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
-  const storeName = order.storeName || order.store_name || '王姐手工披萨';
+  // 从配置读取可自定义内容
+  const storeName = config.printer.storeName || '王姐手工披萨';
+  const footerText = config.printer.footerText || '感谢您的光临！';
+  const footerTip = config.printer.footerTip || '请到取餐口出示取餐码';
+  const audioEnabled = config.printer.audioEnabled !== false;
+
   const paymentMethod = order.paymentMethod || order.payment_method || '';
   const payLabel = paymentMethod === 'balance' ? '余额支付' : paymentMethod === 'wechat' ? '微信支付' : '待支付';
   const pickupCode = order.pickupCode || order.pickup_code || '—';
@@ -128,7 +125,8 @@ function buildOrderContent(order) {
   // 标题
   lines.push(`<C><B><L1>${storeName}</L1></B></C>`);
   lines.push('<C>——————————————</C>');
-  lines.push(`<C><L2>取餐码：${pickupCode}</L2></C>`);
+  lines.push(`<C>取餐码</C>`);
+  lines.push(`<C><L2>${pickupCode}</L2></C>`);
   lines.push('<C>——————————————</C>');
   lines.push(`<BR>`);
 
@@ -146,7 +144,7 @@ function buildOrderContent(order) {
   lines.push('<B>商品名称        数量  金额</B><BR>');
   lines.push('——————————————<BR>');
 
-  // 商品列表
+  // 商品列表（含忌口/过敏选项）
   const items = order.items || [];
   let total = 0;
   for (const item of items) {
@@ -157,30 +155,37 @@ function buildOrderContent(order) {
     total += lineTotal;
     // 名称左对齐补空格到14字符宽度（近似等宽字体）
     const paddedName = name + ' '.repeat(Math.max(0, 14 - name.length));
-    lines.push(`${paddedName} x${qty}  ¥${lineTotal.toFixed(2)}<BR>`);
+    lines.push(`${paddedName} x${qty}  ￥${lineTotal.toFixed(2)}<BR>`);
+
+    // 显示忌口/过敏选项
+    const restrictions = item.restrictions || [];
+    if (restrictions.length > 0) {
+      lines.push(`  └ 忌口: ${restrictions.join(', ')}<BR>`);
+    }
   }
 
   lines.push('——————————————<BR>');
 
   // 金额汇总
   const discount = parseFloat(order.discountAmount || order.discount_amount || 0);
-  lines.push(`<R>商品合计：¥${total.toFixed(2)}</R><BR>`);
+  lines.push(`商品合计：￥${total.toFixed(2)}<BR>`);
   if (discount > 0) {
-    lines.push(`<R>优惠减免：-¥${discount.toFixed(2)}</R><BR>`);
+    lines.push(`优惠减免：-￥${discount.toFixed(2)}<BR>`);
   }
   const paid = parseFloat(order.paidAmount || order.paid_amount || total);
-  lines.push(`<R><B><L1>实付：¥${paid.toFixed(2)}</L1></B></R><BR>`);
+  lines.push(`<B><L1>实付：￥${paid.toFixed(2)}</L1></B><BR>`);
   lines.push(`<BR>`);
 
   // 页脚
   lines.push('<C>——————————————</C>');
-  lines.push('<C>感谢您的光临！</C>');
-  lines.push(`<C>取餐码 ${pickupCode} 请取餐口出示</C>`);
+  lines.push(`<C>${footerText}</C>`);
+  lines.push(`<C>${footerTip}</C>`);
   lines.push(`<BR>`);
 
-  // 切纸 + 语音播报
-  lines.push('<CUT>');
-  lines.push('<AUDIO-COMMON>');
+  // 语音播报
+  if (audioEnabled) {
+    lines.push('<AUDIO-COMMON>');
+  }
 
   return lines.join('');
 }
@@ -307,8 +312,11 @@ const printerService = {
     const now = new Date();
     const timeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
 
+    const storeName = config.printer.storeName || '王姐手工披萨';
+    const audioEnabled = config.printer.audioEnabled !== false;
+
     const lines = [
-      '<C><B><L1>王姐手工披萨</L1></B></C>',
+      `<C><B><L1>${storeName}</L1></B></C>`,
       '<C>——————————————</C>',
       '<C><L2>打印机测试</L2></C>',
       `<BR>`,
@@ -317,10 +325,11 @@ const printerService = {
       `<BR>`,
       '<C>——————————————</C>',
       '<C>打印机配置正确！</C>',
-      '<C>感谢您的光临！</C>',
-      '<CUT>',
-      '<AUDIO-COMMON>',
+      `<C>${config.printer.footerText || '感谢您的光临！'}</C>`,
     ];
+    if (audioEnabled) {
+      lines.push('<AUDIO-COMMON>');
+    }
 
     const content = lines.join('');
     const appSecret = config.printer.appSecret;
@@ -353,6 +362,63 @@ const printerService = {
       console.error(`[Printer] 测试打印异常:`, err.message);
       return { success: false, message: err.message };
     }
+  },
+
+  /**
+   * 生成打印内容预览（使用当前配置，不实际打印）。
+   */
+  previewContent() {
+    const now = new Date();
+    const ts = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+
+    const storeName = config.printer.storeName || '王姐手工披萨';
+    const footerText = config.printer.footerText || '感谢您的光临！';
+    const footerTip = config.printer.footerTip || '请到取餐口出示取餐码';
+    const audioEnabled = config.printer.audioEnabled !== false;
+
+    const lines = [
+      `<C><B><L1>${storeName}</L1></B></C>`,
+      '<C>——————————————</C>',
+      '<C>取餐码</C>',
+      '<C><L2>A001</L2></C>',
+      '<C>——————————————</C>',
+      '<BR>',
+      '订单号：20260617001<BR>',
+      '下单时间：' + ts + '<BR>',
+      '支付方式：微信支付<BR>',
+      '备注：少辣<BR>',
+      '<BR>',
+      '——————————————<BR>',
+      '<B>商品名称        数量  金额</B><BR>',
+      '——————————————<BR>',
+      '夏威夷披萨        x1  ￥58.00<BR>',
+      '  └ 忌口: 不吃辣, 花生过敏<BR>',
+      '榴莲饼            x2  ￥56.00<BR>',
+      '  └ 忌口: 素食<BR>',
+      '——————————————<BR>',
+      '商品合计：￥114.00<BR>',
+      '优惠减免：-￥24.00<BR>',
+      '<B><L1>实付：￥90.00</L1></B><BR>',
+      '<BR>',
+      '<C>——————————————</C>',
+      `<C>${footerText}</C>`,
+      `<C>${footerTip}</C>`,
+      '<BR>',
+    ];
+
+    if (audioEnabled) {
+      lines.push('<AUDIO-COMMON>');
+    }
+
+    const raw = lines.join('');
+
+    // 移除标签，生成纯文本预览
+    const plain = raw
+      .replace(/<AUDIO-COMMON>/g, '')
+      .replace(/<BR>/g, '\n')
+      .replace(/<[^>]+>/g, '');
+
+    return { raw, plain };
   },
 };
 

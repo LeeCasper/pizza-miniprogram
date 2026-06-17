@@ -74,6 +74,11 @@ export interface PrinterSettings {
   copies: number;
   _hasAppSecret?: boolean;
   _hasPkey?: boolean;
+  // 小票模板
+  storeName: string;
+  footerText: string;
+  footerTip: string;
+  audioEnabled: boolean;
 }
 
 export interface PrinterSettingsForm {
@@ -84,4 +89,22 @@ export interface PrinterSettingsForm {
   pkey?: string;
   apiBase?: string;
   copies?: number;
+  // 小票模板
+  storeName?: string;
+  footerText?: string;
+  footerTip?: string;
+  audioEnabled?: boolean;
+}
+
+/** Get printer preview content */
+export function fetchPrinterPreview() {
+  return request<PrinterPreview>({
+    url: '/settings/printer/preview',
+    method: 'GET',
+  });
+}
+
+export interface PrinterPreview {
+  raw: string;
+  plain: string;
 }

@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const config = require('../config');
 const pool = require('../config/database');
 const { signToken } = require('../utils/jwt');
 const productService = require('../services/productService');
@@ -1019,6 +1020,11 @@ const adminApiController = {
           copies: parseInt(cfg.copies, 10) || 1,
           _hasAppSecret: !!cfg.appSecret,
           _hasPkey: !!cfg.pkey,
+          // 小票模板
+          storeName: cfg.storeName || '',
+          footerText: cfg.footerText || '',
+          footerTip: cfg.footerTip || '',
+          audioEnabled: cfg.audioEnabled === '' ? true : cfg.audioEnabled !== 'false',
         },
       });
     } catch (err) {
@@ -1041,6 +1047,11 @@ const adminApiController = {
         pkey: body.pkey !== undefined ? body.pkey : undefined,
         apiBase: body.apiBase !== undefined ? body.apiBase : undefined,
         copies: body.copies !== undefined ? String(body.copies) : undefined,
+        // 小票模板
+        storeName: body.storeName !== undefined ? body.storeName : undefined,
+        footerText: body.footerText !== undefined ? body.footerText : undefined,
+        footerTip: body.footerTip !== undefined ? body.footerTip : undefined,
+        audioEnabled: body.audioEnabled !== undefined ? String(body.audioEnabled) : undefined,
       };
 
       // Masked: keep existing secret unless new one provided
@@ -1092,6 +1103,20 @@ const adminApiController = {
       } else {
         res.json({ code: 500, message: result.message });
       }
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * GET /api/v1/admin/settings/printer/preview
+   * 返回打印内容预览，不实际打印。
+   */
+  async printerPreview(req, res, next) {
+    try {
+      const printerService = require('../services/printerService');
+      const preview = printerService.previewContent();
+      res.json({ code: 0, data: preview });
     } catch (err) {
       next(err);
     }
