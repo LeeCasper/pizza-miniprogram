@@ -577,7 +577,7 @@ Page({
         activeTierIndex,
       });
     });
-    // Background refresh
+    // Background refresh — 拿到最新数据后重建会员卡片 & 自动切到当前等级
     api.get('/user/profile').then(res => {
       if (res.code === 0) {
         const serverData = res.data;
@@ -592,8 +592,18 @@ Page({
         app.globalData.userInfo = serverData;
         wx.setStorageSync('userInfo', serverData);
         const ui = serverData;
-        this.setData({
-          userInfo: { ...ui, balanceText: '¥' + ((ui.balance || 0)).toFixed(2), cardCount: ui.cardCount || 0, bio: ui.bio || '享受美味每一天' }
+        // 用最新 totalSpent 重建卡片并切换到当前等级
+        const freshSpent = ui.totalSpent || 0;
+        this._ensureTiersLoaded().then(apiTiers => {
+          const tierInfo = computeTier(freshSpent, apiTiers);
+          tierInfo._totalSpent = freshSpent;
+          const tierCards = buildTierCards(apiTiers, tierInfo);
+          const activeTierIndex = tierInfo.current.levelIndex - 1;
+          this.setData({
+            userInfo: { ...ui, balanceText: '¥' + ((ui.balance || 0)).toFixed(2), cardCount: ui.cardCount || 0, bio: ui.bio || '享受美味每一天' },
+            tierCards,
+            activeTierIndex,
+          });
         });
       }
     }).catch(() => {});
