@@ -25,7 +25,7 @@
         <view class="profile-text" bindtap="onOpenEditProfile">
           <view class="profile-name-row">
             <text class="profile-name">{{userInfo.name}}</text>
-            <text class="profile-edit-hint">✎</text>
+            <image class="profile-edit-hint" src="/images/edit.png" mode="aspectFit"></image>
           </view>
           <text class="profile-bio">{{userInfo.bio}}</text>
         </view>

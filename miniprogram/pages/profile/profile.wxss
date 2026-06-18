@@ -131,9 +131,9 @@
 }
 
 .profile-edit-hint {
-  font-size: 24rpx;
-  color: var(--color-primary);
-  opacity: 0.5;
+  width: 28rpx;
+  height: 28rpx;
+  opacity: 0.6;
 }
 
 /* ========== 会员卡轮播 ========== */

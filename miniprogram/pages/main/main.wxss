@@ -572,7 +572,7 @@
 .avatar-wrap:active .avatar-edit-mask { opacity: 1; }
 .avatar-edit-icon { font-size: 36rpx; color: #FFFFFF; }
 .profile-name-row { display: flex; align-items: center; gap: 10rpx; }
-.profile-edit-hint { font-size: 24rpx; color: var(--color-primary); opacity: 0.5; }
+.profile-edit-hint { width: 28rpx; height: 28rpx; opacity: 0.6; }
 
 /* ── 会员卡轮播 ── */
 .member-cards-section { margin: 0 0 8rpx; position: relative; }
