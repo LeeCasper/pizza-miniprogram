@@ -17,7 +17,7 @@
       longitude="{{mapLongitude}}"
       scale="{{mapScale}}"
       markers="{{markers}}"
-      show-location="{{locationGranted}}"
+      show-location="{{true}}"
       enable-scroll="{{true}}"
       enable-zoom="{{true}}"
     ></map>
