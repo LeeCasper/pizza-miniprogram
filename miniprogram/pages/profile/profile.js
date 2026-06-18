@@ -120,9 +120,10 @@ Page({
         wx.setStorageSync('userInfo', freshUi);
         ui = freshUi;
       }
-      const totalSpent = ui.totalSpent || 0;
-      const tierInfo = computeTier(totalSpent, apiTiers, ui.memberLevel);
-      tierInfo._totalSpent = totalSpent;
+      // 等级判定使用 余额+消费金额 作为资格金额（与后端逻辑一致）
+      const qualifyingAmount = (ui.totalSpent || 0) + (ui.balance || 0);
+      const tierInfo = computeTier(qualifyingAmount, apiTiers, ui.memberLevel);
+      tierInfo._totalSpent = qualifyingAmount;
       const tierCards = buildTierCards(apiTiers, tierInfo);
       const activeTierIndex = tierInfo.current.levelIndex - 1;
       this.setData({

@@ -10,7 +10,7 @@ const pointsService = require('../services/pointsService');
 const bannerService = require('../services/bannerService');
 const couponTemplateService = require('../services/couponTemplateService');
 const memberTierService = require('../services/memberTierService');
-const { invalidateCache } = require('../utils/memberTier');
+const { invalidateCache, getTierLevel } = require('../utils/memberTier');
 const paymentService = require('../services/paymentService');
 const systemConfigService = require('../services/systemConfigService');
 
@@ -345,6 +345,24 @@ const adminApiController = {
       if (balance !== undefined) updateData.balance = balance;
       if (totalSpent !== undefined) updateData.totalSpent = totalSpent;
       if (memberLevel !== undefined) updateData.memberLevel = memberLevel;
+
+      // 余额或消费金额变动时，自动升级会员等级（仅升不降）
+      if (memberLevel === undefined && (balance !== undefined || totalSpent !== undefined)) {
+        const currentUser = await userService.findById(req.params.id);
+        if (currentUser) {
+          const newBalance = balance !== undefined ? parseFloat(balance) : parseFloat(currentUser.balance || 0);
+          const newTotalSpent = totalSpent !== undefined ? parseFloat(totalSpent) : parseFloat(currentUser.total_spent || 0);
+          const qualifyingAmount = newBalance + newTotalSpent;
+          const computedLevelKey = await getTierLevel(qualifyingAmount);
+          // 比较等级索引：仅在新等级更高时自动升级
+          const tiers = await memberTierService.getActive();
+          const currentIdx = tiers.findIndex(t => t.levelKey === (currentUser.member_level || 'silver'));
+          const computedIdx = tiers.findIndex(t => t.levelKey === computedLevelKey);
+          if (computedIdx > currentIdx) {
+            updateData.memberLevel = computedLevelKey;
+          }
+        }
+      }
 
       const user = await userService.adminUpdate(req.params.id, updateData);
       if (!user) {

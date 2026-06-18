@@ -216,25 +216,26 @@ Page({
 
   loadData(scrollToKey) {
     const ui = app.globalData.userInfo || {};
-    const totalSpent = parseFloat(ui.totalSpent || 0);
+    // 等级判定使用 余额+消费金额 作为资格金额（与后端逻辑一致）
+    const qualifyingAmount = parseFloat(ui.totalSpent || 0) + parseFloat(ui.balance || 0);
 
     this._ensureTiersLoaded().then(apiTiers => {
-      const tierInfo = computeTier(totalSpent, apiTiers, ui.memberLevel);
-      const tiers = buildBenefitTiers(apiTiers, tierInfo, totalSpent);
+      const tierInfo = computeTier(qualifyingAmount, apiTiers, ui.memberLevel);
+      const tiers = buildBenefitTiers(apiTiers, tierInfo, qualifyingAmount);
 
       const currentTier = tiers.find(t => t.status === 'current') || tiers[0];
       const nextTier = tierInfo.next;
       const hasNext = !!nextTier;
-      const spentToNext = hasNext ? (nextTier.minSpent - totalSpent).toFixed(2) : '0.00';
+      const spentToNext = hasNext ? (nextTier.minSpent - qualifyingAmount).toFixed(2) : '0.00';
       const progressPercent = hasNext
-        ? Math.min(100, Math.max(0, ((totalSpent - tierInfo.current.minSpent) / (nextTier.minSpent - tierInfo.current.minSpent)) * 100))
+        ? Math.min(100, Math.max(0, ((qualifyingAmount - tierInfo.current.minSpent) / (nextTier.minSpent - tierInfo.current.minSpent)) * 100))
         : 100;
 
       // Progress fraction text (e.g. "200/400")
       const currentMin = tierInfo.current.minSpent;
       const nextMin = hasNext ? nextTier.minSpent : currentMin;
       const progressFraction = hasNext
-        ? Math.floor(totalSpent - currentMin) + '/' + (nextMin - currentMin)
+        ? Math.floor(qualifyingAmount - currentMin) + '/' + (nextMin - currentMin)
         : '';
 
       const targetKey = scrollToKey || tierInfo.current.levelKey;
@@ -255,8 +256,8 @@ Page({
         heroPointsText,
         nextTier,
         hasNext,
-        totalSpent,
-        totalSpentText: totalSpent.toFixed(2),
+        totalSpent: qualifyingAmount,
+        totalSpentText: qualifyingAmount.toFixed(2),
         spentToNext,
         progressFraction,
         progressPercent,
