@@ -3,8 +3,8 @@ const { api } = require('../../utils/api');
 const app = getApp();
 
 // 默认门店坐标（fallback，GCJ-02）
-const DEFAULT_LAT = 39.9332;
-const DEFAULT_LNG = 116.4544;
+const DEFAULT_LAT = 32.961857;
+const DEFAULT_LNG = 114.646879;
 
 Page({
   data: {
