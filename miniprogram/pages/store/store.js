@@ -53,7 +53,14 @@ Page({
     this.setData({ loading: true });
     api.get('/stores').then(res => {
       if (res.code === 0 && res.data && res.data.length > 0) {
-        this.setData({ store: res.data[0], loading: false });
+        const raw = res.data[0];
+        // Ensure lat/lng are numbers (mysql2 may return DECIMAL as strings)
+        const store = {
+          ...raw,
+          latitude: raw.latitude != null ? parseFloat(raw.latitude) : null,
+          longitude: raw.longitude != null ? parseFloat(raw.longitude) : null,
+        };
+        this.setData({ store, loading: false });
         this.initMap();
       } else {
         this.setData({ loading: false });

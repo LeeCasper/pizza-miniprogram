@@ -277,6 +277,7 @@ const local: App.I18n.Schema = {
     settings_map: '地图配置',
     settings_pay: '支付配置',
     settings_printer: '打印机配置',
+    settings_store: '门店设置',
   },
   page: {
     login: {

@@ -136,3 +136,43 @@ export function fetchUpdateMapSettings(data: MapSettingsForm) {
     data,
   });
 }
+
+// ── Store Settings ───────────────────────────────────
+
+export interface StoreSettings {
+  id: number;
+  name: string;
+  address: string;
+  phone: string;
+  latitude: number | null;
+  longitude: number | null;
+  business_hours: string;
+  image: string;
+  desc: string;
+}
+
+export interface StoreSettingsForm {
+  name?: string;
+  address?: string;
+  phone?: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  business_hours?: string;
+}
+
+/** Get store settings */
+export function fetchStoreSettings() {
+  return request<StoreSettings>({
+    url: '/settings/store',
+    method: 'GET',
+  });
+}
+
+/** Update store settings */
+export function fetchUpdateStoreSettings(data: StoreSettingsForm) {
+  return request<null>({
+    url: '/settings/store',
+    method: 'PUT',
+    data,
+  });
+}

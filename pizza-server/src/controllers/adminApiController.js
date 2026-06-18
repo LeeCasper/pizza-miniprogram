@@ -13,6 +13,7 @@ const memberTierService = require('../services/memberTierService');
 const { invalidateCache, getTierLevel } = require('../utils/memberTier');
 const paymentService = require('../services/paymentService');
 const systemConfigService = require('../services/systemConfigService');
+const storeService = require('../services/storeService');
 
 const adminApiController = {
   // ── Auth ────────────────────────────────────────────
@@ -1143,9 +1144,58 @@ const adminApiController = {
     }
   },
 
+  // ── Store Settings ───────────────────────────────────
+
   /**
-   * POST /api/v1/admin/settings/printer/test
+   * GET /api/v1/admin/settings/store
    */
+  async getStoreSettings(req, res, next) {
+    try {
+      const stores = await storeService.findAll();
+      const store = stores[0] || null;
+
+      if (!store) {
+        return res.json({ code: 0, data: null, message: '暂无门店数据' });
+      }
+
+      res.json({ code: 0, data: store });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * PUT /api/v1/admin/settings/store
+   */
+  async updateStoreSettings(req, res, next) {
+    try {
+      const stores = await storeService.findAll();
+      const store = stores[0];
+
+      if (!store) {
+        return res.status(404).json({ code: 404, message: '门店不存在' });
+      }
+
+      const body = req.body || {};
+      const fields = {};
+
+      // Whitelist editable fields
+      if (body.name !== undefined) fields.name = body.name;
+      if (body.address !== undefined) fields.address = body.address;
+      if (body.phone !== undefined) fields.phone = body.phone;
+      if (body.business_hours !== undefined) fields.business_hours = body.business_hours;
+      if (body.latitude !== undefined) fields.latitude = body.latitude;
+      if (body.longitude !== undefined) fields.longitude = body.longitude;
+
+      if (Object.keys(fields).length > 0) {
+        await storeService.update(store.id, fields);
+      }
+
+      res.json({ code: 0, message: '门店设置已保存' });
+    } catch (err) {
+      next(err);
+    }
+  },
   async testPrinter(req, res, next) {
     try {
       const printerService = require('../services/printerService');

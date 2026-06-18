@@ -113,6 +113,15 @@ const customRoutes: CustomRoute[] = [
           i18nKey: 'route.settings_map',
         },
       },
+      {
+        name: 'settings_store',
+        path: '/settings/store',
+        component: 'view.settings_store',
+        meta: {
+          title: '门店设置',
+          i18nKey: 'route.settings_store',
+        },
+      },
     ],
   },
   // Multi-level routes — parent has layout.base, children have view.xxx

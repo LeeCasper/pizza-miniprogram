@@ -281,6 +281,7 @@ const local: App.I18n.Schema = {
     settings_map: 'Map Settings',
     settings_pay: 'Payment Config',
     settings_printer: 'Printer Config',
+    settings_store: 'Store Settings',
   },
   page: {
     login: {
