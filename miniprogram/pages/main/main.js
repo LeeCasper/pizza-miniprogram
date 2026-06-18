@@ -132,8 +132,25 @@ Page({
         const { activeTab } = this.data;
         const filtered = activeTab === 'all' ? ordersWithDigits : ordersWithDigits.filter(o => o.status === activeTab);
         this.setData({ orders: ordersWithDigits, filteredOrders: filtered, ordersLoaded: true });
+        this._scheduleCancelDeadlineRefresh(ordersWithDigits);
       }
     }).catch(() => {});
+  },
+
+  /** Auto-refresh when the nearest cancelDeadline expires so button disappears */
+  _scheduleCancelDeadlineRefresh(orders) {
+    if (this._cancelTimer) { clearTimeout(this._cancelTimer); this._cancelTimer = null; }
+    const now = Date.now();
+    let nearest = Infinity;
+    for (const o of orders) {
+      if (o.canCancel && o.cancelDeadline) {
+        const dl = new Date(o.cancelDeadline).getTime();
+        if (dl > now && dl < nearest) nearest = dl;
+      }
+    }
+    if (nearest < Infinity) {
+      this._cancelTimer = setTimeout(() => { this.fetchOrders(); }, nearest - now + 500);
+    }
   },
 
   // ── Tab 切换 ────────────────────────────────
@@ -374,6 +391,7 @@ Page({
             if (isPaid) this.loadProfileData(); // refresh balance/points
           } else {
             wx.showToast({ title: result.message || '取消失败', icon: 'none' });
+            this.fetchOrders(); // refresh to update canCancel state
           }
         }).catch(() => { wx.hideLoading(); wx.showToast({ title: '取消失败', icon: 'none' }); });
       }

@@ -16,7 +16,9 @@ const auditService = require('./auditService');
 
 const log = createLogger('OrderCleanup');
 
-const UNPAID_TIMEOUT_MINUTES = 30;
+function getUnpaidTimeoutMinutes() {
+  return require('../config').business.unpaidTimeoutMinutes;
+}
 
 const orderCleanupService = {
   /**
@@ -29,7 +31,7 @@ const orderCleanupService = {
        WHERE status = 'waiting'
          AND payment_method IS NULL
          AND created_at < NOW() - INTERVAL ? MINUTE`,
-      [UNPAID_TIMEOUT_MINUTES]
+      [getUnpaidTimeoutMinutes()]
     );
 
     if (rows.length === 0) return 0;
@@ -81,7 +83,7 @@ const orderCleanupService = {
           entityId: order.id,
           before: { status: 'waiting', paymentMethod: null },
           after: { status: 'cancelled' },
-          metadata: { reason: `Unpaid for ${UNPAID_TIMEOUT_MINUTES}+ minutes` },
+          metadata: { reason: `Unpaid for ${getUnpaidTimeoutMinutes()}+ minutes` },
         }, conn);
 
         await conn.commit();

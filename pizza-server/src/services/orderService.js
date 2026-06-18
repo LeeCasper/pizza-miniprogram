@@ -22,14 +22,16 @@ const orderService = {
     params.push(limit, offset);
 
     const [rows] = await pool.query(sql, params);
-    return rows.map(formatOrder);
+    const cancelMinutes = require('../config').business.orderCancelMinutes;
+    return rows.map(r => formatOrder(r, cancelMinutes));
   },
 
   async findById(orderId) {
     const [rows] = await pool.query('SELECT * FROM orders WHERE id = ?', [orderId]);
     if (!rows[0]) return null;
     const items = await this.getOrderItems(orderId);
-    return { ...formatOrder(rows[0]), items };
+    const cancelMinutes = require('../config').business.orderCancelMinutes;
+    return { ...formatOrder(rows[0], cancelMinutes), items };
   },
 
   async getOrderItems(orderId) {
@@ -121,7 +123,7 @@ const orderService = {
     params.push(limit, (page - 1) * limit);
 
     const [rows] = await pool.query(sql, params);
-    return rows.map(formatOrder);
+    return rows.map(r => formatOrder(r, null)); // null = admin, no cancel time limit
   },
 
   async adminUpdateStatus(orderId, status, adminUser) {
@@ -196,8 +198,9 @@ const orderService = {
   },
 };
 
-function formatOrder(row) {
-  return row ? {
+function formatOrder(row, cancelMinutes) {
+  if (!row) return null;
+  const base = {
     id: row.id,
     userId: row.user_id,
     userName: row.user_name,
@@ -214,7 +217,19 @@ function formatOrder(row) {
     paidAt: row.paid_at || null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
-  } : null;
+  };
+
+  // Cancel eligibility (only for user-facing queries where cancelMinutes is provided)
+  if (cancelMinutes != null && (base.status === 'waiting' || base.status === 'preparing')) {
+    const deadline = new Date(new Date(base.createdAt).getTime() + cancelMinutes * 60000);
+    base.cancelDeadline = deadline.toISOString();
+    base.canCancel = new Date() < deadline;
+  } else {
+    base.cancelDeadline = null;
+    base.canCancel = false;
+  }
+
+  return base;
 }
 
 function formatOrderItem(row) {

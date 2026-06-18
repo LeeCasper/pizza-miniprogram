@@ -19,6 +19,8 @@ function formatOrder(o) {
     statusText: ORDER_STATUS_MAP[o.status] || o.status,
     paymentStatusText: o.paymentMethod ? (o.paymentMethod === 'wechat' ? '微信支付' : '余额支付') : '待支付',
     isPaid: !!o.paymentMethod,
+    canCancel: !!o.canCancel,
+    cancelDeadline: o.cancelDeadline || null,
   };
 }
 

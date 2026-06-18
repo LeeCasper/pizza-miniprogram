@@ -278,6 +278,7 @@ const local: App.I18n.Schema = {
     settings_pay: '支付配置',
     settings_printer: '打印机配置',
     settings_store: '门店设置',
+    settings_business: '业务配置',
   },
   page: {
     login: {

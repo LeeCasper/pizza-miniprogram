@@ -199,6 +199,7 @@ const routeMap: RouteMap = {
   "settings_pay": "/settings/pay",
   "settings_printer": "/settings/printer",
   "settings_store": "/settings/store",
+  "settings_business": "/settings/business",
   "users": "/users",
   "users_list": "/users/list"
 };

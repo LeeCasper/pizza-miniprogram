@@ -53,6 +53,7 @@ declare module "@elegant-router/types" {
     "settings_pay": "/settings/pay";
     "settings_printer": "/settings/printer";
     "settings_store": "/settings/store";
+    "settings_business": "/settings/business";
     "users": "/users";
     "users_list": "/users/list";
   };
@@ -145,6 +146,7 @@ declare module "@elegant-router/types" {
     | "settings_pay"
     | "settings_printer"
     | "settings_store"
+    | "settings_business"
     | "users_list"
   >;
 

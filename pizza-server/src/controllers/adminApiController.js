@@ -1306,6 +1306,63 @@ const adminApiController = {
     }
   },
 
+  // ── Business Settings ─────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/settings/business
+   */
+  async getBusinessSettings(req, res, next) {
+    try {
+      const cfg = await systemConfigService.getBusinessConfig();
+      res.json({
+        code: 0,
+        data: {
+          orderCancelMinutes: parseInt(cfg.orderCancelMinutes, 10) || config.business.orderCancelMinutes,
+          unpaidTimeoutMinutes: parseInt(cfg.unpaidTimeoutMinutes, 10) || config.business.unpaidTimeoutMinutes,
+          storeName: cfg.storeName || config.business.storeName,
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * PUT /api/v1/admin/settings/business
+   */
+  async updateBusinessSettings(req, res, next) {
+    try {
+      const body = req.body || {};
+      const entries = {};
+
+      if (body.orderCancelMinutes !== undefined) {
+        const v = parseInt(body.orderCancelMinutes, 10);
+        if (isNaN(v) || v < 0 || v > 1440) {
+          return res.status(400).json({ code: 400, message: '取消时限应在 0-1440 分钟之间' });
+        }
+        entries.orderCancelMinutes = v;
+      }
+      if (body.unpaidTimeoutMinutes !== undefined) {
+        const v = parseInt(body.unpaidTimeoutMinutes, 10);
+        if (isNaN(v) || v < 1 || v > 1440) {
+          return res.status(400).json({ code: 400, message: '未支付超时应在 1-1440 分钟之间' });
+        }
+        entries.unpaidTimeoutMinutes = v;
+      }
+      if (body.storeName !== undefined) {
+        entries.storeName = String(body.storeName).trim();
+      }
+
+      if (Object.keys(entries).length > 0) {
+        await systemConfigService.updateBusinessConfig(entries);
+      }
+
+      res.json({ code: 0, message: '业务配置已保存' });
+    } catch (err) {
+      next(err);
+    }
+  },
+
   // ── Audit Logs ──────────────────────────────────────
 
   /**

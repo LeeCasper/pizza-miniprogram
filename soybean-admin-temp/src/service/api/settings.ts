@@ -176,3 +176,34 @@ export function fetchUpdateStoreSettings(data: StoreSettingsForm) {
     data,
   });
 }
+
+// ── Business Settings ────────────────────────────────
+
+export interface BusinessSettings {
+  orderCancelMinutes: number;
+  unpaidTimeoutMinutes: number;
+  storeName: string;
+}
+
+export interface BusinessSettingsForm {
+  orderCancelMinutes?: number;
+  unpaidTimeoutMinutes?: number;
+  storeName?: string;
+}
+
+/** Get business settings */
+export function fetchBusinessSettings() {
+  return request<BusinessSettings>({
+    url: '/settings/business',
+    method: 'GET',
+  });
+}
+
+/** Update business settings */
+export function fetchUpdateBusinessSettings(data: BusinessSettingsForm) {
+  return request<null>({
+    url: '/settings/business',
+    method: 'PUT',
+    data,
+  });
+}

@@ -282,6 +282,7 @@ const local: App.I18n.Schema = {
     settings_pay: 'Payment Config',
     settings_printer: 'Printer Config',
     settings_store: 'Store Settings',
+    settings_business: 'Business',
   },
   page: {
     login: {

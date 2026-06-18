@@ -44,6 +44,7 @@ Page({
         const ordersWithDigits = (res.data || []).map(formatOrder);
         this.setData({ orders: ordersWithDigits, loading: false });
         this.filterOrders();
+        this._scheduleCancelDeadlineRefresh(ordersWithDigits);
       } else {
         this.setData({ loading: false });
       }
@@ -141,22 +142,48 @@ Page({
   },
 
   onCancelOrder(e) {
-    const { id } = e.currentTarget.dataset;
+    const { id, paid } = e.currentTarget.dataset;
+    const isPaid = paid === true || paid === 'true';
+    const content = isPaid ? '取消后将自动退款到原支付方式，确定取消吗？' : '确定要取消此订单吗？';
     wx.showModal({
       title: '取消订单',
-      content: '确定要取消该订单吗？',
+      content,
       success: (res) => {
-        if (res.confirm) {
-          api.put('/orders/' + id + '/cancel').then(result => {
-            if (result.code === 0) {
-              wx.showToast({ title: '订单已取消', icon: 'success' });
-              this.fetchOrders();
-            }
-          }).catch(() => {
-            wx.showToast({ title: '取消失败', icon: 'none' });
-          });
-        }
+        if (!res.confirm) return;
+        wx.showLoading({ title: '处理中...' });
+        api.put('/orders/' + id + '/cancel').then(result => {
+          wx.hideLoading();
+          if (result.code === 0) {
+            const msg = result.refund
+              ? (result.refund.method === 'balance' ? '已取消，退款已到账' : '已取消，微信退款处理中')
+              : '订单已取消';
+            wx.showToast({ title: msg, icon: 'success', duration: 2000 });
+            this.fetchOrders();
+          } else {
+            wx.showToast({ title: result.message || '取消失败', icon: 'none' });
+            this.fetchOrders(); // refresh to update canCancel state
+          }
+        }).catch(() => {
+          wx.hideLoading();
+          wx.showToast({ title: '取消失败', icon: 'none' });
+        });
       }
     });
+  },
+
+  /** Auto-refresh when the nearest cancelDeadline expires so button disappears */
+  _scheduleCancelDeadlineRefresh(orders) {
+    if (this._cancelTimer) { clearTimeout(this._cancelTimer); this._cancelTimer = null; }
+    const now = Date.now();
+    let nearest = Infinity;
+    for (const o of orders) {
+      if (o.canCancel && o.cancelDeadline) {
+        const dl = new Date(o.cancelDeadline).getTime();
+        if (dl > now && dl < nearest) nearest = dl;
+      }
+    }
+    if (nearest < Infinity) {
+      this._cancelTimer = setTimeout(() => { this.fetchOrders(); }, nearest - now + 500);
+    }
   },
 });

@@ -58,7 +58,7 @@
         <text class="order-total">合计 <text class="total-price">¥{{item.total}}</text></text>
         <view class="order-actions">
           <view class="order-action-btn pay-btn" wx:if="{{!item.isPaid && item.status !== 'cancelled'}}" bindtap="onPayOrder" data-id="{{item.id}}"><text>去支付</text></view>
-          <view class="order-action-btn outline" wx:if="{{item.status === 'waiting' || item.status === 'preparing'}}" bindtap="onCancelOrder" data-id="{{item.id}}" data-paid="{{item.isPaid}}"><text>{{item.isPaid ? '取消退款' : '取消'}}</text></view>
+          <view class="order-action-btn outline" wx:if="{{item.canCancel}}" bindtap="onCancelOrder" data-id="{{item.id}}" data-paid="{{item.isPaid}}"><text>{{item.isPaid ? '取消退款' : '取消'}}</text></view>
           <view class="order-action-btn primary" bindtap="onOrderDetail" data-id="{{item.id}}"><text>查看详情</text></view>
         </view>
       </view>

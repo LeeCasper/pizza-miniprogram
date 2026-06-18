@@ -61,6 +61,12 @@ const config = {
     footerTip: process.env.PRINTER_FOOTER_TIP || '请到取餐口出示取餐码',
     audioEnabled: process.env.PRINTER_AUDIO_ENABLED !== 'false',
   },
+
+  business: {
+    orderCancelMinutes: 1,
+    unpaidTimeoutMinutes: 30,
+    storeName: '爱家店',
+  },
 };
 
 // ── Production env validation ─────────────────────────

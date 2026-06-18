@@ -88,6 +88,8 @@ router.get('/settings/map', ctrl.getMapSettings);
 router.put('/settings/map', ctrl.updateMapSettings);
 router.get('/settings/store', ctrl.getStoreSettings);
 router.put('/settings/store', ctrl.updateStoreSettings);
+router.get('/settings/business', ctrl.getBusinessSettings);
+router.put('/settings/business', ctrl.updateBusinessSettings);
 
 // Payment records (transaction history)
 router.get('/payment-records', ctrl.listPaymentRecords);

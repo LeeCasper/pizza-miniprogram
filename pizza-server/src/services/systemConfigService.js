@@ -303,6 +303,77 @@ const systemConfigService = {
       log.error({ err }, 'failed to sync map config from DB');
     });
   },
+
+  // ── Business Config ────────────────────────────────
+
+  /**
+   * Get business config from DB.
+   * @returns {Promise<{ orderCancelMinutes, unpaidTimeoutMinutes, storeName }>}
+   */
+  async getBusinessConfig() {
+    try {
+      const [rows] = await pool.query(
+        "SELECT config_key, config_value FROM system_config WHERE config_key LIKE 'biz_%'"
+      );
+      const map = {};
+      rows.forEach(r => { map[r.config_key] = r.config_value || ''; });
+      return {
+        orderCancelMinutes: map.biz_order_cancel_minutes || '',
+        unpaidTimeoutMinutes: map.biz_order_unpaid_timeout_minutes || '',
+        storeName: map.biz_order_store_name || '',
+      };
+    } catch (_) {
+      return { orderCancelMinutes: '', unpaidTimeoutMinutes: '', storeName: '' };
+    }
+  },
+
+  /**
+   * Update business config in DB (UPSERT per key).
+   * @param {object} entries — { orderCancelMinutes, unpaidTimeoutMinutes, storeName }
+   */
+  async updateBusinessConfig(entries) {
+    const fieldMap = {
+      orderCancelMinutes: 'biz_order_cancel_minutes',
+      unpaidTimeoutMinutes: 'biz_order_unpaid_timeout_minutes',
+      storeName: 'biz_order_store_name',
+    };
+
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+      for (const [camelKey, dbKey] of Object.entries(fieldMap)) {
+        if (entries[camelKey] !== undefined) {
+          const value = entries[camelKey] != null ? String(entries[camelKey]) : '';
+          await conn.query(
+            'INSERT INTO system_config (config_key, config_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE config_value = ?',
+            [dbKey, value, value]
+          );
+        }
+      }
+      await conn.commit();
+    } catch (err) {
+      await conn.rollback();
+      throw err;
+    } finally {
+      conn.release();
+    }
+
+    // Sync to in-memory config
+    this.syncBusinessConfigToMemory();
+  },
+
+  /**
+   * Sync business DB config to in-memory config object.
+   */
+  syncBusinessConfigToMemory() {
+    this.getBusinessConfig().then(dbConfig => {
+      if (dbConfig.orderCancelMinutes !== '') config.business.orderCancelMinutes = parseInt(dbConfig.orderCancelMinutes, 10) || 1;
+      if (dbConfig.unpaidTimeoutMinutes !== '') config.business.unpaidTimeoutMinutes = parseInt(dbConfig.unpaidTimeoutMinutes, 10) || 30;
+      if (dbConfig.storeName) config.business.storeName = dbConfig.storeName;
+    }).catch(err => {
+      log.error({ err }, 'failed to sync business config from DB');
+    });
+  },
 };
 
 module.exports = systemConfigService;

@@ -199,9 +199,9 @@ const orderController = {
       // 6. Insert order
       await conn.query(
         `INSERT INTO orders (id, user_id, status, total, discount_amount, paid_amount, pickup_code, store_name, coupon_used_id, note, payment_method, paid_at)
-         VALUES (?, ?, 'waiting', ?, ?, ?, ?, '爱家店', ?, ?, ?, ?)`,
+         VALUES (?, ?, 'waiting', ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [orderId, userId, total.toFixed(2), discountAmount.toFixed(2), paidAmount.toFixed(2),
-         pickupCode, couponUsedId, note || '', paymentMethodValue, paidAt]
+         pickupCode, require('../config').business.storeName, couponUsedId, note || '', paymentMethodValue, paidAt]
       );
 
       // 7. Insert order items
@@ -320,6 +320,17 @@ const orderController = {
       const existing = await orderService.findById(req.params.id);
       if (!existing || existing.userId !== req.user.id) {
         return res.status(400).json({ code: 400, message: '订单不存在或无法取消' });
+      }
+
+      // Time window check: user can only cancel within configured minutes
+      const cancelMinutes = require('../config').business.orderCancelMinutes;
+      const createdAt = new Date(existing.createdAt);
+      const elapsedMs = Date.now() - createdAt.getTime();
+      if (elapsedMs > cancelMinutes * 60 * 1000) {
+        return res.status(400).json({
+          code: 400,
+          message: `订单已超过${cancelMinutes}分钟，无法取消`,
+        });
       }
 
       const cancelled = await orderService.cancel(req.params.id, req.user.id);
