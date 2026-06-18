@@ -1,5 +1,7 @@
 const pool = require('../config/database');
 const { createLogger } = require('../utils/logger');
+const { getTierLevel } = require('../utils/memberTier');
+const auditService = require('./auditService');
 const log = createLogger('User');
 
 const userService = {
@@ -10,7 +12,7 @@ const userService = {
 
   async findById(id) {
     const [rows] = await pool.query(
-      'SELECT id, openid, name, avatar, bio, phone, points, balance, total_spent, member_level, notification_enabled, role, created_at, updated_at FROM users WHERE id = ?',
+      'SELECT id, openid, name, avatar, bio, phone, points, balance, total_spent, total_recharge, member_level, notification_enabled, role, created_at, updated_at FROM users WHERE id = ?',
       [id]
     );
     return rows[0] || null;
@@ -90,6 +92,7 @@ const userService = {
       points: r.points,
       balance: parseFloat(r.balance || 0),
       totalSpent: parseFloat(r.total_spent || 0),
+      totalRecharge: parseFloat(r.total_recharge || 0),
       memberLevel: r.member_level,
       notificationEnabled: !!r.notification_enabled,
       role: r.role,
@@ -112,14 +115,51 @@ const userService = {
     const conn = await pool.getConnection();
     try {
       await conn.beginTransaction();
-      const [[user]] = await conn.query('SELECT balance FROM users WHERE id = ? FOR UPDATE', [id]);
+      const [[user]] = await conn.query(
+        'SELECT balance, total_spent, total_recharge, member_level FROM users WHERE id = ? FOR UPDATE',
+        [id]
+      );
       if (!user) throw new Error('用户不存在');
-      const balanceAfter = parseFloat(user.balance) + parseFloat(amount);
-      await conn.query('UPDATE users SET balance = ? WHERE id = ?', [balanceAfter, id]);
+
+      const parsedAmount = parseFloat(amount);
+      const balanceAfter = parseFloat(user.balance) + parsedAmount;
+      const newTotalSpent = parseFloat(user.total_spent) + parsedAmount;
+      const newTotalRecharge = parseFloat(user.total_recharge) + parsedAmount;
+      const newTierLevel = await getTierLevel(newTotalSpent);
+
+      await conn.query(
+        'UPDATE users SET balance = ?, total_spent = ?, total_recharge = ?, member_level = ? WHERE id = ?',
+        [balanceAfter, newTotalSpent, newTotalRecharge, newTierLevel, id]
+      );
       await conn.query(
         'INSERT INTO balance_history (user_id, amount, balance_after, type, remark) VALUES (?, ?, ?, ?, ?)',
         [id, amount, balanceAfter, 'recharge', remark || '余额充值']
       );
+
+      // Audit: admin recharge
+      await auditService.record({
+        actorType: 'admin',
+        action: 'user.admin_recharge',
+        entityType: 'user',
+        entityId: id,
+        before: { balance: parseFloat(user.balance), totalSpent: parseFloat(user.total_spent), memberLevel: user.member_level },
+        after: { balance: balanceAfter, totalSpent: newTotalSpent, memberLevel: newTierLevel },
+        metadata: { amount: parsedAmount, remark: remark || '余额充值' },
+      }, conn);
+
+      // Audit: tier change (if any)
+      if (newTierLevel !== user.member_level) {
+        await auditService.record({
+          actorType: 'system',
+          action: 'user.tier_change',
+          entityType: 'user',
+          entityId: id,
+          before: { memberLevel: user.member_level },
+          after: { memberLevel: newTierLevel },
+          metadata: { trigger: 'admin_recharge', totalSpent: newTotalSpent },
+        }, conn);
+      }
+
       await conn.commit();
       return { balance: balanceAfter };
     } catch (err) {
@@ -150,6 +190,7 @@ const userService = {
     if (data.points !== undefined) { sets.push('points = ?'); values.push(parseInt(data.points)); }
     if (data.balance !== undefined) { sets.push('balance = ?'); values.push(parseFloat(data.balance)); }
     if (data.totalSpent !== undefined) { sets.push('total_spent = ?'); values.push(parseFloat(data.totalSpent)); }
+    if (data.totalRecharge !== undefined) { sets.push('total_recharge = ?'); values.push(parseFloat(data.totalRecharge)); }
     if (data.memberLevel !== undefined) { sets.push('member_level = ?'); values.push(data.memberLevel); }
     if (sets.length === 0) return this.findById(id);
     values.push(id);

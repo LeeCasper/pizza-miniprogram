@@ -7,6 +7,7 @@ const { generatePickupCode } = require('../utils/pickupCode');
 const { computeTier, getTierLevel } = require('../utils/memberTier');
 const pool = require('../config/database');
 const { createLogger } = require('../utils/logger');
+const auditService = require('../services/auditService');
 const log = createLogger('Order');
 
 const orderController = {
@@ -125,6 +126,24 @@ const orderController = {
 
       const paidAmount = Math.max(0, total - discountAmount);
 
+      // 2c. Stock check & decrement (inside transaction for row-level lock)
+      for (const item of cartItems) {
+        const [[product]] = await conn.query(
+          'SELECT stock FROM products WHERE id = ? FOR UPDATE',
+          [item.productId]
+        );
+        if (product && product.stock >= 0) {
+          if (product.stock < item.quantity) {
+            await conn.rollback();
+            return res.json({ code: 400, message: `"${item.name}" 库存不足（剩余 ${product.stock}）` });
+          }
+          await conn.query(
+            'UPDATE products SET stock = stock - ? WHERE id = ? AND stock >= ?',
+            [item.quantity, item.productId, item.quantity]
+          );
+        }
+      }
+
       // 3. Generate order ID
       const now = new Date();
       const datePrefix = now.getFullYear().toString() +
@@ -240,6 +259,16 @@ const orderController = {
 
       await conn.commit();
 
+      // Audit: order created
+      await auditService.record({
+        actorType: 'user',
+        actorId: userId,
+        action: 'order.created',
+        entityType: 'order',
+        entityId: orderId,
+        after: { total, paidAmount, paymentMethod: paymentMethodValue || 'wechat_pending', pickupCode },
+      });
+
       // Build response
       const order = await orderService.findById(orderId);
 
@@ -297,6 +326,17 @@ const orderController = {
       if (!cancelled) {
         return res.status(400).json({ code: 400, message: '订单不存在或无法取消' });
       }
+
+      // Audit: user cancelled
+      await auditService.record({
+        actorType: 'user',
+        actorId: req.user.id,
+        action: 'order.user_cancelled',
+        entityType: 'order',
+        entityId: req.params.id,
+        before: { status: existing.status, paymentMethod: existing.paymentMethod },
+        after: { status: 'cancelled' },
+      });
 
       // If the order was paid, trigger refund
       let refund = null;

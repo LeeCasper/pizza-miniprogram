@@ -93,4 +93,10 @@ router.put('/settings/store', ctrl.updateStoreSettings);
 router.get('/payment-records', ctrl.listPaymentRecords);
 router.get('/payment-records/:id', ctrl.getPaymentRecord);
 
+// Audit logs
+router.get('/audit-logs', ctrl.listAuditLogs);
+
+// Reconciliation
+router.get('/reconciliation', ctrl.reconcile);
+
 module.exports = router;

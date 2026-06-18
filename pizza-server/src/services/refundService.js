@@ -13,6 +13,7 @@ const config = require('../config');
 const { payRequest, decryptNotify } = require('../utils/wechatPay');
 const { getTierLevel } = require('../utils/memberTier');
 const { createLogger } = require('../utils/logger');
+const auditService = require('./auditService');
 const log = createLogger('Refund');
 
 const refundService = {
@@ -32,6 +33,16 @@ const refundService = {
       const order = orders[0];
       if (!order) throw Object.assign(new Error('订单不存在'), { statusCode: 404 });
       if (!order.payment_method) throw Object.assign(new Error('订单未支付，无需退款'), { statusCode: 400 });
+
+      // Audit: refund initiated
+      await auditService.record({
+        actorType: 'system',
+        action: 'refund.initiated',
+        entityType: 'order',
+        entityId: orderId,
+        before: { status: order.status, paymentMethod: order.payment_method, paidAmount: parseFloat(order.paid_amount) },
+        after: { reason },
+      }, conn);
 
       // Check for existing successful refund
       const [existing] = await conn.query(
@@ -100,6 +111,27 @@ const refundService = {
        VALUES (?, ?, ?, 'balance', ?, ?, 'success', ?, ?)`,
       [orderId, userId, outRefundNo, refundAmount, reason, pointsReversed, couponRestored ? 1 : 0]
     );
+
+    // 6. Restore product stock
+    const [orderItems] = await conn.query(
+      'SELECT product_id, quantity FROM order_items WHERE order_id = ?',
+      [orderId]
+    );
+    for (const item of orderItems) {
+      await conn.query(
+        'UPDATE products SET stock = stock + ? WHERE id = ? AND stock >= 0',
+        [item.quantity, item.product_id]
+      );
+    }
+
+    // 7. Audit: refund completed
+    await auditService.record({
+      actorType: 'system',
+      action: 'refund.completed',
+      entityType: 'order',
+      entityId: orderId,
+      after: { method: 'balance', refundAmount, pointsReversed, couponRestored },
+    }, conn);
 
     log.info({ orderId, refundAmount, pointsReversed, couponRestored }, 'balance refund SUCCESS');
 
@@ -275,6 +307,27 @@ const refundService = {
         'UPDATE refund_records SET points_reversed = ?, coupon_restored = ? WHERE out_refund_no = ?',
         [pointsReversed, couponRestored ? 1 : 0, outRefundNo]
       );
+
+      // Restore product stock
+      const [orderItems] = await conn.query(
+        'SELECT product_id, quantity FROM order_items WHERE order_id = ?',
+        [orderId]
+      );
+      for (const item of orderItems) {
+        await conn.query(
+          'UPDATE products SET stock = stock + ? WHERE id = ? AND stock >= 0',
+          [item.quantity, item.product_id]
+        );
+      }
+
+      // Audit: refund completed
+      await auditService.record({
+        actorType: 'system',
+        action: 'refund.completed',
+        entityType: 'order',
+        entityId: orderId,
+        after: { method: 'wechat', refundAmount, pointsReversed, couponRestored, refundId },
+      }, conn);
 
       await conn.commit();
       log.info({ orderId, pointsReversed, totalSpent: newTotalSpent, level: newLevel }, 'WeChat notify SUCCESS');

@@ -16,6 +16,8 @@ const { invalidateCache, getTierLevel } = require('../utils/memberTier');
 const paymentService = require('../services/paymentService');
 const systemConfigService = require('../services/systemConfigService');
 const storeService = require('../services/storeService');
+const auditService = require('../services/auditService');
+const reconciliationService = require('../services/reconciliationService');
 
 const adminApiController = {
   // ── Auth ────────────────────────────────────────────
@@ -147,7 +149,7 @@ const adminApiController = {
    */
   async createProduct(req, res) {
     try {
-      const { category_key, name, desc, detail_desc, price, image, tag, size_desc, ingredients } = req.body;
+      const { category_key, name, desc, detail_desc, price, image, tag, size_desc, ingredients, stock } = req.body;
       const product = await productService.create({
         category_key,
         name,
@@ -158,6 +160,7 @@ const adminApiController = {
         tag,
         size_desc,
         ingredients: Array.isArray(ingredients) ? ingredients : [],
+        stock: stock !== undefined ? parseInt(stock) : -1,
       });
       return res.status(201).json({ code: 0, message: '商品已创建', data: product });
     } catch (err) {
@@ -171,7 +174,7 @@ const adminApiController = {
    */
   async updateProduct(req, res) {
     try {
-      const { category_key, name, desc, detail_desc, price, image, tag, size_desc, is_available, ingredients } = req.body;
+      const { category_key, name, desc, detail_desc, price, image, tag, size_desc, is_available, ingredients, stock } = req.body;
       const updateData = {};
       if (category_key !== undefined) updateData.category_key = category_key;
       if (name !== undefined) updateData.name = name;
@@ -183,6 +186,7 @@ const adminApiController = {
       if (size_desc !== undefined) updateData.size_desc = size_desc;
       if (is_available !== undefined) updateData.is_available = is_available ? 1 : 0;
       if (ingredients !== undefined) updateData.ingredients = Array.isArray(ingredients) ? ingredients : [];
+      if (stock !== undefined) updateData.stock = parseInt(stock);
 
       const product = await productService.update(req.params.id, updateData);
       if (!product) {
@@ -269,23 +273,32 @@ const adminApiController = {
   async updateOrderStatus(req, res) {
     try {
       const { status } = req.body;
-      const validStatuses = ['waiting', 'preparing', 'completed', 'cancelled'];
-      if (!validStatuses.includes(status)) {
-        return res.status(400).json({ code: 400, message: '无效的状态值' });
+      if (!status) {
+        return res.status(400).json({ code: 400, message: '请提供订单状态' });
       }
+
+      const orderId = req.params.id;
 
       // If cancelling, check if order was paid to trigger refund
       let refund = null;
       if (status === 'cancelled') {
-        const existing = await orderService.findById(req.params.id);
+        const existing = await orderService.findById(orderId);
         if (existing && existing.paymentMethod) {
-          const order = await orderService.adminUpdateStatus(req.params.id, status);
+          let order;
+          try {
+            order = await orderService.adminUpdateStatus(orderId, status, req.user);
+          } catch (err) {
+            if (err.code === 'INVALID_TRANSITION') {
+              return res.status(400).json({ code: 400, message: err.message });
+            }
+            throw err;
+          }
           if (!order) {
             return res.status(404).json({ code: 404, message: '订单不存在' });
           }
           try {
             const refundService = require('../services/refundService');
-            refund = await refundService.refundOrder(req.params.id, '管理员取消订单');
+            refund = await refundService.refundOrder(orderId, '管理员取消订单');
           } catch (refundErr) {
             log.error({ err: refundErr }, 'Refund failed');
             refund = { success: false, message: refundErr.message };
@@ -294,7 +307,15 @@ const adminApiController = {
         }
       }
 
-      const order = await orderService.adminUpdateStatus(req.params.id, status);
+      let order;
+      try {
+        order = await orderService.adminUpdateStatus(orderId, status, req.user);
+      } catch (err) {
+        if (err.code === 'INVALID_TRANSITION') {
+          return res.status(400).json({ code: 400, message: err.message });
+        }
+        throw err;
+      }
       if (!order) {
         return res.status(404).json({ code: 404, message: '订单不存在' });
       }
@@ -354,7 +375,7 @@ const adminApiController = {
    */
   async updateUser(req, res) {
     try {
-      const { name, phone, points, balance, totalSpent, memberLevel } = req.body;
+      const { name, phone, points, balance, totalSpent, totalRecharge, memberLevel } = req.body;
       if (memberLevel) {
         const tiers = await memberTierService.getActive();
         const validKeys = tiers.map(t => t.levelKey);
@@ -369,15 +390,16 @@ const adminApiController = {
       if (balance !== undefined) updateData.balance = balance;
       if (totalSpent !== undefined) updateData.totalSpent = totalSpent;
       if (memberLevel !== undefined) updateData.memberLevel = memberLevel;
+      if (totalRecharge !== undefined) updateData.totalRecharge = totalRecharge;
 
       // 余额或消费金额变动时，自动升级会员等级（仅升不降）
       // 注意：管理后台表单总会发送 memberLevel（即使未改），所以不能用 memberLevel === undefined 判断
+      let currentUser = null;
       if (balance !== undefined || totalSpent !== undefined) {
-        const currentUser = await userService.findById(req.params.id);
+        currentUser = await userService.findById(req.params.id);
         if (currentUser) {
-          const newBalance = balance !== undefined ? parseFloat(balance) : parseFloat(currentUser.balance || 0);
           const newTotalSpent = totalSpent !== undefined ? parseFloat(totalSpent) : parseFloat(currentUser.total_spent || 0);
-          const qualifyingAmount = newBalance + newTotalSpent;
+          const qualifyingAmount = newTotalSpent;
           const computedLevelKey = await getTierLevel(qualifyingAmount);
           // 比较：仅当计算等级高于管理员指定/当前等级时，自动升级
           const tiers = await memberTierService.getActive();
@@ -394,6 +416,31 @@ const adminApiController = {
       if (!user) {
         return res.status(404).json({ code: 404, message: '用户不存在' });
       }
+
+      // 审计：记录余额/消费/充值调整
+      if (balance !== undefined || totalSpent !== undefined || totalRecharge !== undefined) {
+        const before = currentUser ? {
+          balance: currentUser.balance,
+          totalSpent: currentUser.total_spent,
+          totalRecharge: currentUser.total_recharge,
+          memberLevel: currentUser.member_level,
+        } : {};
+        await auditService.record({
+          actorType: 'admin',
+          actorId: req.user.id,
+          action: 'user.balance_adjust',
+          entityType: 'user',
+          entityId: String(req.params.id),
+          before,
+          after: {
+            balance: updateData.balance,
+            totalSpent: updateData.totalSpent,
+            totalRecharge: updateData.totalRecharge,
+            memberLevel: updateData.memberLevel,
+          },
+        });
+      }
+
       return res.json({ code: 0, message: '用户信息已更新', data: user });
     } catch (err) {
       log.error({ err }, 'UpdateUser error');
@@ -1254,6 +1301,44 @@ const adminApiController = {
       const printerService = require('../services/printerService');
       const preview = printerService.previewContent();
       res.json({ code: 0, data: preview });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  // ── Audit Logs ──────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/audit-logs
+   * Query: ?entityType=&entityId=&action=&actorType=&page=1&limit=20
+   */
+  async listAuditLogs(req, res, next) {
+    try {
+      const { entityType, entityId, action, actorType, page = 1, limit = 20 } = req.query;
+      const result = await auditService.query({
+        entityType, entityId, action, actorType,
+        page: parseInt(page), limit: Math.min(parseInt(limit) || 20, 100),
+      });
+      res.json({ code: 0, data: result });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  // ── Reconciliation ─────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/reconcile
+   * Query: ?dateFrom=YYYY-MM-DD&dateTo=YYYY-MM-DD
+   */
+  async reconcile(req, res, next) {
+    try {
+      const { dateFrom, dateTo } = req.query;
+      if (!dateFrom || !dateTo) {
+        return res.status(400).json({ code: 400, message: 'dateFrom and dateTo are required (YYYY-MM-DD)' });
+      }
+      const result = await reconciliationService.reconcile(dateFrom, dateTo);
+      res.json({ code: 0, data: result });
     } catch (err) {
       next(err);
     }

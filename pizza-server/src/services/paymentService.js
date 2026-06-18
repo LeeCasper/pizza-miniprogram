@@ -11,6 +11,7 @@ const { buildPayParams, generateOutTradeNo, payRequest, decryptNotify } = requir
 const { computeTier, getTierLevel } = require('../utils/memberTier');
 const { createLogger } = require('../utils/logger');
 const log = createLogger('Payment');
+const auditService = require('./auditService');
 
 const paymentService = {
 
@@ -289,6 +290,13 @@ const paymentService = {
         } else {
           detail += ' orderAlreadyPaid';
         }
+        await auditService.record({
+          actorType: 'system',
+          action: 'payment.success',
+          entityType: 'order',
+          entityId: record.reference_id,
+          after: { paymentMethod: 'wechat', amount: parseFloat(record.amount), transactionId: transactionId },
+        }, conn);
       } else if (record.type === 'recharge') {
         // Add balance to user + update growth progress (total_spent)
         const amount = parseFloat(record.amount);
@@ -303,8 +311,8 @@ const paymentService = {
           const oldTotalSpent = parseFloat(user.total_spent || 0);
           const newTotalSpent = oldTotalSpent + amount;
           const newTier = await getTierLevel(newTotalSpent);
-          await conn.query('UPDATE users SET total_spent = ?, member_level = ? WHERE id = ?',
-            [newTotalSpent.toFixed(2), newTier, record.user_id]);
+          await conn.query('UPDATE users SET total_spent = ?, total_recharge = total_recharge + ?, member_level = ? WHERE id = ?',
+            [newTotalSpent.toFixed(2), amount, newTier, record.user_id]);
           try {
             await conn.query(
               'INSERT INTO balance_history (user_id, amount, balance_after, type, remark) VALUES (?, ?, ?, ?, ?)',
@@ -314,6 +322,13 @@ const paymentService = {
             log.warn({ err: histErr }, 'balance_history insert skipped (notify)');
           }
           detail = `recharge user=${record.user_id} amount=${amount} balance=${oldBalance}→${balanceAfter} totalSpent=${oldTotalSpent}→${newTotalSpent.toFixed(2)} tier=${newTier}`;
+          await auditService.record({
+            actorType: 'system',
+            action: 'recharge.success',
+            entityType: 'user',
+            entityId: String(record.user_id),
+            after: { amount: parseFloat(record.amount), transactionId: transactionId },
+          }, conn);
         }
       }
 
@@ -480,8 +495,8 @@ const paymentService = {
         const oldTotalSpent = parseFloat(user.total_spent || 0);
         const newTotalSpent = oldTotalSpent + amount;
         const newTier = await getTierLevel(newTotalSpent);
-        await conn.query('UPDATE users SET total_spent = ?, member_level = ? WHERE id = ?',
-          [newTotalSpent.toFixed(2), newTier, record.user_id]);
+        await conn.query('UPDATE users SET total_spent = ?, total_recharge = total_recharge + ?, member_level = ? WHERE id = ?',
+          [newTotalSpent.toFixed(2), amount, newTier, record.user_id]);
         // balance_history insert is best-effort — won't rollback if table missing
         try {
           await conn.query(
@@ -492,6 +507,13 @@ const paymentService = {
           log.warn({ err: histErr }, 'balance_history insert skipped');
         }
         detail = `recharge user=${record.user_id} amount=${amount} balance=${oldBalance}→${balanceAfter} totalSpent=${oldTotalSpent}→${newTotalSpent.toFixed(2)} tier=${newTier}`;
+        await auditService.record({
+          actorType: 'system',
+          action: 'recharge.success',
+          entityType: 'user',
+          entityId: String(record.user_id),
+          after: { amount: parseFloat(record.amount), transactionId: transactionId },
+        }, conn);
       }
 
       await conn.commit();
@@ -589,6 +611,13 @@ const paymentService = {
       } else {
         detail += ' orderAlreadyPaid';
       }
+      await auditService.record({
+        actorType: 'system',
+        action: 'payment.success',
+        entityType: 'order',
+        entityId: record.reference_id,
+        after: { paymentMethod: 'wechat', amount: parseFloat(record.amount), transactionId: transactionId },
+      }, conn);
 
       await conn.commit();
       log.info({ outTradeNo, detail }, 'Synced order from WeChat');

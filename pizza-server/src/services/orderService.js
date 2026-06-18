@@ -1,4 +1,6 @@
 const pool = require('../config/database');
+const { validateTransition } = require('../utils/orderStateMachine');
+const auditService = require('./auditService');
 
 const orderService = {
   async findByUser(userId, status, page = 1, limit = 10, paymentStatus) {
@@ -122,8 +124,39 @@ const orderService = {
     return rows.map(formatOrder);
   },
 
-  async adminUpdateStatus(orderId, status) {
+  async adminUpdateStatus(orderId, status, adminUser) {
+    // Fetch current order to validate transition
+    const [rows] = await pool.query('SELECT * FROM orders WHERE id = ?', [orderId]);
+    const order = rows[0];
+    if (!order) {
+      const err = new Error('订单不存在');
+      err.statusCode = 404;
+      throw err;
+    }
+
+    // Validate state transition
+    const check = validateTransition(order.status, status, order);
+    if (!check.valid) {
+      const err = new Error(check.reason);
+      err.statusCode = 400;
+      err.code = 'INVALID_TRANSITION';
+      throw err;
+    }
+
+    const oldStatus = order.status;
     await pool.query('UPDATE orders SET status = ?, updated_at = NOW() WHERE id = ?', [status, orderId]);
+
+    // Audit log
+    await auditService.record({
+      actorType: 'admin',
+      actorId: adminUser ? adminUser.id : null,
+      action: 'order.status_change',
+      entityType: 'order',
+      entityId: orderId,
+      before: { status: oldStatus },
+      after: { status },
+    });
+
     return this.findById(orderId);
   },
 

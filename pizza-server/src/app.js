@@ -13,6 +13,7 @@ const { errorHandler } = require('./middleware/errorHandler');
 const { requestId } = require('./middleware/requestId');
 const { createLogger } = require('./utils/logger');
 const couponService = require('./services/couponService');
+const orderCleanupService = require('./services/orderCleanupService');
 const pool = require('./config/database');
 
 const serverLog = createLogger('Server');
@@ -207,6 +208,18 @@ const couponCronJob = cron.schedule('0 2 * * *', async () => {
   }
 });
 
+// ── Cron: auto-cancel unpaid orders every 5 minutes ─────
+const orderCleanupJob = cron.schedule('*/5 * * * *', async () => {
+  try {
+    const count = await orderCleanupService.cancelExpiredUnpaidOrders();
+    if (count > 0) {
+      cronLog.info({ count }, 'Auto-cancelled unpaid orders');
+    }
+  } catch (err) {
+    cronLog.error({ err }, 'Order cleanup error');
+  }
+});
+
 // ── Graceful shutdown ──────────────────────────────────
 let isShuttingDown = false;
 
@@ -222,6 +235,7 @@ async function shutdown(signal) {
 
   // 2. Stop cron jobs
   couponCronJob.stop();
+  orderCleanupJob.stop();
 
   // 3. Close DB pool
   try {
