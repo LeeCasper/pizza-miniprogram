@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const session = require('express-session');
 const MySQLStoreFactory = require('express-mysql-session');
 const path = require('path');
@@ -26,9 +28,61 @@ const adminApiRoutes = require('./routes/adminApi');
 
 const app = express();
 
-// ── Global middleware ──────────────────────────────────
-app.use(cors());
+// ── Security middleware ───────────────────────────────
+app.use(helmet({
+  contentSecurityPolicy: false,   // EJS admin pages use inline styles/scripts
+  crossOriginEmbedderPolicy: false,
+}));
+
+// CORS whitelist
+const allowedOrigins = [
+  'https://www.artaides.com',
+  'https://artaides.com',
+];
+if (config.nodeEnv !== 'production') {
+  allowedOrigins.push('http://localhost:9527', 'http://localhost:5173', 'http://127.0.0.1:9527');
+}
+app.use(cors({
+  origin(origin, cb) {
+    // Allow requests with no origin (mobile apps, curl, WeChat mini-program)
+    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+    cb(null, false);
+  },
+  credentials: true,
+}));
+
+// ── Rate limiting ─────────────────────────────────────
 app.set('trust proxy', 1);
+
+// Global API rate limit: 200 req / 15 min per IP
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { code: 429, message: '请求过于频繁，请稍后再试' },
+});
+app.use('/api/', apiLimiter);
+
+// Strict rate limit for auth endpoints: 20 req / 15 min
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { code: 429, message: '登录请求过于频繁，请稍后再试' },
+});
+app.use('/api/v1/auth', authLimiter);
+
+// Strict rate limit for payment endpoints: 30 req / 15 min
+const payLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { code: 429, message: '支付请求过于频繁，请稍后再试' },
+});
+app.use('/api/v1/pay', payLimiter);
 
 // WeChat Pay callbacks MUST receive raw body for signature verification.
 // Mount BEFORE express.json() so the raw parser claims the request first.

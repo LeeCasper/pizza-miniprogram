@@ -110,7 +110,7 @@ const userService = {
     const conn = await pool.getConnection();
     try {
       await conn.beginTransaction();
-      const [[user]] = await conn.query('SELECT balance FROM users WHERE id = ?', [id]);
+      const [[user]] = await conn.query('SELECT balance FROM users WHERE id = ? FOR UPDATE', [id]);
       if (!user) throw new Error('用户不存在');
       const balanceAfter = parseFloat(user.balance) + parseFloat(amount);
       await conn.query('UPDATE users SET balance = ? WHERE id = ?', [balanceAfter, id]);

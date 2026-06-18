@@ -291,7 +291,7 @@ const paymentService = {
         // Add balance to user + update growth progress (total_spent)
         const amount = parseFloat(record.amount);
         const [[user]] = await conn.query(
-          'SELECT balance, total_spent FROM users WHERE id = ?', [record.user_id]
+          'SELECT balance, total_spent FROM users WHERE id = ? FOR UPDATE', [record.user_id]
         );
         if (user) {
           const oldBalance = parseFloat(user.balance);
@@ -467,7 +467,7 @@ const paymentService = {
       // Add balance to user + update growth progress (total_spent)
       const amount = parseFloat(record.amount);
       const [[user]] = await conn.query(
-        'SELECT balance, total_spent FROM users WHERE id = ?', [record.user_id]
+        'SELECT balance, total_spent FROM users WHERE id = ? FOR UPDATE', [record.user_id]
       );
       let detail = '';
       if (user) {

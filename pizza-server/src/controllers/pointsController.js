@@ -44,9 +44,9 @@ const pointsController = {
         return res.status(400).json({ code: 400, message: '商品已售罄' });
       }
 
-      // Check user points and get spending for tier
+      // Check user points and get spending for tier (lock row to prevent race conditions)
       const [userRows] = await conn.query(
-        'SELECT points, total_spent FROM users WHERE id = ?', [userId]
+        'SELECT points, total_spent FROM users WHERE id = ? FOR UPDATE', [userId]
       );
       const userPoints = userRows[0].points;
       if (userPoints < pp.points) {

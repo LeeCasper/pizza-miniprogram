@@ -1,7 +1,7 @@
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '..', '..', '.env') });
 
-module.exports = {
+const config = {
   port: parseInt(process.env.PORT, 10) || 3000,
   nodeEnv: process.env.NODE_ENV || 'development',
 
@@ -62,3 +62,27 @@ module.exports = {
     audioEnabled: process.env.PRINTER_AUDIO_ENABLED !== 'false',
   },
 };
+
+// ── Production env validation ─────────────────────────
+if (config.nodeEnv === 'production') {
+  const required = [
+    ['JWT_SECRET', config.jwtSecret, 'dev-secret-change-me'],
+    ['SESSION_SECRET', config.sessionSecret, 'session-secret-change-me'],
+    ['DB_PASSWORD', config.db.password, ''],
+    ['WX_APPID', config.wx.appId, ''],
+    ['WX_SECRET', config.wx.secret, ''],
+  ];
+  const missing = [];
+  for (const [name, value, insecureDefault] of required) {
+    if (!value || value === insecureDefault) {
+      missing.push(name);
+    }
+  }
+  if (missing.length > 0) {
+    console.error(`[Config] FATAL: Missing required env vars in production: ${missing.join(', ')}`);
+    console.error('[Config] Set these in .env or environment before starting the server.');
+    process.exit(1);
+  }
+}
+
+module.exports = config;

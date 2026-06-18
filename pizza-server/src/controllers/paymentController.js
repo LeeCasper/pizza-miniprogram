@@ -133,6 +133,13 @@ const paymentController = {
   async orderPaymentStatus(req, res, next) {
     try {
       const { orderId } = req.params;
+
+      // Verify order ownership — prevent IDOR
+      const [[order]] = await pool.query('SELECT user_id FROM orders WHERE id = ?', [orderId]);
+      if (!order || order.user_id !== req.user.id) {
+        return res.status(403).json({ code: 403, message: '无权查看此订单' });
+      }
+
       const status = await paymentService.getOrderPaymentStatus(orderId);
 
       if (!status) {
@@ -175,6 +182,13 @@ const paymentController = {
   async rechargePaymentStatus(req, res, next) {
     try {
       const { outTradeNo } = req.params;
+
+      // Verify recharge ownership — prevent IDOR
+      const [[record]] = await pool.query('SELECT user_id FROM payment_records WHERE out_trade_no = ?', [outTradeNo]);
+      if (!record || record.user_id !== req.user.id) {
+        return res.status(403).json({ code: 403, message: '无权查看此充值记录' });
+      }
+
       const status = await paymentService.getRechargePaymentStatus(outTradeNo);
 
       if (!status) {

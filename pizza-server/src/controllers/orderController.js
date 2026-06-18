@@ -24,6 +24,10 @@ const orderController = {
       if (!order) {
         return res.status(404).json({ code: 404, message: '订单不存在' });
       }
+      // Verify ownership — prevent IDOR
+      if (order.userId !== req.user.id) {
+        return res.status(403).json({ code: 403, message: '无权查看此订单' });
+      }
       res.json({ code: 0, data: order });
     } catch (err) {
       next(err);
