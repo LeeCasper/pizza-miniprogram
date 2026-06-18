@@ -4,6 +4,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { NForm, NFormItem, NInput, NInputNumber, NSelect, NSpace, NButton, NCard, NTag, NImage, NCollapse, NCollapseItem } from 'naive-ui';
 import { fetchProduct, fetchCreateProduct, fetchUpdateProduct } from '@/service/api';
 import ImageUpload from '@/components/common/ImageUpload.vue';
+import TagArrayInput from '@/components/common/TagArrayInput.vue';
 
 defineOptions({ name: 'ProductForm' });
 
@@ -39,20 +40,6 @@ const form = ref({
   ingredients: [] as string[],
   is_available: 1,
 });
-
-const ingredientInput = ref('');
-
-function addIngredient() {
-  const val = ingredientInput.value.trim();
-  if (val && !form.value.ingredients.includes(val)) {
-    form.value.ingredients.push(val);
-    ingredientInput.value = '';
-  }
-}
-
-function removeIngredient(idx: number) {
-  form.value.ingredients.splice(idx, 1);
-}
 
 onMounted(async () => {
   if (isEdit.value) {
@@ -137,15 +124,7 @@ async function handleSubmit() {
           <NInput v-model:value="form.size_desc" placeholder="例：9寸 / 12寸" />
         </NFormItem>
         <NFormItem label="配料">
-          <NSpace>
-            <NInput v-model:value="ingredientInput" placeholder="输入配料" style="width:200px" @keyup.enter="addIngredient" />
-            <NButton size="small" @click="addIngredient">添加</NButton>
-          </NSpace>
-          <NSpace style="margin-top:8px">
-            <NTag v-for="(item, idx) in form.ingredients" :key="idx" closable @close="removeIngredient(idx)">
-              {{ item }}
-            </NTag>
-          </NSpace>
+          <TagArrayInput v-model="form.ingredients" placeholder="输入配料" />
         </NFormItem>
         <NFormItem>
           <NSpace>
@@ -163,5 +142,4 @@ async function handleSubmit() {
 <style scoped>
 .product-form { padding: 4px; }
 .page-header { margin-bottom: 16px; }
-.page-title { margin: 0; font-size: 22px; font-weight: 700; }
 </style>

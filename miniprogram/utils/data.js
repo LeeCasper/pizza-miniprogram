@@ -6,7 +6,7 @@ const dietaryRestrictions = [
   { key: 'no_cilantro', label: '不吃香菜' },
   { key: 'vegetarian', label: '素食' },
   { key: 'peanut_allergy', label: '花生过敏' },
-  { key: 'dairy_allergy', label: '牛奶过敏' },
+  { key: 'dairy_allergy', label: '乳制品过敏' },
   { key: 'seafood_allergy', label: '海鲜过敏' },
   { key: 'gluten_allergy', label: '麸质过敏' }
 ];
@@ -397,6 +397,25 @@ const addresses = [
   }
 ];
 
+// ── 分类图标本地映射（数据库存的是 emoji，WXML <image> 无法加载） ──
+const CATEGORY_ICON_MAP = {
+  all: '/images/all-products.png',
+  pizza: '/images/pizza.png',
+  durian: '/images/durian-cake.png',
+  pineapple: '/images/pineapple-cake.png',
+};
+
+// ── 积分商城分类 ──
+const SHOP_CATEGORIES = [
+  { key: 'all', name: '全部', icon: '🔥' },
+  { key: 'pizza', name: '披萨', icon: '🍕' },
+  { key: 'durian', name: '榴莲', icon: '🍈' },
+  { key: 'pineapple', name: '菠萝', icon: '🍍' },
+  { key: 'drink', name: '饮品', icon: '🥤' },
+  { key: 'dessert', name: '甜点', icon: '🍰' },
+  { key: 'snack', name: '小食', icon: '🍟' },
+];
+
 module.exports = {
   products,
   categories,
@@ -404,5 +423,7 @@ module.exports = {
   pointsProducts,
   dietaryRestrictions,
   coupons,
-  addresses
+  addresses,
+  CATEGORY_ICON_MAP,
+  SHOP_CATEGORIES
 };

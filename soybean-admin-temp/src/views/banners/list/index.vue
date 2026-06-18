@@ -105,6 +105,4 @@ onMounted(() => { loadBanners(); });
 
 <style scoped>
 .banners-list { padding: 4px; }
-.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-.page-title { margin: 0; font-size: 22px; font-weight: 700; }
 </style>

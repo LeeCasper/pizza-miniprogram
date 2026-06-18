@@ -137,5 +137,4 @@ async function handleSave() {
 <style scoped>
 .ct-form { padding: 4px; }
 .page-header { margin-bottom: 24px; }
-.page-title { margin: 0; font-size: 22px; font-weight: 700; }
 </style>

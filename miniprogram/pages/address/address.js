@@ -1,6 +1,7 @@
 // pages/address/address.js
 const { api } = require('../../utils/api');
 const app = getApp();
+const { getBackBtnTopBar } = require('../../utils/layout');
 
 Page({
   data: {
@@ -15,13 +16,8 @@ Page({
   },
 
   onLoad() {
-    const sh = app.globalData.statusBarHeight;
-    const rpx = wx.getWindowInfo().windowWidth / 750;
-    const topBarH = sh + 80 * rpx + 24 * rpx;
-    this.setData({
-      statusBarHeight: sh,
-      topBarTotalHeight: topBarH,
-    });
+    const { statusBarHeight, topBarTotalHeight } = getBackBtnTopBar();
+    this.setData({ statusBarHeight, topBarTotalHeight });
     this.fetchAddresses();
   },
 

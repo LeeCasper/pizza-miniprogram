@@ -1,99 +1,13 @@
 // pages/main/main.js
 const { api, fixImageUrl } = require('../../utils/api');
 const pay = require('../../utils/pay');
+const { computeTier, buildTierCards, loadTiers } = require('../../utils/tiers');
+const { getSwiperLayout } = require('../../utils/layout');
+const { formatOrder } = require('../../utils/orders');
+const { CATEGORY_ICON_MAP, dietaryRestrictions, SHOP_CATEGORIES } = require('../../utils/data');
+const { logout } = require('../../utils/auth');
 const app = getApp();
 
-// ── 分类图标本地映射（数据库存的是 emoji，WXML <image> 无法加载） ──
-const CATEGORY_ICON_MAP = {
-  all: '/images/all-products.png',
-  pizza: '/images/pizza.png',
-  durian: '/images/durian-cake.png',
-  pineapple: '/images/pineapple-cake.png',
-};
-
-// ── 忌口选项（静态配置，来自微信小程序常量） ──────────
-const dietaryRestrictions = [
-  { key: 'no_spicy', label: '不吃辣' },
-  { key: 'no_garlic', label: '不吃蒜' },
-  { key: 'no_onion', label: '不吃洋葱' },
-  { key: 'no_cilantro', label: '不吃香菜' },
-  { key: 'vegetarian', label: '素食' },
-  { key: 'peanut_allergy', label: '花生过敏' },
-  { key: 'dairy_allergy', label: '乳制品过敏' },
-  { key: 'seafood_allergy', label: '海鲜过敏' },
-  { key: 'gluten_allergy', label: '麸质过敏' }
-];
-
-// ── 会员等级配置 ──────────────────────────────
-// ── 会员等级（API 驱动 + 本地回退）─────────────
-const FALLBACK_TIERS = [
-  { levelKey: 'silver',    name: '银卡会员',   levelIndex: 1, minSpent:     0, discountRate: 1.00, pointsRewardRate: 1.00, birthdayGift: '生日当月享9折优惠一次',       couponValue:  0, accentColor: '#c0c0c0', bgStartColor: 'rgba(60,60,65,0.88)',  bgEndColor: 'rgba(25,25,30,0.95)', bgImage: '/images/tier-bg-silver.jpg' },
-  { levelKey: 'gold',      name: '金卡会员',   levelIndex: 2, minSpent:   200, discountRate: 0.98, pointsRewardRate: 1.00, birthdayGift: '生日当月享8折优惠一次',       couponValue:  5, accentColor: '#f2ca50', bgStartColor: 'rgba(45,42,33,0.88)',  bgEndColor: 'rgba(17,14,7,0.95)', bgImage: '/images/tier-bg-gold.jpg' },
-  { levelKey: 'rose_gold', name: '玫瑰金会员', levelIndex: 3, minSpent:  1000, discountRate: 0.95, pointsRewardRate: 1.20, birthdayGift: '生日当月享7折优惠+专属礼物',  couponValue: 10, accentColor: '#e0a2a2', bgStartColor: 'rgba(50,35,35,0.88)',  bgEndColor: 'rgba(20,15,15,0.95)', bgImage: '/images/tier-bg-rosegold.jpg' },
-  { levelKey: 'platinum',  name: '铂金会员',   levelIndex: 4, minSpent:  3000, discountRate: 0.90, pointsRewardRate: 1.50, birthdayGift: '生日当月享6折优惠+上门配送',  couponValue: 20, accentColor: '#b4bed2', bgStartColor: 'rgba(35,40,50,0.88)',  bgEndColor: 'rgba(15,17,25,0.95)', bgImage: '/images/tier-bg-platinum.jpg' },
-  { levelKey: 'diamond',   name: '钻石会员',   levelIndex: 5, minSpent: 10000, discountRate: 0.85, pointsRewardRate: 2.00, birthdayGift: '生日当月享5折优惠+专属客服',  couponValue: 50, accentColor: '#82c8f0', bgStartColor: 'rgba(20,35,50,0.88)',  bgEndColor: 'rgba(10,15,25,0.95)', bgImage: '/images/tier-bg-diamond.jpg' },
-];
-
-function computeTier(totalSpent, tiers, memberLevel) {
-  let current = tiers[0], next = tiers[1];
-  // 优先使用服务端 memberLevel（管理员可直接修改等级）
-  if (memberLevel) {
-    const idx = tiers.findIndex(t => t.levelKey === memberLevel);
-    if (idx >= 0) {
-      current = tiers[idx];
-      next = tiers[idx + 1] || null;
-      return { current, next };
-    }
-  }
-  // 回退：从 totalSpent 计算
-  for (let i = tiers.length - 1; i >= 0; i--) {
-    if (totalSpent >= tiers[i].minSpent) { current = tiers[i]; next = tiers[i + 1] || null; break; }
-  }
-  return { current, next };
-}
-
-function buildTierCards(apiTiers, userTier) {
-  const totalSpent = userTier._totalSpent || 0;
-  return apiTiers.map(t => {
-    const isActive = t.levelKey === userTier.current.levelKey;
-    let progressText = '', actionText = '', progressPercent = 0;
-    if (t.levelIndex < userTier.current.levelIndex) {
-      progressText = '已达成';
-      progressPercent = 100;
-      actionText = t.discountRate < 1 ? '享' + ((1 - t.discountRate) * 100).toFixed(0) + '%折扣' : '查看特权';
-    } else if (isActive) {
-      if (userTier.next) {
-        const diff = (userTier.next.minSpent - totalSpent).toFixed(2);
-        progressText = '还差¥' + diff + '升级' + userTier.next.name;
-        progressPercent = Math.min(100, Math.max(0,
-          ((totalSpent - userTier.current.minSpent) / (userTier.next.minSpent - userTier.current.minSpent)) * 100
-        ));
-        actionText = '查看权益';
-      } else {
-        progressText = '已达最高等级';
-        progressPercent = 100;
-        actionText = '尊享特权';
-      }
-    } else {
-      const diff = (t.minSpent - totalSpent).toFixed(2);
-      progressText = '消费满¥' + t.minSpent + '解锁';
-      progressPercent = 0;
-      actionText = '查看权益';
-    }
-    const discountText = t.discountRate < 1 ? (t.discountRate * 10).toFixed(1).replace(/\.0$/, '') + '折' : '';
-    const bgStyle = t.bgImage ? 'background-image:url(' + t.bgImage + ');background-size:cover;background-position:center;' : '';
-    const status = isActive ? 'current' : (t.levelIndex < userTier.current.levelIndex ? 'achieved' : 'locked');
-    return {
-      levelKey: t.levelKey, levelIndex: t.levelIndex, name: t.name,
-      accentColor: t.accentColor, bgStartColor: t.bgStartColor, bgEndColor: t.bgEndColor,
-      bgImage: t.bgImage || null, bgStyle,
-      discountRate: t.discountRate, pointsRewardRate: t.pointsRewardRate,
-      birthdayGift: t.birthdayGift, couponValue: t.couponValue || 0,
-      discountText, progressPercent, status,
-      isActive, progressText, actionText,
-    };
-  });
-}
 Page({
   data: {
     statusBarHeight: app.globalData.statusBarHeight,
@@ -128,15 +42,7 @@ Page({
     // 会员订阅（商城 tab 会员弹窗）
     selectedPlan: 'monthly',
     memberOverlayOpen: false,
-    shopBanners: [], shopCategories: [
-      { key: 'all', name: '全部', icon: '🔥' },
-      { key: 'pizza', name: '披萨', icon: '🍕' },
-      { key: 'durian', name: '榴莲', icon: '🍈' },
-      { key: 'pineapple', name: '菠萝', icon: '🍍' },
-      { key: 'drink', name: '饮品', icon: '🥤' },
-      { key: 'dessert', name: '甜点', icon: '🍰' },
-      { key: 'snack', name: '小食', icon: '🍟' },
-    ],
+    shopBanners: [], shopCategories: SHOP_CATEGORIES,
     shopActiveCat: 'all', shopActiveCatName: '精选好物',
     shopProducts: [], shopFilteredProducts: [],
     shopFlashDeal: null,
@@ -145,14 +51,7 @@ Page({
   },
 
   onLoad() {
-    const win = wx.getWindowInfo();
-    const sh = win.statusBarHeight;
-    const rpx = win.windowWidth / 750;
-    // Tab bar is 100rpx + safe-area, fixed at bottom — reserve its height from scroll area
-    const tabBarPx = 100 * rpx;
-    const swiperHeight = win.windowHeight - (sh + 36);
-    const scrollViewHeight = swiperHeight - tabBarPx;
-    this.setData({ statusBarHeight: sh, topBarTotalHeight: sh + 36, scrollViewHeight });
+    this.setData(getSwiperLayout());
     this.fetchProducts();
     this.fetchOrders();
     this.loadProfileData();
@@ -229,15 +128,7 @@ Page({
   fetchOrders() {
     api.get('/orders').then(res => {
       if (res.code === 0) {
-        const STATUS_MAP = { waiting: '待取餐', preparing: '制作中', completed: '已完成', cancelled: '已取消' };
-        const ordersWithDigits = (res.data || []).map(o => ({
-          ...o,
-          codeDigits: String(o.pickupCode || '').split(''),
-          time: o.createdAt || o.time || '',
-          statusText: STATUS_MAP[o.status] || o.status,
-          paymentStatusText: o.paymentMethod ? (o.paymentMethod === 'wechat' ? '微信支付' : '余额支付') : '待支付',
-          isPaid: !!o.paymentMethod,
-        }));
+        const ordersWithDigits = (res.data || []).map(formatOrder);
         const { activeTab } = this.data;
         const filtered = activeTab === 'all' ? ordersWithDigits : ordersWithDigits.filter(o => o.status === activeTab);
         this.setData({ orders: ordersWithDigits, filteredOrders: filtered, ordersLoaded: true });
@@ -583,7 +474,7 @@ Page({
     // 并行获取最新用户数据 & 等级配置，只构建一次卡片（避免 swiper 连续两次 setData 导致抖动）
     Promise.all([
       api.get('/user/profile').then(res => res.code === 0 ? res.data : null).catch(() => null),
-      this._ensureTiersLoaded(),
+      loadTiers(),
     ]).then(([freshUi, apiTiers]) => {
       let ui = cachedUi;
       if (freshUi) {
@@ -610,16 +501,6 @@ Page({
     });
   },
 
-  _ensureTiersLoaded() {
-    if (this._apiTiers) return Promise.resolve(this._apiTiers);
-    return api.get('/user/member-tiers').then(res => {
-      this._apiTiers = (res && res.code === 0 && res.data && res.data.length) ? res.data.map(t => { const fb = FALLBACK_TIERS.find(f => f.levelKey === t.levelKey); return fb ? { ...fb, ...t } : t; }) : FALLBACK_TIERS;
-      return this._apiTiers;
-    }).catch(() => {
-      this._apiTiers = FALLBACK_TIERS;
-      return this._apiTiers;
-    });
-  },
   onMenuItem(e) {
     const { action } = e.currentTarget.dataset;
     const routes = {
@@ -639,10 +520,7 @@ Page({
     target.tab !== undefined ? this.setData({ currentTab: target.tab }) : wx.navigateTo({ url: target });
   },
   onLogout() {
-    wx.showModal({
-      title: '确认退出', content: '确定要退出登录吗？',
-      success: (res) => { if (res.confirm) { wx.removeStorageSync('token'); wx.removeStorageSync('userInfo'); wx.showToast({ title: '已退出', icon: 'success' }); } }
-    });
+    logout();
   },
 
   // ── 会员卡轮播 ──────────────────────────────

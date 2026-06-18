@@ -2,6 +2,7 @@
 const { api } = require('../../utils/api');
 const pay = require('../../utils/pay');
 const app = getApp();
+const { getSimpleTopBar } = require('../../utils/layout');
 
 const PRESET_AMOUNTS = [50, 100, 200, 300, 500, 1000];
 
@@ -18,11 +19,7 @@ Page({
   },
 
   onLoad() {
-    const sh = app.globalData.statusBarHeight || 44;
-    this.setData({
-      statusBarHeight: sh,
-      topBarTotalHeight: sh + 36,
-    });
+    this.setData(getSimpleTopBar());
     this.loadBalance();
   },
 

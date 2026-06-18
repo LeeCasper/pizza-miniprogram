@@ -173,8 +173,6 @@ onMounted(() => { loadFiles(); });
 
 <style scoped>
 .files-page { padding: 4px; }
-.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-.page-title { margin: 0; font-size: 22px; font-weight: 700; }
 .file-info { display: flex; flex-direction: column; gap: 4px; }
 .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 0; }
 </style>

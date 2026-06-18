@@ -2,6 +2,7 @@
 const { api } = require('../../utils/api');
 const { calculateWalkingDistance, formatDistance } = require('../../utils/mapConfig');
 const app = getApp();
+const { getSimpleTopBar } = require('../../utils/layout');
 
 // 默认门店坐标（fallback，GCJ-02）
 const DEFAULT_LAT = 32.961857;
@@ -32,12 +33,7 @@ Page({
   _lastDistCalc: 0,
 
   onLoad() {
-    const sh = app.globalData.statusBarHeight;
-    const topBarH = sh + 36;
-    this.setData({
-      statusBarHeight: sh,
-      topBarTotalHeight: topBarH,
-    });
+    this.setData(getSimpleTopBar());
     this.fetchStore();
   },
 

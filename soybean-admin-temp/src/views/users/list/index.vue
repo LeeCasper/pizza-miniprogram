@@ -4,6 +4,7 @@ import { NDataTable, NTag, NAvatar, NButton, NSpace, NIcon, NDrawer, NDrawerCont
 import { EditOutlined } from '@vicons/antd';
 import type { DataTableColumns } from 'naive-ui';
 import { fetchUsers, fetchUpdateUser, fetchMemberTiers, type UserEditData } from '@/service/api';
+import { formatPrice } from '@/utils/format';
 
 defineOptions({ name: 'UserList' });
 
@@ -63,10 +64,10 @@ const columns: DataTableColumns<any> = [
   },
   { title: '积分', key: 'points', width: 80 },
   { title: '余额', key: 'balance', width: 80,
-    render(row) { return `¥${Number(row.balance || 0).toFixed(2)}`; }
+    render(row) { return formatPrice(row.balance); }
   },
   { title: '累计消费', key: 'totalSpent', width: 100,
-    render(row) { return `¥${Number(row.totalSpent || 0).toFixed(2)}`; }
+    render(row) { return formatPrice(row.totalSpent); }
   },
   { title: '订单数', key: 'orderCount', width: 80 },
   { title: '注册时间', key: 'createdAt', width: 160 },

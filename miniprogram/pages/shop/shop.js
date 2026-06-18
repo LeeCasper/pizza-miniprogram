@@ -1,16 +1,8 @@
 // pages/shop/shop.js — 会员商城
 const { api, fixImageUrl } = require('../../utils/api');
+const { getSwiperLayout } = require('../../utils/layout');
+const { SHOP_CATEGORIES } = require('../../utils/data');
 const app = getApp();
-
-const SHOP_CATEGORIES = [
-  { key: 'all', name: '全部', icon: '🔥' },
-  { key: 'pizza', name: '披萨', icon: '🍕' },
-  { key: 'durian', name: '榴莲', icon: '🍈' },
-  { key: 'pineapple', name: '菠萝', icon: '🍍' },
-  { key: 'drink', name: '饮品', icon: '🥤' },
-  { key: 'dessert', name: '甜点', icon: '🍰' },
-  { key: 'snack', name: '小食', icon: '🍟' },
-];
 
 Page({
   data: {
@@ -28,17 +20,7 @@ Page({
   },
 
   onLoad() {
-    const win = wx.getWindowInfo();
-    const sh = win.statusBarHeight;
-    const rpx = win.windowWidth / 750;
-    const tabBarPx = 100 * rpx;
-    const swiperHeight = win.windowHeight - (sh + 36);
-    const scrollViewHeight = swiperHeight - tabBarPx;
-    this.setData({
-      statusBarHeight: sh,
-      topBarTotalHeight: sh + 36,
-      scrollViewHeight,
-    });
+    this.setData(getSwiperLayout());
     this.fetchProducts();
   },
 

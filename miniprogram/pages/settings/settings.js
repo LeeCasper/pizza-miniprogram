@@ -1,5 +1,7 @@
 // pages/settings/settings.js
 const { api } = require('../../utils/api');
+const { getBackBtnTopBar } = require('../../utils/layout');
+const { logout } = require('../../utils/auth');
 const app = getApp();
 
 Page({
@@ -17,10 +19,6 @@ Page({
   },
 
   onLoad() {
-    const sh = app.globalData.statusBarHeight;
-    const rpx = wx.getWindowInfo().windowWidth / 750;
-    const topBarH = sh + 80 * rpx + 24 * rpx;
-
     let cacheSize = '0 KB';
     try {
       const info = wx.getStorageInfoSync();
@@ -29,8 +27,7 @@ Page({
     } catch (e) { /* ignore */ }
 
     this.setData({
-      statusBarHeight: sh,
-      topBarTotalHeight: topBarH,
+      ...getBackBtnTopBar(),
       notificationEnabled: app.globalData.notificationEnabled !== false,
       cacheSize,
     });
@@ -77,18 +74,7 @@ Page({
   },
 
   onLogout() {
-    wx.showModal({
-      title: '确认退出',
-      content: '确定要退出登录吗？',
-      success: (res) => {
-        if (res.confirm) {
-          // Clear token
-          wx.removeStorageSync('token');
-          wx.removeStorageSync('userInfo');
-          wx.showToast({ title: '已退出', icon: 'success' });
-        }
-      }
-    });
+    logout();
   },
 
   onOpenDrawer(e) {

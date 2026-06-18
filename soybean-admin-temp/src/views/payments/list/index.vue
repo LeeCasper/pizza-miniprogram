@@ -3,6 +3,7 @@ import { ref, onMounted, h } from 'vue';
 import { NDataTable, NTag, NSelect, NSpace } from 'naive-ui';
 import type { DataTableColumns } from 'naive-ui';
 import { fetchPaymentRecords } from '@/service/api';
+import { formatPrice } from '@/utils/format';
 
 defineOptions({ name: 'PaymentList' });
 
@@ -45,7 +46,7 @@ const columns: DataTableColumns<any> = [
   },
   {
     title: '金额', key: 'amount', width: 80, align: 'right',
-    render(row) { return `¥${Number(row.amount).toFixed(2)}`; }
+    render(row) { return formatPrice(row.amount); }
   },
   {
     title: '状态', key: 'status', width: 80,
@@ -100,6 +101,4 @@ onMounted(() => { loadRecords(); });
 
 <style scoped>
 .payment-list { padding: 4px; }
-.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-.page-title { margin: 0; font-size: 22px; font-weight: 700; }
 </style>

@@ -1,15 +1,9 @@
 // pages/index/index.js
 const { api, fixImageUrl } = require('../../utils/api');
 const pay = require('../../utils/pay');
+const { getSimpleTopBar } = require('../../utils/layout');
+const { CATEGORY_ICON_MAP } = require('../../utils/data');
 const app = getApp();
-
-// ── 分类图标本地映射（数据库存的是 emoji，WXML <image> 无法加载） ──
-const CATEGORY_ICON_MAP = {
-  all: '/images/all-products.png',
-  pizza: '/images/pizza.png',
-  durian: '/images/durian-cake.png',
-  pineapple: '/images/pineapple-cake.png',
-};
 
 Page({
   data: {
@@ -35,11 +29,7 @@ Page({
   },
 
   onLoad() {
-    const sh = app.globalData.statusBarHeight;
-    this.setData({
-      statusBarHeight: sh,
-      topBarTotalHeight: sh + 36,
-    });
+    this.setData(getSimpleTopBar());
     this.fetchData();
   },
 

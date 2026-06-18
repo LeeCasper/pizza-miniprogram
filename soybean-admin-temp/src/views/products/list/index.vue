@@ -5,6 +5,7 @@ import { NDataTable, NButton, NTag, NSpace, NImage, NIcon, NSwitch, useDialog } 
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@vicons/antd';
 import type { DataTableColumns } from 'naive-ui';
 import { fetchProducts, fetchDeleteProduct, fetchToggleProduct, type AdminProduct } from '@/service/api';
+import { formatPrice } from '@/utils/format';
 
 defineOptions({ name: 'ProductList' });
 
@@ -31,7 +32,7 @@ const columns: DataTableColumns<AdminProduct> = [
   },
   {
     title: '价格', key: 'price', width: 90, align: 'right',
-    render(row) { return `¥${Number(row.price).toFixed(2)}`; }
+    render(row) { return formatPrice(row.price); }
   },
   {
     title: '标签', key: 'tag', width: 70,
@@ -119,6 +120,4 @@ onMounted(() => { loadProducts(); });
 
 <style scoped>
 .product-list { padding: 4px; }
-.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-.page-title { margin: 0; font-size: 22px; font-weight: 700; }
 </style>

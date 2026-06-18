@@ -353,6 +353,15 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'settings_printer',
           i18nKey: 'route.settings_printer'
         }
+      },
+      {
+        name: 'settings_store',
+        path: '/settings/store',
+        component: 'view.settings_store',
+        meta: {
+          title: 'settings_store',
+          i18nKey: 'route.settings_store'
+        }
       }
     ]
   },

@@ -1,6 +1,8 @@
 // pages/orders/orders.js
 const { api } = require('../../utils/api');
 const pay = require('../../utils/pay');
+const { getSimpleTopBar } = require('../../utils/layout');
+const { formatOrder } = require('../../utils/orders');
 const app = getApp();
 
 Page({
@@ -20,11 +22,7 @@ Page({
   },
 
   onLoad() {
-    const sh = app.globalData.statusBarHeight;
-    this.setData({
-      statusBarHeight: sh,
-      topBarTotalHeight: sh + 36,
-    });
+    this.setData(getSimpleTopBar());
     this.fetchOrders();
   },
 
@@ -43,15 +41,7 @@ Page({
     this.setData({ loading: true });
     api.get('/orders').then(res => {
       if (res.code === 0) {
-        const STATUS_MAP = { waiting: '待取餐', preparing: '制作中', completed: '已完成', cancelled: '已取消' };
-        const ordersWithDigits = (res.data || []).map(o => ({
-          ...o,
-          codeDigits: String(o.pickupCode || '').split(''),
-          time: o.createdAt ? o.createdAt : (o.time || ''),
-          statusText: STATUS_MAP[o.status] || o.status,
-          paymentStatusText: o.paymentMethod ? (o.paymentMethod === 'wechat' ? '微信支付' : '余额支付') : '待支付',
-          isPaid: !!o.paymentMethod,
-        }));
+        const ordersWithDigits = (res.data || []).map(formatOrder);
         this.setData({ orders: ordersWithDigits, loading: false });
         this.filterOrders();
       } else {

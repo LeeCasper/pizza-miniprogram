@@ -6,6 +6,7 @@ import { PlusOutlined, EditOutlined, DeleteOutlined, SendOutlined } from '@vicon
 import type { DataTableColumns } from 'naive-ui';
 import { fetchCouponTemplates, fetchDeleteCouponTemplate, fetchToggleCouponTemplate, fetchAssignCoupon, fetchUsers } from '@/service/api';
 import type { CouponTemplate } from '@/service/api';
+import { formatPrice } from '@/utils/format';
 
 defineOptions({ name: 'CouponTemplatesList' });
 
@@ -42,7 +43,7 @@ const columns: DataTableColumns<CouponTemplate> = [
     title: '优惠类型', key: 'discountType', width: 90,
     render(row) { return discountTypeMap[row.discountType] || row.discountType; }
   },
-  { title: '最低消费', key: 'minSpend', width: 90, render(row) { return `¥${Number(row.minSpend).toFixed(2)}`; } },
+  { title: '最低消费', key: 'minSpend', width: 90, render(row) { return formatPrice(row.minSpend); } },
   { title: '有效天数', key: 'validDays', width: 80, render(row) { return `${row.validDays}天`; } },
   {
     title: '状态', key: 'isActive', width: 80,
@@ -187,6 +188,4 @@ onMounted(() => { loadTemplates(); });
 
 <style scoped>
 .ct-list { padding: 4px; }
-.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-.page-title { margin: 0; font-size: 22px; font-weight: 700; }
 </style>

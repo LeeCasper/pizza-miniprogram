@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router';
 import { NDataTable, NTag, NButton, NSpace, NSelect } from 'naive-ui';
 import type { DataTableColumns } from 'naive-ui';
 import { fetchOrders } from '@/service/api';
+import { formatPrice } from '@/utils/format';
 
 defineOptions({ name: 'OrderList' });
 
@@ -58,7 +59,7 @@ const columns: DataTableColumns<any> = [
   },
   {
     title: '金额', key: 'total', width: 80, align: 'right',
-    render(row) { return `¥${Number(row.total).toFixed(2)}`; }
+    render(row) { return formatPrice(row.total); }
   },
   { title: '时间', key: 'createdAt', width: 160 },
   {
@@ -103,6 +104,4 @@ onMounted(() => { loadOrders(); });
 
 <style scoped>
 .order-list { padding: 4px; }
-.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-.page-title { margin: 0; font-size: 22px; font-weight: 700; }
 </style>

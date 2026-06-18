@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { NCard, NDescriptions, NDescriptionsItem, NTag, NSelect, NButton, NSpace, NDataTable, NDivider } from 'naive-ui';
 import { fetchOrder, fetchUpdateOrderStatus } from '@/service/api';
+import { formatPrice } from '@/utils/format';
 
 defineOptions({ name: 'OrderDetail' });
 
@@ -27,9 +28,9 @@ const statusMap: Record<string, { label: string; type: 'warning' | 'info' | 'suc
 
 const itemColumns = [
   { title: '商品', key: 'productName' },
-  { title: '单价', key: 'price', render(row: any) { return `¥${Number(row.price).toFixed(2)}`; } },
+  { title: '单价', key: 'price', render(row: any) { return formatPrice(row.price); } },
   { title: '数量', key: 'quantity' },
-  { title: '小计', key: 'subtotal', render(row: any) { return `¥${(row.price * row.quantity).toFixed(2)}`; } },
+  { title: '小计', key: 'subtotal', render(row: any) { return formatPrice(row.price * row.quantity); } },
 ];
 
 async function loadOrder() {
@@ -70,8 +71,8 @@ onMounted(() => { loadOrder(); });
             {{ statusMap[order.status]?.label || order.status }}
           </NTag>
         </NDescriptionsItem>
-        <NDescriptionsItem label="总金额">¥{{ Number(order.total).toFixed(2) }}</NDescriptionsItem>
-        <NDescriptionsItem label="实付">¥{{ Number(order.paidAmount || order.total).toFixed(2) }}</NDescriptionsItem>
+        <NDescriptionsItem label="总金额">{{ formatPrice(order.total) }}</NDescriptionsItem>
+        <NDescriptionsItem label="实付">{{ formatPrice(order.paidAmount || order.total) }}</NDescriptionsItem>
         <NDescriptionsItem label="支付方式">
           <NTag v-if="order.paymentMethod" :type="order.paymentMethod === 'wechat' ? 'info' : 'success'" size="small" :bordered="false">
             {{ order.paymentMethod === 'wechat' ? '微信支付' : '余额支付' }}
@@ -97,5 +98,4 @@ onMounted(() => { loadOrder(); });
 
 <style scoped>
 .order-detail { padding: 4px; }
-.page-title { margin: 0; font-size: 22px; font-weight: 700; }
 </style>

@@ -1,6 +1,7 @@
 // pages/points/points.js
 const { api } = require('../../utils/api');
 const app = getApp();
+const { getSimpleTopBar } = require('../../utils/layout');
 
 Page({
   data: {
@@ -14,10 +15,8 @@ Page({
   },
 
   onLoad() {
-    const sh = app.globalData.statusBarHeight;
     this.setData({
-      statusBarHeight: sh,
-      topBarTotalHeight: sh + 36,
+      ...getSimpleTopBar(),
       userPoints: app.globalData.userInfo.points || 0,
     });
     this.fetchProducts();

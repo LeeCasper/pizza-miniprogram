@@ -6,6 +6,7 @@ import { PlusOutlined, EditOutlined, DeleteOutlined } from '@vicons/antd';
 import type { DataTableColumns } from 'naive-ui';
 import { fetchMemberTiers, fetchDeleteMemberTier, fetchToggleMemberTier } from '@/service/api';
 import type { MemberTier } from '@/service/api';
+import { formatPrice } from '@/utils/format';
 
 defineOptions({ name: 'MemberTiersList' });
 
@@ -19,11 +20,11 @@ const columns: DataTableColumns<MemberTier> = [
   { title: '标识', key: 'levelKey', width: 100 },
   { title: '名称', key: 'name', width: 120, render(row) { return h('strong', {}, row.name); } },
   { title: '序号', key: 'levelIndex', width: 60, align: 'center' },
-  { title: '最低消费', key: 'minSpent', width: 100, render(row) { return `¥${Number(row.minSpent).toFixed(2)}`; } },
+  { title: '最低消费', key: 'minSpent', width: 100, render(row) { return formatPrice(row.minSpent); } },
   { title: '折扣率', key: 'discountRate', width: 80, render(row) { return row.discountRate < 1 ? `${((1 - row.discountRate) * 100).toFixed(0)}折` : '原价'; } },
   { title: '积分倍率', key: 'pointsRewardRate', width: 80, render(row) { return `x${row.pointsRewardRate}`; } },
   { title: '生日礼物', key: 'birthdayGift', width: 180, ellipsis: { tooltip: true } },
-  { title: '奖券', key: 'couponValue', width: 80, render(row) { return `¥${Number(row.couponValue).toFixed(2)}`; } },
+  { title: '奖券', key: 'couponValue', width: 80, render(row) { return formatPrice(row.couponValue); } },
   {
     title: '状态', key: 'isActive', width: 80,
     render(row) {
@@ -98,6 +99,4 @@ onMounted(() => { loadTiers(); });
 
 <style scoped>
 .mt-list { padding: 4px; }
-.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-.page-title { margin: 0; font-size: 22px; font-weight: 700; }
 </style>

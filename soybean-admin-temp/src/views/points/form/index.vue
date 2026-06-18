@@ -4,6 +4,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { NForm, NFormItem, NInput, NInputNumber, NSelect, NSpace, NButton, NCard, NDivider, NTag, NImage, NCollapse, NCollapseItem } from 'naive-ui';
 import { fetchPointsProduct, fetchCreatePointsProduct, fetchUpdatePointsProduct, type PointsProduct } from '@/service/api';
 import ImageUpload from '@/components/common/ImageUpload.vue';
+import TagArrayInput from '@/components/common/TagArrayInput.vue';
 
 defineOptions({ name: 'PointsForm' });
 
@@ -33,8 +34,6 @@ const form = ref<PointsProduct>({
   isActive: 1,
 });
 
-const highlightInput = ref('');
-
 const redeemTypeOptions = [
   { label: '优惠券', value: 'coupon' },
   { label: '实物商品', value: 'physical' },
@@ -51,18 +50,6 @@ const activeOptions = [
   { label: '启用', value: 1 },
   { label: '禁用', value: 0 },
 ];
-
-function addHighlight() {
-  const val = highlightInput.value.trim();
-  if (val && !form.value.highlights.includes(val)) {
-    form.value.highlights.push(val);
-    highlightInput.value = '';
-  }
-}
-
-function removeHighlight(idx: number) {
-  form.value.highlights.splice(idx, 1);
-}
 
 onMounted(async () => {
   if (isEdit.value) {
@@ -161,15 +148,7 @@ async function handleSubmit() {
         </NFormItem>
 
         <NFormItem label="亮点">
-          <NSpace>
-            <NInput v-model:value="highlightInput" placeholder="输入亮点" style="width:200px" @keyup.enter="addHighlight" />
-            <NButton size="small" @click="addHighlight">添加</NButton>
-          </NSpace>
-          <NSpace style="margin-top:8px">
-            <NTag v-for="(item, idx) in form.highlights" :key="idx" closable @close="removeHighlight(idx)">
-              {{ item }}
-            </NTag>
-          </NSpace>
+          <TagArrayInput v-model="form.highlights" placeholder="输入亮点" />
         </NFormItem>
 
         <!-- Coupon template -->
