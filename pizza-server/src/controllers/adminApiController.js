@@ -347,18 +347,20 @@ const adminApiController = {
       if (memberLevel !== undefined) updateData.memberLevel = memberLevel;
 
       // 余额或消费金额变动时，自动升级会员等级（仅升不降）
-      if (memberLevel === undefined && (balance !== undefined || totalSpent !== undefined)) {
+      // 注意：管理后台表单总会发送 memberLevel（即使未改），所以不能用 memberLevel === undefined 判断
+      if (balance !== undefined || totalSpent !== undefined) {
         const currentUser = await userService.findById(req.params.id);
         if (currentUser) {
           const newBalance = balance !== undefined ? parseFloat(balance) : parseFloat(currentUser.balance || 0);
           const newTotalSpent = totalSpent !== undefined ? parseFloat(totalSpent) : parseFloat(currentUser.total_spent || 0);
           const qualifyingAmount = newBalance + newTotalSpent;
           const computedLevelKey = await getTierLevel(qualifyingAmount);
-          // 比较等级索引：仅在新等级更高时自动升级
+          // 比较：仅当计算等级高于管理员指定/当前等级时，自动升级
           const tiers = await memberTierService.getActive();
-          const currentIdx = tiers.findIndex(t => t.levelKey === (currentUser.member_level || 'silver'));
+          const targetLevel = updateData.memberLevel || currentUser.member_level || 'silver';
+          const targetIdx = tiers.findIndex(t => t.levelKey === targetLevel);
           const computedIdx = tiers.findIndex(t => t.levelKey === computedLevelKey);
-          if (computedIdx > currentIdx) {
+          if (computedIdx > targetIdx) {
             updateData.memberLevel = computedLevelKey;
           }
         }
