@@ -104,6 +104,15 @@ const customRoutes: CustomRoute[] = [
           i18nKey: 'route.settings_printer',
         },
       },
+      {
+        name: 'settings_map',
+        path: '/settings/map',
+        component: 'view.settings_map',
+        meta: {
+          title: '地图配置',
+          i18nKey: 'route.settings_map',
+        },
+      },
     ],
   },
   // Multi-level routes — parent has layout.base, children have view.xxx

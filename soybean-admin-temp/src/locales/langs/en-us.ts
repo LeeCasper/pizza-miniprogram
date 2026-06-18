@@ -278,6 +278,7 @@ const local: App.I18n.Schema = {
     files: 'Files',
     files_list: 'Files',
     settings: 'System Settings',
+    settings_map: 'Map Settings',
     settings_pay: 'Payment Config',
     settings_printer: 'Printer Config',
   },

@@ -108,3 +108,31 @@ export interface PrinterPreview {
   raw: string;
   plain: string;
 }
+
+// ── Map Settings ─────────────────────────────────────
+
+export interface MapSettings {
+  tencentKey: string;
+  _hasTencentKey: boolean;
+}
+
+export interface MapSettingsForm {
+  tencentKey?: string;
+}
+
+/** Get map settings (sensitive fields masked) */
+export function fetchMapSettings() {
+  return request<MapSettings>({
+    url: '/settings/map',
+    method: 'GET',
+  });
+}
+
+/** Update map settings */
+export function fetchUpdateMapSettings(data: MapSettingsForm) {
+  return request<null>({
+    url: '/settings/map',
+    method: 'PUT',
+    data,
+  });
+}

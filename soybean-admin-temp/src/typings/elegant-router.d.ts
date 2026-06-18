@@ -49,6 +49,7 @@ declare module "@elegant-router/types" {
     "products_form": "/products/form";
     "products_list": "/products/list";
     "settings": "/settings";
+    "settings_map": "/settings/map";
     "settings_pay": "/settings/pay";
     "settings_printer": "/settings/printer";
     "users": "/users";
@@ -139,6 +140,7 @@ declare module "@elegant-router/types" {
     | "points_list"
     | "products_form"
     | "products_list"
+    | "settings_map"
     | "settings_pay"
     | "settings_printer"
     | "users_list"

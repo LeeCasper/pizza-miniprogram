@@ -274,6 +274,7 @@ const local: App.I18n.Schema = {
     files: '文件管理',
     files_list: '文件管理',
     settings: '系统设置',
+    settings_map: '地图配置',
     settings_pay: '支付配置',
     settings_printer: '打印机配置',
   },

@@ -237,6 +237,70 @@ const systemConfigService = {
       console.error('[Config] Failed to sync printer config from DB:', err.message);
     });
   },
+  // ── Map Config ──────────────────────────────────────
+
+  /**
+   * Get map config from DB.
+   * @returns {Promise<{ tencentKey }>}
+   */
+  async getMapConfig() {
+    try {
+      const [rows] = await pool.query(
+        "SELECT config_key, config_value FROM system_config WHERE config_key LIKE 'map_%'"
+      );
+      const map = {};
+      rows.forEach(r => { map[r.config_key] = r.config_value || ''; });
+      return {
+        tencentKey: map.map_tencent_key || '',
+      };
+    } catch (_) {
+      return { tencentKey: '' };
+    }
+  },
+
+  /**
+   * Update map config in DB (UPSERT per key).
+   * @param {object} entries — { tencentKey }
+   */
+  async updateMapConfig(entries) {
+    const fieldMap = {
+      tencentKey: 'map_tencent_key',
+    };
+
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+      for (const [camelKey, dbKey] of Object.entries(fieldMap)) {
+        if (entries[camelKey] !== undefined) {
+          const value = entries[camelKey] != null ? String(entries[camelKey]) : '';
+          await conn.query(
+            'INSERT INTO system_config (config_key, config_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE config_value = ?',
+            [dbKey, value, value]
+          );
+        }
+      }
+      await conn.commit();
+    } catch (err) {
+      await conn.rollback();
+      throw err;
+    } finally {
+      conn.release();
+    }
+
+    // Sync to in-memory config
+    this.syncMapConfigToMemory();
+  },
+
+  /**
+   * Sync map DB config to in-memory config object.
+   */
+  syncMapConfigToMemory() {
+    this.getMapConfig().then(dbConfig => {
+      if (dbConfig.tencentKey) config.map.tencentKey = dbConfig.tencentKey;
+    }).catch(err => {
+      console.error('[Config] Failed to sync map config from DB:', err.message);
+    });
+  },
 };
 
 module.exports = systemConfigService;

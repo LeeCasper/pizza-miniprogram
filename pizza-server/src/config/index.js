@@ -42,6 +42,10 @@ module.exports = {
     maxFileSize: parseInt(process.env.MAX_FILE_SIZE, 10) || 5 * 1024 * 1024,
   },
 
+  map: {
+    tencentKey: process.env.MAP_TENCENT_KEY || '',
+  },
+
   printer: {
     enabled: process.env.PRINTER_ENABLED === 'true',
     appId: process.env.PRINTER_APPID || '',

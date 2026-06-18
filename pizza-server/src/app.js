@@ -93,6 +93,7 @@ app.use('/api/v1/stores', storeRoutes);
 app.use('/api/v1/upload', uploadRoutes);
 app.use('/api/v1/banners', require('./routes/banners'));
 app.use('/api/v1/pay', require('./routes/payment'));
+app.use('/api/v1/config', require('./routes/config'));
 
 // ── Admin API routes (JSON, JWT) ─────────────────────
 app.use('/api/v1/admin', adminApiRoutes);
@@ -140,6 +141,7 @@ app.listen(PORT, async () => {
     const systemConfigService = require('./services/systemConfigService');
     await systemConfigService.syncPayConfigToMemory();
     systemConfigService.syncPrinterConfigToMemory();
+    systemConfigService.syncMapConfigToMemory();
   } catch (err) {
     console.warn('[Server] Could not sync pay config from DB:', err.message);
   }

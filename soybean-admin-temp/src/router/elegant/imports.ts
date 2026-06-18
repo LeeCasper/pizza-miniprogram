@@ -37,6 +37,7 @@ export const views: Record<LastLevelRouteKey, RouteComponent | (() => Promise<Ro
   points_list: () => import("@/views/points/list/index.vue"),
   products_form: () => import("@/views/products/form/index.vue"),
   products_list: () => import("@/views/products/list/index.vue"),
+  settings_map: () => import("@/views/settings/map/index.vue"),
   settings_pay: () => import("@/views/settings/pay/index.vue"),
   settings_printer: () => import("@/views/settings/printer/index.vue"),
   users_list: () => import("@/views/users/list/index.vue"),

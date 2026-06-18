@@ -1099,6 +1099,50 @@ const adminApiController = {
     }
   },
 
+  // ── Map Settings ─────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/settings/map
+   */
+  async getMapSettings(req, res, next) {
+    try {
+      const cfg = await systemConfigService.getMapConfig();
+
+      res.json({
+        code: 0,
+        data: {
+          tencentKey: cfg.tencentKey ? '****' : '',
+          _hasTencentKey: !!cfg.tencentKey,
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * PUT /api/v1/admin/settings/map
+   */
+  async updateMapSettings(req, res, next) {
+    try {
+      const body = req.body || {};
+      const entries = {};
+
+      // Skip masked placeholder
+      if (body.tencentKey !== undefined && body.tencentKey !== '****' && !body.tencentKey.includes('****')) {
+        entries.tencentKey = body.tencentKey;
+      }
+
+      if (Object.keys(entries).length > 0) {
+        await systemConfigService.updateMapConfig(entries);
+      }
+
+      res.json({ code: 0, message: '地图配置已保存' });
+    } catch (err) {
+      next(err);
+    }
+  },
+
   /**
    * POST /api/v1/admin/settings/printer/test
    */
