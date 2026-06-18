@@ -318,6 +318,20 @@ const paymentService = {
       await conn.commit();
       const txElapsed = Date.now() - txStart;
       console.log(`[Payment] Processed (${txElapsed}ms): ${outTradeNo}, type=${record.type} — ${detail}`);
+
+      // 微信支付成功后触发打印机（异步，不阻塞回调响应）
+      if (record.type === 'order' && require('../config').printer.enabled) {
+        const orderService = require('./orderService');
+        const printerService = require('./printerService');
+        orderService.findById(record.reference_id).then(order => {
+          if (order) {
+            printerService.printOrderTicket(order).catch(err => {
+              console.error('[Printer] 打印失败:', err.message);
+            });
+          }
+        });
+      }
+
       return { success: true, detail };
     } catch (err) {
       await conn.rollback();
@@ -576,6 +590,20 @@ const paymentService = {
 
       await conn.commit();
       console.log(`[Payment] Synced from WeChat: ${outTradeNo} — ${detail}`);
+
+      // 主动同步成功后也触发打印机
+      if (require('../config').printer.enabled) {
+        const orderService = require('./orderService');
+        const printerService = require('./printerService');
+        orderService.findById(orderId).then(order => {
+          if (order) {
+            printerService.printOrderTicket(order).catch(err => {
+              console.error('[Printer] 打印失败:', err.message);
+            });
+          }
+        });
+      }
+
       return { synced: true, detail };
     } catch (err) {
       await conn.rollback();

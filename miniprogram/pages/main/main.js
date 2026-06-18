@@ -283,7 +283,14 @@ Page({
   },
   onAddToCart(e) {
     const { product } = e.currentTarget.dataset;
-    app.addToCart(product, 1);
+    const cart = app.globalData.cart;
+    const currentQty = cart[product.id] ? cart[product.id].quantity : 0;
+    this.setData({
+      detailProduct: product,
+      detailOpen: true,
+      detailQuantity: currentQty || 1,
+      selectedRestrictions: { ...this.data.selectedRestrictions, [product.id]: this.data.selectedRestrictions[product.id] || {} }
+    });
   },
   onDecrease(e) { app.decreaseQuantity(e.currentTarget.dataset.id); },
   onCartBarTap() { this.setData({ cartOpen: true }); },

@@ -407,3 +407,13 @@ miniprogram/
 - **Tab bar state sync**: Standalone pages update `custom-tab-bar`'s `selected` in `onShow`. Main page manages tab state internally via `currentTab`.
 - **`wx:if` vs `hidden`**: `wx:if` for infrequent toggles (modes, overlays). `hidden` for frequent toggles.
 - **`env(safe-area-inset-bottom)`**: Always add to fixed bottom bars, FABs, and scroll-view spacers.
+
+---
+
+## gstack 角色路由
+
+- 当需要产品决策、范围判断时，使用 `/office-hours` 或 `/plan-ceo-review`
+- 当需要架构审查时，使用 `/plan-eng-review`
+- 当代码准备合并前，使用 `/review` 进行代码审查
+- 当需要端到端测试时，使用 `/qa`
+- 当准备发布时，使用 `/ship`

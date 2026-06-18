@@ -83,6 +83,7 @@ router.put('/settings/pay', ctrl.updatePaySettings);
 router.get('/settings/printer', ctrl.getPrinterSettings);
 router.put('/settings/printer', ctrl.updatePrinterSettings);
 router.post('/settings/printer/test', ctrl.testPrinter);
+router.get('/settings/printer/preview', ctrl.printerPreview);
 
 // Payment records (transaction history)
 router.get('/payment-records', ctrl.listPaymentRecords);

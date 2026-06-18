@@ -237,8 +237,8 @@ const orderController = {
       // Build response
       const order = await orderService.findById(orderId);
 
-      // 触发打印机 — 异步，不阻塞下单响应
-      if (require('../config').printer.enabled) {
+      // 余额支付立即打印；微信支付等待回调成功后打印
+      if (paymentMethod === 'balance' && require('../config').printer.enabled) {
         const printerService = require('../services/printerService');
         printerService.printOrderTicket(order).catch(err => {
           console.error('[Printer] 打印失败:', err.message);
