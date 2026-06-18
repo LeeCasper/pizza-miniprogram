@@ -45,7 +45,7 @@
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
 }
 
-.map-image {
+.map-component {
   width: 100%;
   height: 100%;
 }
@@ -59,16 +59,17 @@
 .map-locate-btn {
   width: 80rpx;
   height: 80rpx;
-  background: var(--glass-bg-card);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
-  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--glass-shadow-card);
-  border: var(--glass-border-subtle);
-  font-size: 36rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.12);
+}
+
+.map-locate-icon {
+  width: 36rpx;
+  height: 36rpx;
 }
 
 .main-scroll {
@@ -299,4 +300,37 @@
 
 .action-icon {
   font-size: 36rpx;
+}
+
+/* 并排按钮行 */
+.action-row {
+  display: flex;
+  gap: 24rpx;
+}
+
+.action-btn-half {
+  flex: 1;
+  padding: 28rpx;
+  border-radius: var(--radius-card);
+  text-align: center;
+  font-size: 30rpx;
+  font-weight: var(--font-weight-semibold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+}
+
+.action-btn-half:active {
+  opacity: 0.9;
+  transform: scale(0.98);
+}
+
+.action-btn-half.outline {
+  background: var(--glass-bg-light);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  color: var(--color-on-surface);
+  box-shadow: var(--glass-shadow-elevated);
+  border: var(--glass-border);
 }

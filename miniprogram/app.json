@@ -17,6 +17,15 @@
     "backgroundColor": "#FBFAEE",
     "backgroundTextStyle": "light"
   },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于计算您到门店的距离并提供导航服务"
+    }
+  },
+  "requiredPrivateInfos": [
+    "getLocation",
+    "openLocation"
+  ],
   "style": "v2",
   "sitemapLocation": "sitemap.json"
 }

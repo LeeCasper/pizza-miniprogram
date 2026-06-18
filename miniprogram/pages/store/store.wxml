@@ -11,12 +11,21 @@
 
   <!-- 地图区域 -->
   <view class="map-section">
-    <image class="map-image" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQVH-8n2F1qOKWKaD40T2E9oxSqdbkQlenhsxwKgEjhAKy75BVC5_xWjqj21KIQBuWrpDZ9sMEAYovR1lAaNJz8AVDXMrqNVU0pafIWJRozEDicPY7jcqm7LB5gAj6vyMP58DegFWYXWjYyuIPDVYIQ4XDkQg7rJNKKfjjmy7MXeefZ-p-aYyIyIaKiAGQ45COsjiz1KPt_OGIyRu-DdPiPbV_ahBeVatHwGeSMogdhwF4tIaSX6Zk7xktxMxjclkt_0QqnEZ2ND3J" mode="aspectFill"></image>
-    <view class="map-actions">
-      <view class="map-locate-btn">
-        <text>📍</text>
-      </view>
-    </view>
+    <map
+      class="map-component"
+      latitude="{{mapLatitude}}"
+      longitude="{{mapLongitude}}"
+      scale="{{mapScale}}"
+      markers="{{markers}}"
+      show-location="{{locationGranted}}"
+      enable-scroll="{{true}}"
+      enable-zoom="{{true}}"
+    ></map>
+    <cover-view class="map-actions">
+      <cover-view class="map-locate-btn" bindtap="onLocate">
+        <cover-image class="map-locate-icon" src="/images/store-address.png"></cover-image>
+      </cover-view>
+    </cover-view>
   </view>
 
   <scroll-view scroll-y class="main-scroll" style="flex: 1; height: 0;">
@@ -25,8 +34,7 @@
       <view class="store-header">
         <view class="store-title-row">
           <image class="store-icon" src="/images/store-shop.png" mode="aspectFit"></image>
-          <text class="store-name">王姐手工披萨</text>
-          <text class="store-branch">(爱家店)</text>
+          <text class="store-name">{{store.name || '王姐手工披萨'}}</text>
         </view>
       </view>
 
@@ -34,10 +42,10 @@
       <view class="info-row">
         <image class="info-icon" src="/images/store-address.png" mode="aspectFit"></image>
         <view class="info-content">
-          <text class="info-text">北京市朝阳区三里屯SOHO 1号商场 B1-102</text>
-          <text class="info-sub">距离您大约 2.5 公里</text>
+          <text class="info-text">{{store.address || '暂无地址信息'}}</text>
+          <text class="info-sub" wx:if="{{distance}}">距离您约 {{distance}}</text>
         </view>
-        <view class="info-action">
+        <view class="info-action" bindtap="onViewMap">
           <text>查看地图</text>
         </view>
       </view>
@@ -46,10 +54,7 @@
       <view class="info-row">
         <image class="info-icon" src="/images/store-hours.png" mode="aspectFit"></image>
         <view class="info-content">
-          <text class="info-text">周一至周日 <text class="bold">10:00 - 22:00</text></text>
-        </view>
-        <view class="status-badge open">
-          <text>营业中</text>
+          <text class="info-text">{{store.business_hours || '10:00 - 22:00'}}</text>
         </view>
       </view>
 
@@ -57,9 +62,9 @@
       <view class="info-row">
         <image class="info-icon" src="/images/store-phone.png" mode="aspectFit"></image>
         <view class="info-content">
-          <text class="info-text">010-8888 8888</text>
+          <text class="info-text">{{store.phone || '暂无联系电话'}}</text>
         </view>
-        <view class="call-btn">
+        <view class="call-btn" bindtap="onCallStore">
           <text>📞</text>
         </view>
       </view>
@@ -89,12 +94,18 @@
 
     <!-- 操作按钮 -->
     <view class="action-buttons">
-      <view class="action-btn outline" bindtap="onContactService">
-        <text class="action-icon">🎧</text>
-        <text>联系客服</text>
-      </view>
       <view class="action-btn primary" bindtap="onStartOrder">
         <text>开始点餐</text>
+      </view>
+      <view class="action-row">
+        <view class="action-btn-half outline" bindtap="onNavigate">
+          <text class="action-icon">🧭</text>
+          <text>导航到店</text>
+        </view>
+        <view class="action-btn-half outline" bindtap="onContactService">
+          <text class="action-icon">🎧</text>
+          <text>联系客服</text>
+        </view>
       </view>
     </view>
   </scroll-view>
