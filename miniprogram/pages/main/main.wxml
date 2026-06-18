@@ -67,7 +67,7 @@
 
   <!-- 购物车悬浮条 + 抽屉（仅首页显示） -->
   <block wx:if="{{currentTab === 0}}">
-    <view class="cart-bar {{cartCount > 0 ? 'show' : ''}}" wx:if="{{cartCount > 0}}" bindtap="onCartBarTap">
+    <view class="cart-bar {{cartCount > 0 && !detailOpen ? 'show' : ''}}" wx:if="{{cartCount > 0}}" bindtap="onCartBarTap">
       <view class="cart-bar-inner">
         <view class="cart-bar-left">
           <view class="cart-icon-wrap">
