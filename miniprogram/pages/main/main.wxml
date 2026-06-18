@@ -29,7 +29,7 @@
     <swiper-item>
       <scroll-view scroll-y class="tab-scroll" enhanced show-scrollbar="{{true}}" style="height: {{scrollViewHeight}}px;">
         <include src="tpl-index.wxml"/>
-        <view style="height: 120rpx"></view>
+        <view style="height: calc({{cartCount > 0 ? 240 : 120}}rpx + env(safe-area-inset-bottom))"></view>
       </scroll-view>
     </swiper-item>
 

@@ -283,10 +283,7 @@ Page({
   },
   onAddToCart(e) {
     const { product } = e.currentTarget.dataset;
-    const cart = app.globalData.cart;
-    const currentQty = cart[product.id] ? cart[product.id].quantity : 0;
-    const savedRestrictions = this.data.selectedRestrictions[product.id] || {};
-    this.setData({ detailProduct: product, detailOpen: true, detailQuantity: currentQty || 1, selectedRestrictions: { ...this.data.selectedRestrictions, [product.id]: savedRestrictions } });
+    app.addToCart(product, 1);
   },
   onDecrease(e) { app.decreaseQuantity(e.currentTarget.dataset.id); },
   onCartBarTap() { this.setData({ cartOpen: true }); },
@@ -731,7 +728,11 @@ Page({
     if (!detailProduct) return;
     const sel = selectedRestrictions[detailProduct.id] || {};
     const restrictionLabels = Object.keys(sel).map(key => { const r = dietaryRestrictions.find(d => d.key === key); return r ? r.label : key; });
-    app.addToCart(detailProduct, detailQuantity, restrictionLabels);
+    // 直接设置数量（非累加），避免从详情页重复添加
+    const cart = app.globalData.cart;
+    cart[detailProduct.id] = { ...detailProduct, quantity: detailQuantity, restrictions: restrictionLabels };
+    app.updateCartData();
+    api.post('/cart/items', { productId: detailProduct.id, quantity: detailQuantity, restrictions: restrictionLabels }).catch(() => {});
     this.setData({ detailOpen: false, detailProduct: null });
     wx.showToast({ title: '已加入购物车', icon: 'success', duration: 1500 });
   },
