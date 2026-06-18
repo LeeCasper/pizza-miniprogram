@@ -1,5 +1,6 @@
 // pages/store/store.js
 const { api } = require('../../utils/api');
+const { calculateWalkingDistance, formatDistance } = require('../../utils/mapConfig');
 const app = getApp();
 
 // 默认门店坐标（fallback，GCJ-02）
@@ -13,18 +14,22 @@ Page({
     store: null,
     loading: true,
 
-    // 地图状态
+    // 地图
     mapLatitude: DEFAULT_LAT,
     mapLongitude: DEFAULT_LNG,
     mapScale: 15,
     markers: [],
+    includePoints: [],
 
     // 用户定位
     userLatitude: null,
     userLongitude: null,
-    locationGranted: false,
     distance: '',
+    locationWatching: false,
   },
+
+  // 距离计算节流时间戳
+  _lastDistCalc: 0,
 
   onLoad() {
     const sh = app.globalData.statusBarHeight;
@@ -34,6 +39,14 @@ Page({
       topBarTotalHeight: topBarH,
     });
     this.fetchStore();
+  },
+
+  onUnload() {
+    // 页面卸载：停止实时位置追踪，省电
+    if (this.data.locationWatching) {
+      wx.stopLocationUpdate({ fail() {} });
+      wx.offLocationChange();
+    }
   },
 
   fetchStore() {
@@ -50,9 +63,8 @@ Page({
     });
   },
 
-  /**
-   * 初始化地图：设置中心、创建标记、请求用户定位
-   */
+  // ===== 地图初始化 =====
+
   initMap() {
     const store = this.data.store;
     if (!store) return;
@@ -60,15 +72,95 @@ Page({
     const lat = store.latitude || DEFAULT_LAT;
     const lng = store.longitude || DEFAULT_LNG;
 
+    this.setData({
+      mapLatitude: lat,
+      mapLongitude: lng,
+    });
+    this.updateMarkers();
+    this.requestLocation();
+  },
+
+  // ===== 定位 =====
+
+  /**
+   * 首次高精度定位，然后开启实时追踪
+   */
+  requestLocation() {
+    wx.getSetting({
+      success: (res) => {
+        if (res.authSetting['scope.userLocation'] === false) {
+          // 用户之前拒绝 → 降级
+          return;
+        }
+        wx.getLocation({
+          type: 'gcj02',
+          isHighAccuracy: true,
+          highAccuracyExpireTime: 3000,
+          success: (loc) => {
+            this.onLocationUpdate(loc.latitude, loc.longitude);
+            // 首次定位成功后开启实时追踪
+            this.startLocationWatch();
+          },
+          fail: () => {
+            // 定位失败，仅显示门店
+          },
+        });
+      },
+    });
+  },
+
+  /**
+   * 开启实时位置追踪
+   */
+  startLocationWatch() {
+    if (this.data.locationWatching) return;
+
+    wx.startLocationUpdate({
+      type: 'gcj02',
+      success: () => {
+        this.setData({ locationWatching: true });
+        wx.onLocationChange((loc) => {
+          this.onLocationUpdate(loc.latitude, loc.longitude);
+        });
+      },
+      fail: () => {
+        // 实时追踪开启失败，保留首次定位结果
+      },
+    });
+  },
+
+  /**
+   * 位置更新回调（首次 + 实时）
+   */
+  onLocationUpdate(lat, lng) {
+    this.setData({ userLatitude: lat, userLongitude: lng });
+    this.updateMarkers();
+
+    // 节流：5秒内最多调用一次距离计算
+    const now = Date.now();
+    if (now - this._lastDistCalc < 5000) return;
+    this._lastDistCalc = now;
+    this.calculateDistance();
+  },
+
+  // ===== 标记 & 视野 =====
+
+  updateMarkers() {
+    const s = this.data.store;
+    if (!s) return;
+
+    const storeLat = s.latitude || DEFAULT_LAT;
+    const storeLng = s.longitude || DEFAULT_LNG;
+
     const markers = [{
       id: 1,
-      latitude: lat,
-      longitude: lng,
-      title: store.name || '王姐手工披萨',
+      latitude: storeLat,
+      longitude: storeLng,
+      title: s.name || '王姐手工披萨',
       width: 32,
       height: 32,
       callout: {
-        content: store.name || '王姐手工披萨',
+        content: s.name || '王姐手工披萨',
         color: '#D32F2F',
         fontSize: 14,
         borderRadius: 8,
@@ -78,54 +170,52 @@ Page({
       },
     }];
 
-    this.setData({
-      mapLatitude: lat,
-      mapLongitude: lng,
-      markers: markers,
-    });
+    const includePoints = [{ latitude: storeLat, longitude: storeLng }];
 
-    this.requestLocation();
+    // 用户位置加入 includePoints（自动缩放视野包含两个点）
+    // 用户蓝点由 <map show-location> 原生渲染，无需额外 marker
+    if (this.data.userLatitude) {
+      includePoints.push({
+        latitude: this.data.userLatitude,
+        longitude: this.data.userLongitude,
+      });
+    }
+
+    this.setData({ markers, includePoints });
   },
 
-  /**
-   * 请求用户定位权限并获取位置
-   */
-  requestLocation() {
-    wx.getSetting({
-      success: (res) => {
-        if (res.authSetting['scope.userLocation'] === false) {
-          // 用户之前拒绝过 → 不再弹窗，降级处理
-          this.setData({ locationGranted: false, distance: '' });
-          return;
-        }
-        // 未曾询问或已授权 → 调用 getLocation
-        wx.getLocation({
-          type: 'gcj02',
-          success: (loc) => {
-            this.setData({
-              userLatitude: loc.latitude,
-              userLongitude: loc.longitude,
-              locationGranted: true,
-            });
-            this.calculateDistance();
-          },
-          fail: () => {
-            this.setData({ locationGranted: false, distance: '' });
-          },
-        });
-      },
-    });
-  },
+  // ===== 距离计算 =====
 
   /**
-   * Haversine 公式计算用户与门店的距离
+   * 腾讯 WebService API 步行距离计算
    */
   calculateDistance() {
+    const { userLatitude, userLongitude } = this.data;
+    const s = this.data.store;
+    if (!userLatitude || !s || !s.latitude || !s.longitude) return;
+
+    calculateWalkingDistance(
+      { latitude: userLatitude, longitude: userLongitude },
+      { latitude: s.latitude, longitude: s.longitude }
+    ).then(result => {
+      this.setData({
+        distance: formatDistance(result.distance, result.duration),
+      });
+    }).catch(() => {
+      // SDK 失败 → Haversine 降级
+      this.calculateDistanceFallback();
+    });
+  },
+
+  /**
+   * Haversine 直线距离降级
+   */
+  calculateDistanceFallback() {
     const { userLatitude: uLat, userLongitude: uLng } = this.data;
     const s = this.data.store;
     if (!uLat || !s || !s.latitude || !s.longitude) return;
 
-    const R = 6371; // 地球半径（公里）
+    const R = 6371;
     const toRad = (deg) => deg * Math.PI / 180;
     const dLat = toRad(s.latitude - uLat);
     const dLng = toRad(s.longitude - uLng);
@@ -133,32 +223,42 @@ Page({
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(toRad(uLat)) * Math.cos(toRad(s.latitude)) *
       Math.sin(dLng / 2) * Math.sin(dLng / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const d = R * c;
+    const d = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
     const distance = d < 1
-      ? Math.round(d * 1000) + ' 米'
-      : d.toFixed(1) + ' 公里';
-
+      ? Math.round(d * 1000) + '米'
+      : d.toFixed(1) + '公里';
     this.setData({ distance });
   },
 
-  /**
-   * 定位按钮：将地图中心重置到门店位置
-   */
-  onLocate() {
-    const store = this.data.store;
-    if (!store) return;
-    this.setData({
-      mapLatitude: store.latitude || DEFAULT_LAT,
-      mapLongitude: store.longitude || DEFAULT_LNG,
-      mapScale: 15,
-    });
-  },
+  // ===== 交互 =====
 
   /**
-   * "查看地图"：打开微信内置全屏地图（自带导航按钮）
+   * 定位按钮：重置视野包含门店和用户
    */
+  onLocate() {
+    const s = this.data.store;
+    if (!s) return;
+
+    const storeLat = s.latitude || DEFAULT_LAT;
+    const storeLng = s.longitude || DEFAULT_LNG;
+
+    if (this.data.userLatitude) {
+      // 有用户位置 → 中心取两点中点
+      this.setData({
+        mapLatitude: (storeLat + this.data.userLatitude) / 2,
+        mapLongitude: (storeLng + this.data.userLongitude) / 2,
+      });
+      this.updateMarkers(); // 触发 includePoints 重新缩放
+    } else {
+      this.setData({
+        mapLatitude: storeLat,
+        mapLongitude: storeLng,
+        mapScale: 15,
+      });
+    }
+  },
+
   onViewMap() {
     const store = this.data.store;
     if (!store || !store.latitude || !store.longitude) {
@@ -174,16 +274,10 @@ Page({
     });
   },
 
-  /**
-   * "导航到店"按钮
-   */
   onNavigate() {
     this.onViewMap();
   },
 
-  /**
-   * 电话图标：拨打门店电话
-   */
   onCallStore() {
     const phone = this.data.store ? this.data.store.phone : '';
     if (!phone) {
@@ -200,9 +294,6 @@ Page({
     wx.navigateBack();
   },
 
-  /**
-   * "联系客服"按钮（底部操作区）
-   */
   onContactService() {
     const phone = this.data.store ? this.data.store.phone : '01088888888';
     wx.makePhoneCall({
