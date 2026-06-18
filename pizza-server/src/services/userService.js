@@ -154,6 +154,98 @@ const userService = {
     await pool.query(`UPDATE users SET ${sets.join(', ')} WHERE id = ?`, values);
     return this.findById(id);
   },
+
+  /**
+   * Soft-delete a user account by anonymizing all personal data.
+   * Hard delete is impossible because orders/payment_records FK = RESTRICT.
+   */
+  async deleteAccount(id) {
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+
+      // Lock user row
+      const [[user]] = await conn.query(
+        'SELECT id, balance, points FROM users WHERE id = ? AND deleted_at IS NULL FOR UPDATE',
+        [id]
+      );
+      if (!user) {
+        await conn.rollback();
+        const err = new Error('账号不存在或已注销');
+        err.statusCode = 400;
+        throw err;
+      }
+
+      // Reject if user has active orders
+      const [active] = await conn.query(
+        "SELECT id FROM orders WHERE user_id = ? AND status IN ('waiting', 'preparing') LIMIT 1",
+        [id]
+      );
+      if (active.length > 0) {
+        await conn.rollback();
+        const err = new Error('请先完成或取消进行中的订单');
+        err.statusCode = 400;
+        err.code = 'HAS_ACTIVE_ORDERS';
+        throw err;
+      }
+
+      const balance = parseFloat(user.balance || 0);
+      const points = parseInt(user.points || 0);
+
+      // Clear balance (if any)
+      if (balance > 0) {
+        await conn.query('UPDATE users SET balance = 0 WHERE id = ?', [id]);
+        await conn.query(
+          'INSERT INTO balance_history (user_id, amount, balance_after, type, remark) VALUES (?, ?, 0, ?, ?)',
+          [id, -balance, 'deduct', '账号注销清零']
+        );
+      }
+
+      // Clear points (if any)
+      if (points > 0) {
+        await conn.query('UPDATE users SET points = 0 WHERE id = ?', [id]);
+        await conn.query(
+          'INSERT INTO points_history (user_id, points_change, balance_after, reason, reference_id) VALUES (?, ?, 0, ?, ?)',
+          [id, -points, '账号注销清零', 'account_deletion']
+        );
+      }
+
+      // Anonymize personal data
+      await conn.query(
+        `UPDATE users SET
+          openid = CONCAT('deleted_', id),
+          unionid = NULL,
+          session_key = NULL,
+          name = '已注销用户',
+          avatar = '',
+          bio = '',
+          phone = '',
+          notification_enabled = 0,
+          deleted_at = NOW(),
+          updated_at = NOW()
+        WHERE id = ?`,
+        [id]
+      );
+
+      // Expire all available coupons
+      await conn.query(
+        "UPDATE coupons SET status = 'expired' WHERE user_id = ? AND status = 'available'",
+        [id]
+      );
+
+      // Clear cart
+      await conn.query('DELETE FROM cart_items WHERE user_id = ?', [id]);
+
+      await conn.commit();
+      console.log(`[User] Account deleted (anonymized): userId=${id}, balance=${balance}, points=${points}`);
+      return { success: true };
+    } catch (err) {
+      await conn.rollback().catch(() => {});
+      throw err;
+    } finally {
+      conn.release();
+    }
+  },
 };
 
 module.exports = userService;

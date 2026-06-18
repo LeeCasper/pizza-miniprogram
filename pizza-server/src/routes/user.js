@@ -14,5 +14,6 @@ router.get('/settings', auth, controller.getSettings);
 router.put('/settings', auth, validate('updateSettings'), controller.updateSettings);
 router.get('/balance/history', auth, controller.getBalanceHistory);
 router.post('/balance/recharge', auth, controller.recharge);
+router.delete('/account', auth, controller.deleteAccount);
 
 module.exports = router;

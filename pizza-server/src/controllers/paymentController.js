@@ -1,5 +1,6 @@
 const paymentService = require('../services/paymentService');
 const userService = require('../services/userService');
+const refundService = require('../services/refundService');
 const { verifyNotifySign } = require('../utils/wechatPay');
 const pool = require('../config/database');
 
@@ -214,6 +215,39 @@ const paymentController = {
    * The order controller calls this when paymentMethod === 'balance'.
    * (Implemented inline in orderController, not here.)
    */
+
+  /**
+   * POST /api/v1/pay/refund-notify
+   * WeChat Pay refund callback notification (no JWT auth required).
+   * Uses express.raw() — the body is a Buffer.
+   */
+  async refundNotify(req, res) {
+    const startTime = Date.now();
+    try {
+      const rawBody = Buffer.isBuffer(req.body) ? req.body.toString('utf8') : req.body;
+      console.log(`[Refund] === Refund notify callback received (${rawBody.length}B) ===`);
+
+      // Verify signature
+      if (!verifyNotifySign(req.headers, rawBody)) {
+        console.error(`[Refund] Refund notify SIGNATURE FAILED (${Date.now() - startTime}ms)`);
+        return res.status(200).json({ code: 'FAIL', message: 'Signature verification failed' });
+      }
+
+      const result = await refundService.handleRefundNotify(rawBody);
+      const elapsed = Date.now() - startTime;
+
+      if (result.success) {
+        console.log(`[Refund] Refund notify SUCCESS (${elapsed}ms): ${result.detail || ''}`);
+      } else {
+        console.error(`[Refund] Refund notify FAILED (${elapsed}ms): ${result.reason}`);
+      }
+      // Always return 200 to WeChat Pay
+      res.status(200).json({ code: 'SUCCESS', message: 'OK' });
+    } catch (err) {
+      console.error(`[Refund] Refund notify EXCEPTION (${Date.now() - startTime}ms):`, err.message);
+      res.status(200).json({ code: 'SUCCESS', message: 'OK' });
+    }
+  },
 };
 
 module.exports = paymentController;

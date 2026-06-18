@@ -281,11 +281,40 @@ const orderController = {
 
   async cancel(req, res, next) {
     try {
-      const order = await orderService.cancel(req.params.id, req.user.id);
-      if (!order) {
+      // Fetch order first to check payment status before cancel changes it
+      const existing = await orderService.findById(req.params.id);
+      if (!existing || existing.userId !== req.user.id) {
         return res.status(400).json({ code: 400, message: '订单不存在或无法取消' });
       }
-      res.json({ code: 0, data: order, message: '订单已取消' });
+
+      const cancelled = await orderService.cancel(req.params.id, req.user.id);
+      if (!cancelled) {
+        return res.status(400).json({ code: 400, message: '订单不存在或无法取消' });
+      }
+
+      // If the order was paid, trigger refund
+      let refund = null;
+      if (existing.paymentMethod) {
+        try {
+          const refundService = require('../services/refundService');
+          refund = await refundService.refundOrder(req.params.id, '用户取消订单');
+        } catch (refundErr) {
+          console.error('[Order] Refund failed after cancel:', refundErr.message);
+          // Order is already cancelled — return success but note refund issue
+          return res.json({
+            code: 0,
+            data: cancelled,
+            refund: { success: false, message: '订单已取消，退款处理异常，请联系客服' },
+            message: '订单已取消，退款处理异常',
+          });
+        }
+      }
+
+      const message = refund
+        ? (refund.method === 'balance' ? '订单已取消，退款已到账' : '订单已取消，微信退款处理中')
+        : '订单已取消';
+
+      res.json({ code: 0, data: cancelled, refund, message });
     } catch (err) {
       next(err);
     }

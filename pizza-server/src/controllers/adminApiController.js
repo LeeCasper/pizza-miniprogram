@@ -271,6 +271,27 @@ const adminApiController = {
       if (!validStatuses.includes(status)) {
         return res.status(400).json({ code: 400, message: '无效的状态值' });
       }
+
+      // If cancelling, check if order was paid to trigger refund
+      let refund = null;
+      if (status === 'cancelled') {
+        const existing = await orderService.findById(req.params.id);
+        if (existing && existing.paymentMethod) {
+          const order = await orderService.adminUpdateStatus(req.params.id, status);
+          if (!order) {
+            return res.status(404).json({ code: 404, message: '订单不存在' });
+          }
+          try {
+            const refundService = require('../services/refundService');
+            refund = await refundService.refundOrder(req.params.id, '管理员取消订单');
+          } catch (refundErr) {
+            console.error('[AdminAPI] Refund failed:', refundErr.message);
+            refund = { success: false, message: refundErr.message };
+          }
+          return res.json({ code: 0, message: '订单已取消' + (refund?.success ? '，退款已处理' : ''), data: order, refund });
+        }
+      }
+
       const order = await orderService.adminUpdateStatus(req.params.id, status);
       if (!order) {
         return res.status(404).json({ code: 404, message: '订单不存在' });

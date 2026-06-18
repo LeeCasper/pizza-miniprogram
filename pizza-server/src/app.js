@@ -30,9 +30,10 @@ const app = express();
 app.use(cors());
 app.set('trust proxy', 1);
 
-// WeChat Pay notify callback MUST receive raw body for signature verification.
+// WeChat Pay callbacks MUST receive raw body for signature verification.
 // Mount BEFORE express.json() so the raw parser claims the request first.
 app.use('/api/v1/pay/notify', express.raw({ type: 'application/json' }));
+app.use('/api/v1/pay/refund-notify', express.raw({ type: 'application/json' }));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

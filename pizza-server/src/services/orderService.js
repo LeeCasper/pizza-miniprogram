@@ -73,7 +73,7 @@ const orderService = {
 
   async cancel(orderId, userId) {
     const [result] = await pool.query(
-      "UPDATE orders SET status = 'cancelled', updated_at = NOW() WHERE id = ? AND user_id = ? AND status = 'waiting'",
+      "UPDATE orders SET status = 'cancelled', updated_at = NOW() WHERE id = ? AND user_id = ? AND status IN ('waiting', 'preparing')",
       [orderId, userId]
     );
     if (result.affectedRows === 0) {

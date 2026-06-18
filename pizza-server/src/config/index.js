@@ -32,6 +32,7 @@ module.exports = {
     privateKeyPath: process.env.WX_PAY_PRIVATE_KEY_PATH || './certs/apiclient_key.pem',
     platformCertPath: process.env.WX_PAY_PLATFORM_CERT_PATH || './certs/platform_cert.pem',
     notifyUrl: process.env.WX_PAY_NOTIFY_URL || '',
+    refundNotifyUrl: process.env.WX_PAY_REFUND_NOTIFY_URL || '',
     // Set by systemConfigService.syncPayConfigToMemory() — DB values override .env
     _privateKeyContent: '',
     _platformCertContent: '',

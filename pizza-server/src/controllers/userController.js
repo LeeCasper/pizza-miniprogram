@@ -96,6 +96,18 @@ const userController = {
       next(err);
     }
   },
+
+  async deleteAccount(req, res, next) {
+    try {
+      await userService.deleteAccount(req.user.id);
+      res.json({ code: 0, message: '账号已注销' });
+    } catch (err) {
+      if (err.statusCode) {
+        return res.status(err.statusCode).json({ code: err.statusCode, message: err.message });
+      }
+      next(err);
+    }
+  },
 };
 
 module.exports = userController;

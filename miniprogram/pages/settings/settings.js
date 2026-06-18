@@ -77,6 +77,50 @@ Page({
     logout();
   },
 
+  onDeleteAccount() {
+    wx.showModal({
+      title: '确认注销账号',
+      content: '注销后将删除您的个人信息、清零余额和积分，且无法恢复。',
+      confirmText: '继续注销',
+      confirmColor: '#D32F2F',
+      success: (res) => {
+        if (!res.confirm) return;
+        // 二次确认
+        wx.showModal({
+          title: '再次确认',
+          content: '此操作不可撤销，确定要注销账号吗？',
+          confirmText: '确定注销',
+          confirmColor: '#D32F2F',
+          success: (res2) => {
+            if (!res2.confirm) return;
+            wx.showLoading({ title: '处理中...' });
+            api.delete('/user/account').then(res3 => {
+              wx.hideLoading();
+              if (res3.code === 0) {
+                wx.clearStorageSync();
+                const app = getApp();
+                if (app && app.globalData) {
+                  app.globalData.userInfo = {};
+                  app.globalData.token = '';
+                }
+                wx.showToast({ title: '账号已注销', icon: 'success', duration: 1500 });
+                setTimeout(() => {
+                  wx.reLaunch({ url: '/pages/main/main' });
+                }, 1500);
+              } else {
+                wx.showToast({ title: res3.message || '注销失败', icon: 'none' });
+              }
+            }).catch(err => {
+              wx.hideLoading();
+              const msg = (err && err.message) || '注销失败，请稍后重试';
+              wx.showToast({ title: msg.includes('订单') ? '请先完成或取消进行中的订单' : msg, icon: 'none', duration: 2500 });
+            });
+          }
+        });
+      }
+    });
+  },
+
   onOpenDrawer(e) {
     const { type } = e.currentTarget.dataset;
     const titles = {
