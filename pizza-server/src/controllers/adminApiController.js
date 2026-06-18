@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs');
 const config = require('../config');
 const pool = require('../config/database');
+const { createLogger } = require('../utils/logger');
+const log = createLogger('AdminAPI');
 const { signToken } = require('../utils/jwt');
 const productService = require('../services/productService');
 const orderService = require('../services/orderService');
@@ -60,7 +62,7 @@ const adminApiController = {
         },
       });
     } catch (err) {
-      console.error('[AdminAPI] Login error:', err);
+      log.error({ err }, 'Login error');
       return res.status(500).json({ code: 500, message: '登录失败' });
     }
   },
@@ -87,7 +89,7 @@ const adminApiController = {
         },
       });
     } catch (err) {
-      console.error('[AdminAPI] GetProfile error:', err);
+      log.error({ err }, 'GetProfile error');
       return res.status(500).json({ code: 500, message: '获取管理员信息失败' });
     }
   },
@@ -102,7 +104,7 @@ const adminApiController = {
       const stats = await orderService.getDashboardStats();
       return res.json({ code: 0, data: stats });
     } catch (err) {
-      console.error('[AdminAPI] Dashboard stats error:', err);
+      log.error({ err }, 'Dashboard stats error');
       return res.status(500).json({ code: 500, message: '获取统计数据失败' });
     }
   },
@@ -118,7 +120,7 @@ const adminApiController = {
       const products = await productService.adminList();
       return res.json({ code: 0, data: products });
     } catch (err) {
-      console.error('[AdminAPI] ListProducts error:', err);
+      log.error({ err }, 'ListProducts error');
       return res.status(500).json({ code: 500, message: '获取商品列表失败' });
     }
   },
@@ -134,7 +136,7 @@ const adminApiController = {
       }
       return res.json({ code: 0, data: product });
     } catch (err) {
-      console.error('[AdminAPI] GetProduct error:', err);
+      log.error({ err }, 'GetProduct error');
       return res.status(500).json({ code: 500, message: '获取商品失败' });
     }
   },
@@ -159,7 +161,7 @@ const adminApiController = {
       });
       return res.status(201).json({ code: 0, message: '商品已创建', data: product });
     } catch (err) {
-      console.error('[AdminAPI] CreateProduct error:', err);
+      log.error({ err }, 'CreateProduct error');
       return res.status(500).json({ code: 500, message: err.message || '创建商品失败' });
     }
   },
@@ -188,7 +190,7 @@ const adminApiController = {
       }
       return res.json({ code: 0, message: '商品已更新', data: product });
     } catch (err) {
-      console.error('[AdminAPI] UpdateProduct error:', err);
+      log.error({ err }, 'UpdateProduct error');
       return res.status(500).json({ code: 500, message: err.message || '更新商品失败' });
     }
   },
@@ -201,7 +203,7 @@ const adminApiController = {
       await productService.softDelete(req.params.id);
       return res.json({ code: 0, message: '商品已下架' });
     } catch (err) {
-      console.error('[AdminAPI] DeleteProduct error:', err);
+      log.error({ err }, 'DeleteProduct error');
       return res.status(500).json({ code: 500, message: '下架商品失败' });
     }
   },
@@ -217,7 +219,7 @@ const adminApiController = {
       }
       return res.json({ code: 0, message: '商品状态已切换', data: product });
     } catch (err) {
-      console.error('[AdminAPI] ToggleProduct error:', err);
+      log.error({ err }, 'ToggleProduct error');
       return res.status(500).json({ code: 500, message: '切换商品状态失败' });
     }
   },
@@ -239,7 +241,7 @@ const adminApiController = {
       });
       return res.json({ code: 0, data: orders });
     } catch (err) {
-      console.error('[AdminAPI] ListOrders error:', err);
+      log.error({ err }, 'ListOrders error');
       return res.status(500).json({ code: 500, message: '获取订单列表失败' });
     }
   },
@@ -255,7 +257,7 @@ const adminApiController = {
       }
       return res.json({ code: 0, data: order });
     } catch (err) {
-      console.error('[AdminAPI] GetOrder error:', err);
+      log.error({ err }, 'GetOrder error');
       return res.status(500).json({ code: 500, message: '获取订单失败' });
     }
   },
@@ -285,7 +287,7 @@ const adminApiController = {
             const refundService = require('../services/refundService');
             refund = await refundService.refundOrder(req.params.id, '管理员取消订单');
           } catch (refundErr) {
-            console.error('[AdminAPI] Refund failed:', refundErr.message);
+            log.error({ err: refundErr }, 'Refund failed');
             refund = { success: false, message: refundErr.message };
           }
           return res.json({ code: 0, message: '订单已取消' + (refund?.success ? '，退款已处理' : ''), data: order, refund });
@@ -298,7 +300,7 @@ const adminApiController = {
       }
       return res.json({ code: 0, message: '订单状态已更新', data: order });
     } catch (err) {
-      console.error('[AdminAPI] UpdateOrderStatus error:', err);
+      log.error({ err }, 'UpdateOrderStatus error');
       return res.status(500).json({ code: 500, message: '更新订单状态失败' });
     }
   },
@@ -320,7 +322,7 @@ const adminApiController = {
       });
       return res.json({ code: 0, data: result });
     } catch (err) {
-      console.error('[AdminAPI] ListCoupons error:', err);
+      log.error({ err }, 'ListCoupons error');
       return res.status(500).json({ code: 500, message: '获取优惠券列表失败' });
     }
   },
@@ -341,7 +343,7 @@ const adminApiController = {
       });
       return res.json({ code: 0, data: result });
     } catch (err) {
-      console.error('[AdminAPI] ListUsers error:', err);
+      log.error({ err }, 'ListUsers error');
       return res.status(500).json({ code: 500, message: '获取用户列表失败' });
     }
   },
@@ -394,7 +396,7 @@ const adminApiController = {
       }
       return res.json({ code: 0, message: '用户信息已更新', data: user });
     } catch (err) {
-      console.error('[AdminAPI] UpdateUser error:', err);
+      log.error({ err }, 'UpdateUser error');
       return res.status(500).json({ code: 500, message: err.message || '更新用户失败' });
     }
   },
@@ -409,7 +411,7 @@ const adminApiController = {
       const products = await pointsService.adminProducts();
       return res.json({ code: 0, data: products });
     } catch (err) {
-      console.error('[AdminAPI] ListPointsProducts error:', err);
+      log.error({ err }, 'ListPointsProducts error');
       return res.status(500).json({ code: 500, message: '获取积分商品列表失败' });
     }
   },
@@ -425,7 +427,7 @@ const adminApiController = {
       }
       return res.json({ code: 0, data: formatPointsProduct(rows[0]) });
     } catch (err) {
-      console.error('[AdminAPI] GetPointsProduct error:', err);
+      log.error({ err }, 'GetPointsProduct error');
       return res.status(500).json({ code: 500, message: '获取积分商品失败' });
     }
   },
@@ -457,7 +459,7 @@ const adminApiController = {
       });
       return res.status(201).json({ code: 0, message: '积分商品已创建', data: { id } });
     } catch (err) {
-      console.error('[AdminAPI] CreatePointsProduct error:', err);
+      log.error({ err }, 'CreatePointsProduct error');
       return res.status(500).json({ code: 500, message: err.message || '创建积分商品失败' });
     }
   },
@@ -489,7 +491,7 @@ const adminApiController = {
       await pointsService.updateProduct(req.params.id, updateData);
       return res.json({ code: 0, message: '积分商品已更新' });
     } catch (err) {
-      console.error('[AdminAPI] UpdatePointsProduct error:', err);
+      log.error({ err }, 'UpdatePointsProduct error');
       return res.status(500).json({ code: 500, message: err.message || '更新积分商品失败' });
     }
   },
@@ -502,7 +504,7 @@ const adminApiController = {
       await pointsService.softDelete(req.params.id);
       return res.json({ code: 0, message: '积分商品已下架' });
     } catch (err) {
-      console.error('[AdminAPI] DeletePointsProduct error:', err);
+      log.error({ err }, 'DeletePointsProduct error');
       return res.status(500).json({ code: 500, message: '下架积分商品失败' });
     }
   },
@@ -515,7 +517,7 @@ const adminApiController = {
       await pointsService.toggle(req.params.id);
       return res.json({ code: 0, message: '积分商品状态已切换' });
     } catch (err) {
-      console.error('[AdminAPI] TogglePointsProduct error:', err);
+      log.error({ err }, 'TogglePointsProduct error');
       return res.status(500).json({ code: 500, message: '切换积分商品状态失败' });
     }
   },
@@ -530,7 +532,7 @@ const adminApiController = {
       const banners = await bannerService.adminList();
       return res.json({ code: 0, data: banners });
     } catch (err) {
-      console.error('[AdminAPI] ListBanners error:', err);
+      log.error({ err }, 'ListBanners error');
       return res.status(500).json({ code: 500, message: '获取轮播图列表失败' });
     }
   },
@@ -546,7 +548,7 @@ const adminApiController = {
       }
       return res.json({ code: 0, data: banner });
     } catch (err) {
-      console.error('[AdminAPI] GetBanner error:', err);
+      log.error({ err }, 'GetBanner error');
       return res.status(500).json({ code: 500, message: '获取轮播图失败' });
     }
   },
@@ -568,7 +570,7 @@ const adminApiController = {
       });
       return res.status(201).json({ code: 0, message: '轮播图已创建', data: banner });
     } catch (err) {
-      console.error('[AdminAPI] CreateBanner error:', err);
+      log.error({ err }, 'CreateBanner error');
       return res.status(500).json({ code: 500, message: err.message || '创建轮播图失败' });
     }
   },
@@ -595,7 +597,7 @@ const adminApiController = {
       }
       return res.json({ code: 0, message: '轮播图已更新', data: banner });
     } catch (err) {
-      console.error('[AdminAPI] UpdateBanner error:', err);
+      log.error({ err }, 'UpdateBanner error');
       return res.status(500).json({ code: 500, message: err.message || '更新轮播图失败' });
     }
   },
@@ -608,7 +610,7 @@ const adminApiController = {
       await bannerService.softDelete(req.params.id);
       return res.json({ code: 0, message: '轮播图已下架' });
     } catch (err) {
-      console.error('[AdminAPI] DeleteBanner error:', err);
+      log.error({ err }, 'DeleteBanner error');
       return res.status(500).json({ code: 500, message: '下架轮播图失败' });
     }
   },
@@ -624,7 +626,7 @@ const adminApiController = {
       }
       return res.json({ code: 0, message: '轮播图状态已切换', data: banner });
     } catch (err) {
-      console.error('[AdminAPI] ToggleBanner error:', err);
+      log.error({ err }, 'ToggleBanner error');
       return res.status(500).json({ code: 500, message: '切换轮播图状态失败' });
     }
   },
@@ -639,7 +641,7 @@ const adminApiController = {
       const templates = await couponTemplateService.adminList();
       return res.json({ code: 0, data: templates });
     } catch (err) {
-      console.error('[AdminAPI] ListCouponTemplates error:', err);
+      log.error({ err }, 'ListCouponTemplates error');
       return res.status(500).json({ code: 500, message: '获取优惠券模板列表失败' });
     }
   },
@@ -655,7 +657,7 @@ const adminApiController = {
       }
       return res.json({ code: 0, data: template });
     } catch (err) {
-      console.error('[AdminAPI] GetCouponTemplate error:', err);
+      log.error({ err }, 'GetCouponTemplate error');
       return res.status(500).json({ code: 500, message: '获取优惠券模板失败' });
     }
   },
@@ -681,7 +683,7 @@ const adminApiController = {
       });
       return res.status(201).json({ code: 0, message: '优惠券模板已创建', data: template });
     } catch (err) {
-      console.error('[AdminAPI] CreateCouponTemplate error:', err);
+      log.error({ err }, 'CreateCouponTemplate error');
       return res.status(500).json({ code: 500, message: err.message || '创建优惠券模板失败' });
     }
   },
@@ -712,7 +714,7 @@ const adminApiController = {
       }
       return res.json({ code: 0, message: '优惠券模板已更新', data: template });
     } catch (err) {
-      console.error('[AdminAPI] UpdateCouponTemplate error:', err);
+      log.error({ err }, 'UpdateCouponTemplate error');
       return res.status(500).json({ code: 500, message: err.message || '更新优惠券模板失败' });
     }
   },
@@ -725,7 +727,7 @@ const adminApiController = {
       await couponTemplateService.softDelete(req.params.id);
       return res.json({ code: 0, message: '优惠券模板已下架' });
     } catch (err) {
-      console.error('[AdminAPI] DeleteCouponTemplate error:', err);
+      log.error({ err }, 'DeleteCouponTemplate error');
       return res.status(500).json({ code: 500, message: '删除优惠券模板失败' });
     }
   },
@@ -741,7 +743,7 @@ const adminApiController = {
       }
       return res.json({ code: 0, message: '优惠券模板状态已切换', data: template });
     } catch (err) {
-      console.error('[AdminAPI] ToggleCouponTemplate error:', err);
+      log.error({ err }, 'ToggleCouponTemplate error');
       return res.status(500).json({ code: 500, message: '切换优惠券模板状态失败' });
     }
   },
@@ -756,7 +758,7 @@ const adminApiController = {
       const tiers = await memberTierService.getAll();
       return res.json({ code: 0, data: tiers });
     } catch (err) {
-      console.error('[AdminAPI] ListMemberTiers error:', err);
+      log.error({ err }, 'ListMemberTiers error');
       return res.status(500).json({ code: 500, message: '获取会员等级列表失败' });
     }
   },
@@ -772,7 +774,7 @@ const adminApiController = {
       }
       return res.json({ code: 0, data: tier });
     } catch (err) {
-      console.error('[AdminAPI] GetMemberTier error:', err);
+      log.error({ err }, 'GetMemberTier error');
       return res.status(500).json({ code: 500, message: '获取会员等级失败' });
     }
   },
@@ -812,7 +814,7 @@ const adminApiController = {
       invalidateCache();
       return res.status(201).json({ code: 0, message: '会员等级已创建', data: tier });
     } catch (err) {
-      console.error('[AdminAPI] CreateMemberTier error:', err);
+      log.error({ err }, 'CreateMemberTier error');
       return res.status(500).json({ code: 500, message: err.message || '创建会员等级失败' });
     }
   },
@@ -856,7 +858,7 @@ const adminApiController = {
       invalidateCache();
       return res.json({ code: 0, message: '会员等级已更新', data: tier });
     } catch (err) {
-      console.error('[AdminAPI] UpdateMemberTier error:', err);
+      log.error({ err }, 'UpdateMemberTier error');
       return res.status(500).json({ code: 500, message: err.message || '更新会员等级失败' });
     }
   },
@@ -870,7 +872,7 @@ const adminApiController = {
       invalidateCache();
       return res.json({ code: 0, message: '会员等级已下架' });
     } catch (err) {
-      console.error('[AdminAPI] DeleteMemberTier error:', err);
+      log.error({ err }, 'DeleteMemberTier error');
       return res.status(500).json({ code: 500, message: '删除会员等级失败' });
     }
   },
@@ -887,7 +889,7 @@ const adminApiController = {
       invalidateCache();
       return res.json({ code: 0, message: '会员等级状态已切换', data: tier });
     } catch (err) {
-      console.error('[AdminAPI] ToggleMemberTier error:', err);
+      log.error({ err }, 'ToggleMemberTier error');
       return res.status(500).json({ code: 500, message: '切换会员等级状态失败' });
     }
   },
@@ -928,7 +930,7 @@ const adminApiController = {
 
       return res.json({ code: 0, message: `已成功发放 ${assigned} 张优惠券`, data: { assigned } });
     } catch (err) {
-      console.error('[AdminAPI] AssignCoupon error:', err);
+      log.error({ err }, 'AssignCoupon error');
       return res.status(500).json({ code: 500, message: err.message || '发放优惠券失败' });
     }
   },
@@ -950,7 +952,7 @@ const adminApiController = {
       });
       return res.json({ code: 0, data: result });
     } catch (err) {
-      console.error('[AdminAPI] ListPaymentRecords error:', err);
+      log.error({ err }, 'ListPaymentRecords error');
       return res.status(500).json({ code: 500, message: '获取交易记录失败' });
     }
   },
@@ -966,7 +968,7 @@ const adminApiController = {
       }
       return res.json({ code: 0, data: record });
     } catch (err) {
-      console.error('[AdminAPI] GetPaymentRecord error:', err);
+      log.error({ err }, 'GetPaymentRecord error');
       return res.status(500).json({ code: 500, message: '获取交易记录失败' });
     }
   },
@@ -1228,7 +1230,7 @@ const adminApiController = {
           config.printer.pkey,
           '披萨店打印机'
         );
-        console.log('[AdminAPI] 添加设备结果:', JSON.stringify(addResult));
+        log.info({ addResult }, '添加设备结果');
       }
 
       const result = await printerService.testPrint();

@@ -3,6 +3,8 @@ const userService = require('../services/userService');
 const refundService = require('../services/refundService');
 const { verifyNotifySign } = require('../utils/wechatPay');
 const pool = require('../config/database');
+const { createLogger } = require('../utils/logger');
+const log = createLogger('Payment');
 
 const paymentController = {
 
@@ -87,7 +89,7 @@ const paymentController = {
       const rawBody = Buffer.isBuffer(req.body) ? req.body.toString('utf8') : req.body;
       const bodyLen = rawBody.length;
 
-      console.log(`[Payment] === Notify callback received (${bodyLen}B) ===`);
+      log.info({ bodyLen }, 'notify callback received');
 
       // Verify WeChat Pay signature before processing
       const signHeaders = {
@@ -95,32 +97,32 @@ const paymentController = {
         timestamp: req.headers['wechatpay-timestamp'] || 'MISSING',
         nonce: req.headers['wechatpay-nonce'] || 'MISSING',
       };
-      console.log(`[Payment] Notify headers: serial=${signHeaders.serial}, ts=${signHeaders.timestamp}`);
+      log.info({ serial: signHeaders.serial, timestamp: signHeaders.timestamp }, 'notify headers');
 
       if (!verifyNotifySign(req.headers, rawBody)) {
         const elapsed = Date.now() - startTime;
-        console.error(`[Payment] Notify SIGNATURE FAILED (${elapsed}ms) — headers: serial=${signHeaders.serial}, ts=${signHeaders.timestamp}, nonce=${signHeaders.nonce ? 'present' : 'MISSING'}`);
+        log.error({ elapsedMs: elapsed, serial: signHeaders.serial, timestamp: signHeaders.timestamp, nonce: signHeaders.nonce ? 'present' : 'MISSING' }, 'notify signature FAILED');
         // Still return 200 to prevent WeChat Pay retry storms
         return res.status(200).json({ code: 'FAIL', message: 'Signature verification failed' });
       }
-      console.log(`[Payment] Notify signature VERIFIED (${Date.now() - startTime}ms)`);
+      log.info({ elapsedMs: Date.now() - startTime }, 'notify signature verified');
 
       const result = await paymentService.handleNotify(rawBody);
 
       const totalElapsed = Date.now() - startTime;
       // Always return 200 to WeChat Pay (even on error) to prevent retry
       if (result.success) {
-        console.log(`[Payment] Notify SUCCESS (${totalElapsed}ms): ${result.detail || ''}`);
+        log.info({ elapsedMs: totalElapsed, detail: result.detail }, 'notify SUCCESS');
         res.status(200).json({ code: 'SUCCESS', message: 'OK' });
       } else {
         // Still 200 — WeChat requires HTTP 200, but we signal failure
         // in the response body so we can debug
-        console.error(`[Payment] Notify FAILED (${totalElapsed}ms): reason=${result.reason}`);
+        log.error({ elapsedMs: totalElapsed, reason: result.reason }, 'notify FAILED');
         res.status(200).json({ code: 'SUCCESS', message: 'OK' });
       }
     } catch (err) {
       const elapsed = Date.now() - startTime;
-      console.error(`[Payment] Notify EXCEPTION (${elapsed}ms):`, err.message, err.stack);
+      log.error({ err, elapsedMs: elapsed }, 'notify exception');
       // MUST return 200 to WeChat Pay regardless
       res.status(200).json({ code: 'SUCCESS', message: 'OK' });
     }
@@ -239,11 +241,11 @@ const paymentController = {
     const startTime = Date.now();
     try {
       const rawBody = Buffer.isBuffer(req.body) ? req.body.toString('utf8') : req.body;
-      console.log(`[Refund] === Refund notify callback received (${rawBody.length}B) ===`);
+      log.info({ bodyLen: rawBody.length }, 'refund notify callback received');
 
       // Verify signature
       if (!verifyNotifySign(req.headers, rawBody)) {
-        console.error(`[Refund] Refund notify SIGNATURE FAILED (${Date.now() - startTime}ms)`);
+        log.error({ elapsedMs: Date.now() - startTime }, 'refund notify signature FAILED');
         return res.status(200).json({ code: 'FAIL', message: 'Signature verification failed' });
       }
 
@@ -251,14 +253,14 @@ const paymentController = {
       const elapsed = Date.now() - startTime;
 
       if (result.success) {
-        console.log(`[Refund] Refund notify SUCCESS (${elapsed}ms): ${result.detail || ''}`);
+        log.info({ elapsedMs: elapsed, detail: result.detail }, 'refund notify SUCCESS');
       } else {
-        console.error(`[Refund] Refund notify FAILED (${elapsed}ms): ${result.reason}`);
+        log.error({ elapsedMs: elapsed, reason: result.reason }, 'refund notify FAILED');
       }
       // Always return 200 to WeChat Pay
       res.status(200).json({ code: 'SUCCESS', message: 'OK' });
     } catch (err) {
-      console.error(`[Refund] Refund notify EXCEPTION (${Date.now() - startTime}ms):`, err.message);
+      log.error({ err, elapsedMs: Date.now() - startTime }, 'refund notify exception');
       res.status(200).json({ code: 'SUCCESS', message: 'OK' });
     }
   },

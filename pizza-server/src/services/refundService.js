@@ -12,6 +12,8 @@ const pool = require('../config/database');
 const config = require('../config');
 const { payRequest, decryptNotify } = require('../utils/wechatPay');
 const { getTierLevel } = require('../utils/memberTier');
+const { createLogger } = require('../utils/logger');
+const log = createLogger('Refund');
 
 const refundService = {
   // ──────────────────────────────────────────────────────────
@@ -99,7 +101,7 @@ const refundService = {
       [orderId, userId, outRefundNo, refundAmount, reason, pointsReversed, couponRestored ? 1 : 0]
     );
 
-    console.log(`[Refund] Balance refund SUCCESS: order=${orderId}, amount=${refundAmount}, points=${pointsReversed}, coupon=${couponRestored}`);
+    log.info({ orderId, refundAmount, pointsReversed, couponRestored }, 'balance refund SUCCESS');
 
     return {
       success: true,
@@ -153,7 +155,7 @@ const refundService = {
         [wxRes.refund_id || null, outRefundNo]
       );
 
-      console.log(`[Refund] WeChat refund INITIATED: order=${orderId}, refund_id=${wxRes.refund_id}`);
+      log.info({ orderId, refundId: wxRes.refund_id }, 'WeChat refund INITIATED');
 
       return {
         success: true,
@@ -164,7 +166,7 @@ const refundService = {
       };
     } catch (err) {
       // API call failed — mark as failed
-      console.error(`[Refund] WeChat refund API FAILED: order=${orderId}`, err.message);
+      log.error({ err, orderId }, 'WeChat refund API FAILED');
       await pool.query(
         "UPDATE refund_records SET status = 'failed', updated_at = NOW() WHERE out_refund_no = ?",
         [outRefundNo]
@@ -193,7 +195,7 @@ const refundService = {
     try {
       decrypted = decryptNotify(resource.ciphertext, resource.associated_data, resource.nonce);
     } catch (e) {
-      console.error('[Refund] Decrypt failed:', e.message);
+      log.error({ err: e }, 'decrypt failed');
       return { success: false, reason: 'Decrypt failed' };
     }
 
@@ -201,7 +203,7 @@ const refundService = {
     const refundStatus = decrypted.refund_status; // SUCCESS / CHANGE / ABNORMAL
     const refundId = decrypted.refund_id;
 
-    console.log(`[Refund] Notify: out_refund_no=${outRefundNo}, status=${refundStatus}`);
+    log.info({ outRefundNo, refundStatus }, 'refund notify received');
 
     // Look up refund record
     const [records] = await pool.query(
@@ -275,11 +277,11 @@ const refundService = {
       );
 
       await conn.commit();
-      console.log(`[Refund] WeChat notify SUCCESS: order=${orderId}, points=${pointsReversed}, totalSpent=${newTotalSpent}, level=${newLevel}`);
+      log.info({ orderId, pointsReversed, totalSpent: newTotalSpent, level: newLevel }, 'WeChat notify SUCCESS');
       return { success: true, detail: `Refund completed for order ${orderId}` };
     } catch (err) {
       await conn.rollback().catch(() => {});
-      console.error('[Refund] Notify processing error:', err.message);
+      log.error({ err }, 'notify processing error');
       throw err;
     } finally {
       conn.release();

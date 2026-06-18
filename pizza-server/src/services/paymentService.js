@@ -9,6 +9,8 @@ const pool = require('../config/database');
 const config = require('../config');
 const { buildPayParams, generateOutTradeNo, payRequest, decryptNotify } = require('../utils/wechatPay');
 const { computeTier, getTierLevel } = require('../utils/memberTier');
+const { createLogger } = require('../utils/logger');
+const log = createLogger('Payment');
 
 const paymentService = {
 
@@ -193,7 +195,7 @@ const paymentService = {
     const transactionId = decrypted.transaction_id;
     const tradeState = decrypted.trade_state; // SUCCESS, NOTPAY, CLOSED, etc.
 
-    console.log(`[Payment] Notify: out_trade_no=${outTradeNo}, state=${tradeState}, txn=${transactionId}`);
+    log.info({ outTradeNo, tradeState, transactionId }, 'Payment notify received');
 
     // Look up payment record
     const [[record]] = await pool.query(
@@ -201,13 +203,13 @@ const paymentService = {
       [outTradeNo]
     );
     if (!record) {
-      console.error(`[Payment] Unknown out_trade_no: ${outTradeNo}`);
+      log.error({ outTradeNo }, 'Unknown out_trade_no');
       return { success: false, reason: 'unknown_out_trade_no' };
     }
 
     // Idempotency: already processed
     if (record.status === 'success') {
-      console.log(`[Payment] Already processed: ${outTradeNo}, type=${record.type}`);
+      log.info({ outTradeNo, type: record.type }, 'Already processed');
       return { success: true, detail: `already_processed type=${record.type}` };
     }
 
@@ -218,7 +220,7 @@ const paymentService = {
         "UPDATE payment_records SET status = ?, transaction_id = ?, raw_notify = ?, updated_at = NOW() WHERE id = ?",
         [newStatus, transactionId, JSON.stringify(notifyData), record.id]
       );
-      console.log(`[Payment] Non-success state: ${outTradeNo} → ${newStatus}`);
+      log.info({ outTradeNo, newStatus }, 'Non-success state');
       return { success: true, reason: `trade_state_${tradeState}`, detail: `state=${tradeState} type=${record.type}` };
     }
 
@@ -237,7 +239,7 @@ const paymentService = {
       if (prResult.affectedRows === 0) {
         // Another concurrent handler already processed this — idempotent exit
         await conn.rollback();
-        console.log(`[Payment] Race: already processed by concurrent handler: ${outTradeNo}`);
+        log.info({ outTradeNo }, 'Race: already processed by concurrent handler');
         return { success: true, detail: `concurrent_skip type=${record.type}` };
       }
 
@@ -282,7 +284,7 @@ const paymentService = {
             );
 
             detail += ` points=${earnedPoints} tier=${newTier} totalSpent=${newTotalSpent.toFixed(2)}`;
-            console.log(`[Payment] Order processed: user=${record.user_id} points+${earnedPoints} tier=${newTier}`);
+            log.info({ userId: record.user_id, earnedPoints, tier: newTier }, 'Order processed');
           }
         } else {
           detail += ' orderAlreadyPaid';
@@ -309,7 +311,7 @@ const paymentService = {
               [record.user_id, amount, balanceAfter, 'recharge', '微信支付充值']
             );
           } catch (histErr) {
-            console.warn(`[Payment] balance_history insert skipped (notify): ${histErr.message}`);
+            log.warn({ err: histErr }, 'balance_history insert skipped (notify)');
           }
           detail = `recharge user=${record.user_id} amount=${amount} balance=${oldBalance}→${balanceAfter} totalSpent=${oldTotalSpent}→${newTotalSpent.toFixed(2)} tier=${newTier}`;
         }
@@ -317,7 +319,7 @@ const paymentService = {
 
       await conn.commit();
       const txElapsed = Date.now() - txStart;
-      console.log(`[Payment] Processed (${txElapsed}ms): ${outTradeNo}, type=${record.type} — ${detail}`);
+      log.info({ txElapsed, outTradeNo, type: record.type, detail }, 'Processed');
 
       // 微信支付成功后触发打印机（异步，不阻塞回调响应）
       if (record.type === 'order' && require('../config').printer.enabled) {
@@ -326,7 +328,7 @@ const paymentService = {
         orderService.findById(record.reference_id).then(order => {
           if (order) {
             printerService.printOrderTicket(order).catch(err => {
-              console.error('[Printer] 打印失败:', err.message);
+              log.error({ err }, '打印失败');
             });
           }
         });
@@ -335,7 +337,7 @@ const paymentService = {
       return { success: true, detail };
     } catch (err) {
       await conn.rollback();
-      console.error(`[Payment] Notify TX error (${Date.now() - txStart}ms): ${outTradeNo} —`, err.message);
+      log.error({ err, txElapsed: Date.now() - txStart, outTradeNo }, 'Notify TX error');
       throw err;
     } finally {
       conn.release();
@@ -487,17 +489,17 @@ const paymentService = {
             [record.user_id, amount, balanceAfter, 'recharge', '微信支付充值']
           );
         } catch (histErr) {
-          console.warn(`[Payment] balance_history insert skipped: ${histErr.message}`);
+          log.warn({ err: histErr }, 'balance_history insert skipped');
         }
         detail = `recharge user=${record.user_id} amount=${amount} balance=${oldBalance}→${balanceAfter} totalSpent=${oldTotalSpent}→${newTotalSpent.toFixed(2)} tier=${newTier}`;
       }
 
       await conn.commit();
-      console.log(`[Payment] Synced recharge from WeChat: ${outTradeNo} — ${detail}`);
+      log.info({ outTradeNo, detail }, 'Synced recharge from WeChat');
       return { synced: true, detail };
     } catch (err) {
       await conn.rollback();
-      console.error(`[Payment] SyncRecharge TX error: ${outTradeNo} —`, err.message);
+      log.error({ err, outTradeNo }, 'SyncRecharge TX error');
       throw err;
     } finally {
       conn.release();
@@ -589,7 +591,7 @@ const paymentService = {
       }
 
       await conn.commit();
-      console.log(`[Payment] Synced from WeChat: ${outTradeNo} — ${detail}`);
+      log.info({ outTradeNo, detail }, 'Synced order from WeChat');
 
       // 主动同步成功后也触发打印机
       if (require('../config').printer.enabled) {
@@ -598,7 +600,7 @@ const paymentService = {
         orderService.findById(orderId).then(order => {
           if (order) {
             printerService.printOrderTicket(order).catch(err => {
-              console.error('[Printer] 打印失败:', err.message);
+              log.error({ err }, '打印失败');
             });
           }
         });
@@ -607,7 +609,7 @@ const paymentService = {
       return { synced: true, detail };
     } catch (err) {
       await conn.rollback();
-      console.error(`[Payment] SyncOrder TX error: ${outTradeNo} —`, err.message);
+      log.error({ err, outTradeNo }, 'SyncOrder TX error');
       throw err;
     } finally {
       conn.release();

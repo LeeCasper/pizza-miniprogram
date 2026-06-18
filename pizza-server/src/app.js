@@ -10,7 +10,13 @@ const ejsLayouts = require('express-ejs-layouts');
 
 const config = require('./config');
 const { errorHandler } = require('./middleware/errorHandler');
+const { requestId } = require('./middleware/requestId');
+const { createLogger } = require('./utils/logger');
 const couponService = require('./services/couponService');
+const pool = require('./config/database');
+
+const serverLog = createLogger('Server');
+const cronLog = createLogger('Cron');
 
 // Route imports
 const authRoutes = require('./routes/auth');
@@ -92,6 +98,9 @@ app.use('/api/v1/pay/refund-notify', express.raw({ type: 'application/json' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// ── Request ID ────────────────────────────────────────
+app.use(requestId);
+
 // Static files (uploads & admin assets)
 app.use('/uploads', express.static(config.upload.dir));
 app.use('/admin/assets', express.static(path.join(__dirname, '..', 'public')));
@@ -157,8 +166,22 @@ app.use('/api/v1/admin', adminApiRoutes);
 app.use('/admin', adminRoutes);
 
 // ── Health check ───────────────────────────────────────
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', uptime: process.uptime() });
+app.get('/health', async (req, res) => {
+  const health = {
+    status: 'ok',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+  };
+  try {
+    await pool.query('SELECT 1');
+    health.db = 'ok';
+  } catch (err) {
+    health.status = 'degraded';
+    health.db = 'unreachable';
+    serverLog.warn({ err }, 'Health check: DB unreachable');
+  }
+  const httpStatus = health.status === 'ok' ? 200 : 503;
+  res.status(httpStatus).json(health);
 });
 
 // ── 404 ────────────────────────────────────────────────
@@ -173,23 +196,61 @@ app.use((req, res) => {
 app.use(errorHandler);
 
 // ── Cron: expire overdue coupons daily at 2am ──────────
-cron.schedule('0 2 * * *', async () => {
+const couponCronJob = cron.schedule('0 2 * * *', async () => {
   try {
     const count = await couponService.expireOverdue();
     if (count > 0) {
-      console.log(`[Cron] Expired ${count} overdue coupons`);
+      cronLog.info({ count }, 'Expired overdue coupons');
     }
   } catch (err) {
-    console.error('[Cron] Coupon expiration error:', err.message);
+    cronLog.error({ err }, 'Coupon expiration error');
   }
+});
+
+// ── Graceful shutdown ──────────────────────────────────
+let isShuttingDown = false;
+
+async function shutdown(signal) {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
+  serverLog.info({ signal }, 'Shutdown initiated');
+
+  // 1. Stop accepting new connections
+  server.close(() => {
+    serverLog.info('HTTP server closed');
+  });
+
+  // 2. Stop cron jobs
+  couponCronJob.stop();
+
+  // 3. Close DB pool
+  try {
+    await pool.end();
+    serverLog.info('DB pool closed');
+  } catch (err) {
+    serverLog.error({ err }, 'DB pool close error');
+  }
+
+  process.exit(0);
+}
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
+
+process.on('unhandledRejection', (reason) => {
+  serverLog.error({ err: reason }, 'Unhandled rejection');
+  // Do NOT exit — for a pizza shop, staying up beats crashing
+});
+
+process.on('uncaughtException', (err) => {
+  serverLog.fatal({ err }, 'Uncaught exception — crashing');
+  process.exit(1);
 });
 
 // ── Start ──────────────────────────────────────────────
 const PORT = config.port;
-app.listen(PORT, async () => {
-  console.log(`[Server] Pizza API running on http://localhost:${PORT}`);
-  console.log(`[Server] Admin panel: http://localhost:${PORT}/admin`);
-  console.log(`[Server] Environment: ${config.nodeEnv}`);
+const server = app.listen(PORT, async () => {
+  serverLog.info({ port: PORT, env: config.nodeEnv }, 'Pizza API started');
 
   // Sync WeChat Pay config from DB (overrides .env defaults)
   try {
@@ -198,7 +259,7 @@ app.listen(PORT, async () => {
     systemConfigService.syncPrinterConfigToMemory();
     systemConfigService.syncMapConfigToMemory();
   } catch (err) {
-    console.warn('[Server] Could not sync pay config from DB:', err.message);
+    serverLog.warn({ err }, 'Could not sync config from DB');
   }
 });
 

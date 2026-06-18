@@ -1,4 +1,6 @@
 const pool = require('../config/database');
+const { createLogger } = require('../utils/logger');
+const log = createLogger('User');
 
 const userService = {
   async findByOpenid(openid) {
@@ -237,7 +239,7 @@ const userService = {
       await conn.query('DELETE FROM cart_items WHERE user_id = ?', [id]);
 
       await conn.commit();
-      console.log(`[User] Account deleted (anonymized): userId=${id}, balance=${balance}, points=${points}`);
+      log.info({ userId: id, balance, points }, 'Account deleted (anonymized)');
       return { success: true };
     } catch (err) {
       await conn.rollback().catch(() => {});

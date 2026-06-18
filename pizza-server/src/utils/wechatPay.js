@@ -16,6 +16,8 @@
 const crypto = require('crypto');
 const fs = require('fs');
 const config = require('../config');
+const { createLogger } = require('./logger');
+const log = createLogger('WechatPay');
 
 // ── Helpers ──────────────────────────────────────────────────────────
 
@@ -39,7 +41,7 @@ function loadPem(path) {
   try {
     return fs.readFileSync(path, 'utf8');
   } catch (_) {
-    console.error('[wechatPay] Failed to load PEM:', path);
+    log.error({ path }, 'Failed to load PEM');
     return null;
   }
 }
@@ -128,7 +130,7 @@ function verifyNotifySign(headers, body) {
     const serialNo  = headers['wechatpay-serial'];
 
     if (!timestamp || !nonce || !signature) {
-      console.error('[wechatPay] Missing notify signature headers');
+      log.error('Missing notify signature headers');
       return false;
     }
 
@@ -138,7 +140,7 @@ function verifyNotifySign(headers, body) {
     // Load WeChat platform certificate (DB-backed or file)
     const platformCert = getPlatformCert();
     if (!platformCert) {
-      console.error('[wechatPay] Platform certificate not found.');
+      log.error('Platform certificate not found');
       return false;
     }
 
@@ -147,7 +149,7 @@ function verifyNotifySign(headers, body) {
     verify.end();
     return verify.verify(platformCert, signature, 'base64');
   } catch (err) {
-    console.error('[wechatPay] Notify sign verify error:', err.message);
+    log.error({ err }, 'Notify sign verify error');
     return false;
   }
 }

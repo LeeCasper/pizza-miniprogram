@@ -6,6 +6,8 @@ const pointsService = require('../services/pointsService');
 const { generatePickupCode } = require('../utils/pickupCode');
 const { computeTier, getTierLevel } = require('../utils/memberTier');
 const pool = require('../config/database');
+const { createLogger } = require('../utils/logger');
+const log = createLogger('Order');
 
 const orderController = {
   async list(req, res, next) {
@@ -245,7 +247,7 @@ const orderController = {
       if (paymentMethod === 'balance' && require('../config').printer.enabled) {
         const printerService = require('../services/printerService');
         printerService.printOrderTicket(order).catch(err => {
-          console.error('[Printer] 打印失败:', err.message);
+          log.error({ err }, '打印失败');
         });
       }
       const tier = await computeTier(newTotalSpent);
@@ -303,7 +305,7 @@ const orderController = {
           const refundService = require('../services/refundService');
           refund = await refundService.refundOrder(req.params.id, '用户取消订单');
         } catch (refundErr) {
-          console.error('[Order] Refund failed after cancel:', refundErr.message);
+          log.error({ err: refundErr }, 'Refund failed after cancel');
           // Order is already cancelled — return success but note refund issue
           return res.json({
             code: 0,

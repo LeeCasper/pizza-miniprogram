@@ -9,6 +9,8 @@ const pool = require('../config/database');
 const fs = require('fs');
 const path = require('path');
 const config = require('../config');
+const { createLogger } = require('../utils/logger');
+const log = createLogger('Config');
 
 // Cert file paths
 const CERTS_DIR = path.join(__dirname, '..', '..', 'certs');
@@ -97,14 +99,14 @@ const systemConfigService = {
       }
       if (privateKeyContent !== undefined && privateKeyContent.trim()) {
         fs.writeFileSync(PRIVATE_KEY_PATH, privateKeyContent.trim(), 'utf8');
-        console.log('[Config] Private key synced to disk');
+        log.info('private key synced to disk');
       }
       if (platformCertContent !== undefined && platformCertContent.trim()) {
         fs.writeFileSync(PLATFORM_CERT_PATH, platformCertContent.trim(), 'utf8');
-        console.log('[Config] Platform cert synced to disk');
+        log.info('platform cert synced to disk');
       }
     } catch (err) {
-      console.error('[Config] Failed to write cert files:', err.message);
+      log.error({ err }, 'failed to write cert files');
     }
   },
 
@@ -129,9 +131,9 @@ const systemConfigService = {
       // Also write to disk files
       this._writeCertFiles(dbConfig.privateKey, dbConfig.platformCert);
 
-      console.log('[Config] Pay config synced from DB');
+      log.info('pay config synced from DB');
     } catch (err) {
-      console.error('[Config] Failed to sync pay config from DB:', err.message);
+      log.error({ err }, 'failed to sync pay config from DB');
     }
   },
 
@@ -234,7 +236,7 @@ const systemConfigService = {
       if (dbConfig.footerTip) config.printer.footerTip = dbConfig.footerTip;
       if (dbConfig.audioEnabled !== '') config.printer.audioEnabled = dbConfig.audioEnabled !== 'false';
     }).catch(err => {
-      console.error('[Config] Failed to sync printer config from DB:', err.message);
+      log.error({ err }, 'failed to sync printer config from DB');
     });
   },
   // ── Map Config ──────────────────────────────────────
@@ -298,7 +300,7 @@ const systemConfigService = {
     this.getMapConfig().then(dbConfig => {
       if (dbConfig.tencentKey) config.map.tencentKey = dbConfig.tencentKey;
     }).catch(err => {
-      console.error('[Config] Failed to sync map config from DB:', err.message);
+      log.error({ err }, 'failed to sync map config from DB');
     });
   },
 };

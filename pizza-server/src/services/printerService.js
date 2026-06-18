@@ -11,6 +11,8 @@
 
 const crypto = require('crypto');
 const config = require('../config');
+const { createLogger } = require('../utils/logger');
+const log = createLogger('Printer');
 
 // ── 签名生成 ──────────────────────────────────────────
 
@@ -51,11 +53,11 @@ async function apiRequest(path, bodyParams) {
   let apiBase = config.printer.apiBase || 'https://open.spyun.net';
   let url = new URL(path, apiBase);
   if (url.hostname !== CORRECT_HOST) {
-    console.warn(`[Printer] ⚠ apiBase ${apiBase} 指向错误主机，强制纠正为 ${CORRECT_HOST}`);
+    log.warn({ apiBase, correctHost: CORRECT_HOST }, 'apiBase 指向错误主机，强制纠正');
     url = new URL(path, 'https://' + CORRECT_HOST);
   }
 
-  console.log('[Printer] → POST', url.href);
+  log.info({ url: url.href }, 'POST request');
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 15000);
@@ -69,7 +71,7 @@ async function apiRequest(path, bodyParams) {
     });
 
     const text = await res.text();
-    console.log(`[Printer] API POST ${url.href} → HTTP ${res.status}, body: ${text.slice(0, 500)}`);
+    log.info({ url: url.href, httpStatus: res.status, body: text.slice(0, 500) }, 'API response');
 
     try {
       return JSON.parse(text);
@@ -77,7 +79,7 @@ async function apiRequest(path, bodyParams) {
       return { raw: text, httpStatus: res.status };
     }
   } catch (err) {
-    console.error(`[Printer] API POST ${url.href} → error:`, err.message);
+    log.error({ err, url: url.href }, 'API request error');
     throw err;
   } finally {
     clearTimeout(timer);
@@ -223,11 +225,11 @@ const printerService = {
     const signParams = { appid: params.appid, timestamp: ts, business: '1', sn, pkey, name: name || '披萨店打印机' };
     params.sign = buildSign(signParams, appSecret);
 
-    console.log(`[Printer] 添加设备: sn=${sn}, name=${name}`);
+    log.info({ sn, name }, '添加设备');
 
     try {
       const result = await apiRequest('/v1/printer/add', params);
-      console.log(`[Printer] 添加设备响应:`, JSON.stringify(result));
+      log.info({ result }, '添加设备响应');
 
       if (result.errorcode === 0) {
         return { success: true, message: '设备添加成功' };
@@ -237,7 +239,7 @@ const printerService = {
       }
       return { success: false, message: result.errormsg || `添加失败 (errorcode: ${result.errorcode})` };
     } catch (err) {
-      console.error(`[Printer] 添加设备异常:`, err.message);
+      log.error({ err }, '添加设备异常');
       return { success: false, message: err.message };
     }
   },
@@ -253,7 +255,7 @@ const printerService = {
       return { success: false, message: '打印机未启用' };
     }
     if (!config.printer.sn) {
-      console.warn('[Printer] 未配置打印机 SN，跳过打印');
+      log.warn('未配置打印机 SN，跳过打印');
       return { success: false, message: '未配置打印机 SN' };
     }
 
@@ -261,7 +263,7 @@ const printerService = {
     const contentBytes = Buffer.byteLength(content, 'utf8');
 
     if (contentBytes > 5000) {
-      console.warn(`[Printer] 打印内容过大: ${contentBytes} 字节，将截断`);
+      log.warn({ contentBytes }, '打印内容过大，将截断');
     }
 
     const appSecret = config.printer.appSecret;
@@ -281,19 +283,19 @@ const printerService = {
       sign,
     };
 
-    console.log(`[Printer] 打印订单: ${order.id}, sn=${config.printer.sn}, size=${contentBytes}B`);
+    log.info({ orderId: order.id, sn: config.printer.sn, size: contentBytes }, '打印订单');
 
     try {
       const result = await apiRequest('/v1/printer/print', params);
 
       if (result.errorcode === 0) {
-        console.log(`[Printer] 打印成功: 订单 ${order.id}, jobId=${result.id}`);
+        log.info({ orderId: order.id, jobId: result.id }, '打印成功');
         return { success: true, message: '打印成功', jobId: result.id };
       }
-      console.warn(`[Printer] 打印失败: errorcode=${result.errorcode}, msg=${result.errormsg}`);
+      log.warn({ errorcode: result.errorcode, errormsg: result.errormsg }, '打印失败');
       return { success: false, message: result.errormsg || '打印失败' };
     } catch (err) {
-      console.error(`[Printer] 打印请求异常: ${err.message}`);
+      log.error({ err }, '打印请求异常');
       return { success: false, message: err.message };
     }
   },
@@ -346,20 +348,20 @@ const printerService = {
 
     const params = { ...signParams, sign };
 
-    console.log(`[Printer] 测试打印: sn=${config.printer.sn}`);
+    log.info({ sn: config.printer.sn }, '测试打印');
 
     try {
       const result = await apiRequest('/v1/printer/print', params);
-      console.log(`[Printer] 测试打印响应:`, JSON.stringify(result));
+      log.info({ result }, '测试打印响应');
 
       if (result.errorcode === 0) {
         return { success: true, message: '测试打印已发送' };
       }
       const msg = result.errormsg || `打印失败 (errorcode: ${result.errorcode})`;
-      console.error(`[Printer] 测试打印失败: ${msg}`);
+      log.error({ detail: msg }, '测试打印失败');
       return { success: false, message: msg };
     } catch (err) {
-      console.error(`[Printer] 测试打印异常:`, err.message);
+      log.error({ err }, '测试打印异常');
       return { success: false, message: err.message };
     }
   },
