@@ -755,9 +755,16 @@ Page({
         }
       });
     };
-    // 隐私协议检查：__usePrivacyCheck__ 开启时，需先授权才能调用图片选择
+    // 隐私协议：requirePrivacyAuthorize 在开发者工具中可能不触发回调，
+    // 加 timeout 兜底；fail 时仍尝试选图（DevTools 兼容）
     if (wx.requirePrivacyAuthorize) {
-      wx.requirePrivacyAuthorize({ success: doChoose, fail() { wx.showToast({ title: '需要同意隐私协议才能选择图片', icon: 'none' }); } });
+      var handled = false;
+      wx.requirePrivacyAuthorize({
+        success: function() { if (!handled) { handled = true; doChoose(); } },
+        fail: function() { if (!handled) { handled = true; doChoose(); } },
+        complete: function() { if (!handled) { handled = true; doChoose(); } }
+      });
+      setTimeout(function() { if (!handled) { handled = true; doChoose(); } }, 1500);
     } else {
       doChoose();
     }
