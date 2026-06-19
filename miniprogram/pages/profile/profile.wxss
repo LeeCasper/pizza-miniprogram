@@ -46,11 +46,10 @@
 
 /* ========== 个人信息卡片 ========== */
 .profile-card {
-  margin: 16rpx 32rpx 8rpx;
-  padding: 24rpx;
-  border-radius: var(--radius-card);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-card);
+  margin: 16rpx 0 8rpx;
+  padding: 24rpx 32rpx;
+  border-radius: 32rpx;
+  background: transparent;
 }
 
 .profile-card-top {
@@ -151,7 +150,7 @@
 /* ── 卡片主体 ── */
 .tier-card-wrap { padding: 0 36rpx; height: 100%; display: flex; align-items: center; box-sizing: border-box; transition: padding 0.3s ease; }
 .tier-card-wrap.active { padding: 0 20rpx; }
-.tier-card { width: 100%; height: 100%; border-radius: 28rpx; overflow: hidden; position: relative; box-shadow: 0 12rpx 28rpx -8rpx rgba(0,0,0,0.25); transition: opacity 0.3s ease; }
+.tier-card { width: 100%; height: 100%; border-radius: 28rpx; overflow: hidden; position: relative; box-shadow: 0 4rpx 12rpx -4rpx rgba(0,0,0,0.10); transition: opacity 0.3s ease; }
 
 /* 卡片背景图（<image>标签层） */
 .tier-card-bg-img {
@@ -552,16 +551,16 @@
 .profile-stats {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-end;
   flex-shrink: 0;
   margin-left: auto;
   gap: 2rpx;
 }
 .profile-stat {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2rpx;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 8rpx;
   padding: 4rpx 16rpx;
 }
 .profile-stat:active { opacity: 0.7; }

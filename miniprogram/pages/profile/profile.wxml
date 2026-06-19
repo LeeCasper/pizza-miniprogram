@@ -33,13 +33,13 @@
         </view>
         <view class="profile-stats">
           <view class="profile-stat" bindtap="onMenuItem" data-action="recharge">
-            <text class="profile-stat-value">{{userInfo.balanceText}}</text>
             <text class="profile-stat-label">余额</text>
+            <text class="profile-stat-value">{{userInfo.balanceText}}</text>
           </view>
           <view class="profile-stats-divider"></view>
           <view class="profile-stat" bindtap="onMenuItem" data-action="points">
-            <text class="profile-stat-value">{{userInfo.points || 0}}</text>
             <text class="profile-stat-label">积分</text>
+            <text class="profile-stat-value">{{userInfo.points || 0}}</text>
           </view>
         </view>
       </view>
