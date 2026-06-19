@@ -662,13 +662,13 @@
 .birthday-unset:active { opacity: 0.7; }
 .birthday-prompt { flex: 1; font-size: 24rpx; color: var(--color-primary); }
 .birthday-arrow { font-size: 32rpx; color: var(--color-on-surface-variant); flex-shrink: 0; }
-/* 统计条 */
-.stats-strip { display: flex; align-items: center; margin-top: 24rpx; padding-top: 24rpx; border-top: 1rpx solid var(--color-divider); }
-.stats-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6rpx; }
-.stats-item:active { opacity: 0.7; }
-.stats-value { font-size: 32rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); }
-.stats-label { font-size: 22rpx; color: var(--color-on-surface-variant); }
-.stats-divider { width: 1rpx; height: 56rpx; background: var(--color-divider); align-self: center; flex-shrink: 0; }
+/* 右侧统计 */
+.profile-stats { display: flex; align-items: center; flex-shrink: 0; margin-left: auto; }
+.profile-stat { display: flex; flex-direction: column; align-items: center; gap: 4rpx; padding: 0 20rpx; }
+.profile-stat:active { opacity: 0.7; }
+.profile-stat-value { font-size: 28rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); white-space: nowrap; }
+.profile-stat-label { font-size: 20rpx; color: var(--color-on-surface-variant); }
+.profile-stats-divider { width: 1rpx; height: 48rpx; background: var(--color-divider); flex-shrink: 0; }
 
 /* ── 会员卡轮播 ── */
 .member-cards-section { margin: 0 0 8rpx; position: relative; }

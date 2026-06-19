@@ -552,36 +552,35 @@
 .birthday-prompt { flex: 1; font-size: 24rpx; color: var(--color-primary); }
 .birthday-arrow { font-size: 32rpx; color: var(--color-on-surface-variant); flex-shrink: 0; }
 
-/* ========== 统计条 ========== */
-.stats-strip {
+/* ========== 右侧统计 ========== */
+.profile-stats {
   display: flex;
   align-items: center;
-  margin-top: 24rpx;
-  padding-top: 24rpx;
-  border-top: 1rpx solid var(--color-divider);
+  flex-shrink: 0;
+  margin-left: auto;
 }
-.stats-item {
-  flex: 1;
+.profile-stat {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6rpx;
+  gap: 4rpx;
+  padding: 0 20rpx;
 }
-.stats-item:active { opacity: 0.7; }
-.stats-value {
-  font-size: 32rpx;
+.profile-stat:active { opacity: 0.7; }
+.profile-stat-value {
+  font-size: 28rpx;
   font-weight: var(--font-weight-bold);
   color: var(--color-on-surface);
+  white-space: nowrap;
 }
-.stats-label {
-  font-size: 22rpx;
+.profile-stat-label {
+  font-size: 20rpx;
   color: var(--color-on-surface-variant);
 }
-.stats-divider {
+.profile-stats-divider {
   width: 1rpx;
-  height: 56rpx;
+  height: 48rpx;
   background: var(--color-divider);
-  align-self: center;
   flex-shrink: 0;
 }
 
