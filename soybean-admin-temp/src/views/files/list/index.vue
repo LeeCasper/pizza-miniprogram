@@ -85,9 +85,8 @@ onMounted(() => { loadFiles(); });
 </script>
 
 <template>
-  <div class="files-page">
-    <div class="page-header">
-      <h2 class="page-title">文件管理</h2>
+  <NCard title="文件管理" :bordered="false" class="card-wrapper">
+    <template #header-extra>
       <NButton type="primary" @click="triggerUpload">
         <template #icon>
           <span class="i-mdi:cloud-upload-outline text-18px"></span>
@@ -101,7 +100,7 @@ onMounted(() => { loadFiles(); });
         class="hidden"
         @change="handleUpload"
       />
-    </div>
+    </template>
 
     <NSpin :show="loading">
       <NGrid v-if="files.length > 0" cols="s:2 m:3 l:4 xl:5" :x-gap="12" :y-gap="12">
@@ -168,11 +167,10 @@ onMounted(() => { loadFiles(); });
         <img v-if="previewUrl" :src="previewUrl" class="max-w-80vw max-h-70vh rounded-lg" />
       </div>
     </NModal>
-  </div>
+  </NCard>
 </template>
 
 <style scoped>
-.files-page { padding: 4px; }
 .file-info { display: flex; flex-direction: column; gap: 4px; }
 .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 0; }
 </style>

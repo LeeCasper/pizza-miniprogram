@@ -187,7 +187,7 @@ const livePreview = computed(() => {
     <NGi span="2 m:1">
       <NSpace vertical size="large">
         <!-- 打印机连接配置 -->
-        <NCard title="打印机配置" :bordered="false" size="small">
+        <NCard title="打印机配置" :bordered="false" size="small" class="card-wrapper">
           <template #header-extra>
             <NButton type="primary" size="small" :loading="saving" @click="handleSave">
               保存
@@ -248,7 +248,7 @@ const livePreview = computed(() => {
         </NCard>
 
         <!-- 小票内容设置 -->
-        <NCard title="小票内容设置" :bordered="false" size="small">
+        <NCard title="小票内容设置" :bordered="false" size="small" class="card-wrapper">
           <NForm label-width="120" label-placement="left">
             <NFormItem label="店铺名称">
               <NInput v-model:value="form.storeName" placeholder="王姐手工披萨" />
@@ -269,7 +269,7 @@ const livePreview = computed(() => {
         </NCard>
 
         <!-- 测试与预览 -->
-        <NCard title="测试与预览" :bordered="false" size="small">
+        <NCard title="测试与预览" :bordered="false" size="small" class="card-wrapper">
           <p style="color: var(--n-text-color-2); margin-bottom: 16px">
             发送测试小票到打印机，或查看服务端生成的打印内容。
           </p>
@@ -287,7 +287,7 @@ const livePreview = computed(() => {
 
     <!-- 右侧：实时预览 -->
     <NGi span="2 m:1">
-      <NCard title="小票预览" :bordered="false" size="small">
+      <NCard title="小票预览" :bordered="false" size="small" class="card-wrapper">
         <template #header-extra>
           <span style="color: var(--n-text-color-3); font-size: 12px">随左侧设置实时更新</span>
         </template>

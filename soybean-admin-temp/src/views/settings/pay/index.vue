@@ -97,7 +97,7 @@ async function handleSave() {
 
 <template>
   <NSpace vertical size="large">
-    <NCard title="支付配置" :bordered="false" size="small">
+    <NCard title="支付配置" :bordered="false" size="small" class="card-wrapper">
       <template #header-extra>
         <NButton type="primary" :loading="saving" @click="handleSave">保存配置</NButton>
       </template>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, h } from 'vue';
-import { NDataTable, NTag, NSelect, NSpace } from 'naive-ui';
+import { NCard, NDataTable, NTag, NSelect, NSpace } from 'naive-ui';
 import type { DataTableColumns } from 'naive-ui';
 import { fetchPaymentRecords } from '@/service/api';
 import { formatPrice } from '@/utils/format';
@@ -87,18 +87,15 @@ onMounted(() => { loadRecords(); });
 </script>
 
 <template>
-  <div class="payment-list">
-    <div class="page-header">
-      <h2 class="page-title">交易记录</h2>
+  <NCard title="交易记录" :bordered="false" class="card-wrapper">
+    <template #header-extra>
       <NSpace>
         <NSelect v-model:value="typeFilter" :options="typeOptions" style="width:120px" @update:value="onFilterChange" />
         <NSelect v-model:value="statusFilter" :options="statusOptions" style="width:120px" @update:value="onFilterChange" />
       </NSpace>
-    </div>
+    </template>
     <NDataTable :columns="columns" :data="records" :loading="loading" :row-key="(r: any) => r.id" />
-  </div>
+  </NCard>
 </template>
 
-<style scoped>
-.payment-list { padding: 4px; }
-</style>
+<style scoped></style>

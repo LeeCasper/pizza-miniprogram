@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { NButton, NSpace, NForm, NFormItem, NInput, NInputNumber, NSelect, NColorPicker, NSpin } from 'naive-ui';
+import { NButton, NSpace, NCard, NForm, NFormItem, NInput, NInputNumber, NSelect, NColorPicker, NSpin } from 'naive-ui';
 import { fetchCouponTemplate, fetchCreateCouponTemplate, fetchUpdateCouponTemplate, type CouponTemplate } from '@/service/api';
 
 defineOptions({ name: 'CouponTemplatesForm' });
@@ -85,10 +85,13 @@ async function handleSave() {
 </script>
 
 <template>
-  <div class="ct-form">
-    <div class="page-header">
-      <h2 class="page-title">{{ isEdit ? '编辑模板' : '新建模板' }}</h2>
-    </div>
+  <NCard :title="isEdit ? '编辑模板' : '新建模板'" :bordered="false" class="card-wrapper">
+    <template #header-extra>
+      <NSpace>
+        <NButton @click="router.push('/coupon-templates/list')">返回</NButton>
+        <NButton type="primary" :loading="saving" @click="handleSave">{{ isEdit ? '保存修改' : '创建' }}</NButton>
+      </NSpace>
+    </template>
 
     <NSpin :show="loading">
       <NForm label-placement="left" label-width="100" style="max-width: 640px;">
@@ -122,19 +125,9 @@ async function handleSave() {
         <NFormItem label="使用提示">
           <NInput v-model:value="form.useTip" placeholder="使用须知" type="textarea" />
         </NFormItem>
-
-        <NFormItem>
-          <NSpace>
-            <NButton type="primary" :loading="saving" @click="handleSave">{{ isEdit ? '保存修改' : '创建' }}</NButton>
-            <NButton @click="router.push('/coupon-templates/list')">取消</NButton>
-          </NSpace>
-        </NFormItem>
       </NForm>
     </NSpin>
-  </div>
+  </NCard>
 </template>
 
-<style scoped>
-.ct-form { padding: 4px; }
-.page-header { margin-bottom: 24px; }
-</style>
+<style scoped></style>

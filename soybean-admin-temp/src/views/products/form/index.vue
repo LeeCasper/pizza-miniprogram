@@ -88,58 +88,50 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <div class="product-form">
-    <div class="page-header">
-      <h2 class="page-title">{{ isEdit ? '编辑商品' : '新建商品' }}</h2>
-    </div>
-    <NCard>
-      <NForm :model="form" label-placement="top" :style="{ maxWidth: '680px' }">
-        <NFormItem label="商品名称" required>
-          <NInput v-model:value="form.name" placeholder="例：经典玛格丽特披萨" />
-        </NFormItem>
-        <NFormItem label="分类">
-          <NSelect v-model:value="form.category_key" :options="categoryOptions" style="width:180px" />
-        </NFormItem>
-        <NFormItem label="价格 (元)" required>
-          <NInputNumber v-model:value="form.price" :min="0" :step="0.01" style="width:100%" />
-        </NFormItem>
-        <NFormItem label="商品图片">
-          <ImageUpload v-model="form.image" :width="160" :height="160" />
-          <NCollapse style="margin-top:8px;width:100%">
-            <NCollapseItem title="或手动输入图片 URL" name="url">
-              <NInput v-model:value="form.image" placeholder="https://..." />
-            </NCollapseItem>
-          </NCollapse>
-        </NFormItem>
-        <NFormItem label="标签">
-          <NSelect v-model:value="form.tag" :options="tagOptions" style="width:150px" clearable />
-        </NFormItem>
-        <NFormItem label="简介">
-          <NInput v-model:value="form.desc" type="textarea" placeholder="简短描述" />
-        </NFormItem>
-        <NFormItem label="详情描述">
-          <NInput v-model:value="form.detail_desc" type="textarea" placeholder="详细描述" :autosize="{ minRows: 2 }" />
-        </NFormItem>
-        <NFormItem label="规格说明">
-          <NInput v-model:value="form.size_desc" placeholder="例：9寸 / 12寸" />
-        </NFormItem>
-        <NFormItem label="配料">
-          <TagArrayInput v-model="form.ingredients" placeholder="输入配料" />
-        </NFormItem>
-        <NFormItem>
-          <NSpace>
-            <NButton type="primary" :loading="loading" @click="handleSubmit">
-              {{ isEdit ? '保存修改' : '创建商品' }}
-            </NButton>
-            <NButton @click="router.push('/products')">取消</NButton>
-          </NSpace>
-        </NFormItem>
-      </NForm>
-    </NCard>
-  </div>
+  <NCard :title="isEdit ? '编辑商品' : '新建商品'" :bordered="false" class="card-wrapper">
+    <template #header-extra>
+      <NSpace>
+        <NButton @click="router.push('/products')">返回</NButton>
+        <NButton type="primary" :loading="loading" @click="handleSubmit">
+          {{ isEdit ? '保存修改' : '创建商品' }}
+        </NButton>
+      </NSpace>
+    </template>
+    <NForm :model="form" label-placement="top" :style="{ maxWidth: '680px' }">
+      <NFormItem label="商品名称" required>
+        <NInput v-model:value="form.name" placeholder="例：经典玛格丽特披萨" />
+      </NFormItem>
+      <NFormItem label="分类">
+        <NSelect v-model:value="form.category_key" :options="categoryOptions" style="width:180px" />
+      </NFormItem>
+      <NFormItem label="价格 (元)" required>
+        <NInputNumber v-model:value="form.price" :min="0" :step="0.01" style="width:100%" />
+      </NFormItem>
+      <NFormItem label="商品图片">
+        <ImageUpload v-model="form.image" :width="160" :height="160" />
+        <NCollapse style="margin-top:8px;width:100%">
+          <NCollapseItem title="或手动输入图片 URL" name="url">
+            <NInput v-model:value="form.image" placeholder="https://..." />
+          </NCollapseItem>
+        </NCollapse>
+      </NFormItem>
+      <NFormItem label="标签">
+        <NSelect v-model:value="form.tag" :options="tagOptions" style="width:150px" clearable />
+      </NFormItem>
+      <NFormItem label="简介">
+        <NInput v-model:value="form.desc" type="textarea" placeholder="简短描述" />
+      </NFormItem>
+      <NFormItem label="详情描述">
+        <NInput v-model:value="form.detail_desc" type="textarea" placeholder="详细描述" :autosize="{ minRows: 2 }" />
+      </NFormItem>
+      <NFormItem label="规格说明">
+        <NInput v-model:value="form.size_desc" placeholder="例：9寸 / 12寸" />
+      </NFormItem>
+      <NFormItem label="配料">
+        <TagArrayInput v-model="form.ingredients" placeholder="输入配料" />
+      </NFormItem>
+    </NForm>
+  </NCard>
 </template>
 
-<style scoped>
-.product-form { padding: 4px; }
-.page-header { margin-bottom: 16px; }
-</style>
+<style scoped></style>

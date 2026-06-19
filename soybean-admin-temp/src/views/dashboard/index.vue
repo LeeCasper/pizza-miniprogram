@@ -42,8 +42,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="dashboard">
-    <h2 class="page-title">仪表盘</h2>
+  <NCard title="仪表盘" :bordered="false" class="card-wrapper">
     <NGrid :cols="3" :x-gap="16" :y-gap="16" responsive="screen">
       <NGridItem v-for="card in cards" :key="card.key">
         <NCard :bordered="false" class="stat-card">
@@ -59,12 +58,10 @@ onMounted(async () => {
         </NCard>
       </NGridItem>
     </NGrid>
-  </div>
+  </NCard>
 </template>
 
 <style scoped>
-.dashboard { padding: 4px; }
-.page-title { margin: 0 0 20px; font-size: 22px; font-weight: 700; color: var(--n-text-color); }
 .stat-card { border-radius: 12px; overflow: hidden; }
 .stat-cover {
   height: 80px;

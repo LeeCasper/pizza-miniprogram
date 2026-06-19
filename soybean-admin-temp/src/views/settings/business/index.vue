@@ -54,7 +54,7 @@ async function handleSave() {
 </script>
 
 <template>
-  <NCard title="业务配置" :bordered="false" size="small">
+  <NCard title="业务配置" :bordered="false" size="small" class="card-wrapper">
     <template #header-extra>
       <NButton type="primary" size="small" :loading="saving" @click="handleSave">
         保存

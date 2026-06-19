@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { NButton, NSpace, NForm, NFormItem, NInput, NInputNumber, NSelect } from 'naive-ui';
+import { NButton, NSpace, NCard, NForm, NFormItem, NInput, NInputNumber, NSelect, NSpin } from 'naive-ui';
 import ImageUpload from '@/components/common/ImageUpload.vue';
 import { fetchBanner, fetchCreateBanner, fetchUpdateBanner, fetchProducts, type Banner } from '@/service/api';
 
@@ -83,10 +83,13 @@ async function handleSave() {
 </script>
 
 <template>
-  <div class="banners-form">
-    <div class="page-header">
-      <h2 class="page-title">{{ isEdit ? '编辑轮播图' : '新建轮播图' }}</h2>
-    </div>
+  <NCard :title="isEdit ? '编辑轮播图' : '新建轮播图'" :bordered="false" class="card-wrapper">
+    <template #header-extra>
+      <NSpace>
+        <NButton @click="router.push('/banners/list')">返回</NButton>
+        <NButton type="primary" :loading="saving" @click="handleSave">{{ isEdit ? '保存修改' : '创建' }}</NButton>
+      </NSpace>
+    </template>
 
     <NSpin :show="loading">
       <NForm label-placement="left" label-width="100" style="max-width: 640px;">
@@ -117,19 +120,9 @@ async function handleSave() {
         <NFormItem label="排序">
           <NInputNumber v-model:value="form.sortOrder" :min="0" style="width: 120px" />
         </NFormItem>
-
-        <NFormItem>
-          <NSpace>
-            <NButton type="primary" :loading="saving" @click="handleSave">{{ isEdit ? '保存修改' : '创建' }}</NButton>
-            <NButton @click="router.push('/banners/list')">取消</NButton>
-          </NSpace>
-        </NFormItem>
       </NForm>
     </NSpin>
-  </div>
+  </NCard>
 </template>
 
-<style scoped>
-.banners-form { padding: 4px; }
-.page-header { margin-bottom: 24px; }
-</style>
+<style scoped></style>

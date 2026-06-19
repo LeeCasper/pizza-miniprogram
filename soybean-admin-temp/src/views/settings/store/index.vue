@@ -63,7 +63,7 @@ async function handleSave() {
 </script>
 
 <template>
-  <NCard title="门店设置" :bordered="false" size="small">
+  <NCard title="门店设置" :bordered="false" size="small" class="card-wrapper">
     <template #header-extra>
       <NButton type="primary" size="small" :loading="saving" @click="handleSave">
         保存

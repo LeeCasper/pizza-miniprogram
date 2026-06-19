@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, h } from 'vue';
 import { useRouter } from 'vue-router';
-import { NDataTable, NTag, NButton, NSpace, NSelect } from 'naive-ui';
+import { NCard, NDataTable, NTag, NButton, NSpace, NSelect } from 'naive-ui';
 import type { DataTableColumns } from 'naive-ui';
 import { fetchOrders } from '@/service/api';
 import { formatPrice } from '@/utils/format';
@@ -90,18 +90,15 @@ onMounted(() => { loadOrders(); });
 </script>
 
 <template>
-  <div class="order-list">
-    <div class="page-header">
-      <h2 class="page-title">订单管理</h2>
+  <NCard title="订单管理" :bordered="false" class="card-wrapper">
+    <template #header-extra>
       <NSpace>
         <NSelect v-model:value="statusFilter" :options="statusOptions" style="width:120px" @update:value="onFilterChange" />
         <NSelect v-model:value="paymentStatusFilter" :options="paymentStatusOptions" style="width:120px" @update:value="onFilterChange" />
       </NSpace>
-    </div>
+    </template>
     <NDataTable :columns="columns" :data="orders" :loading="loading" :row-key="(r: any) => r.id" />
-  </div>
+  </NCard>
 </template>
 
-<style scoped>
-.order-list { padding: 4px; }
-</style>
+<style scoped></style>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, h } from 'vue';
-import { NDataTable, NTag, NAvatar, NButton, NSpace, NIcon, NDrawer, NDrawerContent, NForm, NFormItem, NInput, NInputNumber, NSelect } from 'naive-ui';
+import { NCard, NDataTable, NTag, NAvatar, NButton, NSpace, NIcon, NDrawer, NDrawerContent, NForm, NFormItem, NInput, NInputNumber, NSelect } from 'naive-ui';
 import { EditOutlined } from '@vicons/antd';
 import type { DataTableColumns } from 'naive-ui';
 import { fetchUsers, fetchUpdateUser, fetchMemberTiers, type UserEditData } from '@/service/api';
@@ -128,8 +128,7 @@ onMounted(() => { loadUsers(); loadMemberTierOptions(); });
 </script>
 
 <template>
-  <div class="user-list">
-    <h2 class="page-title">用户管理</h2>
+  <NCard title="用户管理" :bordered="false" class="card-wrapper">
     <NDataTable :columns="columns" :data="users" :loading="loading" :row-key="(r: any) => r.id" />
 
     <NDrawer v-model:show="drawerOpen" width="400">
@@ -162,10 +161,7 @@ onMounted(() => { loadUsers(); loadMemberTierOptions(); });
         </template>
       </NDrawerContent>
     </NDrawer>
-  </div>
+  </NCard>
 </template>
 
-<style scoped>
-.user-list { padding: 4px; }
-.page-title { margin: 0 0 16px; font-size: 22px; font-weight: 700; }
-</style>
+<style scoped></style>

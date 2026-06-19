@@ -106,102 +106,95 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <div class="points-form">
-    <h2 class="page-title">{{ isEdit ? '编辑积分商品' : '新建积分商品' }}</h2>
-    <NCard>
-      <NForm :model="form" label-placement="top" :style="{ maxWidth: '640px' }">
-        <NFormItem label="商品名称" required>
-          <NInput v-model:value="form.name" placeholder="例：买一赠一券" />
+  <NCard :title="isEdit ? '编辑积分商品' : '新建积分商品'" :bordered="false" class="card-wrapper">
+    <template #header-extra>
+      <NSpace>
+        <NButton @click="router.push('/points')">返回</NButton>
+        <NButton type="primary" :loading="loading" @click="handleSubmit">
+          {{ isEdit ? '保存修改' : '创建商品' }}
+        </NButton>
+      </NSpace>
+    </template>
+    <NForm :model="form" label-placement="top" :style="{ maxWidth: '640px' }">
+      <NFormItem label="商品名称" required>
+        <NInput v-model:value="form.name" placeholder="例：买一赠一券" />
+      </NFormItem>
+
+      <NFormItem label="兑换类型">
+        <NSelect v-model:value="form.redeemType" :options="redeemTypeOptions" style="width:150px" />
+      </NFormItem>
+
+      <NFormItem label="所需积分" required>
+        <NInputNumber v-model:value="form.points" :min="1" style="width:100%" />
+      </NFormItem>
+
+      <NFormItem label="库存 (-1 表示不限)">
+        <NInputNumber v-model:value="form.stock" :min="-1" style="width:100%" />
+      </NFormItem>
+
+      <NFormItem label="标签">
+        <NInput v-model:value="form.tag" placeholder="例：热门" />
+      </NFormItem>
+
+      <NFormItem label="商品图片">
+        <ImageUpload v-model="form.image" :width="160" :height="160" />
+        <NCollapse style="margin-top:8px;width:100%">
+          <NCollapseItem title="或手动输入图片 URL" name="url">
+            <NInput v-model:value="form.image" placeholder="https://..." />
+          </NCollapseItem>
+        </NCollapse>
+      </NFormItem>
+
+      <NFormItem label="简介">
+        <NInput v-model:value="form.desc" type="textarea" placeholder="简短描述" />
+      </NFormItem>
+
+      <NFormItem label="详情">
+        <NInput v-model:value="form.detailDesc" type="textarea" placeholder="详细描述" :autosize="{ minRows: 3 }" />
+      </NFormItem>
+
+      <NFormItem label="亮点">
+        <TagArrayInput v-model="form.highlights" placeholder="输入亮点" />
+      </NFormItem>
+
+      <!-- Coupon template -->
+      <template v-if="form.redeemType === 'coupon'">
+        <NDivider>生成优惠券模板</NDivider>
+
+        <NFormItem label="券名称">
+          <NInput v-model:value="form.couponName" placeholder="例：买一赠一券" />
         </NFormItem>
 
-        <NFormItem label="兑换类型">
-          <NSelect v-model:value="form.redeemType" :options="redeemTypeOptions" style="width:150px" />
+        <NFormItem label="面值/描述">
+          <NInput v-model:value="form.couponValue" placeholder="例：买一赠一" />
         </NFormItem>
 
-        <NFormItem label="所需积分" required>
-          <NInputNumber v-model:value="form.points" :min="1" style="width:100%" />
+        <NFormItem label="折扣类型">
+          <NSelect v-model:value="form.couponDiscountType" :options="discountTypeOptions" style="width:160px" />
         </NFormItem>
 
-        <NFormItem label="库存 (-1 表示不限)">
-          <NInputNumber v-model:value="form.stock" :min="-1" style="width:100%" />
+        <NFormItem label="折扣值">
+          <NInput v-model:value="form.couponDiscountValue" placeholder="例：50% 或 5元" />
         </NFormItem>
 
-        <NFormItem label="标签">
-          <NInput v-model:value="form.tag" placeholder="例：热门" />
+        <NFormItem label="最低消费">
+          <NInputNumber v-model:value="form.couponMinSpend" :min="0" :step="0.01" style="width:100%" />
         </NFormItem>
 
-        <NFormItem label="商品图片">
-          <ImageUpload v-model="form.image" :width="160" :height="160" />
-          <NCollapse style="margin-top:8px;width:100%">
-            <NCollapseItem title="或手动输入图片 URL" name="url">
-              <NInput v-model:value="form.image" placeholder="https://..." />
-            </NCollapseItem>
-          </NCollapse>
+        <NFormItem label="有效天数">
+          <NInputNumber v-model:value="form.couponValidDays" :min="1" style="width:100%" />
         </NFormItem>
 
-        <NFormItem label="简介">
-          <NInput v-model:value="form.desc" type="textarea" placeholder="简短描述" />
+        <NFormItem label="使用提示">
+          <NInput v-model:value="form.useTip" placeholder="例：仅限堂食" />
         </NFormItem>
+      </template>
 
-        <NFormItem label="详情">
-          <NInput v-model:value="form.detailDesc" type="textarea" placeholder="详细描述" :autosize="{ minRows: 3 }" />
-        </NFormItem>
-
-        <NFormItem label="亮点">
-          <TagArrayInput v-model="form.highlights" placeholder="输入亮点" />
-        </NFormItem>
-
-        <!-- Coupon template -->
-        <template v-if="form.redeemType === 'coupon'">
-          <NDivider>生成优惠券模板</NDivider>
-
-          <NFormItem label="券名称">
-            <NInput v-model:value="form.couponName" placeholder="例：买一赠一券" />
-          </NFormItem>
-
-          <NFormItem label="面值/描述">
-            <NInput v-model:value="form.couponValue" placeholder="例：买一赠一" />
-          </NFormItem>
-
-          <NFormItem label="折扣类型">
-            <NSelect v-model:value="form.couponDiscountType" :options="discountTypeOptions" style="width:160px" />
-          </NFormItem>
-
-          <NFormItem label="折扣值">
-            <NInput v-model:value="form.couponDiscountValue" placeholder="例：50% 或 5元" />
-          </NFormItem>
-
-          <NFormItem label="最低消费">
-            <NInputNumber v-model:value="form.couponMinSpend" :min="0" :step="0.01" style="width:100%" />
-          </NFormItem>
-
-          <NFormItem label="有效天数">
-            <NInputNumber v-model:value="form.couponValidDays" :min="1" style="width:100%" />
-          </NFormItem>
-
-          <NFormItem label="使用提示">
-            <NInput v-model:value="form.useTip" placeholder="例：仅限堂食" />
-          </NFormItem>
-        </template>
-
-        <NFormItem v-if="isEdit" label="状态">
-          <NSelect v-model:value="form.isActive" :options="activeOptions" style="width:120px" />
-        </NFormItem>
-
-        <NFormItem>
-          <NSpace>
-            <NButton type="primary" :loading="loading" @click="handleSubmit">
-              {{ isEdit ? '保存修改' : '创建商品' }}
-            </NButton>
-            <NButton @click="router.push('/points')">取消</NButton>
-          </NSpace>
-        </NFormItem>
-      </NForm>
-    </NCard>
-  </div>
+      <NFormItem v-if="isEdit" label="状态">
+        <NSelect v-model:value="form.isActive" :options="activeOptions" style="width:120px" />
+      </NFormItem>
+    </NForm>
+  </NCard>
 </template>
 
-<style scoped>
-.points-form { padding: 4px; }
-.page-title { margin: 0 0 16px; font-size: 22px; font-weight: 700; }
-</style>
+<style scoped></style>

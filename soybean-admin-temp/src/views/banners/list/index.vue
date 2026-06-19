@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, h } from 'vue';
 import { useRouter } from 'vue-router';
-import { NDataTable, NButton, NTag, NSpace, NImage, NIcon, NSwitch, useDialog } from 'naive-ui';
+import { NCard, NDataTable, NButton, NTag, NSpace, NImage, NIcon, NSwitch, useDialog } from 'naive-ui';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@vicons/antd';
 import type { DataTableColumns } from 'naive-ui';
 import { fetchBanners, fetchDeleteBanner, fetchToggleBanner, type Banner } from '@/service/api';
@@ -91,18 +91,15 @@ onMounted(() => { loadBanners(); });
 </script>
 
 <template>
-  <div class="banners-list">
-    <div class="page-header">
-      <h2 class="page-title">轮播图管理</h2>
+  <NCard title="轮播图管理" :bordered="false" class="card-wrapper">
+    <template #header-extra>
       <NButton type="primary" @click="router.push('/banners/create')">
         <template #icon><NIcon><PlusOutlined /></NIcon></template>
         新建轮播图
       </NButton>
-    </div>
+    </template>
     <NDataTable :columns="columns" :data="banners" :loading="loading" :row-key="(r: Banner) => r.id ?? 0" />
-  </div>
+  </NCard>
 </template>
 
-<style scoped>
-.banners-list { padding: 4px; }
-</style>
+<style scoped></style>

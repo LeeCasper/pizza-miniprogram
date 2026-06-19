@@ -52,13 +52,12 @@ onMounted(() => { loadOrder(); });
 </script>
 
 <template>
-  <div class="order-detail">
-    <NSpace align="center" style="margin-bottom:16px">
-      <NButton quaternary @click="router.push('/orders')">← 返回</NButton>
-      <h2 class="page-title">订单详情</h2>
-    </NSpace>
+  <NCard title="订单详情" :bordered="false" class="card-wrapper" :loading="loading">
+    <template #header-extra>
+      <NButton quaternary @click="router.push('/orders')">← 返回列表</NButton>
+    </template>
 
-    <NCard v-if="order" :loading="loading">
+    <template v-if="order">
       <NDescriptions label-placement="left" :column="2">
         <NDescriptionsItem label="订单号">{{ order.id }}</NDescriptionsItem>
         <NDescriptionsItem label="用户">{{ order.userName }}</NDescriptionsItem>
@@ -92,10 +91,8 @@ onMounted(() => { loadOrder(); });
       <NDivider />
       <h4>商品明细</h4>
       <NDataTable :columns="itemColumns" :data="order.items || []" :row-key="(r: any) => r.id || r.productId" />
-    </NCard>
-  </div>
+    </template>
+  </NCard>
 </template>
 
-<style scoped>
-.order-detail { padding: 4px; }
-</style>
+<style scoped></style>

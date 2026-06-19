@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, h } from 'vue';
-import { NDataTable, NTag } from 'naive-ui';
+import { NCard, NDataTable, NTag } from 'naive-ui';
 import type { DataTableColumns } from 'naive-ui';
 import { fetchCoupons } from '@/service/api';
 
@@ -46,13 +46,9 @@ onMounted(() => { loadCoupons(); });
 </script>
 
 <template>
-  <div class="coupon-list">
-    <h2 class="page-title">优惠券</h2>
+  <NCard title="优惠券" :bordered="false" class="card-wrapper">
     <NDataTable :columns="columns" :data="coupons" :loading="loading" :row-key="(r: any) => r.id" />
-  </div>
+  </NCard>
 </template>
 
-<style scoped>
-.coupon-list { padding: 4px; }
-.page-title { margin: 0 0 16px; font-size: 22px; font-weight: 700; }
-</style>
+<style scoped></style>

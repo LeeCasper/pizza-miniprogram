@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, h } from 'vue';
 import { useRouter } from 'vue-router';
-import { NDataTable, NButton, NTag, NSpace, NImage, NIcon, NSwitch, useDialog } from 'naive-ui';
+import { NCard, NDataTable, NButton, NTag, NSpace, NImage, NIcon, NSwitch, useDialog } from 'naive-ui';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@vicons/antd';
 import type { DataTableColumns } from 'naive-ui';
 import { fetchPointsProducts, fetchDeletePointsProduct, fetchTogglePointsProduct } from '@/service/api';
@@ -94,18 +94,15 @@ onMounted(() => { loadProducts(); });
 </script>
 
 <template>
-  <div class="points-list">
-    <div class="page-header">
-      <h2 class="page-title">积分商城</h2>
+  <NCard title="积分商城" :bordered="false" class="card-wrapper">
+    <template #header-extra>
       <NButton type="primary" @click="router.push('/points/create')">
         <template #icon><NIcon><PlusOutlined /></NIcon></template>
         新建积分商品
       </NButton>
-    </div>
+    </template>
     <NDataTable :columns="columns" :data="products" :loading="loading" :row-key="(r: any) => r.id" />
-  </div>
+  </NCard>
 </template>
 
-<style scoped>
-.points-list { padding: 4px; }
-</style>
+<style scoped></style>

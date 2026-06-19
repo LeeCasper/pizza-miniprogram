@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, h } from 'vue';
 import { useRouter } from 'vue-router';
-import { NDataTable, NButton, NTag, NSpace, NIcon, NSwitch, useDialog } from 'naive-ui';
+import { NCard, NDataTable, NButton, NTag, NSpace, NIcon, NSwitch, useDialog } from 'naive-ui';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@vicons/antd';
 import type { DataTableColumns } from 'naive-ui';
 import { fetchMemberTiers, fetchDeleteMemberTier, fetchToggleMemberTier } from '@/service/api';
@@ -83,20 +83,15 @@ onMounted(() => { loadTiers(); });
 </script>
 
 <template>
-  <div class="mt-list">
-    <div class="page-header">
-      <h2 class="page-title">会员等级</h2>
-      <NSpace>
-        <NButton type="primary" @click="router.push('/member-tiers/create')">
-          <template #icon><NIcon><PlusOutlined /></NIcon></template>
-          新建等级
-        </NButton>
-      </NSpace>
-    </div>
+  <NCard title="会员等级" :bordered="false" class="card-wrapper">
+    <template #header-extra>
+      <NButton type="primary" @click="router.push('/member-tiers/create')">
+        <template #icon><NIcon><PlusOutlined /></NIcon></template>
+        新建等级
+      </NButton>
+    </template>
     <NDataTable :columns="columns" :data="tiers" :loading="loading" :row-key="(r: MemberTier) => r.id ?? 0" />
-  </div>
+  </NCard>
 </template>
 
-<style scoped>
-.mt-list { padding: 4px; }
-</style>
+<style scoped></style>

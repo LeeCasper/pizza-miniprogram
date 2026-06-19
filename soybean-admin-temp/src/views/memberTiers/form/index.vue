@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { NButton, NSpace, NForm, NFormItem, NInput, NInputNumber, NColorPicker, NSpin } from 'naive-ui';
+import { NButton, NSpace, NCard, NForm, NFormItem, NInput, NInputNumber, NColorPicker, NSpin } from 'naive-ui';
 import { fetchMemberTier, fetchCreateMemberTier, fetchUpdateMemberTier, type MemberTier } from '@/service/api';
 
 defineOptions({ name: 'MemberTiersForm' });
@@ -76,14 +76,13 @@ async function handleSave() {
 </script>
 
 <template>
-  <div class="mt-form">
-    <div class="page-header">
-      <h2 class="page-title">{{ isEdit ? '编辑等级' : '新建等级' }}</h2>
+  <NCard :title="isEdit ? '编辑等级' : '新建等级'" :bordered="false" class="card-wrapper">
+    <template #header-extra>
       <NSpace>
         <NButton @click="router.push('/member-tiers/list')">返回</NButton>
         <NButton type="primary" :loading="saving" @click="handleSave">保存</NButton>
       </NSpace>
-    </div>
+    </template>
 
     <NSpin :show="loading">
       <NForm label-placement="left" label-width="140" :style="{ maxWidth: '600px' }">
@@ -122,10 +121,7 @@ async function handleSave() {
         </NFormItem>
       </NForm>
     </NSpin>
-  </div>
+  </NCard>
 </template>
 
-<style scoped>
-.mt-form { padding: 4px; }
-.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-</style>
+<style scoped></style>

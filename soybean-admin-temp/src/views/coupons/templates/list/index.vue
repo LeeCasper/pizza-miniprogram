@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, h } from 'vue';
 import { useRouter } from 'vue-router';
-import { NDataTable, NButton, NTag, NSpace, NIcon, NSwitch, useDialog, NDrawer, NDrawerContent, NForm, NFormItem, NSelect, NTransfer } from 'naive-ui';
+import { NCard, NDataTable, NButton, NTag, NSpace, NIcon, NSwitch, useDialog, NDrawer, NDrawerContent, NForm, NFormItem, NSelect, NTransfer } from 'naive-ui';
 import { PlusOutlined, EditOutlined, DeleteOutlined, SendOutlined } from '@vicons/antd';
 import type { DataTableColumns } from 'naive-ui';
 import { fetchCouponTemplates, fetchDeleteCouponTemplate, fetchToggleCouponTemplate, fetchAssignCoupon, fetchUsers } from '@/service/api';
@@ -145,9 +145,8 @@ onMounted(() => { loadTemplates(); });
 </script>
 
 <template>
-  <div class="ct-list">
-    <div class="page-header">
-      <h2 class="page-title">优惠券模板</h2>
+  <NCard title="优惠券模板" :bordered="false" class="card-wrapper">
+    <template #header-extra>
       <NSpace>
         <NButton type="primary" @click="router.push('/coupon-templates/create')">
           <template #icon><NIcon><PlusOutlined /></NIcon></template>
@@ -158,7 +157,7 @@ onMounted(() => { loadTemplates(); });
           发放优惠券
         </NButton>
       </NSpace>
-    </div>
+    </template>
     <NDataTable :columns="columns" :data="templates" :loading="loading" :row-key="(r: CouponTemplate) => r.id ?? 0" />
 
     <NDrawer v-model:show="assignOpen" width="480">
@@ -183,9 +182,7 @@ onMounted(() => { loadTemplates(); });
         </template>
       </NDrawerContent>
     </NDrawer>
-  </div>
+  </NCard>
 </template>
 
-<style scoped>
-.ct-list { padding: 4px; }
-</style>
+<style scoped></style>
