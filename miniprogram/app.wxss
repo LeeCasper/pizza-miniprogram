@@ -139,6 +139,11 @@ page {
 
 scroll-view {
   will-change: scroll-position;
+  background: transparent;
+}
+
+swiper, swiper-item {
+  background: transparent;
 }
 
 /* === 通用工具类 === */
