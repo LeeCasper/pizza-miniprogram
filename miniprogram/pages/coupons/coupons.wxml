@@ -3,7 +3,7 @@
   <!-- 顶部导航 -->
   <view class="top-bar" style="padding-top: {{statusBarHeight}}px">
     <view class="back-btn" bindtap="onBack">
-      <text>←</text>
+      <image src="/images/back.png" class="back-icon" mode="aspectFit"></image>
     </view>
     <text class="top-title">兑换/优惠券</text>
     <view class="top-spacer"></view>
@@ -119,7 +119,7 @@
     <view class="detail-drawer {{detailOpen ? 'show' : ''}}" catchtap="noop">
       <view class="detail-nav">
         <view class="detail-back-btn" catchtap="onDetailClose">
-          <text class="detail-back-icon">←</text>
+          <image src="/images/back.png" class="detail-back-icon" mode="aspectFit"></image>
         </view>
         <text class="detail-nav-title">券详情</text>
         <view class="detail-nav-spacer"></view>

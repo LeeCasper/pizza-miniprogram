@@ -28,6 +28,7 @@
   font-size: 40rpx;
   color: var(--color-primary);
 }
+.back-icon { width: 40rpx; height: 40rpx; }
 .top-title {
   font-size: 36rpx;
   font-weight: var(--font-weight-bold);
@@ -329,9 +330,8 @@
   transform: scale(0.94);
 }
 .detail-back-icon {
-  font-size: 36rpx;
-  color: var(--color-primary);
-  font-weight: var(--font-weight-semibold);
+  width: 36rpx;
+  height: 36rpx;
 }
 .detail-nav-title {
   font-size: 34rpx;

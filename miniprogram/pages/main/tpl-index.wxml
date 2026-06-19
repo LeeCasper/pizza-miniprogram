@@ -90,7 +90,7 @@
     <!-- 导航行：返回按钮 + 标题，位于页面顶部导航下方 -->
     <view class="detail-nav">
       <view class="detail-back-btn" catchtap="onDetailClose">
-        <text class="detail-back-icon">←</text>
+        <image src="/images/back.png" class="detail-back-icon" mode="aspectFit"></image>
       </view>
       <text class="detail-nav-title">产品详情</text>
       <view class="detail-nav-spacer"></view>

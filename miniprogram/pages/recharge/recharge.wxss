@@ -24,6 +24,7 @@
   font-size: 36rpx;
   color: var(--color-primary);
 }
+.back-icon { width: 36rpx; height: 36rpx; }
 
 .top-title {
   font-size: 34rpx;

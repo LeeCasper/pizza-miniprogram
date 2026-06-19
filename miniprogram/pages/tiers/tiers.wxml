@@ -2,7 +2,7 @@
 <view class="page-container" style="padding-top: {{topBarTotalHeight}}px">
   <!-- 顶部导航 -->
   <view class="top-bar" style="padding-top: {{statusBarHeight}}px">
-    <view class="back-btn" bindtap="onBack"><text>←</text></view>
+    <view class="back-btn" bindtap="onBack"><image src="/images/back.png" class="back-icon" mode="aspectFit"></image></view>
     <text class="top-title">会员权益</text>
     <view class="top-spacer"></view>
   </view>

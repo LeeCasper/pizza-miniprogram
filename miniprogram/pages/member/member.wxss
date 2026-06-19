@@ -25,7 +25,7 @@
   border: 1rpx solid rgba(255,255,255,0.5);
   box-shadow: var(--shadow-sm);
 }
-.back-icon { font-size: 48rpx; color: var(--color-on-surface); font-weight: 300; line-height: 1; }
+.back-icon { width: 40rpx; height: 40rpx; }
 .top-title {
   font-size: 32rpx; font-weight: 700; color: var(--color-on-surface);
   position: absolute; left: 50%; transform: translateX(-50%);

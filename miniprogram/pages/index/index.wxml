@@ -194,7 +194,7 @@
   <view class="detail-drawer {{detailOpen ? 'show' : ''}}" catchtap="noop">
     <view class="detail-nav">
       <view class="detail-back-btn" catchtap="onDetailClose">
-        <text class="detail-back-icon">←</text>
+        <image src="/images/back.png" class="detail-back-icon" mode="aspectFit"></image>
       </view>
       <text class="detail-nav-title">产品详情</text>
       <view class="detail-nav-spacer"></view>

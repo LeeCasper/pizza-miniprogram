@@ -3,7 +3,7 @@
   <!-- 顶部导航 -->
   <view class="top-bar" style="padding-top: {{statusBarHeight}}px">
     <view class="back-btn" bindtap="onBack">
-      <text class="back-icon">‹</text>
+      <image src="/images/back.png" class="back-icon" mode="aspectFit"></image>
     </view>
     <text class="top-title">会员订阅</text>
     <view class="top-points-badge">
