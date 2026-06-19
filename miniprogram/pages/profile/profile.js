@@ -103,32 +103,24 @@ Page({
         fail() { wx.hideLoading(); wx.showToast({ title: '上传失败，请重试', icon: 'none' }); },
       });
     };
-    const doChoose = () => {
-      wx.chooseMedia({
-        count: 1, mediaType: ['image'], sourceType: ['album', 'camera'],
-        success(res) { handleImage(res.tempFiles[0].tempFilePath); },
-        fail() {
-          wx.chooseImage({
-            count: 1, sizeType: ['compressed'], sourceType: ['album', 'camera'],
-            success(r) { handleImage(r.tempFilePaths[0]); },
-            fail() { /* 用户取消 */ }
-          });
-        }
-      });
-    };
-    // 隐私协议：requirePrivacyAuthorize 在开发者工具中可能不触发回调，
-    // 加 timeout 兜底；fail 时仍尝试选图（DevTools 兼容）
-    if (wx.requirePrivacyAuthorize) {
-      var handled = false;
-      wx.requirePrivacyAuthorize({
-        success: function() { if (!handled) { handled = true; doChoose(); } },
-        fail: function() { if (!handled) { handled = true; doChoose(); } },
-        complete: function() { if (!handled) { handled = true; doChoose(); } }
-      });
-      setTimeout(function() { if (!handled) { handled = true; doChoose(); } }, 1500);
-    } else {
-      doChoose();
-    }
+    wx.chooseMedia({
+      count: 1, mediaType: ['image'], sourceType: ['album', 'camera'],
+      success(res) { handleImage(res.tempFiles[0].tempFilePath); },
+      fail(err) {
+        console.warn('[avatar] chooseMedia fail:', err);
+        wx.chooseImage({
+          count: 1, sizeType: ['compressed'], sourceType: ['album', 'camera'],
+          success(r) { handleImage(r.tempFilePaths[0]); },
+          fail(e) {
+            console.warn('[avatar] chooseImage fail:', e);
+            var msg = (e && e.errMsg) || '';
+            if (msg.indexOf('cancel') === -1) {
+              wx.showToast({ title: '无法选择图片', icon: 'none' });
+            }
+          }
+        });
+      }
+    });
   },
 
   // ========== 编辑个人信息 ==========

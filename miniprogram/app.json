@@ -27,7 +27,7 @@
     "startLocationUpdate",
     "onLocationChange"
   ],
-  "__usePrivacyCheck__": true,
+  "__usePrivacyCheck__": false,
   "style": "v2",
   "sitemapLocation": "sitemap.json"
 }
