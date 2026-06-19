@@ -747,6 +747,8 @@ Page({
       success(res) { handleImage(res.tempFiles[0].tempFilePath); },
       fail(err) {
         console.warn('[avatar] chooseMedia fail:', err);
+        // 用户取消不回退
+        if (err && err.errMsg && err.errMsg.indexOf('cancel') > -1) return;
         // 回退到旧版 API
         wx.chooseImage({
           count: 1, sizeType: ['compressed'], sourceType: ['album', 'camera'],
