@@ -75,52 +75,52 @@ Page({
   // ========== 头像 ==========
   onChooseAvatar() {
     const that = this;
-    wx.chooseMedia({
-      count: 1, mediaType: ['image'], sourceType: ['album', 'camera'], sizeType: ['compressed'],
-      success(res) {
-        const avatarPath = res.tempFiles[0].tempFilePath;
-        if (that.data.editProfileOpen) {
-          that.setData({ 'editForm.avatar': avatarPath });
-        } else {
-          // Upload to server
-          wx.showLoading({ title: '上传中...' });
-          wx.uploadFile({
-            url: BASE_URL + '/upload/avatar',
-            filePath: avatarPath,
-            name: 'file',
-            header: {
-              'Authorization': 'Bearer ' + (wx.getStorageSync('token') || ''),
-            },
-            success(result) {
-              wx.hideLoading();
-              if (result.statusCode === 200) {
-                try {
-                  const data = JSON.parse(result.data);
-                  if (data.code === 0) {
-                    app.globalData.userInfo.avatar = fixImageUrl(data.data.url);
-                    that.loadUserData();
-                    wx.showToast({ title: '头像已更新', icon: 'success' });
-                    return;
-                  }
-                } catch (_) {}
+    const handleImage = (avatarPath) => {
+      if (that.data.editProfileOpen) {
+        that.setData({ 'editForm.avatar': avatarPath });
+        return;
+      }
+      wx.showLoading({ title: '上传中...' });
+      wx.uploadFile({
+        url: BASE_URL + '/upload/avatar',
+        filePath: avatarPath, name: 'file',
+        header: { 'Authorization': 'Bearer ' + (wx.getStorageSync('token') || '') },
+        success(result) {
+          wx.hideLoading();
+          if (result.statusCode === 200) {
+            try {
+              const data = JSON.parse(result.data);
+              if (data.code === 0) {
+                app.globalData.userInfo.avatar = fixImageUrl(data.data.url);
+                that.loadUserData();
+                wx.showToast({ title: '头像已更新', icon: 'success' });
+                return;
               }
-              // Fallback: keep local path
-              app.globalData.userInfo.avatar = avatarPath;
-              that.loadUserData();
-              wx.showToast({ title: '头像已更新', icon: 'success' });
-            },
-            fail() {
-              wx.hideLoading();
-              // Fallback: local only
-              app.globalData.userInfo.avatar = avatarPath;
-              that.loadUserData();
-              wx.showToast({ title: '头像已更新（本地）', icon: 'success' });
-            },
+            } catch (_) {}
+          }
+          wx.showToast({ title: '上传失败', icon: 'none' });
+        },
+        fail() { wx.hideLoading(); wx.showToast({ title: '上传失败，请重试', icon: 'none' }); },
+      });
+    };
+    const doChoose = () => {
+      wx.chooseMedia({
+        count: 1, mediaType: ['image'], sourceType: ['album', 'camera'],
+        success(res) { handleImage(res.tempFiles[0].tempFilePath); },
+        fail() {
+          wx.chooseImage({
+            count: 1, sizeType: ['compressed'], sourceType: ['album', 'camera'],
+            success(r) { handleImage(r.tempFilePaths[0]); },
+            fail() { /* 用户取消 */ }
           });
         }
-      },
-      fail() { /* 用户取消选择 */ }
-    });
+      });
+    };
+    if (wx.requirePrivacyAuthorize) {
+      wx.requirePrivacyAuthorize({ success: doChoose, fail() { wx.showToast({ title: '需要同意隐私协议才能选择图片', icon: 'none' }); } });
+    } else {
+      doChoose();
+    }
   },
 
   // ========== 编辑个人信息 ==========

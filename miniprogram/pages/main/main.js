@@ -727,28 +727,40 @@ Page({
 
   onChooseAvatar() {
     const that = this;
-    wx.chooseMedia({
-      count: 1, mediaType: ['image'], sourceType: ['album', 'camera'], sizeType: ['compressed'],
-      success(res) {
-        const avatarPath = res.tempFiles[0].tempFilePath;
-        // 编辑抽屉内：仅暂存本地路径，保存时统一上传
-        if (that.data.editProfileOpen) { that.setData({ 'editForm.avatar': avatarPath }); return; }
-        // 直接点击头像：立即上传
-        wx.showLoading({ title: '上传中...' });
-        that._uploadAvatar(avatarPath).then(url => {
-          wx.hideLoading();
-          app.globalData.userInfo.avatar = url;
-          that.loadProfileData();
-          wx.showToast({ title: '头像已更新', icon: 'success' });
-        }).catch(() => {
-          wx.hideLoading();
-          app.globalData.userInfo.avatar = avatarPath;
-          that.loadProfileData();
-          wx.showToast({ title: '头像已更新（本地）', icon: 'success' });
-        });
-      },
-      fail() { /* 用户取消选择 */ }
-    });
+    const handleImage = (tempFilePath) => {
+      // 编辑抽屉内：仅暂存本地路径，保存时统一上传
+      if (that.data.editProfileOpen) { that.setData({ 'editForm.avatar': tempFilePath }); return; }
+      // 直接点击头像：立即上传
+      wx.showLoading({ title: '上传中...' });
+      that._uploadAvatar(tempFilePath).then(url => {
+        wx.hideLoading();
+        app.globalData.userInfo.avatar = url;
+        that.loadProfileData();
+        wx.showToast({ title: '头像已更新', icon: 'success' });
+      }).catch(() => {
+        wx.hideLoading();
+        wx.showToast({ title: '上传失败，请重试', icon: 'none' });
+      });
+    };
+    const doChoose = () => {
+      wx.chooseMedia({
+        count: 1, mediaType: ['image'], sourceType: ['album', 'camera'],
+        success(res) { handleImage(res.tempFiles[0].tempFilePath); },
+        fail() {
+          wx.chooseImage({
+            count: 1, sizeType: ['compressed'], sourceType: ['album', 'camera'],
+            success(r) { handleImage(r.tempFilePaths[0]); },
+            fail() { /* 用户取消 */ }
+          });
+        }
+      });
+    };
+    // 隐私协议检查：__usePrivacyCheck__ 开启时，需先授权才能调用图片选择
+    if (wx.requirePrivacyAuthorize) {
+      wx.requirePrivacyAuthorize({ success: doChoose, fail() { wx.showToast({ title: '需要同意隐私协议才能选择图片', icon: 'none' }); } });
+    } else {
+      doChoose();
+    }
   },
   onOpenEditProfile() {
     const ui = this.data.userInfo;
