@@ -105,13 +105,14 @@ const api = {
 
 /**
  * Fix image URL: prepend domain to relative paths so WeChat <image> loads from network.
- * Full URLs (https://...) are returned unchanged.
+ * Full URLs (https://...) are returned unchanged. http:// is upgraded to https://.
  */
 function fixImageUrl(url) {
   if (!url) return url;
-  if (url.startsWith('https://') || url.startsWith('http://')) return url;
+  if (url.startsWith('https://')) return url;
+  if (url.startsWith('http://')) return url.replace('http://', 'https://');
   if (url.startsWith('/uploads/')) return 'https://artaides.com' + url;
   return url;
 }
 
-module.exports = { api, doLogin, fixImageUrl };
+module.exports = { api, doLogin, fixImageUrl, BASE_URL };

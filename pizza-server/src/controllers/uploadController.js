@@ -12,10 +12,10 @@ const uploadController = {
       }
 
       const relativePath = '/uploads/' + req.file.filename;
-      const fullUrl = `${req.protocol}://${req.get('host')}${relativePath}`;
-      await userService.updateAvatar(req.user.id, fullUrl);
+      // Store relative path — frontend prepends domain via fixImageUrl
+      await userService.updateAvatar(req.user.id, relativePath);
 
-      res.json({ code: 0, data: { url: fullUrl }, message: '头像更新成功' });
+      res.json({ code: 0, data: { url: relativePath }, message: '头像更新成功' });
     } catch (err) {
       next(err);
     }

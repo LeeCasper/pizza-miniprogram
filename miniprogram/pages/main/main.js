@@ -1,5 +1,5 @@
 // pages/main/main.js
-const { api, fixImageUrl } = require('../../utils/api');
+const { api, fixImageUrl, BASE_URL } = require('../../utils/api');
 const pay = require('../../utils/pay');
 const { computeTier, buildTierCards, loadTiers } = require('../../utils/tiers');
 const { getSwiperLayout } = require('../../utils/layout');
@@ -645,6 +645,8 @@ Page({
         if ((freshUi.totalSpent || 0) < currentTotalSpent) {
           freshUi.totalSpent = currentTotalSpent;
         }
+        // Fix avatar URL for real device (relative path → full https URL)
+        if (freshUi.avatar) freshUi.avatar = fixImageUrl(freshUi.avatar);
         app.globalData.userInfo = freshUi;
         wx.setStorageSync('userInfo', freshUi);
         ui = freshUi;
@@ -703,33 +705,46 @@ Page({
 
   // ── 编辑个人信息 ────────────────────────────
 
+  /** 上传头像文件，返回 Promise<serverUrl> */
+  _uploadAvatar(filePath) {
+    return new Promise((resolve, reject) => {
+      wx.uploadFile({
+        url: BASE_URL + '/upload/avatar', filePath, name: 'file',
+        header: { 'Authorization': 'Bearer ' + (wx.getStorageSync('token') || '') },
+        success(result) {
+          if (result.statusCode === 200) {
+            try {
+              const data = JSON.parse(result.data);
+              if (data.code === 0) { resolve(fixImageUrl(data.data.url)); return; }
+            } catch (_) {}
+          }
+          reject(new Error('上传失败'));
+        },
+        fail: reject,
+      });
+    });
+  },
+
   onChooseAvatar() {
     const that = this;
     wx.chooseImage({
       count: 1, sizeType: ['compressed'], sourceType: ['album', 'camera'],
       success(res) {
         const avatarPath = res.tempFilePaths[0];
+        // 编辑抽屉内：仅暂存本地路径，保存时统一上传
         if (that.data.editProfileOpen) { that.setData({ 'editForm.avatar': avatarPath }); return; }
+        // 直接点击头像：立即上传
         wx.showLoading({ title: '上传中...' });
-        wx.uploadFile({
-          url: 'https://artaides.com/api/v1/upload/avatar', filePath: avatarPath, name: 'file',
-          header: { 'Authorization': 'Bearer ' + (wx.getStorageSync('token') || '') },
-          success(result) {
-            wx.hideLoading();
-            if (result.statusCode === 200) {
-              try {
-                const data = JSON.parse(result.data);
-                if (data.code === 0) { app.globalData.userInfo.avatar = data.data.url; }
-              } catch (_) {}
-            }
-            app.globalData.userInfo.avatar = app.globalData.userInfo.avatar || avatarPath;
-            that.loadProfileData(); wx.showToast({ title: '头像已更新', icon: 'success' });
-          },
-          fail() {
-            wx.hideLoading();
-            app.globalData.userInfo.avatar = avatarPath;
-            that.loadProfileData(); wx.showToast({ title: '头像已更新（本地）', icon: 'success' });
-          }
+        that._uploadAvatar(avatarPath).then(url => {
+          wx.hideLoading();
+          app.globalData.userInfo.avatar = url;
+          that.loadProfileData();
+          wx.showToast({ title: '头像已更新', icon: 'success' });
+        }).catch(() => {
+          wx.hideLoading();
+          app.globalData.userInfo.avatar = avatarPath;
+          that.loadProfileData();
+          wx.showToast({ title: '头像已更新（本地）', icon: 'success' });
         });
       }
     });
@@ -745,11 +760,25 @@ Page({
     const { editForm } = this.data;
     if (!editForm.name.trim()) { wx.showToast({ title: '请输入昵称', icon: 'none' }); return; }
     const ui = app.globalData.userInfo;
-    ui.name = editForm.name.trim(); ui.bio = editForm.bio.trim();
-    if (editForm.avatar) ui.avatar = editForm.avatar;
-    this.setData({ editProfileOpen: false }); this.loadProfileData();
-    api.put('/user/profile', { name: ui.name, bio: ui.bio }).then(() => {
+    const name = editForm.name.trim();
+    const bio = editForm.bio.trim();
+    const avatarChanged = editForm.avatar && editForm.avatar !== ui.avatar && !editForm.avatar.startsWith('http');
+
+    // 乐观更新 UI + 关闭抽屉
+    ui.name = name; ui.bio = bio;
+    this.setData({
+      editProfileOpen: false,
+      userInfo: { ...this.data.userInfo, name, bio, avatar: editForm.avatar || ui.avatar },
+    });
+
+    // 头像变更时先上传，再保存文本字段，最后刷新
+    const avatarPromise = avatarChanged
+      ? this._uploadAvatar(editForm.avatar).then(url => { ui.avatar = url; }).catch(() => {})
+      : Promise.resolve();
+
+    avatarPromise.then(() => api.put('/user/profile', { name, bio })).then(() => {
       wx.showToast({ title: '保存成功', icon: 'success' });
+      this.loadProfileData();
     }).catch(() => { wx.showToast({ title: '保存成功（本地）', icon: 'success' }); });
   },
 

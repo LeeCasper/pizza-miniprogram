@@ -1,4 +1,4 @@
-const { doLogin, api } = require('./utils/api');
+const { doLogin, api, fixImageUrl } = require('./utils/api');
 
 App({
   onLaunch() {
@@ -9,6 +9,7 @@ App({
     const token = wx.getStorageSync('token');
     const cachedUser = wx.getStorageSync('userInfo');
     if (cachedUser) {
+      if (cachedUser.avatar) cachedUser.avatar = fixImageUrl(cachedUser.avatar);
       this.globalData.userInfo = cachedUser;
     }
 
@@ -16,6 +17,7 @@ App({
       // 有 token，验证并刷新用户信息
       api.get('/user/profile').then(res => {
         if (res.code === 0) {
+          if (res.data.avatar) res.data.avatar = fixImageUrl(res.data.avatar);
           this.globalData.userInfo = res.data;
           wx.setStorageSync('userInfo', res.data);
         }
@@ -31,6 +33,7 @@ App({
 
   doAppLogin() {
     doLogin().then(user => {
+      if (user.avatar) user.avatar = fixImageUrl(user.avatar);
       this.globalData.userInfo = user;
       wx.setStorageSync('userInfo', user);
     }).catch(() => {
