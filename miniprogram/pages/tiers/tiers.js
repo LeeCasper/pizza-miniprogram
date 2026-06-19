@@ -40,7 +40,9 @@ Page({
       const currentTier = tiers.find(t => t.status === 'current') || tiers[0];
       const nextTier = tierInfo.next;
       const hasNext = !!nextTier;
-      const spentToNext = hasNext ? (nextTier.minSpent - qualifyingAmount).toFixed(2) : '0.00';
+      const rawDiff = hasNext ? nextTier.minSpent - qualifyingAmount : 0;
+      const spentToNext = rawDiff > 0 ? rawDiff.toFixed(2) : '0.00';
+      const upgradeReady = hasNext && rawDiff <= 0;
       const progressPercent = hasNext
         ? Math.min(100, Math.max(0, ((qualifyingAmount - tierInfo.current.minSpent) / (nextTier.minSpent - tierInfo.current.minSpent)) * 100))
         : 100;
@@ -73,6 +75,7 @@ Page({
         totalSpent: qualifyingAmount,
         totalSpentText: qualifyingAmount.toFixed(2),
         spentToNext,
+        upgradeReady,
         progressFraction,
         progressPercent,
       });

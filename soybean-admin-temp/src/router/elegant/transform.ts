@@ -195,11 +195,11 @@ const routeMap: RouteMap = {
   "products_form": "/products/form",
   "products_list": "/products/list",
   "settings": "/settings",
+  "settings_business": "/settings/business",
   "settings_map": "/settings/map",
   "settings_pay": "/settings/pay",
   "settings_printer": "/settings/printer",
   "settings_store": "/settings/store",
-  "settings_business": "/settings/business",
   "users": "/users",
   "users_list": "/users/list"
 };

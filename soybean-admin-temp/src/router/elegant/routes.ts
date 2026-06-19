@@ -328,6 +328,15 @@ export const generatedRoutes: GeneratedRoute[] = [
     },
     children: [
       {
+        name: 'settings_business',
+        path: '/settings/business',
+        component: 'view.settings_business',
+        meta: {
+          title: 'settings_business',
+          i18nKey: 'route.settings_business'
+        }
+      },
+      {
         name: 'settings_map',
         path: '/settings/map',
         component: 'view.settings_map',

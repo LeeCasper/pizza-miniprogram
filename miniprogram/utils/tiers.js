@@ -43,11 +43,16 @@ function buildTierCards(apiTiers, userTier) {
       actionText = t.discountRate < 1 ? '享' + ((1 - t.discountRate) * 100).toFixed(0) + '%折扣' : '查看特权';
     } else if (isActive) {
       if (userTier.next) {
-        const diff = (userTier.next.minSpent - totalSpent).toFixed(2);
-        progressText = '还差¥' + diff + '升级' + userTier.next.name;
-        progressPercent = Math.min(100, Math.max(0,
-          ((totalSpent - userTier.current.minSpent) / (userTier.next.minSpent - userTier.current.minSpent)) * 100
-        ));
+        const diff = userTier.next.minSpent - totalSpent;
+        if (diff > 0) {
+          progressText = '还差¥' + diff.toFixed(2) + '升级' + userTier.next.name;
+          progressPercent = Math.min(100, Math.max(0,
+            ((totalSpent - userTier.current.minSpent) / (userTier.next.minSpent - userTier.current.minSpent)) * 100
+          ));
+        } else {
+          progressText = '已满足' + userTier.next.name + '升级条件';
+          progressPercent = 100;
+        }
         actionText = '查看权益';
       } else {
         progressText = '已达最高等级';
@@ -145,19 +150,24 @@ function buildBenefitTiers(apiTiers, userTier, totalSpent) {
       progressPercent = 100;
     } else if (status === 'current') {
       if (userTier.next) {
-        progressPercent = Math.min(100, Math.max(0,
-          ((totalSpent - userTier.current.minSpent) / (userTier.next.minSpent - userTier.current.minSpent)) * 100
-        ));
-        const diff = (userTier.next.minSpent - totalSpent).toFixed(2);
-        progressText = '还差¥' + diff + '升级' + userTier.next.name;
+        const diff = userTier.next.minSpent - totalSpent;
+        if (diff > 0) {
+          progressPercent = Math.min(100, Math.max(0,
+            ((totalSpent - userTier.current.minSpent) / (userTier.next.minSpent - userTier.current.minSpent)) * 100
+          ));
+          progressText = '还差¥' + diff.toFixed(2) + '升级' + userTier.next.name;
+        } else {
+          progressPercent = 100;
+          progressText = '已满足' + userTier.next.name + '升级条件';
+        }
       } else {
         progressText = '已达最高等级';
         progressPercent = 100;
       }
     } else {
-      const diff = (t.minSpent - totalSpent).toFixed(2);
-      progressText = '还需消费¥' + diff;
-      progressPercent = 0;
+      const diff = t.minSpent - totalSpent;
+      progressText = diff > 0 ? '还需消费¥' + diff.toFixed(2) : '已达标';
+      progressPercent = diff > 0 ? 0 : 100;
     }
 
     const benefitItems = buildBenefitItems(t);

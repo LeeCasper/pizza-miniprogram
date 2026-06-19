@@ -22,7 +22,8 @@
 
           <!-- 进度条 -->
           <view class="hero-progress-section" wx:if="{{hasNext}}">
-            <text class="hero-progress-text">还差¥{{spentToNext}}升级{{nextTier.name}}</text>
+            <text class="hero-progress-text" wx:if="{{!upgradeReady}}">还差¥{{spentToNext}}升级{{nextTier.name}}</text>
+            <text class="hero-progress-text" wx:else>已满足{{nextTier.name}}升级条件</text>
             <view class="hero-progress-row">
               <view class="hero-progress-bar-bg">
                 <view class="hero-progress-bar-fill" style="width: {{progressPercent}}%; background: {{currentTier.accentColor}}"></view>
