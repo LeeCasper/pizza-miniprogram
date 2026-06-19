@@ -162,7 +162,7 @@
           <view wx:for="{{availableCoupons}}" wx:key="id"
             class="coupon-picker-item {{item.id === (selectedCoupon.id || 0) ? 'selected' : ''}} {{item.disabled ? 'disabled' : ''}}"
             bindtap="{{item.disabled ? 'noop' : 'onSelectCoupon'}}" data-coupon-id="{{item.id}}">
-            <view class="coupon-picker-tag" style="background: {{item.color || '#D32F2F'}}">
+            <view class="coupon-picker-tag" style="background: {{item.color || '#C583FF'}}">
               <text class="coupon-picker-tag-value">{{item.value}}</text>
               <text class="coupon-picker-tag-label">{{item.categoryLabel}}</text>
             </view>

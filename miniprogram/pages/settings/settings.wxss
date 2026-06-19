@@ -300,7 +300,7 @@
   text-align: center;
 }
 .drawer-btn-danger:active {
-  background: rgba(211, 47, 47, 0.08);
+  background: rgba(197, 131, 255, 0.08);
   transform: scale(0.97);
 }
 

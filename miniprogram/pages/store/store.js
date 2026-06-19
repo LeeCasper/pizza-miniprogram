@@ -164,7 +164,7 @@ Page({
       height: 32,
       callout: {
         content: s.name || '王姐手工披萨',
-        color: '#D32F2F',
+        color: '#C583FF',
         fontSize: 14,
         borderRadius: 8,
         bgColor: '#FFFFFF',

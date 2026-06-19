@@ -6,8 +6,10 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 32rpx 24rpx;
-  background: var(--color-surface);
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+  background: var(--glass-bg-nav);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border-bottom: var(--glass-border-subtle);
   position: fixed;
   top: 0;
   left: 0;
@@ -254,9 +256,12 @@
   gap: 6rpx;
   width: 72rpx;
   padding: 20rpx 12rpx;
-  background: var(--color-surface);
+  background: var(--glass-bg-elevated);
+  -webkit-backdrop-filter: var(--glass-blur-lg);
+  backdrop-filter: var(--glass-blur-lg);
+  border: var(--glass-border-subtle);
   border-radius: 24rpx 0 0 24rpx;
-  box-shadow: -4rpx 0 24rpx rgba(0,0,0,0.08);
+  box-shadow: var(--glass-shadow-elevated);
 }
 .announce-float-tab:active {
   transform: scale(0.92);
@@ -279,7 +284,10 @@
 }
 .announce-float-card {
   width: 420rpx;
-  background: var(--color-surface);
+  background: var(--glass-bg-elevated);
+  -webkit-backdrop-filter: var(--glass-blur-lg);
+  backdrop-filter: var(--glass-blur-lg);
+  border: var(--glass-border);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-modal);
   overflow: hidden;
@@ -331,8 +339,11 @@
   margin: 0 32rpx 24rpx;
   padding: 28rpx 16rpx;
   border-radius: 24rpx;
-  background: var(--color-surface);
-  box-shadow: var(--shadow-card);
+  background: var(--glass-bg-card);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow-card);
+  border: var(--glass-border-subtle);
 }
 
 .grid-item {
@@ -357,11 +368,11 @@
   transition: transform 0.15s;
 }
 
-.grid-icon-red { background: rgba(211, 47, 47, 0.08); }
-.grid-icon-gold { background: rgba(251, 192, 45, 0.12); }
-.grid-icon-green { background: rgba(56, 142, 60, 0.08); }
+.grid-icon-red { background: rgba(197, 131, 255, 0.10); }
+.grid-icon-gold { background: rgba(255, 242, 146, 0.15); }
+.grid-icon-green { background: rgba(160, 255, 146, 0.12); }
 .grid-icon-gray { background: var(--color-surface-container); }
-.grid-icon-blue { background: rgba(25, 118, 210, 0.08); }
+.grid-icon-blue { background: rgba(145, 245, 255, 0.12); }
 
 .grid-icon {
   width: 64rpx;
@@ -384,8 +395,11 @@
 
 .menu-card {
   border-radius: 24rpx;
-  background: var(--color-surface);
-  box-shadow: var(--shadow-card);
+  background: var(--glass-bg-card);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow-card);
+  border: var(--glass-border-subtle);
   overflow: hidden;
 }
 
@@ -433,7 +447,9 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: var(--glass-bg-overlay);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
   opacity: 0;
   transition: opacity 0.3s;
 }
@@ -444,7 +460,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--color-surface);
+  background: var(--glass-bg-elevated);
+  -webkit-backdrop-filter: var(--glass-blur-lg);
+  backdrop-filter: var(--glass-blur-lg);
+  border-top: var(--glass-border);
   border-radius: 40rpx 40rpx 0 0;
   transform: translateY(100%);
   transition: transform 0.3s ease;
@@ -536,12 +555,12 @@
   background: var(--color-surface-container-low);
 }
 .birthday-today {
-  background: rgba(251, 192, 45, 0.15);
-  border: 1rpx solid rgba(251, 192, 45, 0.3);
+  background: rgba(255, 242, 146, 0.20);
+  border: 1rpx solid rgba(255, 242, 146, 0.35);
 }
 .birthday-icon { font-size: 32rpx; line-height: 1; flex-shrink: 0; }
 .birthday-text { font-size: 24rpx; color: var(--color-on-surface-variant); flex: 1; }
-.birthday-celebration { font-size: 26rpx; font-weight: var(--font-weight-bold); color: #C67C00; flex: 1; }
+.birthday-celebration { font-size: 26rpx; font-weight: var(--font-weight-bold); color: var(--color-secondary-dark); flex: 1; }
 .birthday-unset { cursor: pointer; }
 .birthday-unset:active { opacity: 0.7; }
 .birthday-prompt { flex: 1; font-size: 24rpx; color: var(--color-primary); }

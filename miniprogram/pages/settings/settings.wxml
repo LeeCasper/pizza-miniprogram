@@ -30,7 +30,7 @@
           <switch
             checked="{{notificationEnabled}}"
             bindchange="onToggleNotification"
-            color="#D32F2F"
+            color="#C583FF"
           />
         </view>
       </view>

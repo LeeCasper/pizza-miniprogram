@@ -1,62 +1,62 @@
-/* === 设计系统 Design Tokens — Artisan Crust ===
-   Stitch 设计稿 1:1 还原：暖乳白底层 + 高饱和地中海配色 + 暖红调阴影
-   https://stitch.google.com/ */
+/* === 设计系统 Design Tokens — Candy Glass ===
+   四色糖果配色 + 超强毛玻璃：紫/黄/绿/青
+   彩色渐变底层让玻璃效果一眼可见 */
 page {
-  /* ── 主色 - 番茄红 Deep Tomato Red ── */
-  --color-primary: #D32F2F;
-  --color-primary-dark: #AF101A;
-  --color-primary-light: #FFB3AC;
+  /* ── 主色 - 糖果紫 Candy Purple ── */
+  --color-primary: #C583FF;
+  --color-primary-dark: #9B4DDB;
+  --color-primary-light: #E8D0FF;
   --color-on-primary: #FFFFFF;
-  --color-primary-container: #FFDAD6;
-  --color-on-primary-container: #930010;
+  --color-primary-container: #F0E0FF;
+  --color-on-primary-container: #6A1B9A;
 
-  /* ── 辅色 - 金黄 Golden Crust Yellow ── */
-  --color-secondary: #FBC02D;
-  --color-secondary-dark: #795900;
-  --color-secondary-container: #FFDFA0;
-  --color-on-secondary: #261A00;
-  --color-on-secondary-container: #5C4300;
+  /* ── 辅色 - 柠檬黄 Lemon Yellow ── */
+  --color-secondary: #FFF292;
+  --color-secondary-dark: #C6A700;
+  --color-secondary-container: #FFF8C4;
+  --color-on-secondary: #3E2D00;
+  --color-on-secondary-container: #5D4300;
 
-  /* ── 第三色 - 翠绿 Fresh Basil Green ── */
-  --color-tertiary: #388E3C;
-  --color-tertiary-container: #9DF898;
-  --color-on-tertiary: #FFFFFF;
+  /* ── 第三色 - 薄荷绿 Mint Green ── */
+  --color-tertiary: #A0FF92;
+  --color-tertiary-container: #C8FFB8;
+  --color-on-tertiary: #1B5E20;
 
-  /* ── 表面/背景色 - 暖乳白 Warm Cream ── */
-  --color-background: #FBFAEE;
-  --color-surface: #FBFAEE;
-  --color-surface-container: #EFEEE3;
-  --color-surface-container-low: #F5F4E8;
+  /* ── 表面/背景色 - 淡薰衣草 Soft Lavender ── */
+  --color-background: #F5F0FF;
+  --color-surface: #F5F0FF;
+  --color-surface-container: #EDE6F7;
+  --color-surface-container-low: #F3EDF9;
   --color-surface-container-lowest: #FFFFFF;
-  --color-surface-container-high: #E9E9DD;
-  --color-surface-container-highest: #E4E3D7;
-  --color-surface-dim: #DBDBCF;
-  --color-surface-bright: #FBFAEE;
+  --color-surface-container-high: #E5DDF0;
+  --color-surface-container-highest: #DDD5E8;
+  --color-surface-dim: #D5CCE0;
+  --color-surface-bright: #F8F4FF;
 
-  /* ── 文字色 - 暖深色 ── */
-  --color-on-background: #1B1C15;
-  --color-on-surface: #1B1C15;
-  --color-on-surface-variant: #5B403D;
+  /* ── 文字色 - 冷深色 ── */
+  --color-on-background: #1A1B2E;
+  --color-on-surface: #1A1B2E;
+  --color-on-surface-variant: #5B4D6E;
 
-  /* ── 描边 - 暖棕调 ── */
-  --color-outline: #8F6F6C;
-  --color-outline-variant: #E4BEBA;
-  --color-divider: #E4E3D7;
+  /* ── 描边 - 薰衣草灰调 ── */
+  --color-outline: #9B8EC4;
+  --color-outline-variant: #D4C8E8;
+  --color-divider: #E5DDF0;
 
-  /* ── 错误 ── */
-  --color-error: #BA1A1A;
+  /* ── 错误（语义色，不随品牌变） ── */
+  --color-error: #D32F2F;
   --color-error-container: #FFDAD6;
 
-  /* ── 阴影 - 暖红调层次系统 ──
-     Stitch Ambient Shadows: 阴影永远不是纯黑，掺入微量 Primary Red
+  /* ── 阴影 - 紫调层次系统 ──
+     阴影掺入微量 Primary Purple
      L1 卡片 / L2 按钮 / L3 模态 */
-  --shadow-xs: 0 1rpx 4rpx rgba(211, 47, 47, 0.03);
-  --shadow-sm: 0 2rpx 8rpx rgba(211, 47, 47, 0.05);
-  --shadow-card: 0 4rpx 20rpx rgba(211, 47, 47, 0.08);
-  --shadow-button: 0 8rpx 24rpx rgba(211, 47, 47, 0.15);
-  --shadow-elevated: 0 8rpx 28rpx rgba(211, 47, 47, 0.07);
-  --shadow-modal: 0 12rpx 40rpx rgba(0, 0, 0, 0.1);
-  --shadow-primary: 0 4rpx 16rpx rgba(211, 47, 47, 0.2);
+  --shadow-xs: 0 1rpx 4rpx rgba(197, 131, 255, 0.05);
+  --shadow-sm: 0 2rpx 8rpx rgba(197, 131, 255, 0.07);
+  --shadow-card: 0 4rpx 20rpx rgba(197, 131, 255, 0.10);
+  --shadow-button: 0 8rpx 24rpx rgba(197, 131, 255, 0.18);
+  --shadow-elevated: 0 8rpx 28rpx rgba(197, 131, 255, 0.10);
+  --shadow-modal: 0 12rpx 40rpx rgba(100, 50, 150, 0.12);
+  --shadow-primary: 0 4rpx 16rpx rgba(197, 131, 255, 0.25);
 
   /* ── 圆角 - 8px 基准 (16rpx) ── */
   --radius-card: 24rpx;
@@ -88,29 +88,30 @@ page {
   --font-weight-regular: 400;
 
   /* ── 毛玻璃 Glassmorphism Tokens ──
-     暖乳白底层上叠加半透明白，Android 无 blur 亦能正常显示 */
-  --glass-bg-card: rgba(255, 255, 255, 0.78);
-  --glass-bg-elevated: rgba(255, 255, 255, 0.88);
-  --glass-bg-light: rgba(255, 255, 255, 0.55);
-  --glass-bg-nav: rgba(251, 250, 238, 0.84);
-  --glass-bg-primary: rgba(211, 47, 47, 0.88);
-  --glass-bg-primary-light: rgba(211, 47, 47, 0.08);
-  --glass-bg-primary-container: rgba(255, 218, 214, 0.85);
-  --glass-bg-dark: rgba(27, 28, 21, 0.88);
-  --glass-bg-overlay: rgba(0, 0, 0, 0.55);
+     大幅降低不透明度 + 加强 blur + 白色发光边框
+     彩色渐变底层让磨砂效果一眼可见 */
+  --glass-bg-card: rgba(255, 255, 255, 0.50);
+  --glass-bg-elevated: rgba(255, 255, 255, 0.62);
+  --glass-bg-light: rgba(255, 255, 255, 0.30);
+  --glass-bg-nav: rgba(245, 240, 255, 0.60);
+  --glass-bg-primary: rgba(197, 131, 255, 0.82);
+  --glass-bg-primary-light: rgba(197, 131, 255, 0.10);
+  --glass-bg-primary-container: rgba(240, 224, 255, 0.65);
+  --glass-bg-dark: rgba(26, 27, 46, 0.82);
+  --glass-bg-overlay: rgba(0, 0, 0, 0.40);
 
-  --glass-blur-sm: saturate(180%) blur(10px);
-  --glass-blur: saturate(180%) blur(20px);
-  --glass-blur-lg: saturate(180%) blur(30px);
+  --glass-blur-sm: saturate(200%) blur(16px);
+  --glass-blur: saturate(200%) blur(28px);
+  --glass-blur-lg: saturate(200%) blur(40px);
 
-  --glass-border: 1rpx solid rgba(255, 255, 255, 0.35);
-  --glass-border-subtle: 1rpx solid rgba(0, 0, 0, 0.06);
-  --glass-border-colored: 1rpx solid rgba(211, 47, 47, 0.10);
-  --glass-border-dark: 1rpx solid rgba(255, 255, 255, 0.08);
+  --glass-border: 2rpx solid rgba(255, 255, 255, 0.55);
+  --glass-border-subtle: 1rpx solid rgba(255, 255, 255, 0.30);
+  --glass-border-colored: 2rpx solid rgba(197, 131, 255, 0.25);
+  --glass-border-dark: 1rpx solid rgba(255, 255, 255, 0.12);
 
-  --glass-shadow-card: 0 2rpx 16rpx rgba(211, 47, 47, 0.04);
-  --glass-shadow-elevated: 0 4rpx 24rpx rgba(211, 47, 47, 0.06);
-  --glass-shadow-button: 0 4rpx 16rpx rgba(211, 47, 47, 0.15);
+  --glass-shadow-card: 0 4rpx 20rpx rgba(197, 131, 255, 0.08);
+  --glass-shadow-elevated: 0 6rpx 28rpx rgba(197, 131, 255, 0.12);
+  --glass-shadow-button: 0 6rpx 20rpx rgba(197, 131, 255, 0.22);
 }
 
 /* === 全局基础样式 === */
@@ -121,6 +122,14 @@ page, view, text, image, scroll-view, swiper, swiper-item, navigator, button, in
 page {
   height: 100vh;
   background-color: var(--color-background);
+  background-image: linear-gradient(
+    135deg,
+    rgba(197, 131, 255, 0.12) 0%,
+    rgba(160, 255, 146, 0.08) 25%,
+    rgba(255, 242, 146, 0.10) 50%,
+    rgba(145, 245, 255, 0.08) 75%,
+    rgba(197, 131, 255, 0.06) 100%
+  );
   color: var(--color-on-background);
   font-family: var(--font-family);
   font-size: 28rpx;
@@ -156,17 +165,23 @@ scroll-view {
 .font-bold { font-weight: var(--font-weight-bold); }
 .font-semibold { font-weight: var(--font-weight-semibold); }
 
-/* 卡片基础样式 — 层次感 */
+/* 卡片基础样式 — 毛玻璃 */
 .card {
-  background: var(--color-surface);
+  background: var(--glass-bg-card);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--glass-shadow-card);
+  border: var(--glass-border-subtle);
 }
 
 .card-cream {
-  background: var(--color-surface-container-low);
+  background: var(--glass-bg-light);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
   border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--glass-shadow-card);
+  border: var(--glass-border-subtle);
 }
 
 /* 按钮样式 */
@@ -191,14 +206,16 @@ scroll-view {
 }
 
 .btn-outline {
-  background: var(--color-surface);
+  background: var(--glass-bg-light);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
   border-radius: var(--radius-card);
   color: var(--color-on-surface);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow-sm);
-  border: 1rpx solid var(--color-outline-variant);
+  box-shadow: var(--glass-shadow-card);
+  border: var(--glass-border);
   transition: all 0.2s;
 }
 

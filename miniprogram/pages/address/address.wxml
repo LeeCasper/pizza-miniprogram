@@ -168,7 +168,7 @@
             <switch
               checked="{{form.isDefault}}"
               bindchange="onToggleDefault"
-              color="#D32F2F"
+              color="#C583FF"
             />
           </view>
         </view>

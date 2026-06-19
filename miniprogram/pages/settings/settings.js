@@ -82,7 +82,7 @@ Page({
       title: '确认注销账号',
       content: '注销后将删除您的个人信息、清零余额和积分，且无法恢复。',
       confirmText: '继续注销',
-      confirmColor: '#D32F2F',
+      confirmColor: '#C583FF',
       success: (res) => {
         if (!res.confirm) return;
         // 二次确认
@@ -90,7 +90,7 @@ Page({
           title: '再次确认',
           content: '此操作不可撤销，确定要注销账号吗？',
           confirmText: '确定注销',
-          confirmColor: '#D32F2F',
+          confirmColor: '#C583FF',
           success: (res2) => {
             if (!res2.confirm) return;
             wx.showLoading({ title: '处理中...' });

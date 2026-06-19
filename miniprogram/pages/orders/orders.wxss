@@ -5,8 +5,10 @@
   align-items: center;
   justify-content: center;
   padding: 0 40rpx 24rpx;
-  background: var(--color-surface);
-  border-bottom: 1rpx solid var(--color-divider);
+  background: var(--glass-bg-nav);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border-bottom: var(--glass-border-subtle);
   position: fixed;
   top: 0;
   left: 0;
@@ -22,8 +24,10 @@
 
 /* 订单Tab */
 .order-tabs {
-  background: var(--color-surface);
-  border-bottom: 1rpx solid var(--color-divider);
+  background: var(--glass-bg-nav);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border-bottom: var(--glass-border-subtle);
   padding: 16rpx 0;
 }
 
@@ -43,12 +47,18 @@
   font-size: 28rpx;
   font-weight: var(--font-weight-semibold);
   color: var(--color-on-surface-variant);
-  background: var(--color-surface-container-low);
+  background: var(--glass-bg-card);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  border: var(--glass-border-subtle);
   flex-shrink: 0;
 }
 
 .tab-item.active {
-  background: var(--color-primary-container);
+  background: var(--glass-bg-primary-container);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  border: var(--glass-border-colored);
   color: var(--color-on-primary-container);
 }
 
@@ -108,8 +118,8 @@
   flex-shrink: 0;
 }
 .payment-badge { padding: 6rpx 20rpx; border-radius: var(--radius-full); font-size: 22rpx; font-weight: var(--font-weight-semibold); flex-shrink: 0; }
-.payment-badge.paid { background: #E8F5E9; color: #2E7D32; }
-.payment-badge.unpaid { background: #FFF3E0; color: #E65100; }
+.payment-badge.paid { background: var(--color-tertiary-container); color: var(--color-on-tertiary); }
+.payment-badge.unpaid { background: var(--color-secondary-container); color: var(--color-secondary-dark); }
 
 .order-status.completed {
   background: var(--color-tertiary-container);
@@ -178,7 +188,9 @@
   justify-content: center;
   gap: 12rpx;
   padding: 24rpx;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.01) 100%);
+  background: var(--glass-bg-primary-light);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
   border-radius: var(--radius-card);
   border: 2rpx dashed rgba(0, 0, 0, 0.08);
   transition: all 0.2s;
@@ -207,7 +219,10 @@
   align-items: center;
   gap: 20rpx;
   padding: 24rpx;
-  background: linear-gradient(135deg, rgba(211, 47, 47, 0.04) 0%, rgba(251, 192, 45, 0.04) 100%);
+  background: var(--glass-bg-card);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: var(--glass-border-subtle);
   border-radius: var(--radius-card);
 }
 
@@ -231,7 +246,10 @@
   font-size: 40rpx;
   font-weight: var(--font-weight-bold);
   color: var(--color-on-surface);
-  background: var(--color-surface-container-lowest);
+  background: var(--glass-bg-elevated);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  border: var(--glass-border-subtle);
   border-radius: 12rpx;
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
   font-family: 'SF Mono', 'Menlo', 'Courier New', monospace;
@@ -246,7 +264,10 @@
 .pickup-hide-btn {
   padding: 12rpx 40rpx;
   border-radius: var(--radius-full);
-  background: var(--color-surface-container);
+  background: var(--glass-bg-card);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  border: var(--glass-border-subtle);
   font-size: 24rpx;
   color: var(--color-on-surface-variant);
   font-weight: var(--font-weight-medium);
@@ -297,15 +318,21 @@
 
 .order-action-btn.outline {
   color: var(--color-on-surface-variant);
-  background: var(--color-surface);
+  background: var(--glass-bg-light);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  border: var(--glass-border);
   box-shadow: var(--shadow-elevated);
 }
 
 .order-action-btn.primary {
-  background: var(--color-primary);
+  background: var(--glass-bg-primary);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  border: 1rpx solid rgba(255,255,255,0.2);
   color: var(--color-on-primary);
 }
-.order-action-btn.pay-btn { background: linear-gradient(135deg, #D32F2F, #b71c1c); color: #FFFFFF; box-shadow: 0 4rpx 16rpx rgba(211, 47, 47, 0.3); }
+.order-action-btn.pay-btn { background: linear-gradient(135deg, #C583FF, #9B4DDB); color: #FFFFFF; box-shadow: 0 4rpx 16rpx rgba(197, 131, 255, 0.3); }
 .order-action-btn.pay-btn:active { transform: scale(0.96); opacity: 0.9; }
 
 /* 空状态 */
