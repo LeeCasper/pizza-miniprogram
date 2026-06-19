@@ -73,6 +73,27 @@ Page({
   },
 
   // ========== 头像 ==========
+
+  /** 上传头像文件，返回 Promise<serverUrl> */
+  _uploadAvatar(filePath) {
+    return new Promise((resolve, reject) => {
+      wx.uploadFile({
+        url: BASE_URL + '/upload/avatar', filePath, name: 'file',
+        header: { 'Authorization': 'Bearer ' + (wx.getStorageSync('token') || '') },
+        success(result) {
+          if (result.statusCode === 200) {
+            try {
+              const data = JSON.parse(result.data);
+              if (data.code === 0) { resolve(fixImageUrl(data.data.url)); return; }
+            } catch (_) {}
+          }
+          reject(new Error('上传失败'));
+        },
+        fail: reject,
+      });
+    });
+  },
+
   onChooseAvatar() {
     const that = this;
     const handleImage = (avatarPath) => {
@@ -81,26 +102,14 @@ Page({
         return;
       }
       wx.showLoading({ title: '上传中...' });
-      wx.uploadFile({
-        url: BASE_URL + '/upload/avatar',
-        filePath: avatarPath, name: 'file',
-        header: { 'Authorization': 'Bearer ' + (wx.getStorageSync('token') || '') },
-        success(result) {
-          wx.hideLoading();
-          if (result.statusCode === 200) {
-            try {
-              const data = JSON.parse(result.data);
-              if (data.code === 0) {
-                app.globalData.userInfo.avatar = fixImageUrl(data.data.url);
-                that.loadUserData();
-                wx.showToast({ title: '头像已更新', icon: 'success' });
-                return;
-              }
-            } catch (_) {}
-          }
-          wx.showToast({ title: '上传失败', icon: 'none' });
-        },
-        fail() { wx.hideLoading(); wx.showToast({ title: '上传失败，请重试', icon: 'none' }); },
+      that._uploadAvatar(avatarPath).then(url => {
+        wx.hideLoading();
+        app.globalData.userInfo.avatar = url;
+        that.loadUserData();
+        wx.showToast({ title: '头像已更新', icon: 'success' });
+      }).catch(() => {
+        wx.hideLoading();
+        wx.showToast({ title: '上传失败，请重试', icon: 'none' });
       });
     };
     wx.chooseMedia({
@@ -157,23 +166,26 @@ Page({
       return;
     }
     const ui = app.globalData.userInfo;
-    ui.name = editForm.name.trim();
-    ui.bio = editForm.bio.trim();
-    if (editForm.avatar) {
-      ui.avatar = editForm.avatar;
-    }
-    this.setData({ editProfileOpen: false });
-    this.loadUserData();
+    const name = editForm.name.trim();
+    const bio = editForm.bio.trim();
+    const avatarChanged = editForm.avatar && editForm.avatar !== ui.avatar && !editForm.avatar.startsWith('https://');
 
-    // Sync to server
-    api.put('/user/profile', {
-      name: ui.name,
-      bio: ui.bio,
-    }).then(() => {
-      wx.showToast({ title: '保存成功', icon: 'success' });
-    }).catch(() => {
-      wx.showToast({ title: '保存成功（本地）', icon: 'success' });
+    // 乐观更新 UI + 关闭抽屉
+    ui.name = name; ui.bio = bio;
+    this.setData({
+      editProfileOpen: false,
+      userInfo: { ...this.data.userInfo, name, bio, avatar: editForm.avatar || ui.avatar },
     });
+
+    // 头像变更时先上传，再保存文本字段，最后刷新
+    const avatarPromise = avatarChanged
+      ? this._uploadAvatar(editForm.avatar).then(url => { ui.avatar = url; }).catch(() => {})
+      : Promise.resolve();
+
+    avatarPromise.then(() => api.put('/user/profile', { name, bio })).then(() => {
+      wx.showToast({ title: '保存成功', icon: 'success' });
+      this.loadUserData();
+    }).catch(() => { wx.showToast({ title: '保存成功（本地）', icon: 'success' }); });
   },
 
   // ── 会员卡轮播 ──────────────────────────────
