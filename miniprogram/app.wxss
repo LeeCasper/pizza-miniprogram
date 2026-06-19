@@ -121,13 +121,14 @@ page, view, text, image, scroll-view, swiper, swiper-item, navigator, button, in
 
 page {
   height: 100vh;
-  background: linear-gradient(
+  background-color: #F0E6FF;
+  background-image: linear-gradient(
     135deg,
-    #EDE0FF 0%,
-    #E0FFE4 30%,
-    #FFFAD6 55%,
-    #E0F7FF 80%,
-    #EDE0FF 100%
+    #DFC0FF 0%,
+    #C0FFB8 25%,
+    #FFF080 50%,
+    #A0EDFF 75%,
+    #DFC0FF 100%
   );
   color: var(--color-on-background);
   font-family: var(--font-family);
@@ -235,6 +236,14 @@ scroll-view {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  background-image: linear-gradient(
+    135deg,
+    #DFC0FF 0%,
+    #C0FFB8 25%,
+    #FFF080 50%,
+    #A0EDFF 75%,
+    #DFC0FF 100%
+  );
 }
 
 /* 安全区域 */
