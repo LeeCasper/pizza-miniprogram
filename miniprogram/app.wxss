@@ -121,14 +121,13 @@ page, view, text, image, scroll-view, swiper, swiper-item, navigator, button, in
 
 page {
   height: 100vh;
-  background-color: var(--color-background);
-  background-image: linear-gradient(
+  background: linear-gradient(
     135deg,
-    rgba(197, 131, 255, 0.12) 0%,
-    rgba(160, 255, 146, 0.08) 25%,
-    rgba(255, 242, 146, 0.10) 50%,
-    rgba(145, 245, 255, 0.08) 75%,
-    rgba(197, 131, 255, 0.06) 100%
+    #EDE0FF 0%,
+    #E0FFE4 30%,
+    #FFFAD6 55%,
+    #E0F7FF 80%,
+    #EDE0FF 100%
   );
   color: var(--color-on-background);
   font-family: var(--font-family);
