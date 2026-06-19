@@ -47,21 +47,36 @@ npm run seed       # insert seed data
 
 ```
 src/
-├── app.js                  — Express app setup, middleware, route mounts
+├── app.js                  — Express app setup, middleware, route mounts, cron jobs, graceful shutdown
 ├── config/
-│   ├── index.js            — env-based config (port, db, jwt, wx, upload)
+│   ├── index.js            — env-based config (port, db, jwt, wx, upload, printer, business)
 │   ├── database.js         — mysql2 pool
 │   └── multer.js           — shared multer instance (diskStorage, 5MB limit)
 ├── middleware/
 │   ├── auth.js             — JWT Bearer token verifier (required + optional)
 │   ├── roleGuard.js        — adminOnly middleware
 │   ├── validation.js       — Joi request validation
-│   └── errorHandler.js     — global error handler
+│   ├── errorHandler.js     — global error handler
+│   └── requestId.js        — X-Request-Id per request (crypto.randomBytes)
 ├── controllers/            — Request handlers
 ├── services/               — Business logic + SQL queries
+│   ├── systemConfigService.js — 4-group admin-configurable settings (pay/printer/map/business)
+│   ├── orderCleanupService.js — Auto-cancel unpaid orders (cron-driven)
+│   ├── auditService.js     — Fire-and-forget audit logging (NEVER throws)
+│   ├── reconciliationService.js — Payment vs order cross-check
+│   ├── refundService.js    — Balance + WeChat refunds with stock/coupon/points reversal
+│   ├── paymentService.js   — Order + recharge payment processing
+│   └── printerService.js   — Cloud receipt printing
 ├── routes/                 — Express Routers (mounted at /api/v1/*)
 │   └── adminApi.js         — Admin JSON API (/api/v1/admin/*), JWT + adminOnly
-└── utils/                  — jwt, wechat login, memberTier, pickupCode
+└── utils/
+    ├── jwt.js              — JWT sign/verify
+    ├── wechat.js           — WeChat login (code → openid)
+    ├── wechatPay.js        — WeChat Pay v3 crypto (sign, verify, decrypt, payRequest)
+    ├── memberTier.js       — Tier calculation from totalSpent
+    ├── pickupCode.js       — 4-digit pickup code generator
+    ├── orderStateMachine.js — Order state transitions + guards
+    └── logger.js           — Pino structured logging (createLogger)
 ```
 
 ### Two Auth Systems
@@ -71,9 +86,13 @@ src/
 
 ### Route Conventions
 
-- Public API routes: `/api/v1/auth`, `/api/v1/products`, etc.
+- Public API routes: `/api/v1/auth`, `/api/v1/products`, `/api/v1/banners`, `/api/v1/config`
 - User API routes: `/api/v1/user/*` — profile, settings, member-tiers, **balance** (history + recharge)
+- Payment routes: `/api/v1/pay/*` — order payment, recharge, WeChat Pay notify callbacks
 - Admin API routes: `/api/v1/admin/*` — all behind `auth` + `adminOnly` middleware
+  - CRUD: products, orders, coupons, coupon-templates, member-tiers, users, points, banners
+  - Settings: `/admin/settings/{pay,printer,map,store,business}` (GET/PUT)
+  - Ops: `/admin/audit-logs`, `/admin/reconciliation`, `/admin/payment-records`
 - Admin EJS routes: `/admin` — session-based, renders EJS views
 - Upload static files: `/uploads` → `config.upload.dir` (default `uploads/`)
 
@@ -82,14 +101,59 @@ src/
 - MySQL, database `pizza`, charset `utf8mb4`
 - Pool configured in `config/database.js`
 - Tables defined in `db/schema.sql` — new tables go here (not auto-migrated)
-- When adding new DB tables: run `npm run migrate` on the server after deploy
-- Cron job at 2am daily expires overdue coupons via `node-cron`
+- **Migration pattern**: Incremental SQL files named `db/migrate_<feature>.sql` or `db/migrate_phase<N>_<name>.sql`. Run manually via `npm run migrate` or direct `mysql < file.sql`. No auto-migration framework — each migration uses `IF NOT EXISTS` / `ALTER TABLE ... ADD COLUMN` to be idempotent.
+- **deploy.py** runs all migrations in order; duplicates produce harmless `Duplicate column` warnings.
+
+### Cron Jobs (2 active)
+
+| Schedule | Job | Config Source |
+|----------|-----|---------------|
+| `0 2 * * *` | Expire overdue coupons | Hardcoded |
+| `*/5 * * * *` | Auto-cancel unpaid orders past timeout | `config.business.unpaidTimeoutMinutes` (default 30) |
+
+Both stopped during graceful shutdown. Both only log when count > 0.
+
+### System Config (Admin-Configurable)
+
+`system_config` table stores key-value pairs. `systemConfigService` manages 4 groups, each with a **get/update/sync triplet**:
+
+| Group | DB Prefix | Notable Fields |
+|-------|-----------|---------------|
+| **pay** | `wx_pay_*` | mchId, apiV3Key, certs, notifyUrl |
+| **printer** | `printer_*` | enabled, sn, copies, storeName |
+| **map** | `map_*` | tencentKey |
+| **business** | `biz_*` | orderCancelMinutes (1), unpaidTimeoutMinutes (30), storeName ('爱家店') |
+
+- Writes use `INSERT ... ON DUPLICATE KEY UPDATE` (UPSERT) — keys auto-created on first save.
+- **Startup sync**: All 4 groups synced from DB to in-memory `config` in the `listen()` callback.
+- **Write-time sync**: After each `updateXConfig()`, the corresponding `syncXConfigToMemory()` runs immediately.
+- Priority chain: `.env` defaults → loaded into `config/index.js` → overridden by DB values at startup and on admin save.
+
+### Order State Machine
+
+```
+waiting   → preparing (guard: must be paid)
+waiting   → cancelled
+preparing → completed
+preparing → cancelled
+completed → (terminal)
+cancelled → (terminal)
+```
+
+`utils/orderStateMachine.js` exports `validateTransition(currentStatus, newStatus, order)`. Used by `orderService.adminUpdateStatus()`. User-facing cancel enforced by SQL `WHERE status IN ('waiting','preparing')`.
+
+**Cancel time window**: User can cancel within `config.business.orderCancelMinutes` (default 1 minute). Enforced in `orderController.cancel()`. Admin cancel is unrestricted. Order API returns `canCancel` (bool) + `cancelDeadline` (ISO timestamp) for frontend display.
 
 ### Production
 
 - Runs under PM2 (`pm2 restart pizza-server`)
 - Config via `.env` at project root
-- Deploy script: `deploy.sh` (git pull → npm install → pm2 restart)
+- Deploy: `python soybean-admin-temp/deploy.py backend` (git pull → npm install → migrations → pm2 restart)
+- **Health check**: `GET /health` → `{ status: "ok"|"degraded", uptime, db: "ok"|"unreachable" }` (200/503)
+- **Rate limiting**: Global API 200/15min, auth 20/15min, pay 30/15min
+- **Graceful shutdown**: SIGTERM/SIGINT → stop cron → close HTTP → close DB pool. `unhandledRejection` logs but does NOT exit.
+- **Logging**: Pino structured JSON (production), pino-pretty (dev). `createLogger('Module')` per file.
+- **WeChat Pay callbacks**: `/pay/notify` and `/pay/refund-notify` mount `express.raw()` BEFORE `express.json()` for signature verification.
 
 ---
 
@@ -111,20 +175,27 @@ pnpm gen-route    # Generate elegant-router types from routes/index.ts
 ```
 src/
 ├── router/
-│   ├── routes/index.ts          — Route definitions (we added `files` route)
+│   ├── routes/index.ts          — Route definitions (CustomRoute[] array)
 │   └── elegant/
 │       ├── imports.ts           — View lazy-import mappings
 │       └── transform.ts         — Route name → path map
 ├── service/api/                 — API functions using @sa/axios flat-request
-│   ├── upload.ts                — (NEW) fetchUploadImage, fetchFileList, fetchDeleteFile
+│   ├── upload.ts                — fetchUploadImage, fetchFileList, fetchDeleteFile
+│   ├── settings.ts              — Settings API (pay/printer/map/store/business)
 │   ├── product.ts, order.ts, coupon.ts, user.ts, points.ts
 │   └── index.ts                 — Barrel exports (must export new modules here)
 ├── views/                       — Page components
-│   ├── files/list/index.vue     — (NEW) File manager (NGrid, upload, delete, preview)
-│   ├── products/form/index.vue  — (MOD) ImageUpload component replaces URL input
-│   └── points/form/index.vue    — (MOD) Same ImageUpload integration
+│   ├── settings/                — System settings pages
+│   │   ├── pay/index.vue        — WeChat Pay config
+│   │   ├── printer/index.vue    — Printer config + test + live preview
+│   │   ├── map/index.vue        — Tencent Map key
+│   │   ├── store/index.vue      — Store info (name, address, coords)
+│   │   └── business/index.vue   — Business config (cancel window, timeout, store name)
+│   ├── files/list/index.vue     — File manager (NGrid, upload, delete, preview)
+│   ├── products/form/index.vue  — ImageUpload component replaces URL input
+│   └── points/form/index.vue    — Same ImageUpload integration
 ├── components/common/
-│   └── ImageUpload.vue          — (NEW) Reusable upload component
+│   └── ImageUpload.vue          — Reusable upload component
 ├── locales/langs/
 │   ├── zh-cn.ts                 — i18n keys (route section for menu labels)
 │   └── en-us.ts
@@ -257,28 +328,23 @@ The app does NOT use WeChat's native `tabBar` config. Instead, `main.wxml` has a
 
 ### Membership Tier System
 
-Three pages render membership tier cards, each with their own copy of tier logic (known duplication — see "Common Pitfalls"):
+Tier logic is centralized in `utils/tiers.js` (single source of truth). Three pages consume it:
 
-| Page | Builder Function | Card Type | Background Class |
-|------|-----------------|-----------|-----------------|
-| `pages/profile/` | `buildTierCards()` | Swiper cards (swipeable) | `tier-bg-{{levelIndex}}` |
-| `pages/main/` (tpl-profile) | `buildTierCards()` | Swiper cards (swipeable) | `tier-bg-{{levelIndex}}` |
-| `pages/tiers/` | `buildBenefitTiers()` | Hero card + comparison cards | Hero: `tier-bg-*`, Compare: `compare-bg-*` |
+| Page | Function Used | Card Type |
+|------|--------------|-----------|
+| `pages/profile/` | `buildTierCards()` | Swiper cards (swipeable) |
+| `pages/main/` (tpl-profile) | `buildTierCards()` | Swiper cards (swipeable) |
+| `pages/tiers/` | `buildBenefitTiers()` | Hero card + comparison cards |
 
-**`FALLBACK_TIERS`** — defined identically in `profile.js`, `main.js`, and `tiers.js`. Each tier object has:
-```js
-{ levelKey, name, levelIndex, minSpent, discountRate, pointsRewardRate,
-  birthdayGift, couponValue, accentColor, bgStartColor, bgEndColor, bgImage }
-```
-- `levelIndex`: 1-5 (silver → diamond)
-- `bgImage`: path to card background image, or `null` for CSS gradient fallback
-- `accentColor`: used for progress bar fill, title text color (hero card), and dot indicators
+**Key exports from `utils/tiers.js`**:
+- `FALLBACK_TIERS` — 5 tiers (silver → diamond) with `levelKey, name, levelIndex, minSpent, discountRate, pointsRewardRate, bgImage, accentColor`
+- `computeTier(totalSpent, tiers, memberLevel)` — determines current/next tier. Prioritizes server-set `memberLevel` (admin override), falls back to `totalSpent` calculation.
+- `buildTierCards(apiTiers, userTier)` — for profile/main swiper (adds `isActive`, `progressText`, `progressPercent`)
+- `buildBenefitTiers(apiTiers, userTier, totalSpent)` — for tiers page (adds `benefitItems[]`, `rangeText`)
+- `loadTiers()` — module-level cached API fetch with FALLBACK_TIERS merge. Replaces per-page `_ensureTiersLoaded()`.
+- `clearTierCache()` — invalidates cache (call after tier admin changes)
 
-**`computeTier(totalSpent, tiers)`** — determines current tier and next tier from spend amount. Identical in profile.js and main.js.
-
-**`tiers.js` vs profile.js/main.js**: `tiers.js` uses `buildBenefitTiers()` which adds `benefitItems[]` (for 2-column grid), `rangeText`, and `compareBgClass`. `profile.js`/`main.js` use `buildTierCards()` which adds `isActive`, `progressText`, `discountText`, `actionText`.
-
-**Backend-configurable**: Tier data is designed to flow from API (`/user/member-tiers`) → `FALLBACK_TIERS` as fallback. Background images, tier configs, and benefit text should all come from the server when API is available.
+**Backend-configurable**: Tier data flows from API (`/user/member-tiers`) → `FALLBACK_TIERS` as fallback. `loadTiers()` merges `{ ...fallback, ...apiTier }` so local `bgImage` survives when API doesn't provide it.
 
 ### WXSS Known Quirks
 
@@ -368,7 +434,13 @@ miniprogram/
 ├── app.wxss            — Design tokens, utility classes, global reset
 ├── utils/
 │   ├── api.js          — HTTP client (wx.request wrapper), doLogin()
-│   └── data.js         — Mock/fallback data
+│   ├── data.js         — Mock/fallback data
+│   ├── tiers.js        — Shared tier module: FALLBACK_TIERS, computeTier, buildTierCards, buildBenefitTiers, loadTiers
+│   ├── orders.js       — ORDER_STATUS_MAP, formatOrder (adds canCancel, isPaid, statusText, etc.)
+│   ├── layout.js       — Shared top bar height calculations (getSimpleTopBar, getBackBtnTopBar, getSwiperLayout)
+│   ├── pay.js          — WeChat Pay flow: payOrder, rechargeBalance (with retry polling)
+│   ├── mapConfig.js    — Tencent Maps API wrapper (walking distance, reverse geocode)
+│   └── auth.js         — Shared logout logic with confirmation modal
 ├── custom-tab-bar/     — Tab bar Component (for standalone pages; only reusable component)
 ├── pages/
 │   ├── main/           — Swiper 4-tab entry (main.js + main.wxml + tpl-index/orders/shop/profile.wxml)
@@ -396,8 +468,8 @@ miniprogram/
 - **CSS `background` shorthand with `/`**: WeChat WXSS silently drops `background: url(...) center/cover`. Use longhand `background-image`, `background-size`, `background-position`, `background-repeat` instead.
 - **`background-image: url()` unreliable**: Local image paths in CSS `url()` have limited WeChat WXSS support. Use `<image>` tag with `src` as an absolutely-positioned background layer for reliable results.
 - **Hybrid background approach**: For tier cards, use BOTH inline `style="{{item.bgStyle}}"` (works in DevTools) AND `<image>` tag (works on real devices). Neither alone covers both platforms.
-- **_ensureTiersLoaded must MERGE, not replace**: When the API returns tier data, it lacks `bgImage` (server-side `formatTier()` doesn't produce it). Always merge API data with FALLBACK_TIERS: `{ ...fb, ...t }` — so local `bgImage` survives when API doesn't provide it.
-- **Duplicate tier logic ×3**: `FALLBACK_TIERS` and `computeTier()` are copy-pasted across `profile.js`, `main.js`, and `tiers.js`. Changes to tier data must be mirrored in all three. Consider extracting to `utils/tiers.js`.
+- **Tier progress negative values**: When admin manually sets a lower tier while `totalSpent` is high, `nextTier.minSpent - totalSpent` goes negative. `buildTierCards()` and `buildBenefitTiers()` in `utils/tiers.js` clamp this — when `diff ≤ 0`, show "已满足升级条件" and set `progressPercent = 100`. Always check for negative before displaying "还差¥X" text.
+- **`loadTiers()` merge pattern**: `utils/tiers.js` `loadTiers()` merges API data with FALLBACK_TIERS: `{ ...fallback, ...apiTier }` — so local `bgImage` survives when API doesn't provide it. Do NOT replace fallback data wholesale.
 - **New page `.json` required**: Every new page must have a `<page>.json` file with `"navigationStyle": "custom"` and `"navigationBarTitleText": "页面名称"`. Without it, the system nav bar shows "王姐手工披萨" on top of the custom top bar.
 - **2MB source size limit**: Keep images compressed. Use JPEG quality 80 for photos, PNG only for small icons. Total `images/` directory should stay well under 500KB.
 - **`form.region.length` in WXML**: Use ternary `{{form.region.length ? form.region[0] : 'placeholder'}}`. Accessing `[0]` on empty array silently renders nothing.
