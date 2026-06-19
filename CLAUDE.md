@@ -441,7 +441,7 @@ miniprogram/
 │   ├── pay.js          — WeChat Pay flow: payOrder, rechargeBalance (with retry polling)
 │   ├── mapConfig.js    — Tencent Maps API wrapper (walking distance, reverse geocode)
 │   ├── auth.js         — Shared logout logic with confirmation modal
-│   └── profileShared.js — Profile mixin: profileMethods (avatar/edit/tier/announce) + loadProfileCore(page, hooks)
+│   └── profileShared.js — Profile mixin: profileMethods (avatar/edit/tier/announce/birthday) + loadProfileCore(page, hooks) + computeBirthdayInfo()
 ├── custom-tab-bar/     — Tab bar Component (for standalone pages; only reusable component)
 ├── pages/
 │   ├── main/           — Swiper 4-tab entry (main.js + main.wxml + tpl-index/orders/shop/profile.wxml)
