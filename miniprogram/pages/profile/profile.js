@@ -1,5 +1,5 @@
 // pages/profile/profile.js
-const { api } = require('../../utils/api');
+const { api, fixImageUrl, BASE_URL } = require('../../utils/api');
 const { computeTier, buildTierCards, loadTiers } = require('../../utils/tiers');
 const { getSimpleTopBar } = require('../../utils/layout');
 const { logout } = require('../../utils/auth');
@@ -45,6 +45,7 @@ Page({
     ]).then(([freshUi, apiTiers]) => {
       let ui = cachedUi;
       if (freshUi) {
+        if (freshUi.avatar) freshUi.avatar = fixImageUrl(freshUi.avatar);
         app.globalData.userInfo = freshUi;
         wx.setStorageSync('userInfo', freshUi);
         ui = freshUi;
@@ -74,19 +75,17 @@ Page({
   // ========== 头像 ==========
   onChooseAvatar() {
     const that = this;
-    wx.chooseImage({
-      count: 1,
-      sizeType: ['compressed'],
-      sourceType: ['album', 'camera'],
+    wx.chooseMedia({
+      count: 1, mediaType: ['image'], sourceType: ['album', 'camera'], sizeType: ['compressed'],
       success(res) {
-        const avatarPath = res.tempFilePaths[0];
+        const avatarPath = res.tempFiles[0].tempFilePath;
         if (that.data.editProfileOpen) {
           that.setData({ 'editForm.avatar': avatarPath });
         } else {
           // Upload to server
           wx.showLoading({ title: '上传中...' });
           wx.uploadFile({
-            url: 'https://artaides.com/api/v1/upload/avatar',
+            url: BASE_URL + '/upload/avatar',
             filePath: avatarPath,
             name: 'file',
             header: {
@@ -95,18 +94,20 @@ Page({
             success(result) {
               wx.hideLoading();
               if (result.statusCode === 200) {
-                const data = JSON.parse(result.data);
-                if (data.code === 0) {
-                  app.globalData.userInfo.avatar = data.data.url;
-                  that.loadUserData();
-                  wx.showToast({ title: '头像已更新', icon: 'success' });
-                }
-              } else {
-                // Fallback: keep local path
-                app.globalData.userInfo.avatar = avatarPath;
-                that.loadUserData();
-                wx.showToast({ title: '头像已更新', icon: 'success' });
+                try {
+                  const data = JSON.parse(result.data);
+                  if (data.code === 0) {
+                    app.globalData.userInfo.avatar = fixImageUrl(data.data.url);
+                    that.loadUserData();
+                    wx.showToast({ title: '头像已更新', icon: 'success' });
+                    return;
+                  }
+                } catch (_) {}
               }
+              // Fallback: keep local path
+              app.globalData.userInfo.avatar = avatarPath;
+              that.loadUserData();
+              wx.showToast({ title: '头像已更新', icon: 'success' });
             },
             fail() {
               wx.hideLoading();
@@ -117,7 +118,8 @@ Page({
             },
           });
         }
-      }
+      },
+      fail() { /* 用户取消选择 */ }
     });
   },
 

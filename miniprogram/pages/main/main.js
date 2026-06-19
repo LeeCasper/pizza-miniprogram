@@ -727,10 +727,10 @@ Page({
 
   onChooseAvatar() {
     const that = this;
-    wx.chooseImage({
-      count: 1, sizeType: ['compressed'], sourceType: ['album', 'camera'],
+    wx.chooseMedia({
+      count: 1, mediaType: ['image'], sourceType: ['album', 'camera'], sizeType: ['compressed'],
       success(res) {
-        const avatarPath = res.tempFilePaths[0];
+        const avatarPath = res.tempFiles[0].tempFilePath;
         // 编辑抽屉内：仅暂存本地路径，保存时统一上传
         if (that.data.editProfileOpen) { that.setData({ 'editForm.avatar': avatarPath }); return; }
         // 直接点击头像：立即上传
@@ -746,7 +746,8 @@ Page({
           that.loadProfileData();
           wx.showToast({ title: '头像已更新（本地）', icon: 'success' });
         });
-      }
+      },
+      fail() { /* 用户取消选择 */ }
     });
   },
   onOpenEditProfile() {
@@ -762,7 +763,7 @@ Page({
     const ui = app.globalData.userInfo;
     const name = editForm.name.trim();
     const bio = editForm.bio.trim();
-    const avatarChanged = editForm.avatar && editForm.avatar !== ui.avatar && !editForm.avatar.startsWith('http');
+    const avatarChanged = editForm.avatar && editForm.avatar !== ui.avatar && !editForm.avatar.startsWith('https://');
 
     // 乐观更新 UI + 关闭抽屉
     ui.name = name; ui.bio = bio;

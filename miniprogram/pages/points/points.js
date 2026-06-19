@@ -1,5 +1,5 @@
 // pages/points/points.js
-const { api } = require('../../utils/api');
+const { api, fixImageUrl } = require('../../utils/api');
 const app = getApp();
 const { getSimpleTopBar } = require('../../utils/layout');
 
@@ -26,7 +26,8 @@ Page({
     this.setData({ loading: true });
     api.get('/points/products').then(res => {
       if (res.code === 0) {
-        this.setData({ products: res.data || [], loading: false });
+        const products = (res.data || []).map(p => ({ ...p, image: fixImageUrl(p.image) }));
+        this.setData({ products, loading: false });
       } else {
         this.setData({ loading: false });
       }

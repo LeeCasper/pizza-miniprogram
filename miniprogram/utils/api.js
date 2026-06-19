@@ -103,6 +103,9 @@ const api = {
   login()          { return doLogin(); },
 };
 
+// Derive origin from BASE_URL to keep image domain consistent with API domain
+const _origin = BASE_URL.replace(/\/api\/v1$/, '');
+
 /**
  * Fix image URL: prepend domain to relative paths so WeChat <image> loads from network.
  * Full URLs (https://...) are returned unchanged. http:// is upgraded to https://.
@@ -111,7 +114,8 @@ function fixImageUrl(url) {
   if (!url) return url;
   if (url.startsWith('https://')) return url;
   if (url.startsWith('http://')) return url.replace('http://', 'https://');
-  if (url.startsWith('/uploads/')) return 'https://artaides.com' + url;
+  if (url.startsWith('/uploads/')) return _origin + url;
+  if (url.startsWith('uploads/')) return _origin + '/' + url;
   return url;
 }
 
