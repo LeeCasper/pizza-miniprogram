@@ -27,7 +27,6 @@ export const views: Record<LastLevelRouteKey, RouteComponent | (() => Promise<Ro
   coupons_templates_list: () => import("@/views/coupons/templates/list/index.vue"),
   dashboard: () => import("@/views/dashboard/index.vue"),
   files_list: () => import("@/views/files/list/index.vue"),
-  home: () => import("@/views/home/index.vue"),
   membertiers_form: () => import("@/views/memberTiers/form/index.vue"),
   membertiers_list: () => import("@/views/memberTiers/list/index.vue"),
   orders_detail: () => import("@/views/orders/detail/index.vue"),

@@ -196,6 +196,46 @@ const orderService = {
       rechargeCount: rechargeCount[0].count,
     };
   },
+
+  /** 仪表盘图表数据：7日订单趋势 + 订单状态分布 */
+  async getDashboardCharts() {
+    // 最近7天订单趋势（含今天）
+    const [orderTrend] = await pool.query(
+      `SELECT DATE(created_at) AS date,
+              COUNT(*) AS orders,
+              COALESCE(SUM(CASE WHEN payment_method IS NOT NULL THEN paid_amount ELSE 0 END), 0) AS revenue
+       FROM orders
+       WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+       GROUP BY DATE(created_at)
+       ORDER BY date ASC`
+    );
+
+    // 订单状态分布（全部订单）
+    const [statusDist] = await pool.query(
+      `SELECT status, COUNT(*) AS count FROM orders GROUP BY status`
+    );
+
+    // 填充没有订单的日期为 0
+    const trendMap = new Map();
+    for (const row of orderTrend) {
+      const d = row.date instanceof Date
+        ? row.date.toISOString().slice(0, 10)
+        : String(row.date).slice(0, 10);
+      trendMap.set(d, { date: d, orders: row.orders, revenue: parseFloat(row.revenue) });
+    }
+    const trend = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      trend.push(trendMap.get(key) || { date: key, orders: 0, revenue: 0 });
+    }
+
+    return {
+      orderTrend: trend,
+      statusDistribution: statusDist.map(r => ({ status: r.status, count: r.count })),
+    };
+  },
 };
 
 function formatOrder(row, cancelMinutes) {

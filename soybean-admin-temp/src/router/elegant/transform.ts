@@ -177,7 +177,6 @@ const routeMap: RouteMap = {
   "dashboard": "/dashboard",
   "files": "/files",
   "files_list": "/files/list",
-  "home": "/home",
   "iframe-page": "/iframe-page/:url",
   "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?",
   "membertiers": "/membertiers",

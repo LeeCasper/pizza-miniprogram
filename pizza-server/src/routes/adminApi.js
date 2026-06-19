@@ -18,6 +18,7 @@ router.get('/profile', ctrl.getProfile);
 
 // Dashboard
 router.get('/dashboard/stats', ctrl.getDashboardStats);
+router.get('/dashboard/charts', ctrl.getDashboardCharts);
 
 // Products
 router.get('/products', ctrl.listProducts);

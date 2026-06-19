@@ -111,6 +111,19 @@ const adminApiController = {
     }
   },
 
+  /**
+   * GET /api/v1/admin/dashboard/charts
+   */
+  async getDashboardCharts(req, res) {
+    try {
+      const charts = await orderService.getDashboardCharts();
+      return res.json({ code: 0, data: charts });
+    } catch (err) {
+      log.error({ err }, 'Dashboard charts error');
+      return res.status(500).json({ code: 500, message: '获取图表数据失败' });
+    }
+  },
+
   // ── Products CRUD ──────────────────────────────────
 
   /**

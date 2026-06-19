@@ -31,7 +31,6 @@ declare module "@elegant-router/types" {
     "dashboard": "/dashboard";
     "files": "/files";
     "files_list": "/files/list";
-    "home": "/home";
     "iframe-page": "/iframe-page/:url";
     "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?";
     "membertiers": "/membertiers";
@@ -94,7 +93,6 @@ declare module "@elegant-router/types" {
     | "coupons"
     | "dashboard"
     | "files"
-    | "home"
     | "iframe-page"
     | "login"
     | "membertiers"
@@ -132,7 +130,6 @@ declare module "@elegant-router/types" {
     | "coupons_templates_list"
     | "dashboard"
     | "files_list"
-    | "home"
     | "membertiers_form"
     | "membertiers_list"
     | "orders_detail"
