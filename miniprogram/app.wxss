@@ -139,11 +139,19 @@ page {
 
 scroll-view {
   will-change: scroll-position;
-  background: transparent;
 }
 
 swiper, swiper-item {
   background: transparent;
+}
+
+/* 主内容滚动区域 — 四色糖果渐变背景（scroll-view 合成层需单独设置） */
+.tab-scroll,
+.orders-scroll,
+.shop-scroll,
+.member-scroll,
+.main-scroll {
+  background-image: linear-gradient(135deg, #DFC0FF 0%, #C0FFB8 25%, #FFF080 50%, #A0EDFF 75%, #DFC0FF 100%);
 }
 
 /* === 通用工具类 === */
