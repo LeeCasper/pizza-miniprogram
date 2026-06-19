@@ -374,6 +374,99 @@ const systemConfigService = {
       log.error({ err }, 'failed to sync business config from DB');
     });
   },
+
+  // ── Theme Config ──────────────────────────────────────
+
+  /**
+   * Get theme config from DB.
+   * @returns {Promise<object>} 9 theme fields
+   */
+  async getThemeConfig() {
+    try {
+      const [rows] = await pool.query(
+        "SELECT config_key, config_value FROM system_config WHERE config_key LIKE 'theme_%'"
+      );
+      const map = {};
+      rows.forEach(r => { map[r.config_key] = r.config_value || ''; });
+      return {
+        primaryColor: map.theme_primary_color || '',
+        secondaryColor: map.theme_secondary_color || '',
+        tertiaryColor: map.theme_tertiary_color || '',
+        accentColor: map.theme_accent_color || '',
+        gradientColor1: map.theme_gradient_color1 || '',
+        gradientColor2: map.theme_gradient_color2 || '',
+        gradientColor3: map.theme_gradient_color3 || '',
+        gradientColor4: map.theme_gradient_color4 || '',
+        glassIntensity: map.theme_glass_intensity || '',
+      };
+    } catch (_) {
+      return {
+        primaryColor: '', secondaryColor: '', tertiaryColor: '', accentColor: '',
+        gradientColor1: '', gradientColor2: '', gradientColor3: '', gradientColor4: '',
+        glassIntensity: '',
+      };
+    }
+  },
+
+  /**
+   * Update theme config in DB (UPSERT per key).
+   * @param {object} entries — { primaryColor, secondaryColor, ... }
+   */
+  async updateThemeConfig(entries) {
+    const fieldMap = {
+      primaryColor: 'theme_primary_color',
+      secondaryColor: 'theme_secondary_color',
+      tertiaryColor: 'theme_tertiary_color',
+      accentColor: 'theme_accent_color',
+      gradientColor1: 'theme_gradient_color1',
+      gradientColor2: 'theme_gradient_color2',
+      gradientColor3: 'theme_gradient_color3',
+      gradientColor4: 'theme_gradient_color4',
+      glassIntensity: 'theme_glass_intensity',
+    };
+
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+      for (const [camelKey, dbKey] of Object.entries(fieldMap)) {
+        if (entries[camelKey] !== undefined) {
+          const value = entries[camelKey] != null ? String(entries[camelKey]) : '';
+          await conn.query(
+            'INSERT INTO system_config (config_key, config_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE config_value = ?',
+            [dbKey, value, value]
+          );
+        }
+      }
+      await conn.commit();
+    } catch (err) {
+      await conn.rollback();
+      throw err;
+    } finally {
+      conn.release();
+    }
+
+    // Sync to in-memory config
+    this.syncThemeConfigToMemory();
+  },
+
+  /**
+   * Sync theme DB config to in-memory config object.
+   */
+  syncThemeConfigToMemory() {
+    this.getThemeConfig().then(dbConfig => {
+      if (dbConfig.primaryColor) config.theme.primaryColor = dbConfig.primaryColor;
+      if (dbConfig.secondaryColor) config.theme.secondaryColor = dbConfig.secondaryColor;
+      if (dbConfig.tertiaryColor) config.theme.tertiaryColor = dbConfig.tertiaryColor;
+      if (dbConfig.accentColor) config.theme.accentColor = dbConfig.accentColor;
+      if (dbConfig.gradientColor1) config.theme.gradientColor1 = dbConfig.gradientColor1;
+      if (dbConfig.gradientColor2) config.theme.gradientColor2 = dbConfig.gradientColor2;
+      if (dbConfig.gradientColor3) config.theme.gradientColor3 = dbConfig.gradientColor3;
+      if (dbConfig.gradientColor4) config.theme.gradientColor4 = dbConfig.gradientColor4;
+      if (dbConfig.glassIntensity) config.theme.glassIntensity = dbConfig.glassIntensity;
+    }).catch(err => {
+      log.error({ err }, 'failed to sync theme config from DB');
+    });
+  },
 };
 
 module.exports = systemConfigService;

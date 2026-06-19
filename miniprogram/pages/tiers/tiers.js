@@ -2,10 +2,12 @@
 const { api } = require('../../utils/api');
 const { computeTier, buildBenefitTiers, loadTiers } = require('../../utils/tiers');
 const { getSimpleTopBar } = require('../../utils/layout');
+const { getThemeStyle } = require('../../utils/theme');
 const app = getApp();
 
 Page({
   data: {
+    themeStyle: getThemeStyle(),
     statusBarHeight: 44,
     topBarTotalHeight: 80,
     tiers: [],
@@ -99,6 +101,10 @@ Page({
         selectedTierKey: levelKey,
       });
     }
+  },
+
+  applyTheme() {
+    this.setData({ themeStyle: getThemeStyle() });
   },
 
   noop() {},

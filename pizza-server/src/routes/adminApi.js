@@ -91,6 +91,8 @@ router.get('/settings/store', ctrl.getStoreSettings);
 router.put('/settings/store', ctrl.updateStoreSettings);
 router.get('/settings/business', ctrl.getBusinessSettings);
 router.put('/settings/business', ctrl.updateBusinessSettings);
+router.get('/settings/theme', ctrl.getThemeSettings);
+router.put('/settings/theme', ctrl.updateThemeSettings);
 
 // Payment records (transaction history)
 router.get('/payment-records', ctrl.listPaymentRecords);

@@ -2,10 +2,13 @@
 const { api, fixImageUrl } = require('../../utils/api');
 const { getSwiperLayout } = require('../../utils/layout');
 const { SHOP_CATEGORIES } = require('../../utils/data');
+const { getThemeStyle, getThemeColor } = require('../../utils/theme');
 const app = getApp();
 
 Page({
   data: {
+    themeStyle: getThemeStyle(),
+    themePrimaryColor: getThemeColor('primary'),
     statusBarHeight: 44,
     topBarTotalHeight: 80,
     scrollViewHeight: 0,
@@ -30,6 +33,10 @@ Page({
       tabBar.setData({ selected: 2 });
     }
     this.syncCart();
+  },
+
+  applyTheme() {
+    this.setData({ themeStyle: getThemeStyle(), themePrimaryColor: getThemeColor('primary') });
   },
 
   fetchProducts() {

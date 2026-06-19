@@ -1,9 +1,21 @@
 const { doLogin, api, fixImageUrl } = require('./utils/api');
+const { loadThemeConfig, buildThemeStyle, getThemeStyle } = require('./utils/theme');
 
 App({
   onLaunch() {
     const windowInfo = wx.getWindowInfo();
     this.globalData.statusBarHeight = windowInfo.statusBarHeight;
+
+    // 异步加载主题配置（不阻塞启动）
+    loadThemeConfig().then(cfg => {
+      this.globalData.themeStyle = getThemeStyle();
+      this.globalData.themeConfig = cfg;
+      // 通知已加载的页面刷新主题
+      const pages = getCurrentPages();
+      pages.forEach(p => {
+        if (p.applyTheme) p.applyTheme();
+      });
+    });
 
     // 尝试自动登录
     const token = wx.getStorageSync('token');
@@ -47,6 +59,8 @@ App({
     cart: {},
     cartCount: 0,
     cartTotal: 0,
+    themeStyle: '',
+    themeConfig: null,
     userInfo: {
       name: '披萨爱好者',
       avatar: '',

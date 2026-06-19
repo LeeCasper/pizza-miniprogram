@@ -1376,6 +1376,74 @@ const adminApiController = {
     }
   },
 
+  // ── Theme Settings ──────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/settings/theme
+   */
+  async getThemeSettings(req, res, next) {
+    try {
+      const cfg = await systemConfigService.getThemeConfig();
+      res.json({
+        code: 0,
+        data: {
+          primaryColor: cfg.primaryColor || config.theme.primaryColor,
+          secondaryColor: cfg.secondaryColor || config.theme.secondaryColor,
+          tertiaryColor: cfg.tertiaryColor || config.theme.tertiaryColor,
+          accentColor: cfg.accentColor || config.theme.accentColor,
+          gradientColor1: cfg.gradientColor1 || config.theme.gradientColor1,
+          gradientColor2: cfg.gradientColor2 || config.theme.gradientColor2,
+          gradientColor3: cfg.gradientColor3 || config.theme.gradientColor3,
+          gradientColor4: cfg.gradientColor4 || config.theme.gradientColor4,
+          glassIntensity: cfg.glassIntensity || config.theme.glassIntensity,
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * PUT /api/v1/admin/settings/theme
+   */
+  async updateThemeSettings(req, res, next) {
+    try {
+      const body = req.body || {};
+      const entries = {};
+      const hexPattern = /^#[0-9A-Fa-f]{6}$/;
+      const colorFields = [
+        'primaryColor', 'secondaryColor', 'tertiaryColor', 'accentColor',
+        'gradientColor1', 'gradientColor2', 'gradientColor3', 'gradientColor4',
+      ];
+
+      for (const field of colorFields) {
+        if (body[field] !== undefined) {
+          const v = String(body[field]).trim();
+          if (!hexPattern.test(v)) {
+            return res.status(400).json({ code: 400, message: `${field} 必须是有效的 HEX 颜色值（如 #FF0000）` });
+          }
+          entries[field] = v;
+        }
+      }
+
+      if (body.glassIntensity !== undefined) {
+        const v = String(body.glassIntensity).trim();
+        if (!['low', 'medium', 'high'].includes(v)) {
+          return res.status(400).json({ code: 400, message: '毛玻璃强度必须是 low、medium 或 high' });
+        }
+        entries.glassIntensity = v;
+      }
+
+      if (Object.keys(entries).length > 0) {
+        await systemConfigService.updateThemeConfig(entries);
+      }
+
+      res.json({ code: 0, message: '主题配置已保存' });
+    } catch (err) {
+      next(err);
+    }
+  },
+
   // ── Audit Logs ──────────────────────────────────────
 
   /**

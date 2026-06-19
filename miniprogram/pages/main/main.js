@@ -6,10 +6,13 @@ const { getSwiperLayout } = require('../../utils/layout');
 const { formatOrder } = require('../../utils/orders');
 const { CATEGORY_ICON_MAP, dietaryRestrictions, SHOP_CATEGORIES } = require('../../utils/data');
 const { profileMethods, loadProfileCore } = require('../../utils/profileShared');
+const { getThemeStyle, getThemeColor } = require('../../utils/theme');
 const app = getApp();
 
 Page({
   data: {
+    themeStyle: getThemeStyle(),
+    themePrimaryColor: getThemeColor('primary'),
     statusBarHeight: app.globalData.statusBarHeight,
     topBarTotalHeight: app.globalData.statusBarHeight + 36,
     scrollViewHeight: 0,
@@ -55,6 +58,8 @@ Page({
     // 加载态
     productsLoaded: false, ordersLoaded: false,
   },
+
+  applyTheme() { this.setData({ themeStyle: getThemeStyle(), themePrimaryColor: getThemeColor('primary') }); },
 
   // ── 共享 profile 方法（头像、编辑、公告、等级轮播、退出等）──
   ...profileMethods,

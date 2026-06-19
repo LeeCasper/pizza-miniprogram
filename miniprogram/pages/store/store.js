@@ -1,6 +1,7 @@
 // pages/store/store.js
 const { api } = require('../../utils/api');
 const { calculateWalkingDistance, formatDistance } = require('../../utils/mapConfig');
+const { getThemeStyle, getThemeColor } = require('../../utils/theme');
 const app = getApp();
 const { getSimpleTopBar } = require('../../utils/layout');
 
@@ -10,6 +11,7 @@ const DEFAULT_LNG = 114.646879;
 
 Page({
   data: {
+    themeStyle: getThemeStyle(),
     statusBarHeight: 44,
     topBarTotalHeight: 80,
     store: null,
@@ -31,6 +33,10 @@ Page({
 
   // 距离计算节流时间戳
   _lastDistCalc: 0,
+
+  applyTheme() {
+    this.setData({ themeStyle: getThemeStyle(), themePrimaryColor: getThemeColor('primary') });
+  },
 
   onLoad() {
     this.setData(getSimpleTopBar());
@@ -164,7 +170,7 @@ Page({
       height: 32,
       callout: {
         content: s.name || '王姐手工披萨',
-        color: '#C583FF',
+        color: getThemeColor('primary'),
         fontSize: 14,
         borderRadius: 8,
         bgColor: '#FFFFFF',

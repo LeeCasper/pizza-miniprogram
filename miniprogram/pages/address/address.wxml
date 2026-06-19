@@ -1,5 +1,5 @@
 <!--pages/address/address.wxml-->
-<view class="page-container" style="padding-top: {{topBarTotalHeight}}px">
+<view class="page-container" style="{{themeStyle}} padding-top: {{topBarTotalHeight}}px">
   <!-- 顶部导航 -->
   <view class="top-bar" style="padding-top: {{statusBarHeight}}px">
     <view class="back-btn" bindtap="onBack">
@@ -168,7 +168,7 @@
             <switch
               checked="{{form.isDefault}}"
               bindchange="onToggleDefault"
-              color="#C583FF"
+              color="{{themePrimaryColor || '#C583FF'}}"
             />
           </view>
         </view>

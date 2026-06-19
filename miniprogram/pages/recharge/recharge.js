@@ -3,11 +3,13 @@ const { api } = require('../../utils/api');
 const pay = require('../../utils/pay');
 const app = getApp();
 const { getSimpleTopBar } = require('../../utils/layout');
+const { getThemeStyle } = require('../../utils/theme');
 
 const PRESET_AMOUNTS = [50, 100, 200, 300, 500, 1000];
 
 Page({
   data: {
+    themeStyle: getThemeStyle(),
     statusBarHeight: 44,
     topBarTotalHeight: 80,
     balance: 0,
@@ -25,6 +27,10 @@ Page({
 
   onShow() {
     this.loadBalance();
+  },
+
+  applyTheme() {
+    this.setData({ themeStyle: getThemeStyle() });
   },
 
   loadBalance() {

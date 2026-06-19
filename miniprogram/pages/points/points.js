@@ -2,9 +2,11 @@
 const { api, fixImageUrl } = require('../../utils/api');
 const app = getApp();
 const { getSimpleTopBar } = require('../../utils/layout');
+const { getThemeStyle } = require('../../utils/theme');
 
 Page({
   data: {
+    themeStyle: getThemeStyle(),
     statusBarHeight: 44,
     topBarTotalHeight: 80,
     products: [],
@@ -119,6 +121,10 @@ Page({
     }).catch(() => {
       wx.hideLoading();
     });
+  },
+
+  applyTheme() {
+    this.setData({ themeStyle: getThemeStyle() });
   },
 
   noop() {}

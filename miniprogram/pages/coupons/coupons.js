@@ -2,9 +2,11 @@
 const { api } = require('../../utils/api');
 const app = getApp();
 const { getBackBtnTopBar } = require('../../utils/layout');
+const { getThemeStyle } = require('../../utils/theme');
 
 Page({
   data: {
+    themeStyle: getThemeStyle(),
     statusBarHeight: 44,
     topBarTotalHeight: 80,
     allCoupons: [],
@@ -114,6 +116,10 @@ Page({
     if (!item || item.status !== 'available') return;
     this.setData({ detailOpen: false, detailProduct: null });
     wx.navigateBack();
+  },
+
+  applyTheme() {
+    this.setData({ themeStyle: getThemeStyle() });
   },
 
   noop() {}

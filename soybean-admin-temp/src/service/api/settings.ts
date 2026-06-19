@@ -207,3 +207,46 @@ export function fetchUpdateBusinessSettings(data: BusinessSettingsForm) {
     data,
   });
 }
+
+// ── Theme Settings ──────────────────────────────────
+
+export interface ThemeSettings {
+  primaryColor: string;
+  secondaryColor: string;
+  tertiaryColor: string;
+  accentColor: string;
+  gradientColor1: string;
+  gradientColor2: string;
+  gradientColor3: string;
+  gradientColor4: string;
+  glassIntensity: 'low' | 'medium' | 'high';
+}
+
+export interface ThemeSettingsForm {
+  primaryColor?: string;
+  secondaryColor?: string;
+  tertiaryColor?: string;
+  accentColor?: string;
+  gradientColor1?: string;
+  gradientColor2?: string;
+  gradientColor3?: string;
+  gradientColor4?: string;
+  glassIntensity?: 'low' | 'medium' | 'high';
+}
+
+/** Get theme settings */
+export function fetchThemeSettings() {
+  return request<ThemeSettings>({
+    url: '/settings/theme',
+    method: 'GET',
+  });
+}
+
+/** Update theme settings */
+export function fetchUpdateThemeSettings(data: ThemeSettingsForm) {
+  return request<null>({
+    url: '/settings/theme',
+    method: 'PUT',
+    data,
+  });
+}

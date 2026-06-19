@@ -112,6 +112,12 @@ page {
   --glass-shadow-card: 0 4rpx 20rpx rgba(197, 131, 255, 0.08);
   --glass-shadow-elevated: 0 6rpx 28rpx rgba(197, 131, 255, 0.12);
   --glass-shadow-button: 0 6rpx 20rpx rgba(197, 131, 255, 0.22);
+
+  /* ── 渐变色变量 ── */
+  --gradient-1: #E8D4FF;
+  --gradient-2: #D0FFCE;
+  --gradient-3: #FFF4B0;
+  --gradient-4: #C0F2FF;
 }
 
 /* === 全局基础样式 === */
@@ -121,14 +127,14 @@ page, view, text, image, scroll-view, swiper, swiper-item, navigator, button, in
 
 page {
   height: 100vh;
-  background-color: #F0E6FF;
+  background-color: #F0EAFF;
   background-image: linear-gradient(
     135deg,
-    #DFC0FF 0%,
-    #C0FFB8 25%,
-    #FFF080 50%,
-    #A0EDFF 75%,
-    #DFC0FF 100%
+    var(--gradient-1) 0%,
+    var(--gradient-2) 25%,
+    var(--gradient-3) 50%,
+    var(--gradient-4) 75%,
+    var(--gradient-1) 100%
   );
   color: var(--color-on-background);
   font-family: var(--font-family);
@@ -151,7 +157,7 @@ swiper, swiper-item {
 .shop-scroll,
 .member-scroll,
 .main-scroll {
-  background-image: linear-gradient(135deg, #DFC0FF 0%, #C0FFB8 25%, #FFF080 50%, #A0EDFF 75%, #DFC0FF 100%);
+  background-image: linear-gradient(135deg, var(--gradient-1) 0%, var(--gradient-2) 25%, var(--gradient-3) 50%, var(--gradient-4) 75%, var(--gradient-1) 100%);
 }
 
 /* === 通用工具类 === */
@@ -251,11 +257,11 @@ swiper, swiper-item {
   height: 100vh;
   background-image: linear-gradient(
     135deg,
-    #DFC0FF 0%,
-    #C0FFB8 25%,
-    #FFF080 50%,
-    #A0EDFF 75%,
-    #DFC0FF 100%
+    var(--gradient-1) 0%,
+    var(--gradient-2) 25%,
+    var(--gradient-3) 50%,
+    var(--gradient-4) 75%,
+    var(--gradient-1) 100%
   );
 }
 

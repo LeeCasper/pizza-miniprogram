@@ -131,6 +131,15 @@ const customRoutes: CustomRoute[] = [
           i18nKey: 'route.settings_business',
         },
       },
+      {
+        name: 'settings_theme',
+        path: '/settings/theme',
+        component: 'view.settings_theme',
+        meta: {
+          title: '主题配置',
+          i18nKey: 'route.settings_theme',
+        },
+      },
     ],
   },
   // Multi-level routes — parent has layout.base, children have view.xxx

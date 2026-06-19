@@ -3,7 +3,7 @@
   <view class="shop-scroll-inner">
     <!-- 促销 Banner 轮播 -->
     <view class="shop-banner-section" wx:if="{{shopBanners.length > 0}}">
-      <swiper class="shop-banner-swiper" autoplay interval="4000" circular indicator-dots indicator-color="rgba(255,255,255,0.3)" indicator-active-color="#C583FF">
+      <swiper class="shop-banner-swiper" autoplay interval="4000" circular indicator-dots indicator-color="rgba(255,255,255,0.3)" indicator-active-color="{{themePrimaryColor || '#C583FF'}}">
         <swiper-item wx:for="{{shopBanners}}" wx:key="id">
           <view class="shop-banner-slide" bindtap="onShopBannerTap" data-id="{{item.id}}">
             <image class="shop-banner-img" src="{{item.image}}" mode="aspectFill"></image>

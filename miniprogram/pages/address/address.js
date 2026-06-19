@@ -2,9 +2,12 @@
 const { api } = require('../../utils/api');
 const app = getApp();
 const { getBackBtnTopBar } = require('../../utils/layout');
+const { getThemeStyle, getThemeColor } = require('../../utils/theme');
 
 Page({
   data: {
+    themeStyle: getThemeStyle(),
+    themePrimaryColor: getThemeColor('primary'),
     statusBarHeight: 44,
     topBarTotalHeight: 80,
     mode: 'list',
@@ -174,6 +177,10 @@ Page({
     if (!id) return;
     this.onDelete({ currentTarget: { dataset: { id } } });
     this.setData({ mode: 'list', editId: null });
+  },
+
+  applyTheme() {
+    this.setData({ themeStyle: getThemeStyle(), themePrimaryColor: getThemeColor('primary') });
   },
 
   noop() {}

@@ -67,6 +67,18 @@ const config = {
     unpaidTimeoutMinutes: 30,
     storeName: '爱家店',
   },
+
+  theme: {
+    primaryColor: '#C583FF',
+    secondaryColor: '#FFF292',
+    tertiaryColor: '#A0FF92',
+    accentColor: '#91F5FF',
+    gradientColor1: '#E8D4FF',
+    gradientColor2: '#D0FFCE',
+    gradientColor3: '#FFF4B0',
+    gradientColor4: '#C0F2FF',
+    glassIntensity: 'medium',
+  },
 };
 
 // ── Production env validation ─────────────────────────
