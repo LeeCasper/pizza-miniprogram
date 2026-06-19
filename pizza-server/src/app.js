@@ -103,7 +103,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(requestId);
 
 // Static files (uploads & admin assets)
-app.use('/uploads', express.static(config.upload.dir));
+// Override helmet's Cross-Origin-Resource-Policy for uploads —
+// WeChat Mini Program renderer loads images cross-origin; 'same-origin' blocks them.
+app.use('/uploads', (req, res, next) => {
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+}, express.static(config.upload.dir));
 app.use('/admin/assets', express.static(path.join(__dirname, '..', 'public')));
 
 // ── View engine (EJS for admin panel) ──────────────────
