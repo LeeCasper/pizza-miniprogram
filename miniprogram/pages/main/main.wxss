@@ -663,12 +663,12 @@
 .birthday-prompt { flex: 1; font-size: 24rpx; color: var(--color-primary); }
 .birthday-arrow { font-size: 32rpx; color: var(--color-on-surface-variant); flex-shrink: 0; }
 /* 右侧统计 */
-.profile-stats { display: flex; align-items: center; flex-shrink: 0; margin-left: auto; }
-.profile-stat { display: flex; flex-direction: column; align-items: center; gap: 4rpx; padding: 0 20rpx; }
+.profile-stats { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; margin-left: auto; gap: 4rpx; }
+.profile-stat { display: flex; flex-direction: column; align-items: center; gap: 2rpx; padding: 8rpx 20rpx; }
 .profile-stat:active { opacity: 0.7; }
-.profile-stat-value { font-size: 28rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); white-space: nowrap; }
+.profile-stat-value { font-size: 30rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); white-space: nowrap; }
 .profile-stat-label { font-size: 20rpx; color: var(--color-on-surface-variant); }
-.profile-stats-divider { width: 1rpx; height: 48rpx; background: var(--color-divider); flex-shrink: 0; }
+.profile-stats-divider { width: 72rpx; height: 1rpx; background: var(--color-divider); flex-shrink: 0; }
 
 /* ── 会员卡轮播 ── */
 .member-cards-section { margin: 0 0 8rpx; position: relative; }
