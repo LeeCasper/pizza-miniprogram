@@ -36,9 +36,10 @@ Page({
     activeTab: 'all', orders: [], filteredOrders: [],
     // 个人中心
     userInfo: {}, cardCount: 0,
-    editProfileOpen: false, editForm: { name: '', bio: '', avatar: '' },
+    editProfileOpen: false, editForm: { name: '', bio: '', avatar: '', birthday: '' },
     announceOpen: false,
     tierCards: [], activeTierIndex: 0,
+    birthdayDisplay: '', birthdayCountdown: '', isBirthdayToday: false, hasBirthday: false,
     // 会员订阅（商城 tab 会员弹窗）
     selectedPlan: 'monthly',
     memberOverlayOpen: false,

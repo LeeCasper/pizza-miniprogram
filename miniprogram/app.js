@@ -57,7 +57,8 @@ App({
       coupons: 0,
       cardCount: 0,
       balance: 0,
-      bio: '享受美味每一天'
+      bio: '享受美味每一天',
+      birthday: null
     },
     notificationEnabled: true,
     settingsPhone: ''

@@ -636,14 +636,16 @@
 .footer-divider { font-size: 18rpx; color: var(--color-on-surface-variant); opacity: 0.2; }
 
 /* ===== 个人中心 ===== */
-.profile-header { display: flex; align-items: center; justify-content: space-between; padding: 32rpx 32rpx 24rpx; }
-.profile-left { display: flex; align-items: center; gap: 24rpx; }
+.profile-card { margin: 24rpx 32rpx; padding: 32rpx; border-radius: var(--radius-card); background: var(--glass-bg-card); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); border: var(--glass-border); box-shadow: var(--shadow-card); }
+.profile-card-top { display: flex; align-items: center; gap: 28rpx; }
 .avatar-wrap { width: 128rpx; height: 128rpx; border-radius: var(--radius-full); overflow: hidden; box-shadow: var(--shadow-sm); flex-shrink: 0; }
+.avatar-wrap-lg { width: 160rpx; height: 160rpx; }
 .avatar { width: 100%; height: 100%; }
 .avatar-placeholder { border-radius: 9999rpx; background: var(--color-surface-container); }
-.profile-text { display: flex; flex-direction: column; gap: 6rpx; }
+.profile-info { flex: 1; display: flex; flex-direction: column; gap: 8rpx; min-width: 0; }
 .profile-name { font-size: 36rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); }
 .profile-bio { font-size: 24rpx; color: var(--color-on-surface-variant); }
+.profile-member-id { font-size: 22rpx; color: var(--color-on-surface-variant); opacity: 0.7; }
 /* 头像编辑遮罩 */
 .avatar-wrap { position: relative; }
 .avatar-edit-mask { position: absolute; inset: 0; border-radius: var(--radius-full); background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
@@ -651,6 +653,22 @@
 .avatar-edit-icon { font-size: 36rpx; color: #FFFFFF; }
 .profile-name-row { display: flex; align-items: center; gap: 10rpx; }
 .profile-edit-hint { width: 28rpx; height: 28rpx; opacity: 0.6; }
+/* 生日行 */
+.birthday-row { display: flex; align-items: center; gap: 12rpx; margin-top: 24rpx; padding: 20rpx 24rpx; border-radius: var(--radius-sm); background: var(--color-surface-container-low); }
+.birthday-today { background: rgba(251, 192, 45, 0.15); border: 1rpx solid rgba(251, 192, 45, 0.3); }
+.birthday-icon { font-size: 32rpx; line-height: 1; flex-shrink: 0; }
+.birthday-text { font-size: 24rpx; color: var(--color-on-surface-variant); flex: 1; }
+.birthday-celebration { font-size: 26rpx; font-weight: var(--font-weight-bold); color: #C67C00; flex: 1; }
+.birthday-unset:active { opacity: 0.7; }
+.birthday-prompt { flex: 1; font-size: 24rpx; color: var(--color-primary); }
+.birthday-arrow { font-size: 32rpx; color: var(--color-on-surface-variant); flex-shrink: 0; }
+/* 统计条 */
+.stats-strip { display: flex; align-items: center; margin-top: 24rpx; padding-top: 24rpx; border-top: 1rpx solid var(--color-divider); }
+.stats-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6rpx; }
+.stats-item:active { opacity: 0.7; }
+.stats-value { font-size: 32rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); }
+.stats-label { font-size: 22rpx; color: var(--color-on-surface-variant); }
+.stats-divider { width: 1rpx; height: 56rpx; background: var(--color-divider); align-self: center; flex-shrink: 0; }
 
 /* ── 会员卡轮播 ── */
 .member-cards-section { margin: 0 0 8rpx; position: relative; }
@@ -877,6 +895,11 @@
 .edit-field { margin-bottom: 32rpx; }
 .edit-field-label { display: block; font-size: 26rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); margin-bottom: 16rpx; }
 .edit-field-input { width: 100%; height: 88rpx; padding: 0 28rpx; border-radius: var(--radius-sm); background: var(--color-surface-container-low); font-size: 30rpx; color: var(--color-on-surface); }
+/* 日期选择器 */
+.edit-field-picker { display: flex; align-items: center; justify-content: space-between; width: 100%; height: 88rpx; padding: 0 28rpx; border-radius: var(--radius-sm); background: var(--color-surface-container-low); box-sizing: border-box; }
+.edit-field-picker-text { font-size: 30rpx; color: var(--color-on-surface); }
+.edit-field-picker-text.placeholder { color: var(--color-on-surface-variant); opacity: 0.5; }
+.edit-field-picker-arrow { font-size: 32rpx; color: var(--color-on-surface-variant); flex-shrink: 0; }
 
 /* ===== 产品详情弹窗 ===== */
 .detail-overlay {

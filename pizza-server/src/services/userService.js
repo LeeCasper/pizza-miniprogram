@@ -12,7 +12,7 @@ const userService = {
 
   async findById(id) {
     const [rows] = await pool.query(
-      'SELECT id, openid, name, avatar, bio, phone, points, balance, total_spent, total_recharge, member_level, notification_enabled, role, created_at, updated_at FROM users WHERE id = ?',
+      'SELECT id, openid, name, avatar, bio, birthday, phone, points, balance, total_spent, total_recharge, member_level, notification_enabled, role, created_at, updated_at FROM users WHERE id = ?',
       [id]
     );
     return rows[0] || null;
@@ -30,11 +30,12 @@ const userService = {
     await pool.query('UPDATE users SET session_key = ? WHERE id = ?', [sessionKey, id]);
   },
 
-  async updateProfile(id, { name, bio }) {
+  async updateProfile(id, { name, bio, birthday }) {
     const sets = [];
     const values = [];
     if (name !== undefined) { sets.push('name = ?'); values.push(name); }
     if (bio !== undefined) { sets.push('bio = ?'); values.push(bio); }
+    if (birthday !== undefined) { sets.push('birthday = ?'); values.push(birthday || null); }
     if (sets.length === 0) return this.findById(id);
     values.push(id);
     await pool.query(`UPDATE users SET ${sets.join(', ')} WHERE id = ?`, values);
@@ -262,6 +263,7 @@ const userService = {
           name = '已注销用户',
           avatar = '',
           bio = '',
+          birthday = NULL,
           phone = '',
           notification_enabled = 0,
           deleted_at = NOW(),

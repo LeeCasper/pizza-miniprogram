@@ -33,6 +33,11 @@ const userController = {
           cardCount: 0,
           balance: parseFloat(user.balance),
           bio: user.bio,
+          birthday: user.birthday
+            ? (user.birthday instanceof Date
+              ? user.birthday.toISOString().slice(0, 10)
+              : String(user.birthday).slice(0, 10))
+            : null,
           tier,
         },
       });

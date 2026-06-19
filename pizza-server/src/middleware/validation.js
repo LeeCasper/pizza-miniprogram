@@ -35,6 +35,9 @@ const schemas = {
   updateProfile: Joi.object({
     name: Joi.string().max(50).messages({ 'string.max': '姓名不能超过50个字符' }),
     bio: Joi.string().max(200).messages({ 'string.max': '简介不能超过200个字符' }),
+    birthday: Joi.string().pattern(/^\d{4}-\d{2}-\d{2}$/).allow('', null).messages({
+      'string.pattern.base': '生日格式应为 YYYY-MM-DD',
+    }),
   }),
 
   addCartItem: Joi.object({

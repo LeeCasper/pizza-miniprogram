@@ -20,6 +20,39 @@ const { api, fixImageUrl, BASE_URL } = require('./api');
 const { computeTier, buildTierCards, loadTiers } = require('./tiers');
 const { logout } = require('./auth');
 
+// ── 生日倒计时计算 ──────────────────────────────
+
+/**
+ * 计算生日展示信息（纯前端，基于本地日期）
+ * @param {string|null} birthdayStr  'YYYY-MM-DD' 或 null
+ * @returns {{ birthdayDisplay: string, birthdayCountdown: string, isBirthdayToday: boolean, hasBirthday: boolean }}
+ */
+function computeBirthdayInfo(birthdayStr) {
+  if (!birthdayStr) {
+    return { birthdayDisplay: '', birthdayCountdown: '', isBirthdayToday: false, hasBirthday: false };
+  }
+  var parts = birthdayStr.split('-');
+  var month = parseInt(parts[1], 10);
+  var day = parseInt(parts[2], 10);
+  var today = new Date();
+  var todayMonth = today.getMonth() + 1;
+  var todayDay = today.getDate();
+  var todayYear = today.getFullYear();
+  var isBirthdayToday = (todayMonth === month && todayDay === day);
+  var birthdayDisplay = month + '月' + day + '日';
+  var birthdayCountdown = '';
+  if (!isBirthdayToday) {
+    var nextBirthday = new Date(todayYear, month - 1, day);
+    var todayMidnight = new Date(todayYear, today.getMonth(), todayDay);
+    if (nextBirthday.getTime() <= todayMidnight.getTime()) {
+      nextBirthday = new Date(todayYear + 1, month - 1, day);
+    }
+    var diffDays = Math.ceil((nextBirthday.getTime() - todayMidnight.getTime()) / 86400000);
+    birthdayCountdown = '距生日还有' + diffDays + '天';
+  }
+  return { birthdayDisplay: birthdayDisplay, birthdayCountdown: birthdayCountdown, isBirthdayToday: isBirthdayToday, hasBirthday: true };
+}
+
 // ── Mixin methods (spread into Page) ─────────────────────
 
 const profileMethods = {
@@ -86,7 +119,7 @@ const profileMethods = {
 
   onOpenEditProfile() {
     const ui = this.data.userInfo;
-    this.setData({ editProfileOpen: true, editForm: { name: ui.name || '', bio: ui.bio || '', avatar: ui.avatar || '' } });
+    this.setData({ editProfileOpen: true, editForm: { name: ui.name || '', bio: ui.bio || '', avatar: ui.avatar || '', birthday: ui.birthday || '' } });
   },
 
   onCloseEditProfile() { this.setData({ editProfileOpen: false }); },
@@ -95,19 +128,33 @@ const profileMethods = {
 
   onBioInput(e) { this.setData({ 'editForm.bio': e.detail.value }); },
 
+  onBirthdayChange(e) { this.setData({ 'editForm.birthday': e.detail.value }); },
+
+  onBirthdayRowTap() {
+    if (!this.data.userInfo.birthday) {
+      this.onOpenEditProfile();
+    }
+  },
+
   onSaveProfile() {
     const { editForm } = this.data;
     if (!editForm.name.trim()) { wx.showToast({ title: '请输入昵称', icon: 'none' }); return; }
     const ui = getApp().globalData.userInfo;
     const name = editForm.name.trim();
     const bio = editForm.bio.trim();
+    const birthday = editForm.birthday || '';
     const avatarChanged = editForm.avatar && editForm.avatar !== ui.avatar && !editForm.avatar.startsWith('https://');
 
     // 乐观更新 UI + 关闭抽屉
-    ui.name = name; ui.bio = bio;
+    ui.name = name; ui.bio = bio; ui.birthday = birthday || null;
+    var bdInfo = computeBirthdayInfo(birthday || null);
     this.setData({
       editProfileOpen: false,
-      userInfo: { ...this.data.userInfo, name, bio, avatar: editForm.avatar || ui.avatar },
+      userInfo: { ...this.data.userInfo, name, bio, birthday: birthday || null, avatar: editForm.avatar || ui.avatar },
+      birthdayDisplay: bdInfo.birthdayDisplay,
+      birthdayCountdown: bdInfo.birthdayCountdown,
+      isBirthdayToday: bdInfo.isBirthdayToday,
+      hasBirthday: bdInfo.hasBirthday,
     });
 
     // 头像变更时先上传，再保存文本字段，最后刷新
@@ -116,7 +163,7 @@ const profileMethods = {
       : Promise.resolve();
 
     const that = this;
-    avatarPromise.then(() => api.put('/user/profile', { name, bio })).then(() => {
+    avatarPromise.then(() => api.put('/user/profile', { name, bio, birthday })).then(() => {
       wx.showToast({ title: '保存成功', icon: 'success' });
       that._reloadProfile();
     }).catch(() => { wx.showToast({ title: '保存成功（本地）', icon: 'success' }); });
@@ -174,8 +221,13 @@ function loadProfileCore(page, hooks) {
   const app = getApp();
   const cachedUi = app.globalData.userInfo;
   // 立即显示缓存的用户基本信息
+  var cachedBd = computeBirthdayInfo(cachedUi.birthday || null);
   page.setData({
     userInfo: { ...cachedUi, balanceText: '¥' + ((cachedUi.balance || 0)).toFixed(2), cardCount: cachedUi.cardCount || 0, bio: cachedUi.bio || '享受美味每一天' },
+    birthdayDisplay: cachedBd.birthdayDisplay,
+    birthdayCountdown: cachedBd.birthdayCountdown,
+    isBirthdayToday: cachedBd.isBirthdayToday,
+    hasBirthday: cachedBd.hasBirthday,
   });
 
   // 并行获取最新用户数据 & 等级配置，只构建一次卡片（避免 swiper 连续两次 setData 导致抖动）
@@ -201,10 +253,15 @@ function loadProfileCore(page, hooks) {
     tierInfo._totalSpent = qualifyingAmount;
     var tierCards = buildTierCards(apiTiers, tierInfo);
     var activeTierIndex = tierInfo.current.levelIndex - 1;
+    var bdInfo = computeBirthdayInfo(ui.birthday || null);
     page.setData({
       userInfo: { ...ui, balanceText: '¥' + ((ui.balance || 0)).toFixed(2), cardCount: ui.cardCount || 0, bio: ui.bio || '享受美味每一天' },
       tierCards: tierCards,
       activeTierIndex: activeTierIndex,
+      birthdayDisplay: bdInfo.birthdayDisplay,
+      birthdayCountdown: bdInfo.birthdayCountdown,
+      isBirthdayToday: bdInfo.isBirthdayToday,
+      hasBirthday: bdInfo.hasBirthday,
     });
     // hook: 加载完成后执行自定义逻辑（例如缓存 tiers、重算价格）
     if (_hooks.afterLoad) _hooks.afterLoad.call(page, apiTiers, ui);

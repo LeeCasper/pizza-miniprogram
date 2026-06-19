@@ -10,10 +10,14 @@ Page({
     userInfo: {},
     cardCount: 0,
     editProfileOpen: false,
-    editForm: { name: '', bio: '', avatar: '' },
+    editForm: { name: '', bio: '', avatar: '', birthday: '' },
     announceOpen: false,
     tierCards: [],
     activeTierIndex: 0,
+    birthdayDisplay: '',
+    birthdayCountdown: '',
+    isBirthdayToday: false,
+    hasBirthday: false,
   },
 
   // ── 共享 profile 方法（头像、编辑、公告、等级轮播、退出等）──
