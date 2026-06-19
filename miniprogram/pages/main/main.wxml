@@ -105,6 +105,31 @@
         </scroll-view>
         <view wx:else class="cart-empty"><text>购物车是空的</text></view>
         <view class="cart-footer" wx:if="{{cartItems.length > 0}}">
+          <!-- 优惠券选择行 -->
+          <view class="coupon-select-row" bindtap="onOpenCouponPicker">
+            <text class="coupon-select-label">🎟️ 优惠券</text>
+            <view class="coupon-select-right">
+              <block wx:if="{{selectedCoupon}}">
+                <text class="coupon-select-name">{{selectedCoupon.name}}</text>
+                <text class="coupon-select-value coupon-active">-¥{{couponDiscountText}}</text>
+              </block>
+              <block wx:elif="{{availableCoupons.length > 0}}">
+                <text class="coupon-select-value">{{availableCoupons.length}}张可用</text>
+              </block>
+              <block wx:else>
+                <text class="coupon-select-value coupon-none">暂无可用</text>
+              </block>
+              <text class="coupon-arrow">›</text>
+            </view>
+          </view>
+          <!-- 价格明细 -->
+          <view class="price-breakdown" wx:if="{{couponDiscountAmount > 0 || tierDiscountAmount > 0}}">
+            <view class="price-row"><text>商品合计</text><text>¥{{cartTotal}}</text></view>
+            <view class="price-row discount" wx:if="{{couponDiscountAmount > 0}}"><text>优惠券减免</text><text>-¥{{couponDiscountText}}</text></view>
+            <view class="price-row discount" wx:if="{{tierDiscountAmount > 0}}"><text>会员{{tierName}}折扣</text><text>-¥{{tierDiscountText}}</text></view>
+            <view class="price-row total"><text>应付金额</text><text class="final-price">¥{{finalPrice}}</text></view>
+          </view>
+          <!-- 支付方式 -->
           <view class="pay-method-row">
             <view class="pay-method-item {{paymentMethod === 'wechat' ? 'active' : ''}}" bindtap="onSwitchPaymentMethod" data-method="wechat">
               <image class="pay-method-icon" src="/images/wechat-pay.png" mode="aspectFit"></image>
@@ -115,8 +140,46 @@
               <text class="pay-method-label">余额支付</text>
             </view>
           </view>
-          <view class="checkout-btn" bindtap="onCheckout"><text>确认下单 ¥{{cartTotal}}</text></view>
+          <view class="checkout-btn" bindtap="onCheckout"><text>确认下单 ¥{{finalPrice}}</text></view>
         </view>
+      </view>
+    </view>
+
+    <!-- 优惠券选择弹窗 -->
+    <view class="coupon-picker-overlay {{couponPickerOpen ? 'show' : ''}}" catchtap="onCloseCouponPicker">
+      <view class="coupon-picker {{couponPickerOpen ? 'show' : ''}}" catchtap="noop">
+        <view class="coupon-picker-header">
+          <text class="coupon-picker-title">选择优惠券</text>
+          <text class="coupon-picker-close" catchtap="onCloseCouponPicker">✕</text>
+        </view>
+        <scroll-view scroll-y class="coupon-picker-list" enhanced show-scrollbar="{{false}}">
+          <!-- 不使用优惠券 -->
+          <view class="coupon-picker-item {{!selectedCoupon ? 'selected' : ''}}" bindtap="onSelectCoupon" data-coupon-id="0">
+            <view class="coupon-picker-info"><text class="coupon-picker-name">不使用优惠券</text></view>
+            <view class="coupon-picker-check" wx:if="{{!selectedCoupon}}">✓</view>
+          </view>
+          <!-- 可用优惠券列表 -->
+          <view wx:for="{{availableCoupons}}" wx:key="id"
+            class="coupon-picker-item {{item.id === (selectedCoupon.id || 0) ? 'selected' : ''}} {{item.disabled ? 'disabled' : ''}}"
+            bindtap="{{item.disabled ? 'noop' : 'onSelectCoupon'}}" data-coupon-id="{{item.id}}">
+            <view class="coupon-picker-tag" style="background: {{item.color || '#D32F2F'}}">
+              <text class="coupon-picker-tag-value">{{item.value}}</text>
+              <text class="coupon-picker-tag-label">{{item.categoryLabel}}</text>
+            </view>
+            <view class="coupon-picker-info">
+              <text class="coupon-picker-name">{{item.name}}</text>
+              <text class="coupon-picker-desc" wx:if="{{item.minSpend > 0 && !item.disabled}}">满¥{{item.minSpend}}可用</text>
+              <text class="coupon-picker-desc warn" wx:if="{{item.disabled}}">未满¥{{item.minSpend}}，暂不可用</text>
+              <text class="coupon-picker-expire">有效期至 {{item.validTo}}</text>
+            </view>
+            <view class="coupon-picker-check" wx:if="{{item.id === (selectedCoupon.id || 0)}}">✓</view>
+          </view>
+          <!-- 空状态 -->
+          <view wx:if="{{availableCoupons.length === 0}}" class="coupon-picker-empty">
+            <text>暂无可用优惠券</text>
+          </view>
+          <view style="height: calc(40rpx + env(safe-area-inset-bottom))"></view>
+        </scroll-view>
       </view>
     </view>
   </block>

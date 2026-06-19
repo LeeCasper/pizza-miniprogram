@@ -46,6 +46,11 @@ Page({
     shopActiveCat: 'all', shopActiveCatName: '精选好物',
     shopProducts: [], shopFilteredProducts: [],
     shopFlashDeal: null,
+    // 优惠券
+    availableCoupons: [], selectedCoupon: null, couponPickerOpen: false,
+    couponDiscountAmount: 0, couponDiscountText: '0.00',
+    tierDiscountAmount: 0, tierDiscountText: '0.00', tierName: '',
+    finalPrice: '0.00',
     // 加载态
     productsLoaded: false, ordersLoaded: false,
   },
@@ -178,6 +183,7 @@ Page({
     const updatedShopProducts = this.data.shopProducts.map(p => ({ ...p, quantity: cart[p.id] ? cart[p.id].quantity : 0 }));
     const shopFiltered = this.data.shopActiveCat === 'all' ? updatedShopProducts : updatedShopProducts.filter(p => p.category === this.data.shopActiveCat || (p.category_key && p.category_key === this.data.shopActiveCat));
     this.setData({ products: updatedProducts, filteredProducts: filtered, shopProducts: updatedShopProducts, shopFilteredProducts: shopFiltered, cartItems: Object.values(cart), cartCount: app.globalData.cartCount, cartTotal: app.globalData.cartTotal });
+    this.recalcPrice();
   },
   updateCart() { this.syncCart(); },
 
@@ -201,9 +207,9 @@ Page({
     });
   },
   onDecrease(e) { app.decreaseQuantity(e.currentTarget.dataset.id); },
-  onCartBarTap() { this.setData({ cartOpen: true }); },
-  onCartClose() { this.setData({ cartOpen: false }); },
-  onClearCart() { app.clearCart(); this.setData({ cartOpen: false }); },
+  onCartBarTap() { this.setData({ cartOpen: true }); this.fetchAvailableCoupons(); },
+  onCartClose() { this.setData({ cartOpen: false, couponPickerOpen: false }); },
+  onClearCart() { app.clearCart(); this.setData({ cartOpen: false, selectedCoupon: null, couponPickerOpen: false }); },
 
   onCheckout() {
     if (this.data.cartCount === 0) {
@@ -212,14 +218,14 @@ Page({
 
     const pm = this.data.paymentMethod;
 
-    // Balance payment: warn if balance might not be enough
+    // Balance payment: warn if balance might not be enough (use discounted price)
     if (pm === 'balance') {
       const balance = parseFloat((app.globalData.userInfo && app.globalData.userInfo.balance) || 0);
-      const cartTotal = parseFloat(this.data.cartTotal);
-      if (balance < cartTotal) {
+      const finalTotal = parseFloat(this.data.finalPrice);
+      if (balance < finalTotal) {
         wx.showModal({
           title: '余额不足',
-          content: `当前余额 ¥${balance.toFixed(2)}，订单金额 ¥${cartTotal.toFixed(2)}。\n是否切换为微信支付？`,
+          content: `当前余额 ¥${balance.toFixed(2)}，应付金额 ¥${finalTotal.toFixed(2)}。\n是否切换为微信支付？`,
           confirmText: '切换支付',
           cancelText: '取消',
           success: (res) => {
@@ -232,13 +238,18 @@ Page({
       }
     }
 
+    const payload = { paymentMethod: pm };
+    if (this.data.selectedCoupon) {
+      payload.couponId = this.data.selectedCoupon.id;
+    }
+
     wx.showLoading({ title: '提交中...' });
-    api.post('/orders', { paymentMethod: pm }).then(res => {
+    api.post('/orders', payload).then(res => {
       wx.hideLoading();
       if (res.code === 0) {
         const orderData = res.data;
         app.clearCart();
-        this.setData({ cartOpen: false });
+        this.setData({ cartOpen: false, selectedCoupon: null, couponPickerOpen: false });
 
         // If wechat payment, initiate payment flow
         if (pm === 'wechat' && orderData.paymentStatus === 'unpaid') {
@@ -284,6 +295,126 @@ Page({
   onSwitchPaymentMethod(e) {
     const { method } = e.currentTarget.dataset;
     this.setData({ paymentMethod: method });
+  },
+
+  // ── 优惠券 ──────────────────────────────────
+
+  fetchAvailableCoupons() {
+    api.get('/coupons?category=discount&status=available').then(res => {
+      if (res.code === 0) {
+        const cartTotal = parseFloat(this.data.cartTotal) || 0;
+        const coupons = (res.data || [])
+          .filter(c => c.category === 'discount')
+          .map(c => ({
+            ...c,
+            minSpend: parseFloat(c.minSpend || 0),
+            disabled: parseFloat(c.minSpend || 0) > 0 && cartTotal < parseFloat(c.minSpend || 0),
+          }));
+        this.setData({ availableCoupons: coupons });
+        this.recalcPrice();
+      }
+    }).catch(() => {});
+  },
+
+  onOpenCouponPicker() {
+    if (this.data.availableCoupons.length === 0 && !this._couponsFetched) {
+      this._couponsFetched = true;
+      this.fetchAvailableCoupons();
+    }
+    this.setData({ couponPickerOpen: true });
+  },
+  onCloseCouponPicker() {
+    this.setData({ couponPickerOpen: false });
+  },
+
+  onSelectCoupon(e) {
+    const couponId = parseInt(e.currentTarget.dataset.couponId);
+    if (couponId === 0) {
+      // "不使用优惠券"
+      this.setData({ selectedCoupon: null, couponPickerOpen: false });
+      this.recalcPrice();
+      return;
+    }
+    const coupon = this.data.availableCoupons.find(c => c.id === couponId);
+    if (coupon && !coupon.disabled) {
+      this.setData({ selectedCoupon: coupon, couponPickerOpen: false });
+      this.recalcPrice();
+    }
+  },
+
+  recalcPrice() {
+    const cartTotal = parseFloat(this.data.cartTotal) || 0;
+    if (cartTotal <= 0) {
+      this.setData({ couponDiscountAmount: 0, couponDiscountText: '0.00', tierDiscountAmount: 0, tierDiscountText: '0.00', tierName: '', finalPrice: '0.00' });
+      return;
+    }
+
+    const coupon = this.data.selectedCoupon;
+    let couponDiscount = 0;
+
+    if (coupon) {
+      // minSpend 校验：不满足则自动取消
+      if (coupon.minSpend > 0 && cartTotal < coupon.minSpend) {
+        this.setData({ selectedCoupon: null });
+        return this.recalcPrice();
+      }
+      switch (coupon.discountType) {
+        case 'fixed_amount':
+          couponDiscount = parseFloat(coupon.discountValue) || 0;
+          break;
+        case 'buy_one_get_one': {
+          const items = Object.values(app.globalData.cart);
+          if (items.length > 0) couponDiscount = Math.min(...items.map(i => i.price));
+          break;
+        }
+        case 'half_price': {
+          const items = Object.values(app.globalData.cart);
+          const target = items[0];
+          if (target) couponDiscount = target.price * 0.5 * target.quantity;
+          break;
+        }
+        case 'free_delivery':
+          couponDiscount = 0;
+          break;
+      }
+      couponDiscount = Math.min(couponDiscount, cartTotal);
+    }
+
+    // 会员折扣（叠加在优惠券之后）
+    const ui = app.globalData.userInfo || {};
+    const qualifyingAmount = parseFloat(ui.totalSpent || 0) + parseFloat(ui.balance || 0);
+    const tiers = this._cachedTiers || [];
+    let tierDiscount = 0;
+    let tierName = '';
+
+    if (tiers.length > 0) {
+      const tierInfo = computeTier(qualifyingAmount, tiers, ui.memberLevel);
+      const rate = tierInfo.current.discountRate || 1;
+      if (rate < 1) {
+        const afterCoupon = cartTotal - couponDiscount;
+        tierDiscount = Math.round(afterCoupon * (1 - rate) * 100) / 100;
+        tierName = tierInfo.current.name;
+      }
+    }
+
+    const totalDiscount = couponDiscount + tierDiscount;
+    const final = Math.max(0, cartTotal - totalDiscount);
+
+    // 同步更新优惠券列表中的 disabled 状态
+    const updatedCoupons = this.data.availableCoupons.map(c => ({
+      ...c,
+      disabled: c.minSpend > 0 && cartTotal < c.minSpend,
+    }));
+
+    this.setData({
+      availableCoupons: updatedCoupons,
+      couponDiscountAmount: couponDiscount,
+      couponDiscountText: couponDiscount.toFixed(2),
+      tierDiscountAmount: tierDiscount,
+      tierDiscountText: tierDiscount.toFixed(2),
+      tierName,
+      finalPrice: final.toFixed(2),
+    });
   },
   // ── Banner轮播 ──────────────────────────────
   onBannerTap(e) {
@@ -506,6 +637,7 @@ Page({
       api.get('/user/profile').then(res => res.code === 0 ? res.data : null).catch(() => null),
       loadTiers(),
     ]).then(([freshUi, apiTiers]) => {
+      this._cachedTiers = apiTiers;
       let ui = cachedUi;
       if (freshUi) {
         // Protect optimistic totalSpent: never decrease with stale server data
@@ -528,6 +660,7 @@ Page({
         tierCards,
         activeTierIndex,
       });
+      this.recalcPrice();
     });
   },
 
