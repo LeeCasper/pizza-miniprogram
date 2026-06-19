@@ -1,11 +1,11 @@
 // pages/main/main.js
-const { api, fixImageUrl, BASE_URL } = require('../../utils/api');
+const { api, fixImageUrl } = require('../../utils/api');
 const pay = require('../../utils/pay');
-const { computeTier, buildTierCards, loadTiers } = require('../../utils/tiers');
+const { computeTier } = require('../../utils/tiers');
 const { getSwiperLayout } = require('../../utils/layout');
 const { formatOrder } = require('../../utils/orders');
 const { CATEGORY_ICON_MAP, dietaryRestrictions, SHOP_CATEGORIES } = require('../../utils/data');
-const { logout } = require('../../utils/auth');
+const { profileMethods, loadProfileCore } = require('../../utils/profileShared');
 const app = getApp();
 
 Page({
@@ -54,6 +54,12 @@ Page({
     // 加载态
     productsLoaded: false, ordersLoaded: false,
   },
+
+  // ── 共享 profile 方法（头像、编辑、公告、等级轮播、退出等）──
+  ...profileMethods,
+
+  /** 约定接口：头像上传/保存后的数据刷新指向 */
+  _reloadProfile() { this.loadProfileData(); },
 
   onLoad() {
     this.setData(getSwiperLayout());
@@ -626,43 +632,16 @@ Page({
   // ── 个人中心 ────────────────────────────────
 
   loadProfileData() {
-    const cachedUi = app.globalData.userInfo;
-    // 立即显示缓存的用户基本信息
-    this.setData({
-      userInfo: { ...cachedUi, balanceText: '¥' + ((cachedUi.balance || 0)).toFixed(2), cardCount: cachedUi.cardCount || 0, bio: cachedUi.bio || '享受美味每一天' },
-    });
-
-    // 并行获取最新用户数据 & 等级配置，只构建一次卡片（避免 swiper 连续两次 setData 导致抖动）
-    Promise.all([
-      api.get('/user/profile').then(res => res.code === 0 ? res.data : null).catch(() => null),
-      loadTiers(),
-    ]).then(([freshUi, apiTiers]) => {
-      this._cachedTiers = apiTiers;
-      let ui = cachedUi;
-      if (freshUi) {
+    loadProfileCore(this, {
+      beforeMerge(freshUi, cachedUi) {
         // Protect optimistic totalSpent: never decrease with stale server data
-        const currentTotalSpent = cachedUi.totalSpent || 0;
-        if ((freshUi.totalSpent || 0) < currentTotalSpent) {
-          freshUi.totalSpent = currentTotalSpent;
-        }
-        // Fix avatar URL for real device (relative path → full https URL)
-        if (freshUi.avatar) freshUi.avatar = fixImageUrl(freshUi.avatar);
-        app.globalData.userInfo = freshUi;
-        wx.setStorageSync('userInfo', freshUi);
-        ui = freshUi;
-      }
-      // 等级判定使用 余额+消费金额 作为资格金额（与后端逻辑一致）
-      const qualifyingAmount = (ui.totalSpent || 0) + (ui.balance || 0);
-      const tierInfo = computeTier(qualifyingAmount, apiTiers, ui.memberLevel);
-      tierInfo._totalSpent = qualifyingAmount;
-      const tierCards = buildTierCards(apiTiers, tierInfo);
-      const activeTierIndex = tierInfo.current.levelIndex - 1;
-      this.setData({
-        userInfo: { ...ui, balanceText: '¥' + ((ui.balance || 0)).toFixed(2), cardCount: ui.cardCount || 0, bio: ui.bio || '享受美味每一天' },
-        tierCards,
-        activeTierIndex,
-      });
-      this.recalcPrice();
+        const cur = cachedUi.totalSpent || 0;
+        if ((freshUi.totalSpent || 0) < cur) freshUi.totalSpent = cur;
+      },
+      afterLoad(apiTiers) {
+        this._cachedTiers = apiTiers;
+        this.recalcPrice();
+      },
     });
   },
 
@@ -683,118 +662,6 @@ Page({
       wx.showToast({ title: msgs[action] || '功能开发中', icon: 'none', duration: 2000 }); return;
     }
     target.tab !== undefined ? this.setData({ currentTab: target.tab }) : wx.navigateTo({ url: target });
-  },
-  onLogout() {
-    logout();
-  },
-
-  // ── 会员卡轮播 ──────────────────────────────
-  onTierChange(e) {
-    const idx = e.detail.current;
-    const tierCards = this.data.tierCards.map((card, i) => {
-      card.isActive = i === idx;
-      return card;
-    });
-    this.setData({ activeTierIndex: idx, tierCards });
-  },
-
-  onUpgradeTier(e) {
-    const levelKey = e.currentTarget.dataset.levelKey;
-    wx.navigateTo({ url: '/pages/tiers/tiers?levelKey=' + levelKey });
-  },
-
-  // ── 编辑个人信息 ────────────────────────────
-
-  /** 上传头像文件，返回 Promise<serverUrl> */
-  _uploadAvatar(filePath) {
-    return new Promise((resolve, reject) => {
-      wx.uploadFile({
-        url: BASE_URL + '/upload/avatar', filePath, name: 'file',
-        header: { 'Authorization': 'Bearer ' + (wx.getStorageSync('token') || '') },
-        success(result) {
-          if (result.statusCode === 200) {
-            try {
-              const data = JSON.parse(result.data);
-              if (data.code === 0) { resolve(fixImageUrl(data.data.url)); return; }
-            } catch (_) {}
-          }
-          reject(new Error('上传失败'));
-        },
-        fail: reject,
-      });
-    });
-  },
-
-  onChooseAvatar() {
-    const that = this;
-    const handleImage = (tempFilePath) => {
-      // 编辑抽屉内：仅暂存本地路径，保存时统一上传
-      if (that.data.editProfileOpen) { that.setData({ 'editForm.avatar': tempFilePath }); return; }
-      // 直接点击头像：立即上传
-      wx.showLoading({ title: '上传中...' });
-      that._uploadAvatar(tempFilePath).then(url => {
-        wx.hideLoading();
-        app.globalData.userInfo.avatar = url;
-        that.loadProfileData();
-        wx.showToast({ title: '头像已更新', icon: 'success' });
-      }).catch(() => {
-        wx.hideLoading();
-        wx.showToast({ title: '上传失败，请重试', icon: 'none' });
-      });
-    };
-    wx.chooseMedia({
-      count: 1, mediaType: ['image'], sourceType: ['album', 'camera'],
-      success(res) { handleImage(res.tempFiles[0].tempFilePath); },
-      fail(err) {
-        console.warn('[avatar] chooseMedia fail:', err);
-        // 用户取消不回退
-        if (err && err.errMsg && err.errMsg.indexOf('cancel') > -1) return;
-        // 回退到旧版 API
-        wx.chooseImage({
-          count: 1, sizeType: ['compressed'], sourceType: ['album', 'camera'],
-          success(r) { handleImage(r.tempFilePaths[0]); },
-          fail(e) {
-            console.warn('[avatar] chooseImage fail:', e);
-            var msg = (e && e.errMsg) || '';
-            if (msg.indexOf('cancel') === -1) {
-              wx.showToast({ title: '无法选择图片', icon: 'none' });
-            }
-          }
-        });
-      }
-    });
-  },
-  onOpenEditProfile() {
-    const ui = this.data.userInfo;
-    this.setData({ editProfileOpen: true, editForm: { name: ui.name || '', bio: ui.bio || '', avatar: ui.avatar || '' } });
-  },
-  onCloseEditProfile() { this.setData({ editProfileOpen: false }); },
-  onNameInput(e) { this.setData({ 'editForm.name': e.detail.value }); },
-  onBioInput(e) { this.setData({ 'editForm.bio': e.detail.value }); },
-  onSaveProfile() {
-    const { editForm } = this.data;
-    if (!editForm.name.trim()) { wx.showToast({ title: '请输入昵称', icon: 'none' }); return; }
-    const ui = app.globalData.userInfo;
-    const name = editForm.name.trim();
-    const bio = editForm.bio.trim();
-    const avatarChanged = editForm.avatar && editForm.avatar !== ui.avatar && !editForm.avatar.startsWith('https://');
-
-    // 乐观更新 UI + 关闭抽屉
-    ui.name = name; ui.bio = bio;
-    this.setData({
-      editProfileOpen: false,
-      userInfo: { ...this.data.userInfo, name, bio, avatar: editForm.avatar || ui.avatar },
-    });
-
-    // 头像变更时先上传，再保存文本字段，最后刷新
-    const avatarPromise = avatarChanged
-      ? this._uploadAvatar(editForm.avatar).then(url => { ui.avatar = url; }).catch(() => {})
-      : Promise.resolve();
-
-    avatarPromise.then(() => api.put('/user/profile', { name, bio })).then(() => {
-      wx.showToast({ title: '保存成功', icon: 'success' });
-      this.loadProfileData();
-    }).catch(() => { wx.showToast({ title: '保存成功（本地）', icon: 'success' }); });
   },
 
   // ── 产品详情弹窗 ────────────────────────────
@@ -828,20 +695,4 @@ Page({
     this.setData({ detailOpen: false, detailProduct: null });
     wx.showToast({ title: '已加入购物车', icon: 'success', duration: 1500 });
   },
-  // ── 公告浮窗 ──────────────────────────────
-  onAnnounceToggle() {
-    const open = !this.data.announceOpen;
-    this.setData({ announceOpen: open });
-    if (this._announceTimer) clearTimeout(this._announceTimer);
-    if (open) {
-      this._announceTimer = setTimeout(() => {
-        this.setData({ announceOpen: false });
-      }, 8000);
-    }
-  },
-  onAnnounceClose() {
-    this.setData({ announceOpen: false });
-    if (this._announceTimer) clearTimeout(this._announceTimer);
-  },
-  noop() {}
 });
