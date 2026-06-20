@@ -189,8 +189,8 @@
 }
 
 .call-btn {
-  width: 80rpx;
-  height: 80rpx;
+  box-sizing: border-box;
+  padding: 12rpx 24rpx;
   background: var(--glass-bg-primary-container);
   -webkit-backdrop-filter: var(--glass-blur-sm);
   backdrop-filter: var(--glass-blur-sm);
@@ -198,8 +198,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 36rpx;
+  gap: 10rpx;
   border: var(--glass-border-colored);
+  box-shadow: var(--glass-shadow-button);
+}
+
+.call-btn-hover {
+  opacity: 0.85;
+  transform: scale(0.97);
+}
+
+.call-btn-icon {
+  width: 34rpx;
+  height: 34rpx;
+  flex-shrink: 0;
+}
+
+.call-btn-text {
+  font-size: 26rpx;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-on-primary-container);
+  line-height: 1;
 }
 
 /* 须知卡片 */

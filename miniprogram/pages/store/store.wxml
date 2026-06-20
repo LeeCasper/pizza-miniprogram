@@ -65,8 +65,9 @@
         <view class="info-content">
           <text class="info-text">{{store.phone || '暂无联系电话'}}</text>
         </view>
-        <view class="call-btn" bindtap="onCallStore">
-          <text>📞</text>
+        <view class="call-btn" bindtap="onCallStore" hover-class="call-btn-hover">
+          <image class="call-btn-icon" src="/images/call-phone.png" mode="aspectFit"></image>
+          <text class="call-btn-text">点击拨打</text>
         </view>
       </view>
     </view>
