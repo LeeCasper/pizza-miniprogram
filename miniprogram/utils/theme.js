@@ -145,25 +145,27 @@ function loadThemeConfig() {
 
   _themePromise = api.get('/config/theme').then(res => {
     if (res.code === 0 && res.data) {
-      // 合并 API 数据与默认值
-      _themeConfig = {};
+      // 成功：合并 API 数据与默认值，仅此分支写入缓存
+      const cfg = {};
       Object.keys(DEFAULTS).forEach(key => {
-        _themeConfig[key] = res.data[key] || DEFAULTS[key];
+        cfg[key] = res.data[key] || DEFAULTS[key];
       });
       // 分页覆盖（不在 DEFAULTS 中，单独保留）
-      _themeConfig.pageOverrides = res.data.pageOverrides || {};
-    } else {
-      _themeConfig = { ...DEFAULTS, pageOverrides: {} };
+      cfg.pageOverrides = res.data.pageOverrides || {};
+      _themeConfig = cfg;
+      _themeStyle = buildThemeStyle(_themeConfig); // 预构建样式字符串
+      _themePromise = null;
+      return _themeConfig;
     }
-    // 预构建样式字符串
-    _themeStyle = buildThemeStyle(_themeConfig);
+    // 响应异常（code≠0 / 无 data）：视为失败，不缓存，下次重试
     _themePromise = null;
-    return _themeConfig;
+    return { ...DEFAULTS, pageOverrides: {} };
   }).catch(() => {
-    _themeConfig = { ...DEFAULTS, pageOverrides: {} };
-    _themeStyle = '';  // 使用 app.wxss 默认值
+    // 网络失败：绝不把 DEFAULTS 写入 _themeConfig —— 否则整场会话被锁死在默认主题（紫+四色渐变）、
+    // 永不重试（命中 if(_themeConfig) 短路）。保持 _themeConfig=null + 不动 _themeStyle，
+    // 下次 loadThemeConfig() 自动重试；网络恢复后页面 onShow 即自愈到后台真实主题。
     _themePromise = null;
-    return _themeConfig;
+    return { ...DEFAULTS, pageOverrides: {} };
   });
 
   return _themePromise;

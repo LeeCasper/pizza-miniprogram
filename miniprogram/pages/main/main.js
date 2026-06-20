@@ -6,7 +6,7 @@ const { getSwiperLayout } = require('../../utils/layout');
 const { formatOrder } = require('../../utils/orders');
 const { CATEGORY_ICON_MAP, dietaryRestrictions, SHOP_CATEGORIES } = require('../../utils/data');
 const { profileMethods, loadProfileCore } = require('../../utils/profileShared');
-const { getThemeStyle, getThemeColor, getNavBarStyle, buildPageOverrideStyle, getPageNavStyle } = require('../../utils/theme');
+const { getThemeStyle, getThemeColor, getNavBarStyle, buildPageOverrideStyle, getPageNavStyle, loadThemeConfig } = require('../../utils/theme');
 const app = getApp();
 
 // Tab 序号 → 分页主题 pageKey
@@ -102,6 +102,8 @@ Page({
     this.loadProfileData();
     // Refresh orders when showing
     this.fetchOrders();
+    // 主题自愈：若启动时那次广播因网络抖动失败，落地页此处重新加载并应用后台真实主题
+    loadThemeConfig().then(() => this.applyTheme());
   },
 
   // ── 数据加载 ─────────────────────────────────
