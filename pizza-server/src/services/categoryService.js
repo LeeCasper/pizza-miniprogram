@@ -57,6 +57,10 @@ const categoryService = {
   },
 
   async remove(key) {
+    // 软删商品(is_deleted=1)仍通过外键引用本分类,会让 DELETE 触发 errno 1451。
+    // 它们已对后台/小程序全部不可见,分类归属对其无意义 → 先解绑(category_key 置 NULL)再删分类。
+    // 在售商品(is_deleted=0)由控制器守卫先行拦截,不会走到这里。
+    await pool.query('UPDATE products SET category_key = NULL WHERE category_key = ? AND is_deleted = 1', [key]);
     await pool.query('DELETE FROM categories WHERE `key` = ?', [key]);
   },
 };

@@ -312,6 +312,9 @@ const adminApiController = {
       return res.json({ code: 0, message: '分类已删除' });
     } catch (err) {
       log.error({ err }, 'DeleteCategory error');
+      if (err && (err.errno === 1451 || err.code === 'ER_ROW_IS_REFERENCED_2')) {
+        return res.status(400).json({ code: 400, message: '该分类下仍有商品引用,无法删除' });
+      }
       return res.status(500).json({ code: 500, message: '删除分类失败' });
     }
   },
