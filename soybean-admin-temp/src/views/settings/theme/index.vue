@@ -66,6 +66,28 @@ function emptyOverride(): Record<string, string | null> {
   };
 }
 
+// NColorPicker 在某些 mode 下会输出 rgba()/8 位 hex；后端只接受 6 位 #RRGGBB。
+// 这里统一归一化为 6 位 hex（丢弃 alpha），保证保存不被 400 拒绝。
+function toHex6(v: string | null | undefined): string {
+  if (!v) return '';
+  const s = String(v).trim();
+  if (/^#[0-9a-fA-F]{8}$/.test(s)) return s.slice(0, 7); // #RRGGBBAA → #RRGGBB
+  if (/^#[0-9a-fA-F]{6}$/.test(s)) return s;
+  if (/^#[0-9a-fA-F]{3}$/.test(s)) {
+    return '#' + s[1] + s[1] + s[2] + s[2] + s[3] + s[3];
+  }
+  const m = s.match(/rgba?\(([^)]+)\)/i);
+  if (m) {
+    const parts = m[1].split(',').map(x => x.trim());
+    const toByte = (n: string) => {
+      const num = Math.max(0, Math.min(255, Math.round(parseFloat(n))));
+      return num.toString(16).padStart(2, '0');
+    };
+    return '#' + toByte(parts[0]) + toByte(parts[1]) + toByte(parts[2]);
+  }
+  return s; // 交给后端校验
+}
+
 const activePageTab = ref('index');
 const pageForm = ref<Record<string, Record<string, string | null>>>(
   PAGE_TABS.reduce((acc, t) => {
@@ -126,18 +148,24 @@ onMounted(async () => {
 
 async function handleSave() {
   saving.value = true;
+  // 全局色归一化为 6 位 hex（NColorPicker 某些 mode 会输出 rgba），glassIntensity 非颜色保持原样
+  const globalPayload: Record<string, string> = {};
+  Object.keys(form.value).forEach(k => {
+    const val = (form.value as any)[k];
+    globalPayload[k] = k === 'glassIntensity' ? val : toHex6(val);
+  });
   // 收集分页覆盖：每页只提交非空字段（空=跟随全局）；空对象表示清除该页
   const pageOverrides: Record<string, Record<string, string>> = {};
   PAGE_TABS.forEach(t => {
     const src = pageForm.value[t.key];
     const cleaned: Record<string, string> = {};
     OVERRIDE_FIELDS.forEach(f => {
-      const v = (src[f.key] || '').trim();
+      const v = toHex6(src[f.key]);
       if (v) cleaned[f.key] = v;
     });
     pageOverrides[t.key] = cleaned;
   });
-  const { error } = await fetchUpdateThemeSettings({ ...form.value, pageOverrides } as any);
+  const { error } = await fetchUpdateThemeSettings({ ...globalPayload, pageOverrides } as any);
   if (!error) {
     message.success('主题配置已保存，小程序下次启动时生效');
   } else {
@@ -166,22 +194,22 @@ async function handleSave() {
         <NGrid :cols="2" :x-gap="24">
           <NGridItem>
             <NFormItem label="主色（按钮）">
-              <NColorPicker v-model:value="form.primaryColor" :show-alpha="false" />
+              <NColorPicker v-model:value="form.primaryColor" :show-alpha="false" :modes="['hex']" />
             </NFormItem>
           </NGridItem>
           <NGridItem>
             <NFormItem label="辅色（高亮）">
-              <NColorPicker v-model:value="form.secondaryColor" :show-alpha="false" />
+              <NColorPicker v-model:value="form.secondaryColor" :show-alpha="false" :modes="['hex']" />
             </NFormItem>
           </NGridItem>
           <NGridItem>
             <NFormItem label="第三色（辅助）">
-              <NColorPicker v-model:value="form.tertiaryColor" :show-alpha="false" />
+              <NColorPicker v-model:value="form.tertiaryColor" :show-alpha="false" :modes="['hex']" />
             </NFormItem>
           </NGridItem>
           <NGridItem>
             <NFormItem label="强调色（信息）">
-              <NColorPicker v-model:value="form.accentColor" :show-alpha="false" />
+              <NColorPicker v-model:value="form.accentColor" :show-alpha="false" :modes="['hex']" />
             </NFormItem>
           </NGridItem>
         </NGrid>
@@ -193,22 +221,22 @@ async function handleSave() {
         <NGrid :cols="2" :x-gap="24">
           <NGridItem>
             <NFormItem label="渐变色 1">
-              <NColorPicker v-model:value="form.gradientColor1" :show-alpha="false" />
+              <NColorPicker v-model:value="form.gradientColor1" :show-alpha="false" :modes="['hex']" />
             </NFormItem>
           </NGridItem>
           <NGridItem>
             <NFormItem label="渐变色 2">
-              <NColorPicker v-model:value="form.gradientColor2" :show-alpha="false" />
+              <NColorPicker v-model:value="form.gradientColor2" :show-alpha="false" :modes="['hex']" />
             </NFormItem>
           </NGridItem>
           <NGridItem>
             <NFormItem label="渐变色 3">
-              <NColorPicker v-model:value="form.gradientColor3" :show-alpha="false" />
+              <NColorPicker v-model:value="form.gradientColor3" :show-alpha="false" :modes="['hex']" />
             </NFormItem>
           </NGridItem>
           <NGridItem>
             <NFormItem label="渐变色 4">
-              <NColorPicker v-model:value="form.gradientColor4" :show-alpha="false" />
+              <NColorPicker v-model:value="form.gradientColor4" :show-alpha="false" :modes="['hex']" />
             </NFormItem>
           </NGridItem>
         </NGrid>
@@ -359,7 +387,7 @@ async function handleSave() {
             <NGrid :cols="3" :x-gap="20">
               <NGridItem v-for="f in OVERRIDE_FIELDS" :key="f.key">
                 <NFormItem :label="f.label">
-                  <NColorPicker v-model:value="pageForm[t.key][f.key]" :show-alpha="false" clearable />
+                  <NColorPicker v-model:value="pageForm[t.key][f.key]" :show-alpha="false" :modes="['hex']" clearable />
                 </NFormItem>
               </NGridItem>
             </NGrid>
