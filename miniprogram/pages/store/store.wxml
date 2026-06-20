@@ -93,21 +93,7 @@
       </view>
     </view>
 
-    <!-- 操作按钮 -->
-    <view class="action-buttons">
-      <view class="action-btn primary" bindtap="onStartOrder">
-        <text>开始点餐</text>
-      </view>
-      <view class="action-row">
-        <view class="action-btn-half outline" bindtap="onNavigate">
-          <text class="action-icon">🧭</text>
-          <text>导航到店</text>
-        </view>
-        <view class="action-btn-half outline" bindtap="onContactService">
-          <text class="action-icon">🎧</text>
-          <text>联系客服</text>
-        </view>
-      </view>
-    </view>
+    <!-- 底部安全区占位 -->
+    <view style="height: calc(40rpx + env(safe-area-inset-bottom));"></view>
   </scroll-view>
 </view>

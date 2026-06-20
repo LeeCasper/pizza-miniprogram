@@ -294,10 +294,6 @@ Page({
     });
   },
 
-  onNavigate() {
-    this.onViewMap();
-  },
-
   onCallStore() {
     const phone = this.data.store ? this.data.store.phone : '';
     if (!phone) {
@@ -311,18 +307,6 @@ Page({
   },
 
   onBack() {
-    wx.navigateBack();
-  },
-
-  onContactService() {
-    const phone = this.data.store ? this.data.store.phone : '01088888888';
-    wx.makePhoneCall({
-      phoneNumber: phone.replace(/-/g, ''),
-      fail() {},
-    });
-  },
-
-  onStartOrder() {
     wx.navigateBack();
   },
 });
