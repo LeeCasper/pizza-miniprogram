@@ -180,8 +180,8 @@
   padding: 24rpx 40rpx;
   padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
   background: linear-gradient(180deg, rgba(245,240,255,0) 0%, var(--glass-bg-nav) 40%);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  /* 不用 backdrop-filter：固定底栏的 backdrop 层会在 App 切回前台时被 WeChat 重新栅格化→闪烁。
+     这里的渐变 scrim 本身已够，无需模糊。 */
   z-index: 50;
 }
 .fab-btn {

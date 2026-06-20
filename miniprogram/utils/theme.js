@@ -344,13 +344,13 @@ function getNavBarStyle() {
       }
     : hexToRgb(cfg.primaryColor || DEFAULTS.primaryColor);
 
+  // ⚠ 切回前台导航栏闪烁根因：position:fixed 上的 backdrop-filter 会在 App resume 时被
+  // WeChat WebView 重新栅格化 → 整条顶/底栏闪一帧；且不少机型上毛玻璃压根不渲染（栏看着
+  // 就是一块实色）。故顶/底栏不再用 backdrop-filter，改近实色底（提到 ~0.92/0.95，外观与
+  // 现状几乎一致），从源头去掉闪烁。卡片/弹层等非固定元素仍保留毛玻璃。
   return {
-    nav: 'background: rgba(' + base.r + ', ' + base.g + ', ' + base.b + ', ' + glass.navOpacity + ');' +
-         '-webkit-backdrop-filter: ' + ('saturate(200%) blur(' + glass.blur + ')') + ';' +
-         'backdrop-filter: ' + ('saturate(200%) blur(' + glass.blur + ')') + ';',
-    tabBar: 'background: rgba(' + base.r + ', ' + base.g + ', ' + base.b + ', ' + glass.elevatedOpacity + ');' +
-            '-webkit-backdrop-filter: ' + ('saturate(200%) blur(' + glass.blurLg + ')') + ';' +
-            'backdrop-filter: ' + ('saturate(200%) blur(' + glass.blurLg + ')') + ';',
+    nav: 'background: rgba(' + base.r + ', ' + base.g + ', ' + base.b + ', 0.92);',
+    tabBar: 'background: rgba(' + base.r + ', ' + base.g + ', ' + base.b + ', 0.95);',
   };
 }
 
@@ -414,9 +414,8 @@ function getPageNavStyle(pageKey) {
   if (!ov || !ov.navColor) return getNavBarStyle().nav;
   const glass = GLASS_PRESETS[cfg.glassIntensity] || GLASS_PRESETS.medium;
   const c = hexToRgb(ov.navColor);
-  return 'background: rgba(' + c.r + ', ' + c.g + ', ' + c.b + ', ' + glass.navOpacity + ');' +
-         '-webkit-backdrop-filter: ' + ('saturate(200%) blur(' + glass.blur + ')') + ';' +
-         'backdrop-filter: ' + ('saturate(200%) blur(' + glass.blur + ')') + ';';
+  // 同 getNavBarStyle：固定顶栏去掉 backdrop-filter、改近实色，消除 resume 时整条栏闪烁。
+  return 'background: rgba(' + c.r + ', ' + c.g + ', ' + c.b + ', 0.92);';
 }
 
 /**
