@@ -96,6 +96,11 @@ const pageForm = ref<Record<string, Record<string, string | null>>>(
   }, {} as Record<string, Record<string, string | null>>)
 );
 
+// 单项「恢复默认」：清空该页该字段 → 留空即跟随全局/默认主题
+function resetPageField(pageKey: string, fieldKey: string) {
+  pageForm.value[pageKey][fieldKey] = '';
+}
+
 const glassOptions = [
   { label: '低 - 轻微模糊', value: 'low' },
   { label: '中 - 标准毛玻璃（默认）', value: 'medium' },
@@ -387,13 +392,30 @@ async function handleSave() {
             <NGrid :cols="3" :x-gap="20">
               <NGridItem v-for="f in OVERRIDE_FIELDS" :key="f.key">
                 <NFormItem :label="f.label">
-                  <NColorPicker v-model:value="pageForm[t.key][f.key]" :show-alpha="false" :modes="['hex']" clearable />
+                  <div style="display: flex; gap: 8px; align-items: center; width: 100%">
+                    <NColorPicker
+                      v-model:value="pageForm[t.key][f.key]"
+                      :show-alpha="false"
+                      :modes="['hex']"
+                      clearable
+                      style="flex: 1; min-width: 0"
+                    />
+                    <NButton
+                      size="tiny"
+                      tertiary
+                      style="flex-shrink: 0; white-space: nowrap"
+                      :disabled="!pageForm[t.key][f.key]"
+                      @click="resetPageField(t.key, f.key)"
+                    >
+                      恢复默认
+                    </NButton>
+                  </div>
                 </NFormItem>
               </NGridItem>
             </NGrid>
           </NForm>
           <div style="color: #999; font-size: 12px; margin-top: 4px">
-            留空的项跟随全局主题；用颜色选择器内置的清除按钮即可还原为「跟随全局」。
+            留空的项跟随全局主题；点每个颜色后的「恢复默认」按钮即可清空该项、还原为跟随全局/默认主题。
           </div>
         </NTabPane>
       </NTabs>
