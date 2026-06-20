@@ -58,8 +58,7 @@
   padding: 40rpx;
   margin-bottom: 32rpx;
   background: var(--glass-bg-card);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
+  /* 去 backdrop-filter：切回前台 WeChat 重栅格化毛玻璃→闪烁；保留半透明底色 */
   border-radius: var(--radius-card);
   box-shadow: var(--glass-shadow-card);
   border: var(--glass-border-subtle);
@@ -98,8 +97,6 @@
   padding: 16rpx 24rpx;
   border-radius: var(--radius-full);
   background: var(--glass-bg-primary-light);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   border: var(--glass-border-colored);
 }
 
@@ -113,8 +110,6 @@
 .mall-card {
   overflow: hidden;
   background: var(--glass-bg-card);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
   border-radius: var(--radius-card);
   box-shadow: var(--glass-shadow-card);
   border: var(--glass-border-subtle);
@@ -196,8 +191,6 @@
   width: 100%;
   padding: 20rpx;
   background: var(--glass-bg-primary);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   color: var(--color-on-primary);
   border-radius: var(--radius-full);
   text-align: center;
@@ -213,8 +206,6 @@
 
 .redeem-btn.disabled {
   background: var(--glass-bg-card);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   color: var(--color-on-surface-variant);
   border: var(--glass-border-subtle);
 }

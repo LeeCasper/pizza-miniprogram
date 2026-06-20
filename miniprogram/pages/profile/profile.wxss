@@ -255,8 +255,6 @@
   width: 72rpx;
   padding: 20rpx 12rpx;
   background: var(--glass-bg-elevated);
-  -webkit-backdrop-filter: var(--glass-blur-lg);
-  backdrop-filter: var(--glass-blur-lg);
   border: var(--glass-border-subtle);
   border-radius: 24rpx 0 0 24rpx;
   box-shadow: var(--glass-shadow-elevated);
@@ -283,8 +281,6 @@
 .announce-float-card {
   width: 420rpx;
   background: var(--glass-bg-elevated);
-  -webkit-backdrop-filter: var(--glass-blur-lg);
-  backdrop-filter: var(--glass-blur-lg);
   border: var(--glass-border);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-modal);
