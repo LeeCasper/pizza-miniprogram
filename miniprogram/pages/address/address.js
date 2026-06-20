@@ -2,11 +2,13 @@
 const { api } = require('../../utils/api');
 const app = getApp();
 const { getBackBtnTopBar } = require('../../utils/layout');
-const { getThemeStyle, getThemeColor } = require('../../utils/theme');
+const { getThemeStyle, getThemeColor, getNavBarStyle } = require('../../utils/theme');
+const _navBg = () => getNavBarStyle().nav;
 
 Page({
   data: {
     themeStyle: getThemeStyle(),
+    navBarBg: _navBg(),
     themePrimaryColor: getThemeColor('primary'),
     statusBarHeight: 44,
     topBarTotalHeight: 80,
@@ -180,7 +182,7 @@ Page({
   },
 
   applyTheme() {
-    this.setData({ themeStyle: getThemeStyle(), themePrimaryColor: getThemeColor('primary') });
+    this.setData({ themeStyle: getThemeStyle(), themePrimaryColor: getThemeColor('primary'), navBarBg: _navBg() });
   },
 
   noop() {}

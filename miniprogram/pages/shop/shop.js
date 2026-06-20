@@ -2,12 +2,14 @@
 const { api, fixImageUrl } = require('../../utils/api');
 const { getSwiperLayout } = require('../../utils/layout');
 const { SHOP_CATEGORIES } = require('../../utils/data');
-const { getThemeStyle, getThemeColor } = require('../../utils/theme');
+const { getThemeStyle, getThemeColor, getNavBarStyle } = require('../../utils/theme');
+const _navBg = () => getNavBarStyle().nav;
 const app = getApp();
 
 Page({
   data: {
     themeStyle: getThemeStyle(),
+    navBarBg: _navBg(),
     themePrimaryColor: getThemeColor('primary'),
     statusBarHeight: 44,
     topBarTotalHeight: 80,
@@ -36,7 +38,7 @@ Page({
   },
 
   applyTheme() {
-    this.setData({ themeStyle: getThemeStyle(), themePrimaryColor: getThemeColor('primary') });
+    this.setData({ themeStyle: getThemeStyle(), themePrimaryColor: getThemeColor('primary'), navBarBg: _navBg() });
   },
 
   fetchProducts() {

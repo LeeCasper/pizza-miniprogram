@@ -1,7 +1,8 @@
 // pages/store/store.js
 const { api } = require('../../utils/api');
 const { calculateWalkingDistance, formatDistance } = require('../../utils/mapConfig');
-const { getThemeStyle, getThemeColor } = require('../../utils/theme');
+const { getThemeStyle, getThemeColor, getNavBarStyle } = require('../../utils/theme');
+const _navBg = () => getNavBarStyle().nav;
 const app = getApp();
 const { getSimpleTopBar } = require('../../utils/layout');
 
@@ -12,6 +13,7 @@ const DEFAULT_LNG = 114.646879;
 Page({
   data: {
     themeStyle: getThemeStyle(),
+    navBarBg: _navBg(),
     statusBarHeight: 44,
     topBarTotalHeight: 80,
     store: null,
@@ -35,7 +37,7 @@ Page({
   _lastDistCalc: 0,
 
   applyTheme() {
-    this.setData({ themeStyle: getThemeStyle(), themePrimaryColor: getThemeColor('primary') });
+    this.setData({ themeStyle: getThemeStyle(), themePrimaryColor: getThemeColor('primary'), navBarBg: _navBg() });
   },
 
   onLoad() {

@@ -3,13 +3,15 @@ const { api } = require('../../utils/api');
 const pay = require('../../utils/pay');
 const app = getApp();
 const { getSimpleTopBar } = require('../../utils/layout');
-const { getThemeStyle } = require('../../utils/theme');
+const { getThemeStyle, getNavBarStyle } = require('../../utils/theme');
+const _navBg = () => getNavBarStyle().nav;
 
 const PRESET_AMOUNTS = [50, 100, 200, 300, 500, 1000];
 
 Page({
   data: {
     themeStyle: getThemeStyle(),
+    navBarBg: _navBg(),
     statusBarHeight: 44,
     topBarTotalHeight: 80,
     balance: 0,
@@ -30,7 +32,7 @@ Page({
   },
 
   applyTheme() {
-    this.setData({ themeStyle: getThemeStyle() });
+    this.setData({ themeStyle: getThemeStyle(), navBarBg: _navBg() });
   },
 
   loadBalance() {

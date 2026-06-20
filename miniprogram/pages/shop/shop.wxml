@@ -1,7 +1,7 @@
 <!-- pages/shop/shop.wxml — 会员商城 -->
 <view class="shop-page" style="{{themeStyle}} padding-top: {{topBarTotalHeight}}px">
   <!-- 顶部导航 -->
-  <view class="shop-top-bar" style="padding-top: {{statusBarHeight}}px">
+  <view class="shop-top-bar" style="padding-top: {{statusBarHeight}}px; {{navBarBg}}">
     <text class="shop-top-title">会员商城</text>
   </view>
 

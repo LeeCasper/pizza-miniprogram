@@ -307,6 +307,28 @@ function getThemeColor(key) {
 }
 
 /**
+ * 获取导航栏专用的背景样式字符串（直接 rgba 值，不依赖 CSS 变量继承）
+ * 用于顶部 top-bar 和底部 tab-bar 的 style 属性
+ * @returns {{ nav: string, tabBar: string }}
+ */
+function getNavBarStyle() {
+  const cfg = _themeConfig || DEFAULTS;
+  const glass = GLASS_PRESETS[cfg.glassIntensity] || GLASS_PRESETS.medium;
+  const navTint = lighten(cfg.primaryColor, 0.05);
+  const nr = hexToRgb(navTint);
+  const tabTint = lighten(cfg.primaryColor, 0.10);
+  const tr = hexToRgb(tabTint);
+  return {
+    nav: 'background: rgba(' + nr.r + ', ' + nr.g + ', ' + nr.b + ', ' + glass.navOpacity + ');' +
+         '-webkit-backdrop-filter: ' + ('saturate(200%) blur(' + glass.blur + ')') + ';' +
+         'backdrop-filter: ' + ('saturate(200%) blur(' + glass.blur + ')') + ';',
+    tabBar: 'background: rgba(' + tr.r + ', ' + tr.g + ', ' + tr.b + ', ' + glass.elevatedOpacity + ');' +
+            '-webkit-backdrop-filter: ' + ('saturate(200%) blur(' + glass.blurLg + ')') + ';' +
+            'backdrop-filter: ' + ('saturate(200%) blur(' + glass.blurLg + ')') + ';',
+  };
+}
+
+/**
  * 清除缓存（管理员修改主题后调用）
  */
 function clearThemeCache() {
@@ -320,6 +342,7 @@ module.exports = {
   buildThemeStyle,
   getThemeStyle,
   getThemeColor,
+  getNavBarStyle,
   clearThemeCache,
   DEFAULTS,
 };

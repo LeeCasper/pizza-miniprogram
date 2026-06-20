@@ -2,11 +2,13 @@
 const { api, fixImageUrl } = require('../../utils/api');
 const app = getApp();
 const { getSimpleTopBar } = require('../../utils/layout');
-const { getThemeStyle } = require('../../utils/theme');
+const { getThemeStyle, getNavBarStyle } = require('../../utils/theme');
+const _navBg = () => getNavBarStyle().nav;
 
 Page({
   data: {
     themeStyle: getThemeStyle(),
+    navBarBg: _navBg(),
     statusBarHeight: 44,
     topBarTotalHeight: 80,
     products: [],
@@ -124,7 +126,7 @@ Page({
   },
 
   applyTheme() {
-    this.setData({ themeStyle: getThemeStyle() });
+    this.setData({ themeStyle: getThemeStyle(), navBarBg: _navBg() });
   },
 
   noop() {}

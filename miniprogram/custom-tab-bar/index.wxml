@@ -1,5 +1,5 @@
 <!-- custom-tab-bar -->
-<view class="tab-bar">
+<view class="tab-bar" style="{{tabBarBg}}">
   <view
     wx:for="{{list}}"
     wx:key="index"
