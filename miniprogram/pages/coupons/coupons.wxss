@@ -443,7 +443,7 @@
 }
 .rp-price {
   font-size: 24rpx;
-  color: var(--color-primary);
+  color: var(--color-price);
 }
 
 /* 优惠详情描述 */

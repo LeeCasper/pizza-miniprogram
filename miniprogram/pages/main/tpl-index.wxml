@@ -85,7 +85,7 @@
 </view>
 
 <!-- 产品详情弹窗 -->
-<view class="detail-overlay {{detailOpen ? 'show' : ''}}" catchtap="onDetailClose">
+<view class="detail-overlay {{detailOpen ? 'show' : ''}}" catchtap="onDetailClose" style="{{paneDetailStyle}}">
   <view class="detail-drawer {{detailOpen ? 'show' : ''}}" catchtap="noop">
     <!-- 导航行：返回按钮 + 标题，位于页面顶部导航下方 -->
     <view class="detail-nav">

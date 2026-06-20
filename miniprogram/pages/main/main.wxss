@@ -29,7 +29,11 @@
 
 
 /* ===== Swiper ===== */
-.main-swiper { background: var(--color-background); }
+/* 透明：让 swiper 区域露出 .app-root 的主题渐变，作为全局背景基底。
+   原 var(--color-background)（=lighten(主色,42%)≈近白）是不透明层，会盖住主题渐变，
+   导致透明的 .order-tabs 等元素露出的是这层近白底而非背景色 —— 这正是「订单状态条还是白色」的真因。
+   各 tab 的滚动区（.tab-scroll/.orders-scroll/...）本就自铺主题渐变，不受影响。 */
+.main-swiper { background: transparent; }
 
 .tab-scroll {
   padding: 0 0 72rpx;
@@ -174,7 +178,7 @@
 .product-name { font-size: 30rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-background); display: block; margin-bottom: 8rpx; }
 .product-desc { font-size: 24rpx; color: var(--color-on-surface-variant); }
 .product-bottom { display: flex; align-items: center; justify-content: space-between; }
-.product-price { font-size: 30rpx; font-weight: var(--font-weight-bold); color: var(--color-primary); }
+.product-price { font-size: 30rpx; font-weight: var(--font-weight-bold); color: var(--color-price); }
 
 .add-btn {
   width: 72rpx; height: 72rpx; border-radius: var(--radius-full);
@@ -289,7 +293,7 @@
 .cart-item-name { font-size: 30rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-background); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cart-item-tags { display: flex; flex-wrap: wrap; gap: 8rpx; }
 .cart-item-tag { font-size: 20rpx; color: var(--color-primary); background: var(--glass-bg-primary-light); padding: 4rpx 14rpx; border-radius: 8rpx; border: var(--glass-border-colored); white-space: nowrap; }
-.cart-item-price { font-size: 28rpx; font-weight: var(--font-weight-bold); color: var(--color-primary); }
+.cart-item-price { font-size: 28rpx; font-weight: var(--font-weight-bold); color: var(--color-price); }
 .cart-empty { padding: 80rpx 0; text-align: center; color: var(--color-on-surface-variant); font-size: 28rpx; }
 .cart-footer { padding: 24rpx 40rpx; padding-bottom: calc(24rpx + env(safe-area-inset-bottom)); border-top: 1rpx solid var(--color-divider); }
 .checkout-btn {
@@ -346,7 +350,7 @@
 }
 .price-row.discount { color: var(--color-tertiary); }
 .price-row.total { padding-top: 12rpx; font-size: 28rpx; color: var(--color-on-surface); font-weight: var(--font-weight-semibold); }
-.final-price { color: var(--color-primary); font-size: 32rpx; font-weight: var(--font-weight-bold); }
+.final-price { color: var(--color-price); font-size: 32rpx; font-weight: var(--font-weight-bold); }
 
 /* ===== 优惠券选择弹窗 ===== */
 .coupon-picker-overlay {
@@ -406,9 +410,21 @@
 .coupon-picker-empty { padding: 80rpx 0; text-align: center; color: #bbb; font-size: 28rpx; }
 
 /* ===== 订单 ===== */
-.order-tabs { background: var(--glass-bg-nav); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); border-bottom: var(--glass-border-subtle); padding: 16rpx 0; }
-.tabs-scroll { white-space: nowrap; }
-.tabs-list { display: flex; padding: 0 40rpx; gap: 16rpx; }
+/* Tab 条固定不动：sticky 钉在 .orders-scroll 视口顶部，订单列表在其下滚动。
+   毛玻璃底取 --glass-bg-nav（背景渐变均值，与顶/底导航栏同款、跟随后台背景色），
+   卡片上滚时被磨砂层盖住不穿透；margin:0 -40rpx 抵消 .scroll-inner 内边距使其满宽铺满。 */
+.order-tabs {
+  position: sticky; top: 0; z-index: 5;
+  margin: 0 -40rpx; padding: 16rpx 40rpx;
+  background: var(--glass-bg-nav);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border-bottom: var(--glass-border-subtle);
+}
+.tabs-scroll { white-space: nowrap; background: transparent; }
+.tabs-list { display: flex; flex-direction: row; flex-wrap: nowrap; gap: 16rpx; }
+/* 注意：毛玻璃(backdrop-filter)+box-shadow+圆角 在 WeChat 中会让阴影按矩形合成层投射、
+   无视 border-radius，导致圆角胶囊外缘出现直角阴影。胶囊坐在磨砂 Tab 条上无需自带投影，故不加 box-shadow。 */
 .tab-item {
   padding: 16rpx 36rpx; border-radius: var(--radius-full); font-size: 28rpx;
   font-weight: var(--font-weight-semibold); color: var(--color-on-surface-variant);
@@ -417,13 +433,36 @@
   backdrop-filter: var(--glass-blur-sm);
   border: var(--glass-border-subtle);
   flex-shrink: 0;
+  /* 丝滑过渡：底色/文字用 easeOutExpo 平滑渐变，缩放用轻微回弹曲线 */
+  transition: background-color 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+              color 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.28s cubic-bezier(0.34, 1.4, 0.5, 1);
 }
-.tab-item.active { background: var(--glass-bg-primary-container); color: var(--color-on-primary-container); border: var(--glass-border-colored); }
+.tab-item:active { transform: scale(0.94); }
+.tab-item.active { background: var(--glass-bg-primary); color: var(--color-on-primary); border: 1rpx solid rgba(255, 255, 255, 0.25); transform: scale(1.03); }
 
-.orders-scroll { padding: 24rpx 0 72rpx; overflow-x: hidden; box-sizing: border-box; }
+.orders-scroll { padding: 0 0 63rpx; overflow-x: hidden; box-sizing: border-box; }
 .scroll-inner { padding: 0 40rpx; }
 
-.order-card { margin-bottom: 24rpx; padding: 32rpx; overflow: hidden; }
+/* 订单卡片：更实的磨砂面板 + 亮边 + 柔和大模糊投影 + 左侧状态色条，明显从背景浮出、聚焦每一单。
+   投影用大模糊柔光，规避「毛玻璃+box-shadow+圆角」直角阴影（大模糊下圆角处不可察）。
+   左侧 8rpx 色条按订单状态着色，与状态徽章同色系；padding-left 24rpx 抵消色条使内容左缩进仍为 32rpx。 */
+.order-card {
+  position: relative;
+  margin-bottom: 28rpx;
+  padding: 32rpx 32rpx 32rpx 24rpx;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--glass-bg-elevated);
+  border: var(--glass-border);
+  border-left: 8rpx solid var(--color-outline-variant);
+  box-shadow: var(--glass-shadow-elevated);
+}
+.order-card.order-waiting { border-left-color: var(--color-primary); }
+.order-card.order-preparing { border-left-color: var(--color-secondary-dark); }
+.order-card.order-completed { border-left-color: var(--color-tertiary); }
+.order-card.order-cancelled { border-left-color: var(--color-outline); }
 .order-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24rpx; }
 .order-header-left { display: flex; flex-direction: column; gap: 8rpx; flex: 1; overflow: hidden; min-width: 0; }
 .order-store { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -459,7 +498,7 @@
 
 .order-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1rpx solid var(--color-divider); padding-top: 24rpx; margin-top: 16rpx; flex-wrap: wrap; gap: 16rpx; }
 .order-total { font-size: 28rpx; color: var(--color-on-surface); flex-shrink: 0; }
-.total-price { font-size: 32rpx; font-weight: var(--font-weight-bold); color: var(--color-primary); }
+.total-price { font-size: 32rpx; font-weight: var(--font-weight-bold); color: var(--color-price); }
 .order-actions { display: flex; gap: 16rpx; flex-shrink: 0; }
 .order-action-btn { padding: 12rpx 32rpx; border-radius: var(--radius-full); font-size: 26rpx; font-weight: var(--font-weight-semibold); white-space: nowrap; }
 .order-action-btn.outline { color: var(--color-on-surface-variant); background: var(--glass-bg-light); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); box-shadow: var(--glass-shadow-elevated); border: var(--glass-border); }
@@ -467,7 +506,7 @@
 .order-action-btn.pay-btn { background: linear-gradient(135deg, #C583FF, #9B4DDB); color: #FFFFFF; box-shadow: 0 4rpx 16rpx rgba(197, 131, 255, 0.3); }
 .order-action-btn.pay-btn:active { transform: scale(0.96); opacity: 0.9; }
 
-.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 200rpx; }
+.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 140rpx; }
 .empty-icon { font-size: 120rpx; margin-bottom: 32rpx; }
 .empty-text { font-size: 32rpx; color: var(--color-on-surface-variant); margin-bottom: 16rpx; }
 .empty-sub { font-size: 26rpx; color: var(--color-on-surface-variant); opacity: 0.7; }
@@ -518,7 +557,7 @@
 .shop-product-desc { font-size: 22rpx; color: var(--color-on-surface-variant); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 16rpx; }
 .shop-product-bottom { display: flex; align-items: center; justify-content: space-between; }
 .shop-product-price-row { display: flex; align-items: baseline; gap: 8rpx; }
-.shop-product-price { font-size: 30rpx; font-weight: var(--font-weight-bold); color: var(--color-primary); }
+.shop-product-price { font-size: 30rpx; font-weight: var(--font-weight-bold); color: var(--color-price); }
 .shop-product-original { font-size: 20rpx; color: var(--color-outline-variant); text-decoration: line-through; }
 
 .shop-add-btn { width: 56rpx; height: 56rpx; border-radius: var(--radius-full); background: var(--glass-bg-primary-light); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); display: flex; align-items: center; justify-content: center; box-shadow: var(--glass-shadow-elevated); border: var(--glass-border-colored); flex-shrink: 0; transition: all 0.2s; }
@@ -1015,7 +1054,7 @@
 .detail-price {
   font-size: 40rpx;
   font-weight: var(--font-weight-bold);
-  color: var(--color-primary);
+  color: var(--color-price);
   flex-shrink: 0;
 }
 

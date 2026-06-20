@@ -1,8 +1,8 @@
 // pages/store/store.js
 const { api } = require('../../utils/api');
 const { calculateWalkingDistance, formatDistance } = require('../../utils/mapConfig');
-const { getThemeStyle, getThemeColor, getNavBarStyle } = require('../../utils/theme');
-const _navBg = () => getNavBarStyle().nav;
+const { getThemeStyle, getThemeColor, getNavBarStyle, buildPageOverrideStyle, getPageNavStyle } = require('../../utils/theme');
+const _navBg = () => getPageNavStyle('pickup');
 const app = getApp();
 const { getSimpleTopBar } = require('../../utils/layout');
 
@@ -14,6 +14,7 @@ Page({
   data: {
     themeStyle: getThemeStyle(),
     navBarBg: _navBg(),
+    pageOverrideStyle: buildPageOverrideStyle('pickup'),
     statusBarHeight: 44,
     topBarTotalHeight: 80,
     store: null,
@@ -37,7 +38,7 @@ Page({
   _lastDistCalc: 0,
 
   applyTheme() {
-    this.setData({ themeStyle: getThemeStyle(), themePrimaryColor: getThemeColor('primary'), navBarBg: _navBg() });
+    this.setData({ themeStyle: getThemeStyle(), themePrimaryColor: getThemeColor('primary'), navBarBg: _navBg(), pageOverrideStyle: buildPageOverrideStyle('pickup') });
   },
 
   onLoad() {

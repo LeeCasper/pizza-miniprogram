@@ -6,19 +6,35 @@ const { getSwiperLayout } = require('../../utils/layout');
 const { formatOrder } = require('../../utils/orders');
 const { CATEGORY_ICON_MAP, dietaryRestrictions, SHOP_CATEGORIES } = require('../../utils/data');
 const { profileMethods, loadProfileCore } = require('../../utils/profileShared');
-const { getThemeStyle, getThemeColor, getNavBarStyle } = require('../../utils/theme');
+const { getThemeStyle, getThemeColor, getNavBarStyle, buildPageOverrideStyle, getPageNavStyle } = require('../../utils/theme');
 const app = getApp();
 
-function _navStyles() {
-  const s = getNavBarStyle();
-  return { navBarBg: s.nav, tabBarBg: s.tabBar };
+// Tab 序号 → 分页主题 pageKey
+const TAB_PAGE_KEYS = ['index', 'orders', 'shop', 'profile'];
+
+function _navStyles(tab) {
+  // 顶栏底色随当前 Tab 切换（各 Tab 可独立设导航色）；底部 tab-bar 仍全局
+  return { navBarBg: getPageNavStyle(TAB_PAGE_KEYS[tab] || 'index'), tabBarBg: getNavBarStyle().tabBar };
+}
+
+// 各面板/遮罩的分页覆盖样式串（CSS 变量只作用于各自子树，实现分页独立）
+function _paneStyles() {
+  return {
+    paneIndexStyle: buildPageOverrideStyle('index'),
+    paneOrdersStyle: buildPageOverrideStyle('orders'),
+    paneShopStyle: buildPageOverrideStyle('shop'),
+    paneProfileStyle: buildPageOverrideStyle('profile'),
+    paneDetailStyle: buildPageOverrideStyle('detail'),
+    paneCheckoutStyle: buildPageOverrideStyle('checkout'),
+  };
 }
 
 Page({
   data: {
     themeStyle: getThemeStyle(),
     themePrimaryColor: getThemeColor('primary'),
-    ..._navStyles(),
+    ..._navStyles(0),
+    ..._paneStyles(),
     statusBarHeight: app.globalData.statusBarHeight,
     topBarTotalHeight: app.globalData.statusBarHeight + 36,
     scrollViewHeight: 0,
@@ -65,7 +81,7 @@ Page({
     productsLoaded: false, ordersLoaded: false,
   },
 
-  applyTheme() { this.setData({ themeStyle: getThemeStyle(), themePrimaryColor: getThemeColor('primary'), ..._navStyles() }); },
+  applyTheme() { this.setData({ themeStyle: getThemeStyle(), themePrimaryColor: getThemeColor('primary'), ..._navStyles(this.data.currentTab), ..._paneStyles() }); },
 
   // ── 共享 profile 方法（头像、编辑、公告、等级轮播、退出等）──
   ...profileMethods,
@@ -181,12 +197,12 @@ Page({
   onTabTap(e) {
     const { index } = e.currentTarget.dataset;
     if (this.data.currentTab === index) return;
-    this.setData({ currentTab: index });
+    this.setData({ currentTab: index, navBarBg: getPageNavStyle(TAB_PAGE_KEYS[index] || 'index') });
     if (index === 1) this.fetchOrders();
   },
   onSwiperChange(e) {
     const idx = e.detail.current;
-    this.setData({ currentTab: idx });
+    this.setData({ currentTab: idx, navBarBg: getPageNavStyle(TAB_PAGE_KEYS[idx] || 'index') });
     if (idx === 1) this.fetchOrders();
   },
 
@@ -673,7 +689,7 @@ Page({
       const msgs = { lucky: '幸运转盘即将上线，敬请期待！', service: '客服热线: 400-888-8888' };
       wx.showToast({ title: msgs[action] || '功能开发中', icon: 'none', duration: 2000 }); return;
     }
-    target.tab !== undefined ? this.setData({ currentTab: target.tab }) : wx.navigateTo({ url: target });
+    target.tab !== undefined ? this.setData({ currentTab: target.tab, navBarBg: getPageNavStyle(TAB_PAGE_KEYS[target.tab] || 'index') }) : wx.navigateTo({ url: target });
   },
 
   // ── 产品详情弹窗 ────────────────────────────

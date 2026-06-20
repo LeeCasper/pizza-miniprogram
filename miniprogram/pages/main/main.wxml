@@ -27,7 +27,7 @@
   >
     <!-- Tab 0: 首页 -->
     <swiper-item>
-      <scroll-view scroll-y class="tab-scroll" enhanced show-scrollbar="{{true}}" style="height: {{scrollViewHeight}}px;">
+      <scroll-view scroll-y class="tab-scroll" enhanced show-scrollbar="{{true}}" style="height: {{scrollViewHeight}}px; {{paneIndexStyle}}">
         <include src="tpl-index.wxml"/>
         <view style="height: calc({{cartCount > 0 ? 240 : 120}}rpx + env(safe-area-inset-bottom))"></view>
       </scroll-view>
@@ -67,7 +67,7 @@
 
   <!-- 购物车悬浮条 + 抽屉（仅首页显示） -->
   <block wx:if="{{currentTab === 0}}">
-    <view class="cart-bar {{cartCount > 0 && !detailOpen ? 'show' : ''}}" wx:if="{{cartCount > 0}}" bindtap="onCartBarTap">
+    <view class="cart-bar {{cartCount > 0 && !detailOpen ? 'show' : ''}}" wx:if="{{cartCount > 0}}" bindtap="onCartBarTap" style="{{paneCheckoutStyle}}">
       <view class="cart-bar-inner">
         <view class="cart-bar-left">
           <view class="cart-icon-wrap">
@@ -81,7 +81,7 @@
     </view>
 
     <view class="cart-overlay {{cartOpen ? 'show' : ''}}" catchtap="onCartClose">
-      <view class="cart-drawer {{cartOpen ? 'show' : ''}}" catchtap="noop">
+      <view class="cart-drawer {{cartOpen ? 'show' : ''}}" catchtap="noop" style="{{paneCheckoutStyle}}">
         <view class="cart-header">
           <text class="cart-title">已选商品</text>
           <view class="cart-clear" bindtap="onClearCart"><image class="cart-clear-icon" src="/images/trash.png" mode="aspectFit"></image><text>清空</text></view>

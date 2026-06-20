@@ -1396,6 +1396,7 @@ const adminApiController = {
           gradientColor3: cfg.gradientColor3 || config.theme.gradientColor3,
           gradientColor4: cfg.gradientColor4 || config.theme.gradientColor4,
           glassIntensity: cfg.glassIntensity || config.theme.glassIntensity,
+          pageOverrides: cfg.pageOverrides || config.theme.pageOverrides || {},
         },
       });
     } catch (err) {
@@ -1432,6 +1433,39 @@ const adminApiController = {
           return res.status(400).json({ code: 400, message: '毛玻璃强度必须是 low、medium 或 high' });
         }
         entries.glassIntensity = v;
+      }
+
+      // 分页主题覆盖：{ pageKey: { field: hexOrEmpty } }，留空=清除该项=跟随全局
+      if (body.pageOverrides !== undefined) {
+        const PAGE_KEYS = ['index', 'orders', 'shop', 'profile', 'detail', 'checkout', 'pickup', 'tiers'];
+        const OVERRIDE_FIELDS = ['cardColor', 'priceColor', 'navColor', 'buttonColor', 'textColor', 'gradient1', 'gradient2', 'gradient3', 'gradient4'];
+        const po = body.pageOverrides;
+        if (typeof po !== 'object' || po === null || Array.isArray(po)) {
+          return res.status(400).json({ code: 400, message: 'pageOverrides 必须是对象' });
+        }
+        const cleaned = {};
+        for (const pageKey of Object.keys(po)) {
+          if (!PAGE_KEYS.includes(pageKey)) {
+            return res.status(400).json({ code: 400, message: `未知的页面: ${pageKey}` });
+          }
+          const pageVal = po[pageKey];
+          if (typeof pageVal !== 'object' || pageVal === null || Array.isArray(pageVal)) {
+            return res.status(400).json({ code: 400, message: `${pageKey} 配置必须是对象` });
+          }
+          const cleanedPage = {};
+          for (const field of Object.keys(pageVal)) {
+            if (!OVERRIDE_FIELDS.includes(field)) {
+              return res.status(400).json({ code: 400, message: `${pageKey} 含未知字段: ${field}` });
+            }
+            const v = pageVal[field] == null ? '' : String(pageVal[field]).trim();
+            if (v !== '' && !hexPattern.test(v)) {
+              return res.status(400).json({ code: 400, message: `${pageKey}.${field} 必须是有效的 HEX 颜色值（如 #FF0000）` });
+            }
+            cleanedPage[field] = v;
+          }
+          cleaned[pageKey] = cleanedPage;
+        }
+        entries.pageOverrides = cleaned;
       }
 
       if (Object.keys(entries).length > 0) {

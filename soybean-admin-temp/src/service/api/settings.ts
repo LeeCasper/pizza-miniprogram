@@ -210,6 +210,21 @@ export function fetchUpdateBusinessSettings(data: BusinessSettingsForm) {
 
 // ── Theme Settings ──────────────────────────────────
 
+export type ThemePageKey = 'index' | 'orders' | 'shop' | 'profile' | 'detail' | 'checkout' | 'pickup' | 'tiers';
+
+/** 单页主题覆盖（每项可选，留空=跟随全局） */
+export interface PageThemeOverride {
+  cardColor?: string;
+  priceColor?: string;
+  navColor?: string;
+  buttonColor?: string;
+  textColor?: string;
+  gradient1?: string;
+  gradient2?: string;
+  gradient3?: string;
+  gradient4?: string;
+}
+
 export interface ThemeSettings {
   primaryColor: string;
   secondaryColor: string;
@@ -220,6 +235,7 @@ export interface ThemeSettings {
   gradientColor3: string;
   gradientColor4: string;
   glassIntensity: 'low' | 'medium' | 'high';
+  pageOverrides?: Partial<Record<ThemePageKey, PageThemeOverride>>;
 }
 
 export interface ThemeSettingsForm {
@@ -232,6 +248,7 @@ export interface ThemeSettingsForm {
   gradientColor3?: string;
   gradientColor4?: string;
   glassIntensity?: 'low' | 'medium' | 'high';
+  pageOverrides?: Partial<Record<ThemePageKey, PageThemeOverride>>;
 }
 
 /** Get theme settings */

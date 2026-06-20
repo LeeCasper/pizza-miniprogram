@@ -1,5 +1,5 @@
 <!-- 商城页 — 会员商城 -->
-<scroll-view scroll-y class="shop-scroll" enhanced show-scrollbar="{{false}}" style="height: {{scrollViewHeight}}px;">
+<scroll-view scroll-y class="shop-scroll" enhanced show-scrollbar="{{false}}" style="height: {{scrollViewHeight}}px; {{paneShopStyle}}">
   <view class="shop-scroll-inner">
     <!-- 促销 Banner 轮播 -->
     <view class="shop-banner-section" wx:if="{{shopBanners.length > 0}}">

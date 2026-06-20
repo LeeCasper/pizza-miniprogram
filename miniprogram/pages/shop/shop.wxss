@@ -168,7 +168,7 @@
   display: flex; align-items: baseline; gap: 8rpx;
 }
 .shop-product-price {
-  font-size: 30rpx; font-weight: var(--font-weight-bold); color: var(--color-primary);
+  font-size: 30rpx; font-weight: var(--font-weight-bold); color: var(--color-price);
 }
 .shop-product-original {
   font-size: 20rpx; color: var(--color-outline-variant); text-decoration: line-through;

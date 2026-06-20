@@ -2,14 +2,15 @@
 const { api } = require('../../utils/api');
 const { computeTier, buildBenefitTiers, loadTiers } = require('../../utils/tiers');
 const { getSimpleTopBar } = require('../../utils/layout');
-const { getThemeStyle, getNavBarStyle } = require('../../utils/theme');
-const _navBg = () => getNavBarStyle().nav;
+const { getThemeStyle, getNavBarStyle, buildPageOverrideStyle, getPageNavStyle } = require('../../utils/theme');
+const _navBg = () => getPageNavStyle('tiers');
 const app = getApp();
 
 Page({
   data: {
     themeStyle: getThemeStyle(),
     navBarBg: _navBg(),
+    pageOverrideStyle: buildPageOverrideStyle('tiers'),
     statusBarHeight: 44,
     topBarTotalHeight: 80,
     tiers: [],
@@ -25,6 +26,10 @@ Page({
     hasNext: false,
     heroDiscountText: '',
     heroPointsText: '',
+  },
+
+  applyTheme() {
+    this.setData({ themeStyle: getThemeStyle(), navBarBg: _navBg(), pageOverrideStyle: buildPageOverrideStyle('tiers') });
   },
 
   onLoad(options) {

@@ -4,6 +4,7 @@
 page {
   /* ── 主色 - 糖果紫 Candy Purple ── */
   --color-primary: #C583FF;
+  --color-price: #C583FF;
   --color-primary-dark: #9B4DDB;
   --color-primary-light: #E8D0FF;
   --color-on-primary: #FFFFFF;
@@ -128,14 +129,10 @@ page, view, text, image, scroll-view, swiper, swiper-item, navigator, button, in
 page {
   height: 100vh;
   background-color: #F0EAFF;
-  background-image: linear-gradient(
-    135deg,
-    var(--gradient-1) 0%,
-    var(--gradient-2) 25%,
-    var(--gradient-3) 50%,
-    var(--gradient-4) 75%,
-    var(--gradient-1) 100%
-  );
+  /* page 自身渐变中和：彩色渐变改由 .app-root / .page-container（带 themeStyle 主题变量）绘制。
+     page 是祖先元素，读不到子元素内联的 --gradient-* 覆盖值，会永远停留在硬编码彩色渐变，
+     并从半透明导航栏（top-bar/tab-bar）背后漏出 —— 这正是「导航栏不跟随背景色」的根因。 */
+  background-image: none;
   color: var(--color-on-background);
   font-family: var(--font-family);
   font-size: 28rpx;
@@ -157,6 +154,14 @@ swiper, swiper-item {
 .shop-scroll,
 .member-scroll,
 .main-scroll {
+  background-image: linear-gradient(135deg, var(--gradient-1) 0%, var(--gradient-2) 25%, var(--gradient-3) 50%, var(--gradient-4) 75%, var(--gradient-1) 100%);
+}
+
+/* 全屏根容器 — 主题渐变权威层。
+   themeStyle（含后台覆盖的 --gradient-1~4）内联在 .app-root 上，故此处读到的是主题值（如白色），
+   而非 page 上的硬编码默认值。100vh 全覆盖盖住 page，半透明导航栏 backdrop 采样到的就是这层主题渐变。 */
+.app-root {
+  min-height: 100vh;
   background-image: linear-gradient(135deg, var(--gradient-1) 0%, var(--gradient-2) 25%, var(--gradient-3) 50%, var(--gradient-4) 75%, var(--gradient-1) 100%);
 }
 

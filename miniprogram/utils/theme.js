@@ -150,15 +150,17 @@ function loadThemeConfig() {
       Object.keys(DEFAULTS).forEach(key => {
         _themeConfig[key] = res.data[key] || DEFAULTS[key];
       });
+      // 分页覆盖（不在 DEFAULTS 中，单独保留）
+      _themeConfig.pageOverrides = res.data.pageOverrides || {};
     } else {
-      _themeConfig = { ...DEFAULTS };
+      _themeConfig = { ...DEFAULTS, pageOverrides: {} };
     }
     // 预构建样式字符串
     _themeStyle = buildThemeStyle(_themeConfig);
     _themePromise = null;
     return _themeConfig;
   }).catch(() => {
-    _themeConfig = { ...DEFAULTS };
+    _themeConfig = { ...DEFAULTS, pageOverrides: {} };
     _themeStyle = '';  // 使用 app.wxss 默认值
     _themePromise = null;
     return _themeConfig;
@@ -207,8 +209,19 @@ function buildThemeStyle(cfg) {
   const divider = lighten(cfg.primaryColor, 0.36);
 
   // 玻璃背景色 — 融入主色调而非纯白
-  const navTint = lighten(cfg.primaryColor, 0.08);
-  const navRgb = hexToRgb(navTint);
+  // 但「导航/工具条」类玻璃底色（--glass-bg-nav）应取自「背景渐变均值」，而非按钮主色。
+  // 否则后台改「背景色」时，.order-tabs / 商城顶栏 / 地址渐隐 等条状玻璃面不会跟随（病根同导航栏）。
+  // 与 getNavBarStyle() 保持同一套派生逻辑。
+  const _navGrads = [cfg.gradientColor1, cfg.gradientColor2, cfg.gradientColor3, cfg.gradientColor4]
+    .filter(Boolean)
+    .map(hexToRgb);
+  const navRgb = _navGrads.length
+    ? {
+        r: Math.round(_navGrads.reduce((a, c) => a + c.r, 0) / _navGrads.length),
+        g: Math.round(_navGrads.reduce((a, c) => a + c.g, 0) / _navGrads.length),
+        b: Math.round(_navGrads.reduce((a, c) => a + c.b, 0) / _navGrads.length),
+      }
+    : hexToRgb(lighten(cfg.primaryColor, 0.08));
   const elevatedTint = lighten(cfg.primaryColor, 0.15);
   const elevRgb = hexToRgb(elevatedTint);
   const cardTint = lighten(cfg.primaryColor, 0.22);
@@ -217,6 +230,7 @@ function buildThemeStyle(cfg) {
   const vars = [
     // 品牌色
     '--color-primary: ' + cfg.primaryColor,
+    '--color-price: ' + cfg.primaryColor,
     '--color-primary-dark: ' + primaryDark,
     '--color-primary-light: ' + primaryLight,
     '--color-primary-container: ' + primaryContainer,
@@ -339,6 +353,71 @@ function getNavBarStyle() {
 }
 
 /**
+ * 构建「分页覆盖」CSS 变量串 —— 仅声明该页「已设置」的字段，叠加在全局 themeStyle 之后/之内。
+ * CSS 变量只向下层叠：把它写在某面板/页面的包裹元素上，即只影响该子树（实现分页独立）。
+ * 留空字段不输出 → 自动跟随全局。
+ * @param {string} pageKey - index|orders|shop|profile|detail|checkout|pickup|tiers
+ * @returns {string} CSS 变量声明串（无覆盖时为 ''）
+ */
+function buildPageOverrideStyle(pageKey) {
+  const cfg = _themeConfig || DEFAULTS;
+  const ov = (cfg.pageOverrides && cfg.pageOverrides[pageKey]) || null;
+  if (!ov) return '';
+  const glass = GLASS_PRESETS[cfg.glassIntensity] || GLASS_PRESETS.medium;
+  const out = [];
+
+  // 卡片色 → 卡片/抬升/浅色面（按当前毛玻璃强度透明度生成 rgba）
+  if (ov.cardColor) {
+    const c = hexToRgb(ov.cardColor);
+    out.push('--glass-bg-card: rgba(' + c.r + ', ' + c.g + ', ' + c.b + ', ' + glass.cardOpacity + ')');
+    out.push('--glass-bg-elevated: rgba(' + c.r + ', ' + c.g + ', ' + c.b + ', ' + glass.elevatedOpacity + ')');
+    out.push('--glass-bg-light: rgba(' + c.r + ', ' + c.g + ', ' + c.b + ', ' + glass.lightOpacity + ')');
+  }
+  // 价格色
+  if (ov.priceColor) out.push('--color-price: ' + ov.priceColor);
+  // 导航色 → 玻璃导航底色变量（顶栏内联值另由 getPageNavStyle 处理）
+  if (ov.navColor) {
+    const n = hexToRgb(ov.navColor);
+    out.push('--glass-bg-nav: rgba(' + n.r + ', ' + n.g + ', ' + n.b + ', ' + glass.navOpacity + ')');
+  }
+  // 按钮色 → 主按钮背景
+  if (ov.buttonColor) {
+    const b = hexToRgb(ov.buttonColor);
+    out.push('--glass-bg-primary: rgba(' + b.r + ', ' + b.g + ', ' + b.b + ', 0.82)');
+    out.push('--glass-bg-primary-light: rgba(' + b.r + ', ' + b.g + ', ' + b.b + ', 0.10)');
+  }
+  // 文字色
+  if (ov.textColor) {
+    out.push('--color-on-surface: ' + ov.textColor);
+    out.push('--color-on-background: ' + ov.textColor);
+  }
+  // 背景渐变（4 色，按需覆盖；scroll-view 的 linear-gradient 读取这些变量）
+  if (ov.gradient1) out.push('--gradient-1: ' + ov.gradient1);
+  if (ov.gradient2) out.push('--gradient-2: ' + ov.gradient2);
+  if (ov.gradient3) out.push('--gradient-3: ' + ov.gradient3);
+  if (ov.gradient4) out.push('--gradient-4: ' + ov.gradient4);
+
+  return out.length ? out.join('; ') + ';' : '';
+}
+
+/**
+ * 获取某页顶栏的内联背景串（用于 top-bar 的 navBarBg）。
+ * 若该页设了 navColor，则用该色派生毛玻璃底；否则回退全局 getNavBarStyle().nav。
+ * @param {string} pageKey
+ * @returns {string}
+ */
+function getPageNavStyle(pageKey) {
+  const cfg = _themeConfig || DEFAULTS;
+  const ov = (cfg.pageOverrides && cfg.pageOverrides[pageKey]) || null;
+  if (!ov || !ov.navColor) return getNavBarStyle().nav;
+  const glass = GLASS_PRESETS[cfg.glassIntensity] || GLASS_PRESETS.medium;
+  const c = hexToRgb(ov.navColor);
+  return 'background: rgba(' + c.r + ', ' + c.g + ', ' + c.b + ', ' + glass.navOpacity + ');' +
+         '-webkit-backdrop-filter: ' + ('saturate(200%) blur(' + glass.blur + ')') + ';' +
+         'backdrop-filter: ' + ('saturate(200%) blur(' + glass.blur + ')') + ';';
+}
+
+/**
  * 清除缓存（管理员修改主题后调用）
  */
 function clearThemeCache() {
@@ -353,6 +432,8 @@ module.exports = {
   getThemeStyle,
   getThemeColor,
   getNavBarStyle,
+  buildPageOverrideStyle,
+  getPageNavStyle,
   clearThemeCache,
   DEFAULTS,
 };

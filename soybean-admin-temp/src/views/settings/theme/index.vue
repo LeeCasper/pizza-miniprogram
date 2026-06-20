@@ -11,6 +11,8 @@ import {
   NGrid,
   NGridItem,
   NSpace,
+  NTabs,
+  NTabPane,
   useMessage,
 } from 'naive-ui';
 import { fetchThemeSettings, fetchUpdateThemeSettings } from '@/service/api';
@@ -32,6 +34,45 @@ const form = ref({
   gradientColor4: '#C0F2FF',
   glassIntensity: 'medium' as 'low' | 'medium' | 'high',
 });
+
+// ── 分页定制：8 个页面 × 6 维度（card/price/nav/button/text + 4 渐变）──
+const PAGE_TABS: { key: string; label: string }[] = [
+  { key: 'index', label: '点单' },
+  { key: 'orders', label: '订单' },
+  { key: 'shop', label: '商城' },
+  { key: 'profile', label: '我的' },
+  { key: 'detail', label: '商品详情' },
+  { key: 'checkout', label: '结算' },
+  { key: 'pickup', label: '门店自取' },
+  { key: 'tiers', label: '会员权益' },
+];
+
+const OVERRIDE_FIELDS: { key: string; label: string }[] = [
+  { key: 'cardColor', label: '卡片色' },
+  { key: 'priceColor', label: '价格色' },
+  { key: 'navColor', label: '顶部导航色' },
+  { key: 'buttonColor', label: '按钮色' },
+  { key: 'textColor', label: '文字色' },
+  { key: 'gradient1', label: '背景渐变 1' },
+  { key: 'gradient2', label: '背景渐变 2' },
+  { key: 'gradient3', label: '背景渐变 3' },
+  { key: 'gradient4', label: '背景渐变 4' },
+];
+
+function emptyOverride(): Record<string, string | null> {
+  return {
+    cardColor: '', priceColor: '', navColor: '', buttonColor: '', textColor: '',
+    gradient1: '', gradient2: '', gradient3: '', gradient4: '',
+  };
+}
+
+const activePageTab = ref('index');
+const pageForm = ref<Record<string, Record<string, string | null>>>(
+  PAGE_TABS.reduce((acc, t) => {
+    acc[t.key] = emptyOverride();
+    return acc;
+  }, {} as Record<string, Record<string, string | null>>)
+);
 
 const glassOptions = [
   { label: '低 - 轻微模糊', value: 'low' },
@@ -72,13 +113,31 @@ onMounted(async () => {
     form.value.gradientColor3 = data.gradientColor3 || '#FFF4B0';
     form.value.gradientColor4 = data.gradientColor4 || '#C0F2FF';
     form.value.glassIntensity = data.glassIntensity || 'medium';
+    const po: any = (data as any).pageOverrides || {};
+    PAGE_TABS.forEach(t => {
+      const src = po[t.key] || {};
+      OVERRIDE_FIELDS.forEach(f => {
+        pageForm.value[t.key][f.key] = src[f.key] || '';
+      });
+    });
   }
   loading.value = false;
 });
 
 async function handleSave() {
   saving.value = true;
-  const { error } = await fetchUpdateThemeSettings({ ...form.value });
+  // 收集分页覆盖：每页只提交非空字段（空=跟随全局）；空对象表示清除该页
+  const pageOverrides: Record<string, Record<string, string>> = {};
+  PAGE_TABS.forEach(t => {
+    const src = pageForm.value[t.key];
+    const cleaned: Record<string, string> = {};
+    OVERRIDE_FIELDS.forEach(f => {
+      const v = (src[f.key] || '').trim();
+      if (v) cleaned[f.key] = v;
+    });
+    pageOverrides[t.key] = cleaned;
+  });
+  const { error } = await fetchUpdateThemeSettings({ ...form.value, pageOverrides } as any);
   if (!error) {
     message.success('主题配置已保存，小程序下次启动时生效');
   } else {
@@ -89,7 +148,8 @@ async function handleSave() {
 </script>
 
 <template>
-  <div style="display: flex; gap: 16px; align-items: flex-start">
+  <div style="display: flex; flex-direction: column; gap: 16px">
+    <div style="display: flex; gap: 16px; align-items: flex-start">
     <!-- 左侧：配置表单 -->
     <NCard title="主题配置" :bordered="false" size="small" class="card-wrapper" style="flex: 1">
       <template #header-extra>
@@ -288,6 +348,27 @@ async function handleSave() {
           底部导航栏
         </div>
       </div>
+    </NCard>
+    </div>
+
+    <!-- 分页定制：每页可独立覆盖 6 维度，留空=跟随全局 -->
+    <NCard title="分页定制（每页可单独覆盖，留空 = 跟随全局）" :bordered="false" size="small" class="card-wrapper">
+      <NTabs v-model:value="activePageTab" type="line" animated>
+        <NTabPane v-for="t in PAGE_TABS" :key="t.key" :name="t.key" :tab="t.label">
+          <NForm label-placement="top">
+            <NGrid :cols="3" :x-gap="20">
+              <NGridItem v-for="f in OVERRIDE_FIELDS" :key="f.key">
+                <NFormItem :label="f.label">
+                  <NColorPicker v-model:value="pageForm[t.key][f.key]" :show-alpha="false" clearable />
+                </NFormItem>
+              </NGridItem>
+            </NGrid>
+          </NForm>
+          <div style="color: #999; font-size: 12px; margin-top: 4px">
+            留空的项跟随全局主题；用颜色选择器内置的清除按钮即可还原为「跟随全局」。
+          </div>
+        </NTabPane>
+      </NTabs>
     </NCard>
   </div>
 </template>

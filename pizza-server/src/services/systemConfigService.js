@@ -388,6 +388,10 @@ const systemConfigService = {
       );
       const map = {};
       rows.forEach(r => { map[r.config_key] = r.config_value || ''; });
+      let pageOverrides = {};
+      if (map.theme_page_overrides) {
+        try { pageOverrides = JSON.parse(map.theme_page_overrides) || {}; } catch (_) { pageOverrides = {}; }
+      }
       return {
         primaryColor: map.theme_primary_color || '',
         secondaryColor: map.theme_secondary_color || '',
@@ -398,12 +402,13 @@ const systemConfigService = {
         gradientColor3: map.theme_gradient_color3 || '',
         gradientColor4: map.theme_gradient_color4 || '',
         glassIntensity: map.theme_glass_intensity || '',
+        pageOverrides,
       };
     } catch (_) {
       return {
         primaryColor: '', secondaryColor: '', tertiaryColor: '', accentColor: '',
         gradientColor1: '', gradientColor2: '', gradientColor3: '', gradientColor4: '',
-        glassIntensity: '',
+        glassIntensity: '', pageOverrides: {},
       };
     }
   },
@@ -437,6 +442,14 @@ const systemConfigService = {
           );
         }
       }
+      // 分页覆盖（JSON blob，独立于标量 fieldMap 之外）
+      if (entries.pageOverrides !== undefined) {
+        const json = JSON.stringify(entries.pageOverrides || {});
+        await conn.query(
+          'INSERT INTO system_config (config_key, config_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE config_value = ?',
+          ['theme_page_overrides', json, json]
+        );
+      }
       await conn.commit();
     } catch (err) {
       await conn.rollback();
@@ -463,6 +476,8 @@ const systemConfigService = {
       if (dbConfig.gradientColor3) config.theme.gradientColor3 = dbConfig.gradientColor3;
       if (dbConfig.gradientColor4) config.theme.gradientColor4 = dbConfig.gradientColor4;
       if (dbConfig.glassIntensity) config.theme.glassIntensity = dbConfig.glassIntensity;
+      // 分页覆盖：始终覆盖（含清空），DB 无该行时 getThemeConfig 返回 {}
+      config.theme.pageOverrides = dbConfig.pageOverrides || {};
     }).catch(err => {
       log.error({ err }, 'failed to sync theme config from DB');
     });
