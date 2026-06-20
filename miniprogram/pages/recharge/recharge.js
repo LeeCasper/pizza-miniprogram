@@ -3,7 +3,7 @@ const { api } = require('../../utils/api');
 const pay = require('../../utils/pay');
 const app = getApp();
 const { getSimpleTopBar } = require('../../utils/layout');
-const { getThemeStyle, getNavBarStyle } = require('../../utils/theme');
+const { getThemeStyle, getNavBarStyle, loadThemeConfig } = require('../../utils/theme');
 const _navBg = () => getNavBarStyle().nav;
 
 const PRESET_AMOUNTS = [50, 100, 200, 300, 500, 1000];
@@ -29,6 +29,7 @@ Page({
 
   onShow() {
     this.loadBalance();
+    loadThemeConfig().then(() => this.applyTheme());
   },
 
   applyTheme() {

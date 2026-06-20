@@ -2,7 +2,7 @@
 const { api, fixImageUrl } = require('../../utils/api');
 const app = getApp();
 const { getSimpleTopBar } = require('../../utils/layout');
-const { getThemeStyle, getNavBarStyle } = require('../../utils/theme');
+const { getThemeStyle, getNavBarStyle, loadThemeConfig } = require('../../utils/theme');
 const _navBg = () => getNavBarStyle().nav;
 
 Page({
@@ -123,6 +123,11 @@ Page({
     }).catch(() => {
       wx.hideLoading();
     });
+  },
+
+  onShow() {
+    // 主题：本页经 navigateTo 打开，晚于 app.js 启动广播，需自加载并应用主题
+    loadThemeConfig().then(() => this.applyTheme());
   },
 
   applyTheme() {
