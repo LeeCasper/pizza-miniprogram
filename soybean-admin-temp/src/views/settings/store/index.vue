@@ -24,6 +24,7 @@ const form = ref({
   business_hours: '',
   latitude: null as number | null,
   longitude: null as number | null,
+  pickup_notice: '',
 });
 
 onMounted(async () => {
@@ -36,6 +37,7 @@ onMounted(async () => {
     form.value.business_hours = data.business_hours || '';
     form.value.latitude = data.latitude;
     form.value.longitude = data.longitude;
+    form.value.pickup_notice = data.pickup_notice || '';
   }
   loading.value = false;
 });
@@ -50,6 +52,7 @@ async function handleSave() {
     business_hours: form.value.business_hours,
     latitude: form.value.latitude,
     longitude: form.value.longitude,
+    pickup_notice: form.value.pickup_notice,
   };
 
   const { error } = await fetchUpdateStoreSettings(payload);
@@ -85,6 +88,15 @@ async function handleSave() {
 
       <NFormItem label="营业时间">
         <NInput v-model:value="form.business_hours" placeholder="例如 10:00-22:00" />
+      </NFormItem>
+
+      <NFormItem label="自取须知">
+        <NInput
+          v-model:value="form.pickup_notice"
+          type="textarea"
+          :autosize="{ minRows: 3, maxRows: 8 }"
+          placeholder="每行填写一条须知，将按行显示在小程序「门店自取」页"
+        />
       </NFormItem>
 
       <NFormItem label="纬度 (Latitude)">

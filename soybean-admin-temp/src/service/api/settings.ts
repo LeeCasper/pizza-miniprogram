@@ -149,6 +149,7 @@ export interface StoreSettings {
   business_hours: string;
   image: string;
   desc: string;
+  pickup_notice: string;
 }
 
 export interface StoreSettingsForm {
@@ -158,6 +159,7 @@ export interface StoreSettingsForm {
   latitude?: number | null;
   longitude?: number | null;
   business_hours?: string;
+  pickup_notice?: string;
 }
 
 /** Get store settings */

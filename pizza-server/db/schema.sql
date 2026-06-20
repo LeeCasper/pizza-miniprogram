@@ -236,6 +236,7 @@ CREATE TABLE IF NOT EXISTS stores (
     business_hours VARCHAR(100) DEFAULT '10:00-22:00',
     image VARCHAR(500) DEFAULT '',
     `desc` TEXT,
+    pickup_notice TEXT,
     is_active TINYINT(1) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

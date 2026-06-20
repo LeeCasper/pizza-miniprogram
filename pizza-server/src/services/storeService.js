@@ -27,10 +27,10 @@ const storeService = {
   /**
    * Update store fields (whitelist approach)
    * @param {number} id
-   * @param {object} data — { name, address, phone, latitude, longitude, business_hours, image, desc }
+   * @param {object} data — { name, address, phone, latitude, longitude, business_hours, image, desc, pickup_notice }
    */
   async update(id, data) {
-    const allowedFields = ['name', 'address', 'phone', 'latitude', 'longitude', 'business_hours', 'image', 'desc'];
+    const allowedFields = ['name', 'address', 'phone', 'latitude', 'longitude', 'business_hours', 'image', 'desc', 'pickup_notice'];
     const sets = [];
     const values = [];
 

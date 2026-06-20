@@ -10,6 +10,13 @@ const { getSimpleTopBar } = require('../../utils/layout');
 const DEFAULT_LAT = 32.961857;
 const DEFAULT_LNG = 114.646879;
 
+// 自取须知默认文案（后台未配置时回退）
+const DEFAULT_PICKUP_NOTICES = [
+  '订单制作通常需要 15-20 分钟，请根据提示时间前往门店取餐。',
+  '到店后，请向店员出示您的取餐码或预留手机号。',
+  '为保证比萨口感，建议您在制作完成后 10 分钟内取餐。',
+];
+
 Page({
   data: {
     themeStyle: getThemeStyle(),
@@ -19,6 +26,7 @@ Page({
     topBarTotalHeight: 80,
     store: null,
     loading: true,
+    pickupNotices: DEFAULT_PICKUP_NOTICES,
 
     // 地图
     mapLatitude: DEFAULT_LAT,
@@ -73,7 +81,8 @@ Page({
           latitude: raw.latitude != null ? parseFloat(raw.latitude) : null,
           longitude: raw.longitude != null ? parseFloat(raw.longitude) : null,
         };
-        this.setData({ store, loading: false });
+        const pickupNotices = this.parsePickupNotices(store.pickup_notice);
+        this.setData({ store, pickupNotices, loading: false });
         this.initMap();
       } else {
         this.setData({ loading: false });
@@ -81,6 +90,15 @@ Page({
     }).catch(() => {
       this.setData({ loading: false });
     });
+  },
+
+  /**
+   * 解析后台「自取须知」(多行文本,每行一条);为空时回退默认三条
+   */
+  parsePickupNotices(raw) {
+    if (!raw || typeof raw !== 'string') return DEFAULT_PICKUP_NOTICES;
+    const lines = raw.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+    return lines.length ? lines : DEFAULT_PICKUP_NOTICES;
   },
 
   // ===== 地图初始化 =====

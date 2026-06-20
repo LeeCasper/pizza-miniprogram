@@ -241,7 +241,9 @@
 }
 
 .info-card-icon {
-  font-size: 36rpx;
+  width: 40rpx;
+  height: 40rpx;
+  flex-shrink: 0;
 }
 
 .info-card-title {

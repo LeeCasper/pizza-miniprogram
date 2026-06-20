@@ -75,21 +75,13 @@
     <!-- 自取须知 -->
     <view class="info-card card-cream">
       <view class="info-card-header">
-        <text class="info-card-icon">ℹ️</text>
+        <image class="info-card-icon" src="/images/notice.png" mode="aspectFit"></image>
         <text class="info-card-title">自取须知</text>
       </view>
       <view class="info-card-list">
-        <view class="info-card-item">
+        <view class="info-card-item" wx:for="{{pickupNotices}}" wx:key="index">
           <text class="check-icon">✅</text>
-          <text>订单制作通常需要 <text class="bold">15-20 分钟</text>。请根据提示时间前往门店取餐。</text>
-        </view>
-        <view class="info-card-item">
-          <text class="check-icon">✅</text>
-          <text>到店后，请向店员出示您的<text class="bold">取餐码</text>或预留手机号。</text>
-        </view>
-        <view class="info-card-item">
-          <text class="check-icon">✅</text>
-          <text>为保证比萨口感，建议您在制作完成后 10 分钟内取餐。</text>
+          <text>{{item}}</text>
         </view>
       </view>
     </view>

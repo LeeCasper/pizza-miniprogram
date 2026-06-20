@@ -1347,6 +1347,7 @@ const adminApiController = {
       if (body.business_hours !== undefined) fields.business_hours = body.business_hours;
       if (body.latitude !== undefined) fields.latitude = body.latitude;
       if (body.longitude !== undefined) fields.longitude = body.longitude;
+      if (body.pickup_notice !== undefined) fields.pickup_notice = body.pickup_notice;
 
       if (Object.keys(fields).length > 0) {
         await storeService.update(store.id, fields);
