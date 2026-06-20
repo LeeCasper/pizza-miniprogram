@@ -314,15 +314,25 @@ function getThemeColor(key) {
 function getNavBarStyle() {
   const cfg = _themeConfig || DEFAULTS;
   const glass = GLASS_PRESETS[cfg.glassIntensity] || GLASS_PRESETS.medium;
-  const navTint = lighten(cfg.primaryColor, 0.05);
-  const nr = hexToRgb(navTint);
-  const tabTint = lighten(cfg.primaryColor, 0.10);
-  const tr = hexToRgb(tabTint);
+
+  // 导航栏是毛玻璃，应融入「页面背景色」（4 个渐变色），而非按钮主色。
+  // 取 4 个渐变色 RGB 的平均值作为底色 —— 后台改背景色时导航栏随之变化。
+  const grads = [cfg.gradientColor1, cfg.gradientColor2, cfg.gradientColor3, cfg.gradientColor4]
+    .filter(Boolean)
+    .map(hexToRgb);
+  const base = grads.length
+    ? {
+        r: Math.round(grads.reduce((s, c) => s + c.r, 0) / grads.length),
+        g: Math.round(grads.reduce((s, c) => s + c.g, 0) / grads.length),
+        b: Math.round(grads.reduce((s, c) => s + c.b, 0) / grads.length),
+      }
+    : hexToRgb(cfg.primaryColor || DEFAULTS.primaryColor);
+
   return {
-    nav: 'background: rgba(' + nr.r + ', ' + nr.g + ', ' + nr.b + ', ' + glass.navOpacity + ');' +
+    nav: 'background: rgba(' + base.r + ', ' + base.g + ', ' + base.b + ', ' + glass.navOpacity + ');' +
          '-webkit-backdrop-filter: ' + ('saturate(200%) blur(' + glass.blur + ')') + ';' +
          'backdrop-filter: ' + ('saturate(200%) blur(' + glass.blur + ')') + ';',
-    tabBar: 'background: rgba(' + tr.r + ', ' + tr.g + ', ' + tr.b + ', ' + glass.elevatedOpacity + ');' +
+    tabBar: 'background: rgba(' + base.r + ', ' + base.g + ', ' + base.b + ', ' + glass.elevatedOpacity + ');' +
             '-webkit-backdrop-filter: ' + ('saturate(200%) blur(' + glass.blurLg + ')') + ';' +
             'backdrop-filter: ' + ('saturate(200%) blur(' + glass.blurLg + ')') + ';',
   };
