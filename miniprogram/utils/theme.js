@@ -206,8 +206,13 @@ function buildThemeStyle(cfg) {
   const outlineVariant = lighten(cfg.primaryColor, 0.30);
   const divider = lighten(cfg.primaryColor, 0.36);
 
-  // 主色 Nav 背景 — 带主色调的淡色
-  const navRgb = hexToRgb(lighten(cfg.primaryColor, 0.40));
+  // 玻璃背景色 — 融入主色调而非纯白
+  const navTint = lighten(cfg.primaryColor, 0.08);
+  const navRgb = hexToRgb(navTint);
+  const elevatedTint = lighten(cfg.primaryColor, 0.15);
+  const elevRgb = hexToRgb(elevatedTint);
+  const cardTint = lighten(cfg.primaryColor, 0.22);
+  const cardRgb = hexToRgb(cardTint);
 
   const vars = [
     // 品牌色
@@ -248,10 +253,10 @@ function buildThemeStyle(cfg) {
     '--gradient-3: ' + cfg.gradientColor3,
     '--gradient-4: ' + cfg.gradientColor4,
 
-    // 毛玻璃 — 背景
-    '--glass-bg-card: rgba(255, 255, 255, ' + glass.cardOpacity + ')',
-    '--glass-bg-elevated: rgba(255, 255, 255, ' + glass.elevatedOpacity + ')',
-    '--glass-bg-light: rgba(255, 255, 255, ' + glass.lightOpacity + ')',
+    // 毛玻璃 — 背景（融入主色调，不再纯白）
+    '--glass-bg-card: rgba(' + cardRgb.r + ', ' + cardRgb.g + ', ' + cardRgb.b + ', ' + glass.cardOpacity + ')',
+    '--glass-bg-elevated: rgba(' + elevRgb.r + ', ' + elevRgb.g + ', ' + elevRgb.b + ', ' + glass.elevatedOpacity + ')',
+    '--glass-bg-light: rgba(' + elevRgb.r + ', ' + elevRgb.g + ', ' + elevRgb.b + ', ' + glass.lightOpacity + ')',
     '--glass-bg-nav: rgba(' + navRgb.r + ', ' + navRgb.g + ', ' + navRgb.b + ', ' + glass.navOpacity + ')',
     '--glass-bg-primary: rgba(' + p.r + ', ' + p.g + ', ' + p.b + ', 0.82)',
     '--glass-bg-primary-light: rgba(' + p.r + ', ' + p.g + ', ' + p.b + ', 0.10)',
