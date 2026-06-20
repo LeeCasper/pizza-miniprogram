@@ -102,8 +102,13 @@ Page({
     this.loadProfileData();
     // Refresh orders when showing
     this.fetchOrders();
-    // 主题自愈：若启动时那次广播因网络抖动失败，落地页此处重新加载并应用后台真实主题
-    loadThemeConfig().then(() => this.applyTheme());
+    // 主题自愈：若启动时那次广播因网络抖动失败，落地页此处重新加载并应用后台真实主题。
+    // ⚠ 仅当主题「实际发生变化」时才重应用：否则每次切回前台都给 backdrop-filter 毛玻璃
+    // tab-bar 重设同值 style，触发 WeChat 重新合成模糊层 → 底部导航栏闪烁（真机可见）。
+    loadThemeConfig().then(() => {
+      const fresh = getThemeStyle();
+      if (fresh && fresh !== this.data.themeStyle) this.applyTheme();
+    });
   },
 
   // ── 数据加载 ─────────────────────────────────
