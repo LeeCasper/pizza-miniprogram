@@ -164,6 +164,15 @@ const customRoutes: CustomRoute[] = [
         },
       },
       {
+        name: 'products_categories',
+        path: '/products/categories',
+        component: 'view.products_categories',
+        meta: {
+          title: '商品分类',
+          i18nKey: 'route.products_categories',
+        },
+      },
+      {
         name: 'products_create',
         path: '/products/create',
         component: 'view.products_form',

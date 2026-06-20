@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 import { NCard, NDataTable, NButton, NTag, NSpace, NImage, NIcon, NSwitch, useDialog } from 'naive-ui';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@vicons/antd';
 import type { DataTableColumns } from 'naive-ui';
-import { fetchProducts, fetchDeleteProduct, fetchToggleProduct, type AdminProduct } from '@/service/api';
+import { fetchProducts, fetchDeleteProduct, fetchToggleProduct, fetchCategories, type AdminProduct } from '@/service/api';
 import { formatPrice } from '@/utils/format';
 
 defineOptions({ name: 'ProductList' });
@@ -12,6 +12,7 @@ defineOptions({ name: 'ProductList' });
 const router = useRouter();
 const dialog = useDialog();
 const products = ref<AdminProduct[]>([]);
+const categoryMap = ref<Record<string, string>>({});
 const loading = ref(false);
 
 const columns: DataTableColumns<AdminProduct> = [
@@ -26,8 +27,7 @@ const columns: DataTableColumns<AdminProduct> = [
   {
     title: '分类', key: 'category_key', width: 100,
     render(row) {
-      const map: Record<string, string> = { pizza: '披萨', durian: '榴莲', pineapple: '凤梨酥' };
-      return h(NTag, { size: 'small', bordered: false }, () => map[row.category_key] || row.category_key);
+      return h(NTag, { size: 'small', bordered: false }, () => categoryMap.value[row.category_key] || row.category_key);
     }
   },
   {
@@ -71,6 +71,15 @@ async function loadProducts() {
   loading.value = false;
 }
 
+async function loadCategories() {
+  const { data, error } = await fetchCategories();
+  if (!error && data) {
+    const map: Record<string, string> = {};
+    data.forEach(c => { map[c.key] = c.name; });
+    categoryMap.value = map;
+  }
+}
+
 async function handleToggle(id: number, val: boolean) {
   // Optimistic update: flip local state immediately
   const product = products.value.find(p => p.id === id);
@@ -88,21 +97,21 @@ async function handleToggle(id: number, val: boolean) {
 
 async function handleDelete(id: number) {
   dialog.warning({
-    title: '确认下架',
-    content: '确定下架该商品？下架后用户将不可见。',
-    positiveText: '确认下架',
+    title: '确认删除',
+    content: '确定删除该商品？删除后将从列表移除（订单历史仍保留）。',
+    positiveText: '确认删除',
     negativeText: '取消',
     onPositiveClick: async () => {
       const { error } = await fetchDeleteProduct(id);
       if (!error) {
-        window.$message?.success('商品已下架');
+        window.$message?.success('商品已删除');
         loadProducts();
       }
     },
   });
 }
 
-onMounted(() => { loadProducts(); });
+onMounted(() => { loadProducts(); loadCategories(); });
 </script>
 
 <template>

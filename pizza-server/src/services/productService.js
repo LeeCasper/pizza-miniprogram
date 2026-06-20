@@ -2,7 +2,7 @@ const pool = require('../config/database');
 
 const productService = {
   async findAll(category) {
-    let sql = 'SELECT * FROM products WHERE is_available = 1';
+    let sql = 'SELECT * FROM products WHERE is_available = 1 AND is_deleted = 0';
     const params = [];
     if (category && category !== 'all') {
       sql += ' AND category_key = ?';
@@ -20,7 +20,7 @@ const productService = {
 
   // Admin methods
   async adminList() {
-    const [rows] = await pool.query('SELECT * FROM products ORDER BY sort_order ASC, id ASC');
+    const [rows] = await pool.query('SELECT * FROM products WHERE is_deleted = 0 ORDER BY sort_order ASC, id ASC');
     return rows.map(formatProduct);
   },
 
@@ -57,7 +57,8 @@ const productService = {
   },
 
   async softDelete(id) {
-    await pool.query('UPDATE products SET is_available = 0 WHERE id = ?', [id]);
+    // 真删除标记:从后台列表与小程序消失,但保留行以维持订单历史外键(order_items 无 CASCADE)
+    await pool.query('UPDATE products SET is_deleted = 1 WHERE id = ?', [id]);
   },
 
   async toggle(id) {

@@ -5,6 +5,7 @@ const { createLogger } = require('../utils/logger');
 const log = createLogger('AdminAPI');
 const { signToken } = require('../utils/jwt');
 const productService = require('../services/productService');
+const categoryService = require('../services/categoryService');
 const orderService = require('../services/orderService');
 const couponService = require('../services/couponService');
 const userService = require('../services/userService');
@@ -218,10 +219,10 @@ const adminApiController = {
   async deleteProduct(req, res) {
     try {
       await productService.softDelete(req.params.id);
-      return res.json({ code: 0, message: '商品已下架' });
+      return res.json({ code: 0, message: '商品已删除' });
     } catch (err) {
       log.error({ err }, 'DeleteProduct error');
-      return res.status(500).json({ code: 500, message: '下架商品失败' });
+      return res.status(500).json({ code: 500, message: '删除商品失败' });
     }
   },
 
@@ -238,6 +239,80 @@ const adminApiController = {
     } catch (err) {
       log.error({ err }, 'ToggleProduct error');
       return res.status(500).json({ code: 500, message: '切换商品状态失败' });
+    }
+  },
+
+  // ── Categories ──────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/categories
+   */
+  async listCategories(req, res) {
+    try {
+      const categories = await categoryService.adminList();
+      return res.json({ code: 0, data: categories });
+    } catch (err) {
+      log.error({ err }, 'ListCategories error');
+      return res.status(500).json({ code: 500, message: '获取分类列表失败' });
+    }
+  },
+
+  /**
+   * POST /api/v1/admin/categories
+   */
+  async createCategory(req, res) {
+    try {
+      const { key, name, icon, sortOrder, isActive } = req.body;
+      if (!key || !/^[a-z0-9_]+$/.test(key)) {
+        return res.status(400).json({ code: 400, message: '分类标识只能含小写字母、数字、下划线' });
+      }
+      if (!name || !String(name).trim()) {
+        return res.status(400).json({ code: 400, message: '分类名称不能为空' });
+      }
+      const exists = await categoryService.findByKey(key);
+      if (exists) {
+        return res.status(400).json({ code: 400, message: '分类标识已存在' });
+      }
+      const category = await categoryService.create({ key, name: String(name).trim(), icon, sortOrder, isActive });
+      return res.json({ code: 0, message: '分类已创建', data: category });
+    } catch (err) {
+      log.error({ err }, 'CreateCategory error');
+      return res.status(500).json({ code: 500, message: '创建分类失败' });
+    }
+  },
+
+  /**
+   * PUT /api/v1/admin/categories/:key
+   */
+  async updateCategory(req, res) {
+    try {
+      const exists = await categoryService.findByKey(req.params.key);
+      if (!exists) {
+        return res.status(404).json({ code: 404, message: '分类不存在' });
+      }
+      const { name, icon, sortOrder, isActive } = req.body;
+      const category = await categoryService.update(req.params.key, { name, icon, sortOrder, isActive });
+      return res.json({ code: 0, message: '分类已更新', data: category });
+    } catch (err) {
+      log.error({ err }, 'UpdateCategory error');
+      return res.status(500).json({ code: 500, message: '更新分类失败' });
+    }
+  },
+
+  /**
+   * DELETE /api/v1/admin/categories/:key
+   */
+  async deleteCategory(req, res) {
+    try {
+      const count = await categoryService.countProducts(req.params.key);
+      if (count > 0) {
+        return res.status(400).json({ code: 400, message: `该分类下还有 ${count} 个商品,无法删除` });
+      }
+      await categoryService.remove(req.params.key);
+      return res.json({ code: 0, message: '分类已删除' });
+    } catch (err) {
+      log.error({ err }, 'DeleteCategory error');
+      return res.status(500).json({ code: 500, message: '删除分类失败' });
     }
   },
 

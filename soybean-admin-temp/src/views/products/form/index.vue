@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { NForm, NFormItem, NInput, NInputNumber, NSelect, NSpace, NButton, NCard, NTag, NImage, NCollapse, NCollapseItem } from 'naive-ui';
-import { fetchProduct, fetchCreateProduct, fetchUpdateProduct } from '@/service/api';
+import { fetchProduct, fetchCreateProduct, fetchUpdateProduct, fetchCategories } from '@/service/api';
 import ImageUpload from '@/components/common/ImageUpload.vue';
 import TagArrayInput from '@/components/common/TagArrayInput.vue';
 
@@ -13,11 +13,7 @@ const route = useRoute();
 const isEdit = computed(() => !!route.params.id);
 const loading = ref(false);
 
-const categoryOptions = [
-  { label: '披萨', value: 'pizza' },
-  { label: '榴莲披萨', value: 'durian' },
-  { label: '凤梨酥', value: 'pineapple' },
-];
+const categoryOptions = ref<{ label: string; value: string }[]>([]);
 
 const tagOptions = [
   { label: '经典', value: '经典' },
@@ -42,6 +38,14 @@ const form = ref({
 });
 
 onMounted(async () => {
+  // 分类下拉来自数据库(替换写死的 pizza/durian/pineapple)
+  const catRes = await fetchCategories();
+  if (!catRes.error && catRes.data) {
+    categoryOptions.value = catRes.data.map(c => ({ label: c.name, value: c.key }));
+    if (!isEdit.value && categoryOptions.value.length && !categoryOptions.value.some(o => o.value === form.value.category_key)) {
+      form.value.category_key = categoryOptions.value[0].value;
+    }
+  }
   if (isEdit.value) {
     loading.value = true;
     const { data, error } = await fetchProduct(Number(route.params.id));

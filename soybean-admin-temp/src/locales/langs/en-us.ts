@@ -232,6 +232,7 @@ const local: App.I18n.Schema = {
     dashboard: 'Dashboard',
     products: 'Products',
     products_list: 'Product List',
+    products_categories: 'Categories',
     products_create: 'Add Product',
     products_edit: 'Edit Product',
     products_form: 'Product Form',

@@ -288,6 +288,15 @@ export const generatedRoutes: GeneratedRoute[] = [
     },
     children: [
       {
+        name: 'products_categories',
+        path: '/products/categories',
+        component: 'view.products_categories',
+        meta: {
+          title: 'products_categories',
+          i18nKey: 'route.products_categories'
+        }
+      },
+      {
         name: 'products_form',
         path: '/products/form',
         component: 'view.products_form',

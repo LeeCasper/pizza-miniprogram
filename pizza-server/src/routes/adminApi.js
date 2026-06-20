@@ -28,6 +28,12 @@ router.put('/products/:id', ctrl.updateProduct);
 router.delete('/products/:id', ctrl.deleteProduct);
 router.put('/products/:id/toggle', ctrl.toggleProduct);
 
+// Product categories
+router.get('/categories', ctrl.listCategories);
+router.post('/categories', ctrl.createCategory);
+router.put('/categories/:key', ctrl.updateCategory);
+router.delete('/categories/:key', ctrl.deleteCategory);
+
 // Orders
 router.get('/orders', ctrl.listOrders);
 router.get('/orders/:id', ctrl.getOrder);

@@ -228,6 +228,7 @@ const local: App.I18n.Schema = {
     dashboard: '仪表盘',
     products: '商品管理',
     products_list: '商品列表',
+    products_categories: '商品分类',
     products_create: '新建商品',
     products_edit: '编辑商品',
     products_form: '商品表单',

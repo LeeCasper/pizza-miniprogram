@@ -45,6 +45,7 @@ declare module "@elegant-router/types" {
     "points_form": "/points/form";
     "points_list": "/points/list";
     "products": "/products";
+    "products_categories": "/products/categories";
     "products_form": "/products/form";
     "products_list": "/products/list";
     "settings": "/settings";
@@ -138,6 +139,7 @@ declare module "@elegant-router/types" {
     | "payments_list"
     | "points_form"
     | "points_list"
+    | "products_categories"
     | "products_form"
     | "products_list"
     | "settings_business"

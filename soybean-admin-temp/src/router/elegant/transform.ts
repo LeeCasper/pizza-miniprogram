@@ -191,6 +191,7 @@ const routeMap: RouteMap = {
   "points_form": "/points/form",
   "points_list": "/points/list",
   "products": "/products",
+  "products_categories": "/products/categories",
   "products_form": "/products/form",
   "products_list": "/products/list",
   "settings": "/settings",
