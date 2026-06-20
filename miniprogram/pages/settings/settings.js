@@ -2,7 +2,7 @@
 const { api } = require('../../utils/api');
 const { getBackBtnTopBar } = require('../../utils/layout');
 const { logout } = require('../../utils/auth');
-const { getThemeStyle, getThemeColor, getNavBarStyle } = require('../../utils/theme');
+const { getThemeStyle, getThemeColor, getNavBarStyle, loadThemeConfig } = require('../../utils/theme');
 const _navBg = () => getNavBarStyle().nav;
 const app = getApp();
 
@@ -50,6 +50,11 @@ Page({
 
   applyTheme() {
     this.setData({ themeStyle: getThemeStyle(), themePrimaryColor: getThemeColor('primary'), navBarBg: _navBg() });
+  },
+
+  onShow() {
+    // 主题：本页经 navigateTo 打开，晚于 app.js 启动广播，需自加载并应用主题（与其它二级页一致）
+    loadThemeConfig().then(() => this.applyTheme());
   },
 
   onBack() {

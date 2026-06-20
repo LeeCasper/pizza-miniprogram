@@ -2,7 +2,7 @@
 const { api, fixImageUrl } = require('../../utils/api');
 const { getSwiperLayout } = require('../../utils/layout');
 const { SHOP_CATEGORIES } = require('../../utils/data');
-const { getThemeStyle, getThemeColor, getNavBarStyle, buildPageOverrideStyle, getPageNavStyle } = require('../../utils/theme');
+const { getThemeStyle, getThemeColor, getNavBarStyle, buildPageOverrideStyle, getPageNavStyle, loadThemeConfig } = require('../../utils/theme');
 const _navBg = () => getPageNavStyle('shop');
 const app = getApp();
 
@@ -36,6 +36,8 @@ Page({
       tabBar.setData({ selected: 2 });
     }
     this.syncCart();
+    // 主题：本页经 navigateTo 打开，晚于 app.js 启动广播，需自加载并应用主题（与其它二级页一致）
+    loadThemeConfig().then(() => this.applyTheme());
   },
 
   applyTheme() {
