@@ -6,9 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: 0 40rpx 24rpx;
-  background: var(--glass-bg-nav);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
+  /* background & backdrop-filter 由 inline style {{navBarBg}} 控制 */
   border-bottom: var(--glass-border-subtle);
   position: fixed;
   top: 0;

@@ -8,9 +8,7 @@
   justify-content: space-around;
   align-items: center;
   height: calc(100rpx + env(safe-area-inset-bottom));
-  background: var(--glass-bg-elevated);
-  -webkit-backdrop-filter: var(--glass-blur-lg);
-  backdrop-filter: var(--glass-blur-lg);
+  /* background & backdrop-filter 由 inline style {{tabBarBg}} 控制 */
   border-top: var(--glass-border-subtle);
   padding-bottom: env(safe-area-inset-bottom);
   z-index: 999;
