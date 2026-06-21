@@ -918,7 +918,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: var(--glass-bg-overlay);
+  background: var(--color-surface);
   opacity: 0;
   transition: opacity 0.3s;
 }
