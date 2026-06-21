@@ -35,6 +35,14 @@
    各 tab 的滚动区（.tab-scroll/.orders-scroll/...）本就自铺主题渐变，不受影响。 */
 .main-swiper { background: transparent; }
 
+/* Tab 切换：swiper 横向滑动已关闭(duration=0 + disable-touch)，无重栅格化卡顿；
+   切换瞬间给当前 pane 一个轻量淡入，丝滑不生硬。 */
+.swiper-pane.pane-active { animation: paneFadeIn 0.24s ease-out; }
+@keyframes paneFadeIn {
+  from { opacity: 0.4; }
+  to   { opacity: 1; }
+}
+
 .tab-scroll {
   padding: 0 0 72rpx;
   overflow-x: hidden;

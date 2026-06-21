@@ -21,12 +21,12 @@
     class="main-swiper"
     current="{{currentTab}}"
     bindchange="onSwiperChange"
-    duration="300"
-    easing-function="easeInOutCubic"
+    duration="0"
+    disable-touch="{{true}}"
     style="height: {{scrollViewHeight}}px;"
   >
     <!-- Tab 0: 首页 -->
-    <swiper-item>
+    <swiper-item class="swiper-pane {{currentTab === 0 ? 'pane-active' : ''}}">
       <scroll-view scroll-y class="tab-scroll" enhanced show-scrollbar="{{true}}" style="height: {{scrollViewHeight}}px; {{paneIndexStyle}}">
         <include src="tpl-index.wxml"/>
         <view style="height: calc({{cartCount > 0 ? 240 : 120}}rpx + env(safe-area-inset-bottom))"></view>
@@ -34,19 +34,19 @@
     </swiper-item>
 
     <!-- Tab 1: 订单（含 order-tabs + scroll-view，需 flex 包裹层） -->
-    <swiper-item>
+    <swiper-item class="swiper-pane {{currentTab === 1 ? 'pane-active' : ''}}">
       <view style="display: flex; flex-direction: column; height: {{scrollViewHeight}}px;">
         <include src="tpl-orders.wxml"/>
       </view>
     </swiper-item>
 
     <!-- Tab 2: 商城 -->
-    <swiper-item>
+    <swiper-item class="swiper-pane {{currentTab === 2 ? 'pane-active' : ''}}">
       <include src="tpl-shop.wxml"/>
     </swiper-item>
 
     <!-- Tab 3: 个人 -->
-    <swiper-item>
+    <swiper-item class="swiper-pane {{currentTab === 3 ? 'pane-active' : ''}}">
       <include src="tpl-profile.wxml"/>
     </swiper-item>
   </swiper>
