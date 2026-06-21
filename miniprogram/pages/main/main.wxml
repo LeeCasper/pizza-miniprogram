@@ -93,7 +93,7 @@
             <view class="qty-stepper">
               <view class="qty-btn" bindtap="onDecrease" data-id="{{item.id}}"><text class="qty-icon">−</text></view>
               <text class="qty-num">{{item.quantity}}</text>
-              <view class="qty-btn qty-plus" bindtap="onAddToCart" data-product="{{item}}"><text class="qty-icon">+</text></view>
+              <view class="qty-btn qty-plus" bindtap="onCartIncrease" data-product="{{item}}"><text class="qty-icon">+</text></view>
             </view>
           </view>
         </scroll-view>
