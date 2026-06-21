@@ -469,7 +469,7 @@
 .order-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24rpx; }
 .order-header-left { display: flex; flex-direction: column; gap: 8rpx; flex: 1; overflow: hidden; min-width: 0; }
 .order-store { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.order-no { font-size: 22rpx; color: var(--color-on-surface-variant); font-family: 'SF Mono', 'Menlo', 'Courier New', monospace; letter-spacing: 1rpx; }
+.order-no { font-size: 24rpx; color: var(--color-on-surface-variant); }
 .order-time { font-size: 24rpx; color: var(--color-on-surface-variant); }
 .order-header-right { display: flex; align-items: center; gap: 12rpx; flex-shrink: 0; }
 .order-status { padding: 8rpx 24rpx; border-radius: var(--radius-full); font-size: 24rpx; font-weight: var(--font-weight-semibold); flex-shrink: 0; box-shadow: inset 1rpx 1rpx 2rpx rgba(255,255,255,0.55), inset -1rpx -1rpx 3rpx rgba(120,108,94,0.2); }
