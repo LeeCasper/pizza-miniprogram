@@ -120,7 +120,7 @@
           <view class="price-breakdown" wx:if="{{couponDiscountAmount > 0 || tierDiscountAmount > 0}}">
             <view class="price-row"><text>商品合计</text><text>¥{{cartTotal}}</text></view>
             <view class="price-row discount" wx:if="{{couponDiscountAmount > 0}}"><text>优惠券减免</text><text>-¥{{couponDiscountText}}</text></view>
-            <view class="price-row" wx:if="{{tierDiscountAmount > 0}}"><text>会员{{tierName}}折扣</text><text>-¥{{tierDiscountText}}</text></view>
+            <view class="price-row" wx:if="{{tierDiscountAmount > 0}}"><text>{{tierName}}折扣</text><text>-¥{{tierDiscountText}}</text></view>
             <view class="price-row total"><text>应付金额</text><text class="final-price">¥{{finalPrice}}</text></view>
           </view>
           <!-- 支付方式 -->
