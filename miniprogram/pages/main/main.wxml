@@ -16,40 +16,32 @@
     </block>
   </view>
 
-  <!-- Swiper 主体 -->
-  <swiper
-    class="main-swiper"
-    current="{{currentTab}}"
-    bindchange="onSwiperChange"
-    duration="0"
-    disable-touch="{{true}}"
-    style="height: {{scrollViewHeight}}px;"
-  >
+  <!-- Tab 内容区：不用 swiper，杜绝左右滑动切页（原生 swiper 的 disable-touch 多版本被忽略）。
+       仅底部导航点击切 currentTab，用 hidden 显隐，切换即时 + pane-active 淡入。 -->
+  <view class="main-swiper" style="height: {{scrollViewHeight}}px;">
     <!-- Tab 0: 首页 -->
-    <swiper-item class="swiper-pane {{currentTab === 0 ? 'pane-active' : ''}}">
+    <view class="swiper-pane {{currentTab === 0 ? 'pane-active' : ''}}" hidden="{{currentTab !== 0}}" style="height: {{scrollViewHeight}}px;">
       <scroll-view scroll-y class="tab-scroll" enhanced show-scrollbar="{{true}}" style="height: {{scrollViewHeight}}px; {{paneIndexStyle}}">
         <include src="tpl-index.wxml"/>
         <view style="height: calc({{cartCount > 0 ? 240 : 120}}rpx + env(safe-area-inset-bottom))"></view>
       </scroll-view>
-    </swiper-item>
+    </view>
 
     <!-- Tab 1: 订单（含 order-tabs + scroll-view，需 flex 包裹层） -->
-    <swiper-item class="swiper-pane {{currentTab === 1 ? 'pane-active' : ''}}">
-      <view style="display: flex; flex-direction: column; height: {{scrollViewHeight}}px;">
-        <include src="tpl-orders.wxml"/>
-      </view>
-    </swiper-item>
+    <view class="swiper-pane {{currentTab === 1 ? 'pane-active' : ''}}" hidden="{{currentTab !== 1}}" style="display: flex; flex-direction: column; height: {{scrollViewHeight}}px;">
+      <include src="tpl-orders.wxml"/>
+    </view>
 
     <!-- Tab 2: 商城 -->
-    <swiper-item class="swiper-pane {{currentTab === 2 ? 'pane-active' : ''}}">
+    <view class="swiper-pane {{currentTab === 2 ? 'pane-active' : ''}}" hidden="{{currentTab !== 2}}" style="height: {{scrollViewHeight}}px;">
       <include src="tpl-shop.wxml"/>
-    </swiper-item>
+    </view>
 
     <!-- Tab 3: 个人 -->
-    <swiper-item class="swiper-pane {{currentTab === 3 ? 'pane-active' : ''}}">
+    <view class="swiper-pane {{currentTab === 3 ? 'pane-active' : ''}}" hidden="{{currentTab !== 3}}" style="height: {{scrollViewHeight}}px;">
       <include src="tpl-profile.wxml"/>
-    </swiper-item>
-  </swiper>
+    </view>
+  </view>
 
   <!-- 底部导航栏（固定，永不重渲染） -->
   <view class="tab-bar" style="{{tabBarBg}}">
