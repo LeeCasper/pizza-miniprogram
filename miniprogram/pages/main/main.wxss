@@ -615,7 +615,7 @@
 .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
 .card-status-label { display: block; font-size: 22rpx; color: #C8C6C5; text-transform: uppercase; letter-spacing: 4rpx; margin-bottom: 8rpx; }
 .card-level { font-size: 48rpx; font-weight: var(--font-weight-bold); color: #FFFFFF; letter-spacing: -2rpx; }
-.card-badge { width: 88rpx; height: 88rpx; background: rgba(255,255,255,0.1); border-radius: var(--radius-card); border: 1rpx solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; -webkit-backdrop-filter: blur(20rpx); backdrop-filter: blur(20rpx); }
+.card-badge { width: 88rpx; height: 88rpx; background: rgba(255,255,255,0.1); border-radius: var(--radius-card); border: 1rpx solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; }
 .badge-icon { font-size: 48rpx; }
 .card-bottom { display: flex; justify-content: space-between; align-items: flex-end; }
 .card-id-label { display: block; font-size: 22rpx; color: #C8C6C5; margin-bottom: 8rpx; }
@@ -630,7 +630,7 @@
 .privileges-scroll { width: 100%; }
 .privileges-row { display: flex; gap: 24rpx; padding: 0 0 12rpx; }
 .privilege-item { display: flex; flex-direction: column; align-items: center; gap: 12rpx; min-width: 112rpx; flex-shrink: 0; }
-.privilege-icon-wrap { width: 112rpx; height: 112rpx; border-radius: 28rpx; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; box-shadow: inset 0 4rpx 8rpx rgba(255,255,255,0.8), 0 4rpx 16rpx rgba(0,0,0,0.06); -webkit-backdrop-filter: blur(16rpx); backdrop-filter: blur(16rpx); transition: transform 0.2s; }
+.privilege-icon-wrap { width: 112rpx; height: 112rpx; border-radius: 28rpx; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; box-shadow: inset 0 4rpx 8rpx rgba(255,255,255,0.8), 0 4rpx 16rpx rgba(0,0,0,0.06); transition: transform 0.2s; }
 .privilege-icon-wrap:active { transform: translateY(-4rpx); }
 .privilege-icon-shine { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.5) 0%, transparent 50%); pointer-events: none; }
 .privilege-icon { font-size: 46rpx; position: relative; z-index: 1; filter: drop-shadow(0 2rpx 4rpx rgba(0,0,0,0.1)); }
@@ -641,7 +641,7 @@
 .privilege-icon-pink { background: rgba(252,231,243,0.6); border: 1rpx solid rgba(236,72,153,0.2); }
 .privilege-icon-teal { background: rgba(190,242,42,0.2); border: 1rpx solid rgba(16,185,129,0.15); }
 
-.coupon-banner { display: flex; align-items: center; justify-content: space-between; padding: 20rpx 24rpx; margin-bottom: 24rpx; background: rgba(233,233,221,0.4); -webkit-backdrop-filter: blur(24rpx); backdrop-filter: blur(24rpx); border-radius: 24rpx; border: 1rpx solid rgba(255,255,255,0.5); box-shadow: var(--shadow-sm); }
+.coupon-banner { display: flex; align-items: center; justify-content: space-between; padding: 20rpx 24rpx; margin-bottom: 24rpx; background: rgba(233,233,221,0.4); border-radius: 24rpx; border: 1rpx solid rgba(255,255,255,0.5); box-shadow: var(--shadow-sm); }
 .coupon-banner-left { display: flex; align-items: center; gap: 12rpx; }
 .coupon-banner-icon { font-size: 28rpx; }
 .coupon-banner-text { font-size: 24rpx; font-weight: 600; color: var(--color-on-surface); }

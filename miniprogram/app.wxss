@@ -88,31 +88,35 @@ page {
   --font-weight-medium: 500;
   --font-weight-regular: 400;
 
-  /* ── 毛玻璃 Glassmorphism Tokens ──
-     大幅降低不透明度 + 加强 blur + 白色发光边框
-     彩色渐变底层让磨砂效果一眼可见 */
-  --glass-bg-card: rgba(255, 255, 255, 0.50);
-  --glass-bg-elevated: rgba(255, 255, 255, 0.62);
-  --glass-bg-light: rgba(255, 255, 255, 0.30);
-  --glass-bg-nav: rgba(245, 240, 255, 0.60);
-  --glass-bg-primary: rgba(197, 131, 255, 0.82);
-  --glass-bg-primary-light: rgba(197, 131, 255, 0.10);
-  --glass-bg-primary-container: rgba(240, 224, 255, 0.65);
-  --glass-bg-dark: rgba(26, 27, 46, 0.82);
+  /* ── 玻璃 Tokens（静态「假玻璃」，无 backdrop-filter）──
+     去实时模糊：App 切回前台时 WeChat 会把 backdrop-filter 层 tear-down→重栅格化→闪一帧。
+     改为：不透明底 + 表面微渐变光泽 + 顶缘内高光(inset) + 浮起投影 —— 静态绘制立体感，
+     既不闪又保玻璃质感。--glass-blur* 保留为 none 以中和全部 backdrop-filter 引用。
+     例外：--glass-bg-overlay 是弹层蒙层，必须保持半透明（改不透明会盖黑弹层背后整屏）。 */
+  --glass-bg-card: linear-gradient(160deg, #FFFFFF 0%, #F6F1FE 100%);
+  --glass-bg-elevated: linear-gradient(160deg, #FFFFFF 0%, #FAF7FF 100%);
+  --glass-bg-light: #F3EDFB;
+  --glass-bg-nav: #F2ECFD;
+  --glass-bg-primary: linear-gradient(160deg, #C583FF 0%, #B566F5 100%);
+  --glass-bg-primary-light: #F3E8FF;
+  --glass-bg-primary-container: #F0E0FF;
+  --glass-bg-dark: #1F2138;
   --glass-bg-overlay: rgba(0, 0, 0, 0.40);
 
-  --glass-blur-sm: saturate(200%) blur(16px);
-  --glass-blur: saturate(200%) blur(28px);
-  --glass-blur-lg: saturate(200%) blur(40px);
+  /* 去模糊：全部 backdrop-filter: var(--glass-blur*) 引用就地变 none，一处灭全站闪烁 */
+  --glass-blur-sm: none;
+  --glass-blur: none;
+  --glass-blur-lg: none;
 
   --glass-border: 2rpx solid rgba(255, 255, 255, 0.55);
   --glass-border-subtle: 1rpx solid rgba(255, 255, 255, 0.30);
   --glass-border-colored: 2rpx solid rgba(197, 131, 255, 0.25);
   --glass-border-dark: 1rpx solid rgba(255, 255, 255, 0.12);
 
-  --glass-shadow-card: 0 4rpx 20rpx rgba(197, 131, 255, 0.08);
-  --glass-shadow-elevated: 0 6rpx 28rpx rgba(197, 131, 255, 0.12);
-  --glass-shadow-button: 0 6rpx 20rpx rgba(197, 131, 255, 0.22);
+  /* inset 顶缘亮线 = 玻璃接光高光（静态，不重栅格化）；叠原有外投影 = 浮起立体感 */
+  --glass-shadow-card: inset 0 1rpx 0 rgba(255, 255, 255, 0.9), 0 4rpx 20rpx rgba(197, 131, 255, 0.10);
+  --glass-shadow-elevated: inset 0 1rpx 0 rgba(255, 255, 255, 0.9), 0 6rpx 28rpx rgba(197, 131, 255, 0.12);
+  --glass-shadow-button: inset 0 1rpx 0 rgba(255, 255, 255, 0.35), 0 6rpx 20rpx rgba(197, 131, 255, 0.22);
 
   /* ── 渐变色变量 ── */
   --gradient-1: #E8D4FF;
