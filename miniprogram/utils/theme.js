@@ -114,20 +114,23 @@ function darken(hex, amount) {
 }
 
 // ── 毛玻璃强度预设 ───────────────────────────────────────
+// 注意：已全局移除 backdrop-filter（切回前台闪烁）。弹窗本体(.detail-drawer/.cart-drawer/
+// .coupon-picker)背景用 --glass-bg-elevated，必须不透明(elevatedOpacity=1)，
+// 否则去模糊后弹窗本体会透出背后页面。蒙层(--glass-bg-overlay)仍保持半透明用于弹窗外变暗。
 
 const GLASS_PRESETS = {
   low: {
-    cardOpacity: 0.70, elevatedOpacity: 0.80, lightOpacity: 0.50, navOpacity: 0.75,
+    cardOpacity: 0.70, elevatedOpacity: 1, lightOpacity: 0.50, navOpacity: 0.75,
     blurSm: '12px', blur: '16px', blurLg: '24px',
     borderOpacity: 0.20, borderSubtleOpacity: 0.15,
   },
   medium: {
-    cardOpacity: 0.50, elevatedOpacity: 0.62, lightOpacity: 0.30, navOpacity: 0.60,
+    cardOpacity: 0.50, elevatedOpacity: 1, lightOpacity: 0.30, navOpacity: 0.60,
     blurSm: '16px', blur: '28px', blurLg: '40px',
     borderOpacity: 0.55, borderSubtleOpacity: 0.30,
   },
   high: {
-    cardOpacity: 0.35, elevatedOpacity: 0.45, lightOpacity: 0.20, navOpacity: 0.40,
+    cardOpacity: 0.35, elevatedOpacity: 1, lightOpacity: 0.20, navOpacity: 0.40,
     blurSm: '24px', blur: '40px', blurLg: '56px',
     borderOpacity: 0.70, borderSubtleOpacity: 0.45,
   },
