@@ -22,7 +22,8 @@
   z-index: 100;
 }
 
-.top-bar-left { display: flex; align-items: center; }
+.top-bar-left { display: flex; align-items: center; gap: 16rpx; }
+.brand-logo { width: 56rpx; height: 56rpx; border-radius: 12rpx; flex-shrink: 0; }
 
 .brand-title { font-size: 36rpx; font-weight: var(--font-weight-bold); color: var(--color-primary); }
 .top-title { font-size: 36rpx; font-weight: var(--font-weight-bold); color: var(--color-primary); }

@@ -3,7 +3,7 @@
   <!-- 顶部导航栏（按 Tab 切换标题） -->
   <view class="top-bar" style="padding-top: {{statusBarHeight}}px;">
     <block wx:if="{{currentTab === 0}}">
-      <view class="top-bar-left"><text class="brand-title">王姐手工披萨</text></view>
+      <view class="top-bar-left"><image class="brand-logo" src="/images/wangjie-logo.png" mode="aspectFit"/><text class="brand-title">王姐手工披萨</text></view>
     </block>
     <block wx:elif="{{currentTab === 1}}">
       <text class="top-title">订单中心</text>
