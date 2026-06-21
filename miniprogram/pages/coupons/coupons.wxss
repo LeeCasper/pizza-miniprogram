@@ -284,7 +284,8 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: var(--color-surface);
+  /* 弹窗蒙层：半透明暗底，弹窗外页面变暗但仍可见（标准弹窗交互，非全白遮盖） */
+  background: var(--glass-bg-overlay);
   opacity: 0;
   transition: opacity 0.3s;
 }

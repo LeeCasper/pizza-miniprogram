@@ -251,9 +251,8 @@
 .cart-overlay.show { visibility: visible; }
 .cart-overlay::before {
   content: ''; position: absolute; inset: 0;
-  /* 去 backdrop-filter 后，原 40% 黑半透明蒙层会透出背后菜单（结算抽屉仅 80vh，上方约 20vh 露页面）；
-     改不透明浅底，与商品/优惠券/积分详情弹层一致，避免“结算页变透明”。 */
-  background: var(--color-surface);
+  /* 弹窗蒙层：半透明暗底，结算抽屉外的页面变暗但仍可见（标准弹窗交互，非全白遮盖） */
+  background: var(--glass-bg-overlay);
   opacity: 0; transition: opacity 0.3s;
 }
 .cart-overlay.show::before { opacity: 1; }
@@ -928,7 +927,8 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: var(--color-surface);
+  /* 弹窗蒙层：半透明暗底，弹窗外页面变暗但仍可见（标准弹窗交互，非全白遮盖） */
+  background: var(--glass-bg-overlay);
   opacity: 0;
   transition: opacity 0.3s;
 }
