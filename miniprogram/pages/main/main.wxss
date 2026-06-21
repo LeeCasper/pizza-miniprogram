@@ -685,13 +685,13 @@
 /* ===== 个人中心 ===== */
 .profile-card { margin: 16rpx 0 8rpx; padding: 24rpx 32rpx; border-radius: 32rpx; background: transparent; }
 .profile-card-top { display: flex; align-items: center; gap: 20rpx; }
-.avatar-wrap { width: 88rpx; height: 88rpx; border-radius: var(--radius-full); overflow: hidden; flex-shrink: 0;
+.avatar-wrap { width: 112rpx; height: 112rpx; border-radius: var(--radius-full); overflow: hidden; flex-shrink: 0;
   /* 粘土头像：白描边环 + 外柔影 + 顶微高光（鼓起浮起感） */
   box-shadow: 0 0 0 4rpx #FFFFFF, 0 8rpx 16rpx rgba(120, 108, 94, 0.20), 0 -1rpx 4rpx rgba(255, 255, 255, 0.6); }
 .avatar { width: 100%; height: 100%; }
 .avatar-placeholder { border-radius: 9999rpx; background: var(--color-surface-container); }
 .profile-info { flex: 1; display: flex; flex-direction: column; gap: 4rpx; min-width: 0; }
-.profile-name { font-size: 32rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); }
+.profile-name { font-size: 38rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); }
 .profile-bio { font-size: 24rpx; color: var(--color-on-surface-variant); }
 /* 会员编号：粘土小药丸（柔紫实底 + 内顶高光 + 内底暗影 + 外柔影） */
 .profile-member-id {
