@@ -468,7 +468,9 @@
 }
 .order-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24rpx; }
 .order-header-left { display: flex; flex-direction: column; gap: 8rpx; flex: 1; overflow: hidden; min-width: 0; }
-.order-store { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.order-store { display: flex; align-items: center; gap: 10rpx; min-width: 0; }
+.order-store-icon { width: 44rpx; height: 44rpx; flex-shrink: 0; border-radius: 8rpx; }
+.order-store-name { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .order-no { font-size: 24rpx; color: var(--color-on-surface-variant); }
 .order-time { font-size: 24rpx; color: var(--color-on-surface-variant); }
 .order-header-right { display: flex; align-items: center; gap: 12rpx; flex-shrink: 0; }

@@ -21,7 +21,10 @@
       <view wx:for="{{filteredOrders}}" wx:key="id" class="order-card card order-{{item.status}}">
         <view class="order-header">
           <view class="order-header-left">
-            <text class="order-store">🏪 {{item.store}}</text>
+            <view class="order-store">
+              <image class="order-store-icon" src="/images/store-icon.png" mode="aspectFit"/>
+              <text class="order-store-name">王姐的店</text>
+            </view>
             <text class="order-no">单号 {{item.id}}</text>
             <text class="order-time">{{item.time}}</text>
           </view>
