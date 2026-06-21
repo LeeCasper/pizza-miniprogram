@@ -299,7 +299,7 @@
 .cart-item-name { font-size: 30rpx; font-weight: var(--font-weight-semibold); color: #5E5142; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cart-item-tags { display: flex; flex-wrap: wrap; gap: 8rpx; }
 .cart-item-tag { font-size: 20rpx; color: #8A7B66; background: #F1ECE3; padding: 4rpx 14rpx; border-radius: 8rpx; box-shadow: inset 2rpx 2rpx 3rpx rgba(255, 255, 255, 0.9), inset -2rpx -2rpx 3rpx rgba(120, 108, 94, 0.12); white-space: nowrap; }
-.cart-item-price { font-size: 28rpx; font-weight: var(--font-weight-bold); color: #C0563A; }
+.cart-item-price { font-size: 28rpx; font-weight: var(--font-weight-bold); color: var(--color-price); }
 .cart-empty { padding: 80rpx 0; text-align: center; color: #8A7B66; font-size: 28rpx; }
 .cart-footer { padding: 24rpx 40rpx; padding-bottom: calc(24rpx + env(safe-area-inset-bottom)); border-top: 1rpx solid var(--color-divider); }
 .checkout-btn {
@@ -360,7 +360,7 @@
 }
 .price-row.discount { color: var(--color-tertiary); }
 .price-row.total { padding-top: 12rpx; font-size: 28rpx; color: #5E5142; font-weight: var(--font-weight-semibold); }
-.final-price { color: #C0563A; font-size: 32rpx; font-weight: var(--font-weight-bold); }
+.final-price { color: var(--color-price); font-size: 32rpx; font-weight: var(--font-weight-bold); }
 
 /* ===== 优惠券选择弹窗 ===== */
 .coupon-picker-overlay {

@@ -4,7 +4,7 @@
 page {
   /* ── 主色 - 暖陶土 Warm Terracotta ── */
   --color-primary: #C0563A;
-  --color-price: #C0563A;
+  --color-price: #C0392B;
   --color-primary-dark: #9E4329;
   --color-primary-light: #E0B8A8;
   --color-on-primary: #FFFFFF;
