@@ -2,13 +2,9 @@
 const { api, fixImageUrl } = require('../../utils/api');
 const app = getApp();
 const { getSimpleTopBar } = require('../../utils/layout');
-const { getThemeStyle, getNavBarStyle, loadThemeConfig } = require('../../utils/theme');
-const _navBg = () => getNavBarStyle().nav;
 
 Page({
   data: {
-    themeStyle: getThemeStyle(),
-    navBarBg: _navBg(),
     statusBarHeight: 44,
     topBarTotalHeight: 80,
     products: [],
@@ -123,15 +119,6 @@ Page({
     }).catch(() => {
       wx.hideLoading();
     });
-  },
-
-  onShow() {
-    // 主题：本页经 navigateTo 打开，晚于 app.js 启动广播，需自加载并应用主题
-    loadThemeConfig().then(() => this.applyTheme());
-  },
-
-  applyTheme() {
-    this.setData({ themeStyle: getThemeStyle(), navBarBg: _navBg() });
   },
 
   noop() {}

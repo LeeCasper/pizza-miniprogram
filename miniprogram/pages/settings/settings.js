@@ -2,15 +2,10 @@
 const { api } = require('../../utils/api');
 const { getBackBtnTopBar } = require('../../utils/layout');
 const { logout } = require('../../utils/auth');
-const { getThemeStyle, getThemeColor, getNavBarStyle, loadThemeConfig } = require('../../utils/theme');
-const _navBg = () => getNavBarStyle().nav;
 const app = getApp();
 
 Page({
   data: {
-    themeStyle: getThemeStyle(),
-    navBarBg: _navBg(),
-    themePrimaryColor: getThemeColor('primary'),
     statusBarHeight: 44,
     topBarTotalHeight: 80,
     notificationEnabled: true,
@@ -46,15 +41,6 @@ Page({
         });
       }
     }).catch(() => {});
-  },
-
-  applyTheme() {
-    this.setData({ themeStyle: getThemeStyle(), themePrimaryColor: getThemeColor('primary'), navBarBg: _navBg() });
-  },
-
-  onShow() {
-    // 主题：本页经 navigateTo 打开，晚于 app.js 启动广播，需自加载并应用主题（与其它二级页一致）
-    loadThemeConfig().then(() => this.applyTheme());
   },
 
   onBack() {
@@ -96,7 +82,7 @@ Page({
       title: '确认注销账号',
       content: '注销后将删除您的个人信息、清零余额和积分，且无法恢复。',
       confirmText: '继续注销',
-      confirmColor: getThemeColor('primary'),
+      confirmColor: '#C0563A',
       success: (res) => {
         if (!res.confirm) return;
         // 二次确认
@@ -104,7 +90,7 @@ Page({
           title: '再次确认',
           content: '此操作不可撤销，确定要注销账号吗？',
           confirmText: '确定注销',
-          confirmColor: getThemeColor('primary'),
+          confirmColor: '#C0563A',
           success: (res2) => {
             if (!res2.confirm) return;
             wx.showLoading({ title: '处理中...' });

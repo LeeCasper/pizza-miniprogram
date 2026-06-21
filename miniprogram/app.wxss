@@ -2,14 +2,14 @@
    四色糖果配色 + 超强毛玻璃：紫/黄/绿/青
    彩色渐变底层让玻璃效果一眼可见 */
 page {
-  /* ── 主色 - 糖果紫 Candy Purple ── */
-  --color-primary: #C583FF;
-  --color-price: #C583FF;
-  --color-primary-dark: #9B4DDB;
-  --color-primary-light: #E8D0FF;
+  /* ── 主色 - 暖陶土 Warm Terracotta ── */
+  --color-primary: #C0563A;
+  --color-price: #C0563A;
+  --color-primary-dark: #9E4329;
+  --color-primary-light: #E0B8A8;
   --color-on-primary: #FFFFFF;
-  --color-primary-container: #F0E0FF;
-  --color-on-primary-container: #6A1B9A;
+  --color-primary-container: #F5E2D8;
+  --color-on-primary-container: #7A3220;
 
   /* ── 辅色 - 柠檬黄 Lemon Yellow ── */
   --color-secondary: #FFF292;
@@ -23,41 +23,41 @@ page {
   --color-tertiary-container: #C8FFB8;
   --color-on-tertiary: #1B5E20;
 
-  /* ── 表面/背景色 - 淡薰衣草 Soft Lavender ── */
-  --color-background: #F5F0FF;
-  --color-surface: #F5F0FF;
-  --color-surface-container: #EDE6F7;
-  --color-surface-container-low: #F3EDF9;
+  /* ── 表面/背景色 - 暖奶油 Warm Cream ── */
+  --color-background: #F7F1E9;
+  --color-surface: #F7F1E9;
+  --color-surface-container: #F1EADD;
+  --color-surface-container-low: #F5EFE4;
   --color-surface-container-lowest: #FFFFFF;
-  --color-surface-container-high: #E5DDF0;
-  --color-surface-container-highest: #DDD5E8;
-  --color-surface-dim: #D5CCE0;
-  --color-surface-bright: #F8F4FF;
+  --color-surface-container-high: #ECE3D5;
+  --color-surface-container-highest: #E4DAC9;
+  --color-surface-dim: #DDD2BE;
+  --color-surface-bright: #FAF6EF;
 
   /* ── 文字色 - 冷深色 ── */
   --color-on-background: #1A1B2E;
   --color-on-surface: #1A1B2E;
-  --color-on-surface-variant: #5B4D6E;
+  --color-on-surface-variant: #8A7B66;
 
-  /* ── 描边 - 薰衣草灰调 ── */
-  --color-outline: #9B8EC4;
-  --color-outline-variant: #D4C8E8;
-  --color-divider: #E5DDF0;
+  /* ── 描边 - 暖灰调 ── */
+  --color-outline: #B0A593;
+  --color-outline-variant: #E0D6C6;
+  --color-divider: #E8E0D4;
 
   /* ── 错误（语义色，不随品牌变） ── */
   --color-error: #D32F2F;
   --color-error-container: #FFDAD6;
 
-  /* ── 阴影 - 紫调层次系统 ──
-     阴影掺入微量 Primary Purple
+  /* ── 阴影 - 暖灰层次系统 ──
+     阴影掺入微量暖灰（与黏土投影一致）
      L1 卡片 / L2 按钮 / L3 模态 */
-  --shadow-xs: 0 1rpx 4rpx rgba(197, 131, 255, 0.05);
-  --shadow-sm: 0 2rpx 8rpx rgba(197, 131, 255, 0.07);
-  --shadow-card: 0 4rpx 20rpx rgba(197, 131, 255, 0.10);
-  --shadow-button: 0 8rpx 24rpx rgba(197, 131, 255, 0.18);
-  --shadow-elevated: 0 8rpx 28rpx rgba(197, 131, 255, 0.10);
-  --shadow-modal: 0 12rpx 40rpx rgba(100, 50, 150, 0.12);
-  --shadow-primary: 0 4rpx 16rpx rgba(197, 131, 255, 0.25);
+  --shadow-xs: 0 1rpx 4rpx rgba(120, 108, 94, 0.06);
+  --shadow-sm: 0 2rpx 8rpx rgba(120, 108, 94, 0.08);
+  --shadow-card: 0 4rpx 20rpx rgba(120, 108, 94, 0.12);
+  --shadow-button: 0 8rpx 24rpx rgba(120, 108, 94, 0.18);
+  --shadow-elevated: 0 8rpx 28rpx rgba(120, 108, 94, 0.12);
+  --shadow-modal: 0 12rpx 40rpx rgba(60, 50, 40, 0.16);
+  --shadow-primary: 0 4rpx 16rpx rgba(120, 108, 94, 0.20);
 
   /* ── 圆角 - 8px 基准 (16rpx) ── */
   --radius-card: 24rpx;
@@ -93,13 +93,13 @@ page {
      改为：不透明底 + 表面微渐变光泽 + 顶缘内高光(inset) + 浮起投影 —— 静态绘制立体感，
      既不闪又保玻璃质感。--glass-blur* 保留为 none 以中和全部 backdrop-filter 引用。
      例外：--glass-bg-overlay 是弹层蒙层，必须保持半透明（改不透明会盖黑弹层背后整屏）。 */
-  --glass-bg-card: linear-gradient(160deg, #FFFFFF 0%, #F6F1FE 100%);
-  --glass-bg-elevated: linear-gradient(160deg, #FFFFFF 0%, #FAF7FF 100%);
-  --glass-bg-light: #F3EDFB;
-  --glass-bg-nav: #F2ECFD;
-  --glass-bg-primary: linear-gradient(160deg, #C583FF 0%, #B566F5 100%);
-  --glass-bg-primary-light: #F3E8FF;
-  --glass-bg-primary-container: #F0E0FF;
+  --glass-bg-card: linear-gradient(160deg, #FFFFFF 0%, #F4F0E9 100%);
+  --glass-bg-elevated: linear-gradient(160deg, #FFFFFF 0%, #F8F4EC 100%);
+  --glass-bg-light: #F1ECE3;
+  --glass-bg-nav: #F3ECE0;
+  --glass-bg-primary: linear-gradient(160deg, #C0563A 0%, #A8492F 100%);
+  --glass-bg-primary-light: #F7E9E2;
+  --glass-bg-primary-container: #F5E2D8;
   --glass-bg-dark: #1F2138;
   --glass-bg-overlay: rgba(0, 0, 0, 0.40);
 
@@ -113,19 +113,19 @@ page {
 
   --glass-border: 2rpx solid rgba(255, 255, 255, 0.55);
   --glass-border-subtle: 1rpx solid rgba(255, 255, 255, 0.30);
-  --glass-border-colored: 2rpx solid rgba(197, 131, 255, 0.25);
+  --glass-border-colored: 2rpx solid rgba(120, 108, 94, 0.22);
   --glass-border-dark: 1rpx solid rgba(255, 255, 255, 0.12);
 
-  /* inset 顶缘亮线 = 玻璃接光高光（静态，不重栅格化）；叠原有外投影 = 浮起立体感 */
-  --glass-shadow-card: inset 0 1rpx 0 rgba(255, 255, 255, 0.9), 0 4rpx 20rpx rgba(197, 131, 255, 0.10);
-  --glass-shadow-elevated: inset 0 1rpx 0 rgba(255, 255, 255, 0.9), 0 6rpx 28rpx rgba(197, 131, 255, 0.12);
-  --glass-shadow-button: inset 0 1rpx 0 rgba(255, 255, 255, 0.35), 0 6rpx 20rpx rgba(197, 131, 255, 0.22);
+  /* inset 顶缘亮线 = 接光高光（静态，不重栅格化）；叠暖灰外投影 = 浮起立体感 */
+  --glass-shadow-card: inset 0 1rpx 0 rgba(255, 255, 255, 0.9), 0 4rpx 20rpx rgba(120, 108, 94, 0.12);
+  --glass-shadow-elevated: inset 0 1rpx 0 rgba(255, 255, 255, 0.9), 0 6rpx 28rpx rgba(120, 108, 94, 0.14);
+  --glass-shadow-button: inset 0 1rpx 0 rgba(255, 255, 255, 0.35), 0 6rpx 20rpx rgba(120, 108, 94, 0.20);
 
-  /* ── 渐变色变量 ── */
-  --gradient-1: #E8D4FF;
-  --gradient-2: #D0FFCE;
-  --gradient-3: #FFF4B0;
-  --gradient-4: #C0F2FF;
+  /* ── 渐变色变量 - 暖奶油 ── */
+  --gradient-1: #FBF6EE;
+  --gradient-2: #F3ECE0;
+  --gradient-3: #F7F1E6;
+  --gradient-4: #EFE7D8;
 }
 
 /* === 全局基础样式 === */
@@ -135,10 +135,9 @@ page, view, text, image, scroll-view, swiper, swiper-item, navigator, button, in
 
 page {
   height: 100vh;
-  background-color: #F0EAFF;
-  /* page 自身渐变中和：彩色渐变改由 .app-root / .page-container（带 themeStyle 主题变量）绘制。
-     page 是祖先元素，读不到子元素内联的 --gradient-* 覆盖值，会永远停留在硬编码彩色渐变，
-     并从半透明导航栏（top-bar/tab-bar）背后漏出 —— 这正是「导航栏不跟随背景色」的根因。 */
+  background-color: #F6F1E9;
+  /* page 渐变中和：彩色渐变改由 .app-root / .page-container 绘制（读静态 --gradient-* 暖奶油值）。
+     page 是祖先元素，置 background-image:none，避免从固定导航栏背后漏出与内容区不一致的底色。 */
   background-image: none;
   color: var(--color-on-background);
   font-family: var(--font-family);
@@ -164,9 +163,8 @@ swiper, swiper-item {
   background-image: linear-gradient(135deg, var(--gradient-1) 0%, var(--gradient-2) 25%, var(--gradient-3) 50%, var(--gradient-4) 75%, var(--gradient-1) 100%);
 }
 
-/* 全屏根容器 — 主题渐变权威层。
-   themeStyle（含后台覆盖的 --gradient-1~4）内联在 .app-root 上，故此处读到的是主题值（如白色），
-   而非 page 上的硬编码默认值。100vh 全覆盖盖住 page，半透明导航栏 backdrop 采样到的就是这层主题渐变。 */
+/* 全屏根容器 — 背景渐变权威层（静态 --gradient-1~4，暖奶油）。
+   100vh 全覆盖盖住 page，固定导航栏（不透明暖底）压在其上，整页底色统一。 */
 .app-root {
   min-height: 100vh;
   background-image: linear-gradient(135deg, var(--gradient-1) 0%, var(--gradient-2) 25%, var(--gradient-3) 50%, var(--gradient-4) 75%, var(--gradient-1) 100%);

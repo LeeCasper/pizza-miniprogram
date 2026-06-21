@@ -1,15 +1,7 @@
 // custom-tab-bar/index.js
-const { getNavBarStyle } = require('../utils/theme');
-
-function _tabBg() {
-  const s = getNavBarStyle();
-  return s.tabBar;
-}
-
 Component({
   data: {
     selected: 0,
-    tabBarBg: _tabBg(),
     list: [
       { pagePath: '/pages/index/index', text: '点单', icon: '/images/tab-menu.png' },
       { pagePath: '/pages/orders/orders', text: '订单', icon: '/images/tab-orders.png' },
@@ -18,16 +10,7 @@ Component({
     ]
   },
 
-  pageLifetimes: {
-    show() {
-      this.setData({ tabBarBg: _tabBg() });
-    }
-  },
-
   methods: {
-    applyTheme() {
-      this.setData({ tabBarBg: _tabBg() });
-    },
     switchTab(e) {
       const { index, path } = e.currentTarget.dataset;
       if (this.data.selected === index) return;

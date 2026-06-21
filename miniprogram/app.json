@@ -12,9 +12,9 @@
   ],
   "window": {
     "navigationBarTitleText": "王姐手工披萨",
-    "navigationBarBackgroundColor": "#C583FF",
-    "navigationBarTextStyle": "white",
-    "backgroundColor": "#F5F0FF",
+    "navigationBarBackgroundColor": "#F6F1E9",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#F6F1E9",
     "backgroundTextStyle": "light"
   },
   "permission": {

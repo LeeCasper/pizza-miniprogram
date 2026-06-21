@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 32rpx 24rpx;
-  /* background & backdrop-filter 由 inline style {{navBarBg}} 控制 */
+  background: var(--glass-bg-nav);
   border-bottom: var(--glass-border-subtle);
   position: fixed;
   top: 0;
@@ -360,7 +360,7 @@
   transition: transform 0.15s;
 }
 
-.grid-icon-red { background: rgba(197, 131, 255, 0.10); }
+.grid-icon-red { background: rgba(120, 108, 94, 0.10); }
 .grid-icon-gold { background: rgba(255, 242, 146, 0.15); }
 .grid-icon-green { background: rgba(160, 255, 146, 0.12); }
 .grid-icon-gray { background: var(--color-surface-container); }

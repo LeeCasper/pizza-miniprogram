@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 32rpx 20rpx;
-  /* background & backdrop-filter 由 inline style {{navBarBg}} 控制 */
+  background: var(--glass-bg-nav);
   border-bottom: var(--glass-border-subtle);
   position: fixed;
   top: 0;
@@ -44,11 +44,11 @@
 
 /* ── 余额卡片 ── */
 .balance-card {
-  background: linear-gradient(135deg, #C583FF, #9B4DDB);
+  background: linear-gradient(160deg, #7A6F61 0%, #5C5249 100%);
   border-radius: 24rpx;
   padding: 40rpx 36rpx;
   margin-bottom: 40rpx;
-  box-shadow: 0 8rpx 28rpx -6rpx rgba(197, 131, 255, 0.35);
+  box-shadow: 0 8rpx 28rpx -6rpx rgba(60, 50, 40, 0.30);
 }
 
 .balance-label {
@@ -137,7 +137,7 @@
 
 .custom-active {
   color: var(--color-primary);
-  background: rgba(197, 131, 255, 0.08);
+  background: rgba(120, 108, 94, 0.08);
 }
 
 .custom-input-wrap {
@@ -179,11 +179,11 @@
   width: 100%;
   padding: 28rpx 0;
   border-radius: var(--radius-full);
-  background: linear-gradient(135deg, #C583FF, #9B4DDB);
+  background: linear-gradient(160deg, #7A6F61 0%, #5C5249 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6rpx 20rpx rgba(197, 131, 255, 0.25);
+  box-shadow: 0 6rpx 20rpx rgba(120, 108, 94, 0.25);
 }
 
 .recharge-btn:active {

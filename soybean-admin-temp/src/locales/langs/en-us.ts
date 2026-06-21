@@ -283,7 +283,6 @@ const local: App.I18n.Schema = {
     settings_printer: 'Printer Config',
     settings_store: 'Store Settings',
     settings_business: 'Business',
-    settings_theme: 'Theme',
   },
   page: {
     login: {

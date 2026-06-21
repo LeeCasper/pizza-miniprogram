@@ -74,7 +74,7 @@
 .shop-cat-icon-wrap.cat-active {
   background: var(--glass-bg-primary-light);
   border: var(--glass-border-colored);
-  box-shadow: 0 2rpx 8rpx rgba(197,131,255,0.15);
+  box-shadow: 0 2rpx 8rpx rgba(120,108,94,0.15);
 }
 .shop-cat-icon { font-size: 48rpx; line-height: 1; }
 .shop-cat-name { font-size: 22rpx; color: var(--color-on-surface); font-weight: 500; }
@@ -85,7 +85,7 @@
   display: flex; align-items: center; justify-content: space-between;
   margin: 16rpx 0 24rpx;
   padding: 24rpx 28rpx;
-  background: linear-gradient(135deg, rgba(240,224,255,0.4) 0%, rgba(197,131,255,0.15) 100%);
+  background: linear-gradient(135deg, rgba(244,235,226,0.4) 0%, rgba(120,108,94,0.15) 100%);
   border-radius: var(--radius-card);
   border: 2rpx solid var(--glass-border-colored);
 }

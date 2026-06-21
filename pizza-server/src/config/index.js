@@ -67,21 +67,6 @@ const config = {
     unpaidTimeoutMinutes: 30,
     storeName: '爱家店',
   },
-
-  theme: {
-    primaryColor: '#C583FF',
-    secondaryColor: '#FFF292',
-    tertiaryColor: '#A0FF92',
-    accentColor: '#91F5FF',
-    gradientColor1: '#E8D4FF',
-    gradientColor2: '#D0FFCE',
-    gradientColor3: '#FFF4B0',
-    gradientColor4: '#C0F2FF',
-    glassIntensity: 'medium',
-    // 分页主题覆盖（每页可独立覆盖卡片/价格/导航/按钮/文字/背景渐变色，留空=跟随全局）
-    // 形如 { index:{cardColor,priceColor,navColor,buttonColor,textColor,gradient1..4}, orders:{...}, ... }
-    pageOverrides: {},
-  },
 };
 
 // ── Production env validation ─────────────────────────

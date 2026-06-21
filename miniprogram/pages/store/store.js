@@ -1,8 +1,6 @@
 // pages/store/store.js
 const { api } = require('../../utils/api');
 const { calculateWalkingDistance, formatDistance } = require('../../utils/mapConfig');
-const { getThemeStyle, getThemeColor, getNavBarStyle, buildPageOverrideStyle, getPageNavStyle, loadThemeConfig } = require('../../utils/theme');
-const _navBg = () => getPageNavStyle('pickup');
 const app = getApp();
 const { getSimpleTopBar } = require('../../utils/layout');
 
@@ -19,9 +17,6 @@ const DEFAULT_PICKUP_NOTICES = [
 
 Page({
   data: {
-    themeStyle: getThemeStyle(),
-    navBarBg: _navBg(),
-    pageOverrideStyle: buildPageOverrideStyle('pickup'),
     statusBarHeight: 44,
     topBarTotalHeight: 80,
     store: null,
@@ -45,21 +40,9 @@ Page({
   // 距离计算节流时间戳
   _lastDistCalc: 0,
 
-  applyTheme() {
-    this.setData({ themeStyle: getThemeStyle(), themePrimaryColor: getThemeColor('primary'), navBarBg: _navBg(), pageOverrideStyle: buildPageOverrideStyle('pickup') });
-  },
-
   onLoad() {
     this.setData(getSimpleTopBar());
-    // 主题：本页经 navigateTo 打开，晚于 app.js 启动时的一次性主题广播，
-    // 必须自行加载并应用，否则 themeStyle 卡在空串、漏出 app.wxss 写死的兜底渐变。
-    loadThemeConfig().then(() => this.applyTheme());
     this.fetchStore();
-  },
-
-  onShow() {
-    // 再次进入页面时同步最新主题（此时 _themeStyle 多半已就绪）
-    this.applyTheme();
   },
 
   onUnload() {
@@ -199,7 +182,7 @@ Page({
       height: 32,
       callout: {
         content: s.name || '王姐手工披萨',
-        color: getThemeColor('primary'),
+        color: '#C0563A',
         fontSize: 14,
         borderRadius: 8,
         bgColor: '#FFFFFF',

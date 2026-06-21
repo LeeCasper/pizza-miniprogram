@@ -5,7 +5,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 40rpx 24rpx;
-  /* background & backdrop-filter 由 inline style {{navBarBg}} 控制 */
+  background: var(--glass-bg-nav);
   border-bottom: var(--glass-border-subtle);
   box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
   position: fixed;

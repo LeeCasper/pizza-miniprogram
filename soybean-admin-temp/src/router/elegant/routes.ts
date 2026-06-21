@@ -369,15 +369,6 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'settings_store',
           i18nKey: 'route.settings_store'
         }
-      },
-      {
-        name: 'settings_theme',
-        path: '/settings/theme',
-        component: 'view.settings_theme',
-        meta: {
-          title: 'settings_theme',
-          i18nKey: 'route.settings_theme'
-        }
       }
     ]
   },

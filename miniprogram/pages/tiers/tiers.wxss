@@ -12,7 +12,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 32rpx 20rpx;
-  /* background & backdrop-filter 由 inline style {{navBarBg}} 控制 */
+  background: var(--glass-bg-nav);
   border-bottom: var(--glass-border-subtle);
   box-shadow: 0 2rpx 20rpx rgba(0, 0, 0, 0.06);
   position: fixed;
@@ -270,7 +270,7 @@
 /* 选中态：红色边框 + 发光 + 微提亮 */
 .tier-compare-card.compare-card-selected {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 6rpx rgba(197, 131, 255, 0.22), 0 8rpx 32rpx rgba(0, 0, 0, 0.35);
+  box-shadow: 0 0 0 6rpx rgba(120, 108, 94, 0.22), 0 8rpx 32rpx rgba(0, 0, 0, 0.35);
   transform: translateY(-4rpx);
 }
 

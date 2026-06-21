@@ -1,7 +1,7 @@
 <!--pages/main/main.wxml-->
-<view class="app-root" style="{{themeStyle}} padding-top: {{topBarTotalHeight}}px">
+<view class="app-root" style="padding-top: {{topBarTotalHeight}}px">
   <!-- 顶部导航栏（按 Tab 切换标题） -->
-  <view class="top-bar" style="padding-top: {{statusBarHeight}}px; {{navBarBg}}">
+  <view class="top-bar" style="padding-top: {{statusBarHeight}}px;">
     <block wx:if="{{currentTab === 0}}">
       <view class="top-bar-left"><text class="brand-title">王姐手工披萨</text></view>
     </block>
@@ -23,7 +23,7 @@
   <view class="main-swiper" style="height: {{scrollViewHeight}}px;">
     <!-- Tab 0: 首页 -->
     <view class="swiper-pane {{currentTab === 0 ? 'pane-active' : ''}}" style="height: {{scrollViewHeight}}px; {{currentTab === 0 ? '' : 'display: none;'}}">
-      <scroll-view scroll-y class="tab-scroll" enhanced show-scrollbar="{{true}}" style="height: {{scrollViewHeight}}px; {{paneIndexStyle}}">
+      <scroll-view scroll-y class="tab-scroll" enhanced bounces="{{false}}" show-scrollbar="{{true}}" style="height: {{scrollViewHeight}}px;">
         <include src="tpl-index.wxml"/>
         <view style="height: calc({{cartCount > 0 ? 240 : 120}}rpx + env(safe-area-inset-bottom))"></view>
       </scroll-view>
@@ -46,7 +46,7 @@
   </view>
 
   <!-- 底部导航栏（固定，永不重渲染） -->
-  <view class="tab-bar" style="{{tabBarBg}}">
+  <view class="tab-bar">
     <view
       wx:for="{{tabList}}"
       wx:key="index"
@@ -61,7 +61,7 @@
 
   <!-- 购物车悬浮条 + 抽屉（仅首页显示） -->
   <block wx:if="{{currentTab === 0}}">
-    <view class="cart-bar {{cartCount > 0 && !detailOpen ? 'show' : ''}}" wx:if="{{cartCount > 0}}" bindtap="onCartBarTap" style="{{paneCheckoutStyle}}">
+    <view class="cart-bar {{cartCount > 0 && !detailOpen ? 'show' : ''}}" wx:if="{{cartCount > 0}}" bindtap="onCartBarTap">
       <view class="cart-bar-inner">
         <view class="cart-bar-left">
           <view class="cart-icon-wrap">
@@ -75,7 +75,7 @@
     </view>
 
     <view class="cart-overlay {{cartOpen ? 'show' : ''}}" catchtap="onCartClose">
-      <view class="cart-drawer {{cartOpen ? 'show' : ''}}" catchtap="noop" style="{{paneCheckoutStyle}}">
+      <view class="cart-drawer {{cartOpen ? 'show' : ''}}" catchtap="noop">
         <view class="cart-header">
           <text class="cart-title">已选商品</text>
           <view class="cart-clear" bindtap="onClearCart"><image class="cart-clear-icon" src="/images/trash.png" mode="aspectFit"></image><text>清空</text></view>
@@ -156,7 +156,7 @@
           <view wx:for="{{availableCoupons}}" wx:key="id"
             class="coupon-picker-item {{item.id === (selectedCoupon.id || 0) ? 'selected' : ''}} {{item.disabled ? 'disabled' : ''}}"
             bindtap="{{item.disabled ? 'noop' : 'onSelectCoupon'}}" data-coupon-id="{{item.id}}">
-            <view class="coupon-picker-tag" style="background: {{item.color || themePrimaryColor || '#C583FF'}}">
+            <view class="coupon-picker-tag" style="background: {{item.color || '#C0563A'}}">
               <text class="coupon-picker-tag-value">{{item.value}}</text>
               <text class="coupon-picker-tag-label">{{item.categoryLabel}}</text>
             </view>

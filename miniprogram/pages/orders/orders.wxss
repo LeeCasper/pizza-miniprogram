@@ -5,7 +5,7 @@
   align-items: center;
   justify-content: center;
   padding: 0 40rpx 24rpx;
-  /* background & backdrop-filter 由 inline style {{navBarBg}} 控制 */
+  background: var(--glass-bg-nav);
   border-bottom: var(--glass-border-subtle);
   position: fixed;
   top: 0;
@@ -312,7 +312,7 @@
   border: 1rpx solid rgba(255,255,255,0.2);
   color: var(--color-on-primary);
 }
-.order-action-btn.pay-btn { background: linear-gradient(135deg, #C583FF, #9B4DDB); color: #FFFFFF; box-shadow: 0 4rpx 16rpx rgba(197, 131, 255, 0.3); }
+.order-action-btn.pay-btn { background: linear-gradient(160deg, #7A6F61 0%, #5C5249 100%); color: #FFFFFF; box-shadow: 0 6rpx 16rpx rgba(60, 50, 40, 0.28), inset 2rpx 2rpx 4rpx rgba(255, 255, 255, 0.2), inset -3rpx -4rpx 8rpx rgba(30, 24, 18, 0.28); }
 .order-action-btn.pay-btn:active { transform: scale(0.96); opacity: 0.9; }
 
 /* 空状态 */

@@ -246,7 +246,7 @@ const coupons = [
     status: 'available',
     usedAt: null,
     code: 'MK2024D101',
-    color: '#C583FF',
+    color: '#C0563A',
     // 兑换券专属：兑换商品信息
     redeemProduct: {
       name: '经典玛格丽特披萨',
@@ -270,7 +270,7 @@ const coupons = [
     status: 'expired',
     usedAt: null,
     code: 'GX2024Q106',
-    color: '#9B4DDB',
+    color: '#9E4329',
     redeemProduct: {
       name: '季度限定礼盒',
       price: 199,

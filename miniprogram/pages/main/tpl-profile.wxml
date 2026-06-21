@@ -1,5 +1,5 @@
 <!-- 个人中心内容片段 -->
-<scroll-view scroll-y class="main-scroll" enhanced show-scrollbar="{{false}}" style="height: {{scrollViewHeight}}px; {{paneProfileStyle}}">
+<scroll-view scroll-y class="main-scroll" enhanced show-scrollbar="{{false}}" style="height: {{scrollViewHeight}}px;">
   <!-- 个人信息卡片 -->
   <view class="profile-card">
     <!-- 顶部：头像 + 信息 + 统计 -->
@@ -19,16 +19,16 @@
         <text class="profile-bio">{{userInfo.bio}}</text>
         <text class="profile-member-id">会员编号 #{{userInfo.memberId}}</text>
       </view>
-      <!-- 余额 + 积分（粘土风）：放在个人信息右侧，竖向堆叠 -->
+      <!-- 钱包：余额(上)+积分(下)；与信息栏同顶同底——余额顶≈名称顶、积分底≈会员编号底 -->
       <view class="wallet-row">
-        <view class="wallet-card wallet-balance" bindtap="onMenuItem" data-action="recharge">
+        <view class="wallet-card wallet-balance" catchtap="onMenuItem" data-action="recharge">
           <view class="wallet-icon wallet-icon-balance"><text class="wallet-icon-emoji">💰</text></view>
           <view class="wallet-card-body">
             <text class="wallet-card-label">余额</text>
             <text class="wallet-card-value">{{userInfo.balanceText}}</text>
           </view>
         </view>
-        <view class="wallet-card wallet-points" bindtap="onMenuItem" data-action="points">
+        <view class="wallet-card wallet-points" catchtap="onMenuItem" data-action="points">
           <view class="wallet-icon wallet-icon-points"><text class="wallet-icon-emoji">⭐</text></view>
           <view class="wallet-card-body">
             <text class="wallet-card-label">积分</text>

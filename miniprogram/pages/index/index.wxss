@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: 0 40rpx 24rpx;
-  /* background & backdrop-filter 由 inline style {{navBarBg}} 控制 */
+  background: var(--glass-bg-nav);
   border-bottom: var(--glass-border-subtle);
   position: fixed;
   top: 0;
@@ -567,7 +567,7 @@
 }
 .pay-method-item.active {
   border-color: var(--color-primary);
-  background: rgba(197, 131, 255, 0.06);
+  background: rgba(120, 108, 94, 0.06);
   color: var(--color-primary); font-weight: var(--font-weight-semibold);
 }
 .pay-method-icon { width: 36rpx; height: 36rpx; flex-shrink: 0; }

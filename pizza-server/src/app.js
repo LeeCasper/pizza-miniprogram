@@ -278,7 +278,6 @@ const server = app.listen(PORT, async () => {
     systemConfigService.syncPrinterConfigToMemory();
     systemConfigService.syncMapConfigToMemory();
     systemConfigService.syncBusinessConfigToMemory();
-    systemConfigService.syncThemeConfigToMemory();
   } catch (err) {
     serverLog.warn({ err }, 'Could not sync config from DB');
   }

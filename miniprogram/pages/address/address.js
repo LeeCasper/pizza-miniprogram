@@ -2,14 +2,9 @@
 const { api } = require('../../utils/api');
 const app = getApp();
 const { getBackBtnTopBar } = require('../../utils/layout');
-const { getThemeStyle, getThemeColor, getNavBarStyle, loadThemeConfig } = require('../../utils/theme');
-const _navBg = () => getNavBarStyle().nav;
 
 Page({
   data: {
-    themeStyle: getThemeStyle(),
-    navBarBg: _navBg(),
-    themePrimaryColor: getThemeColor('primary'),
     statusBarHeight: 44,
     topBarTotalHeight: 80,
     mode: 'list',
@@ -179,15 +174,6 @@ Page({
     if (!id) return;
     this.onDelete({ currentTarget: { dataset: { id } } });
     this.setData({ mode: 'list', editId: null });
-  },
-
-  onShow() {
-    // 主题：本页经 navigateTo 打开，晚于 app.js 启动广播，需自加载并应用主题
-    loadThemeConfig().then(() => this.applyTheme());
-  },
-
-  applyTheme() {
-    this.setData({ themeStyle: getThemeStyle(), themePrimaryColor: getThemeColor('primary'), navBarBg: _navBg() });
   },
 
   noop() {}
