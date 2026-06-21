@@ -1312,15 +1312,15 @@
 
 .detail-add-btn {
   flex: 1;
-  /* 粘土紫主按钮 */
-  background: linear-gradient(160deg, #7A6F61 0%, #5C5249 100%);
+  /* 粘土红主按钮 */
+  background: linear-gradient(160deg, #CE4636 0%, #A22A1E 100%);
   color: var(--color-on-primary);
   border-radius: var(--radius-full);
   padding: 28rpx 32rpx;
   text-align: center;
   font-size: 28rpx;
   font-weight: var(--font-weight-bold);
-  box-shadow: inset 2rpx 2rpx 3rpx rgba(255,255,255,0.45), inset -3rpx -4rpx 8rpx rgba(120,108,94,0.45), 0 6rpx 16rpx rgba(120,108,94,0.40);
+  box-shadow: inset 2rpx 2rpx 3rpx rgba(255,255,255,0.35), inset -3rpx -4rpx 8rpx rgba(120,30,20,0.45), 0 6rpx 16rpx rgba(150,40,28,0.40);
   white-space: nowrap;
 }
 .detail-add-btn:active {
