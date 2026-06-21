@@ -353,7 +353,7 @@
 .coupon-picker-overlay.show { visibility: visible; opacity: 1; }
 .coupon-picker {
   position: fixed; left: 0; right: 0; bottom: 0;
-  max-height: 65vh; background: var(--glass-bg-elevated);
+  max-height: 65vh; background: #FFFFFF; /* 优惠券弹窗本体固定白色，不跟随主题(--glass-bg-elevated) */
   border: var(--glass-border);
   border-radius: 32rpx 32rpx 0 0;
   transform: translateY(100%); transition: transform 0.3s ease;
