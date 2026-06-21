@@ -117,7 +117,8 @@ Page({
     Promise.all([
       api.get('/products'),
       api.get('/products/categories'),
-    ]).then(([prodRes, catRes]) => {
+      api.get('/banners'),
+    ]).then(([prodRes, catRes, bannerRes]) => {
       if (prodRes.code === 0) {
         const cart = app.globalData.cart;
         const products = (prodRes.data || []).map(p => ({
@@ -125,9 +126,18 @@ Page({
           image: fixImageUrl(p.image),
           quantity: cart[p.id] ? cart[p.id].quantity : 0,
         }));
-        // 从产品生成轮播图数据
+        // 优先用后台配置的轮播图（/banners）；映射成模板字段，图片走 fixImageUrl 补全 /uploads 前缀。
+        const apiBanners = (bannerRes && bannerRes.code === 0 ? (bannerRes.data || []) : []).map(b => ({
+          id: b.id,
+          productId: b.linkType === 'product' ? b.linkProductId : null,
+          image: fixImageUrl(b.imageUrl),
+          tag: b.tag || '',
+          title: b.title || '',
+          subtitle: b.subtitle || '',
+        }));
+        // 回退：后台未配置启用的 banner 时，从产品生成默认轮播，避免首页空白
         const productsWithImages = products.filter(p => p.image);
-        const banners = productsWithImages.slice(0, 3).map((p, i) => ({
+        const fallbackBanners = productsWithImages.slice(0, 3).map((p, i) => ({
           id: i,
           productId: p.id,
           image: p.image,
@@ -135,10 +145,9 @@ Page({
           title: p.name,
           subtitle: p.desc || '',
         }));
-        // 若产品图不足，补充默认占位
-        while (banners.length < 3) {
-          banners.push({
-            id: banners.length,
+        while (fallbackBanners.length < 3) {
+          fallbackBanners.push({
+            id: fallbackBanners.length,
             productId: null,
             image: '/images/pizza.png',
             tag: '🔥 新品',
@@ -146,6 +155,7 @@ Page({
             subtitle: '新鲜食材，匠心制作',
           });
         }
+        const banners = apiBanners.length ? apiBanners : fallbackBanners;
 
         this.setData({
           products,
