@@ -47,8 +47,10 @@ const bannerService = {
     return this.findById(id);
   },
 
-  async softDelete(id) {
-    await pool.query('UPDATE banners SET is_active = 0 WHERE id = ?', [id]);
+  async remove(id) {
+    // 真删除:banners 无任何表外键引用(banners 是子方:link_product_id→products)，可安全硬删。
+    // 不像 products 需保留行维持 order_items 订单历史外键，故无需 is_deleted 软删标记。
+    await pool.query('DELETE FROM banners WHERE id = ?', [id]);
   },
 
   async toggle(id) {

@@ -745,11 +745,11 @@ const adminApiController = {
    */
   async deleteBanner(req, res) {
     try {
-      await bannerService.softDelete(req.params.id);
-      return res.json({ code: 0, message: '轮播图已下架' });
+      await bannerService.remove(req.params.id);
+      return res.json({ code: 0, message: '轮播图已删除' });
     } catch (err) {
       log.error({ err }, 'DeleteBanner error');
-      return res.status(500).json({ code: 500, message: '下架轮播图失败' });
+      return res.status(500).json({ code: 500, message: '删除轮播图失败' });
     }
   },
 
