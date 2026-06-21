@@ -456,24 +456,20 @@
 .scroll-inner { padding: 0 40rpx; }
 
 /* 订单卡片：粘土风浮起面板——暖白渐变 + 双向 inset（左上白高光 + 右下暖阴影）+ 柔和外投影，从背景鼓出。
-   左侧 8rpx 色条按订单状态着色，与状态徽章同色系；padding-left 24rpx 抵消色条使内容左缩进仍为 32rpx。 */
+   不再有左侧状态色条；订单状态由右上角徽章传达，卡片四边内边距对称。 */
 .order-card {
   position: relative;
   margin-bottom: 28rpx;
-  padding: 32rpx 32rpx 32rpx 24rpx;
+  padding: 32rpx;
   overflow: hidden;
   border-radius: 28rpx;
   background: linear-gradient(160deg, #FFFFFF 0%, #F3EEE5 100%);
-  border-left: 8rpx solid var(--color-outline-variant);
   box-shadow: inset 3rpx 3rpx 7rpx rgba(255,255,255,0.85), inset -4rpx -5rpx 11rpx rgba(120,108,94,0.14), 0 8rpx 22rpx rgba(120,108,94,0.16);
 }
-.order-card.order-waiting { border-left-color: var(--color-primary); }
-.order-card.order-preparing { border-left-color: var(--color-secondary-dark); }
-.order-card.order-completed { border-left-color: var(--color-tertiary); }
-.order-card.order-cancelled { border-left-color: var(--color-outline); }
 .order-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24rpx; }
 .order-header-left { display: flex; flex-direction: column; gap: 8rpx; flex: 1; overflow: hidden; min-width: 0; }
 .order-store { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.order-no { font-size: 22rpx; color: var(--color-on-surface-variant); font-family: 'SF Mono', 'Menlo', 'Courier New', monospace; letter-spacing: 1rpx; }
 .order-time { font-size: 24rpx; color: var(--color-on-surface-variant); }
 .order-header-right { display: flex; align-items: center; gap: 12rpx; flex-shrink: 0; }
 .order-status { padding: 8rpx 24rpx; border-radius: var(--radius-full); font-size: 24rpx; font-weight: var(--font-weight-semibold); flex-shrink: 0; box-shadow: inset 1rpx 1rpx 2rpx rgba(255,255,255,0.55), inset -1rpx -1rpx 3rpx rgba(120,108,94,0.2); }
@@ -484,11 +480,13 @@
 .payment-badge.paid { background: var(--color-tertiary-container); color: var(--color-on-tertiary); }
 .payment-badge.unpaid { background: var(--color-secondary-container); color: var(--color-secondary-dark); }
 
-.order-items { border-top: 1rpx solid var(--color-divider); padding-top: 24rpx; }
-.order-item { display: flex; align-items: center; justify-content: space-between; padding: 12rpx 0; }
-.order-item-name { font-size: 28rpx; color: var(--color-on-surface); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
-.order-item-qty { display: flex; align-items: center; gap: 16rpx; font-size: 26rpx; color: var(--color-on-surface-variant); flex-shrink: 0; margin-left: 16rpx; }
-.order-item-price { color: var(--color-on-surface); font-weight: var(--font-weight-semibold); min-width: 80rpx; text-align: right; }
+.order-items { border-top: 1rpx solid var(--color-divider); padding-top: 20rpx; display: flex; flex-direction: column; gap: 18rpx; }
+.order-item { display: flex; align-items: center; gap: 20rpx; }
+.order-item-thumb { width: 92rpx; height: 92rpx; border-radius: 18rpx; flex-shrink: 0; background: linear-gradient(160deg, #F4EFE6 0%, #E9E1D4 100%); box-shadow: inset 2rpx 2rpx 5rpx rgba(120,108,94,0.2), inset -2rpx -2rpx 5rpx rgba(255,255,255,0.85); }
+.order-item-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6rpx; }
+.order-item-name { font-size: 28rpx; color: var(--color-on-surface); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.order-item-unit { font-size: 24rpx; color: var(--color-on-surface-variant); }
+.order-item-count { font-size: 28rpx; font-weight: var(--font-weight-bold); color: var(--color-primary); flex-shrink: 0; }
 
 /* 取餐码 */
 .pickup-section { border-top: 1rpx solid var(--color-divider); padding: 28rpx 0 8rpx; }

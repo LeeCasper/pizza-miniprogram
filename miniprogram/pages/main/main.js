@@ -150,7 +150,13 @@ Page({
   fetchOrders() {
     api.get('/orders').then(res => {
       if (res.code === 0) {
-        const ordersWithDigits = (res.data || []).map(formatOrder);
+        const ordersWithDigits = (res.data || []).map(o => {
+          const fo = formatOrder(o);
+          if (fo.items && fo.items.length) {
+            fo.items = fo.items.map(it => ({ ...it, image: fixImageUrl(it.image) }));
+          }
+          return fo;
+        });
         const { activeTab } = this.data;
         const filtered = activeTab === 'all' ? ordersWithDigits : ordersWithDigits.filter(o => o.status === activeTab);
         this.setData({ orders: ordersWithDigits, filteredOrders: filtered, ordersLoaded: true });

@@ -23,7 +23,33 @@ const orderService = {
 
     const [rows] = await pool.query(sql, params);
     const cancelMinutes = require('../config').business.orderCancelMinutes;
-    return rows.map(r => formatOrder(r, cancelMinutes));
+    const orders = rows.map(r => formatOrder(r, cancelMinutes));
+
+    // 批量附带每单商品明细（用于订单卡展示商品图片/数量）。
+    // order_items 无 image 列 → LEFT JOIN products 取图（商品被删则为空）。一次 IN 查询避免 N+1。
+    if (orders.length) {
+      const ids = orders.map(o => o.id);
+      const placeholders = ids.map(() => '?').join(',');
+      const [itemRows] = await pool.query(
+        `SELECT oi.order_id, oi.product_name, oi.price, oi.quantity, p.image AS product_image
+         FROM order_items oi
+         LEFT JOIN products p ON oi.product_id = p.id
+         WHERE oi.order_id IN (${placeholders})`,
+        ids
+      );
+      const byOrder = {};
+      for (const it of itemRows) {
+        (byOrder[it.order_id] || (byOrder[it.order_id] = [])).push({
+          name: it.product_name,
+          qty: it.quantity,
+          price: parseFloat(it.price),
+          image: it.product_image || '',
+        });
+      }
+      orders.forEach(o => { o.items = byOrder[o.id] || []; });
+    }
+
+    return orders;
   },
 
   async findById(orderId) {

@@ -22,6 +22,7 @@
         <view class="order-header">
           <view class="order-header-left">
             <text class="order-store">🏪 {{item.store}}</text>
+            <text class="order-no">单号 {{item.id}}</text>
             <text class="order-time">{{item.time}}</text>
           </view>
           <view class="order-header-right">
@@ -31,11 +32,12 @@
         </view>
         <view class="order-items">
           <view wx:for="{{item.items}}" wx:key="name" wx:for-item="prod" class="order-item">
-            <text class="order-item-name">{{prod.name}}</text>
-            <view class="order-item-qty">
-              <text>x{{prod.qty}}</text>
-              <text class="order-item-price">¥{{prod.price}}</text>
+            <image class="order-item-thumb" src="{{prod.image}}" mode="aspectFill"></image>
+            <view class="order-item-main">
+              <text class="order-item-name">{{prod.name}}</text>
+              <text class="order-item-unit">¥{{prod.price}}</text>
             </view>
+            <text class="order-item-count">×{{prod.qty}}</text>
           </view>
         </view>
         <!-- 取餐码 -->
