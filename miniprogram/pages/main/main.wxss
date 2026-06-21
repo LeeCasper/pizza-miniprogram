@@ -719,6 +719,7 @@
 .birthday-today { background: #FFF3D6;
   box-shadow: inset 2rpx 2rpx 4rpx rgba(255,255,255,0.9), inset -3rpx -3rpx 7rpx rgba(196,134,13,0.16), 0 5rpx 12rpx rgba(196,134,13,0.12); }
 .birthday-icon { font-size: 32rpx; line-height: 1; flex-shrink: 0; }
+.birthday-icon-img { width: 40rpx; height: 40rpx; flex-shrink: 0; }
 .birthday-text { font-size: 24rpx; color: var(--color-on-surface-variant); flex: 1; }
 .birthday-celebration { font-size: 26rpx; font-weight: var(--font-weight-bold); color: #C67C00; flex: 1; }
 .birthday-row:active { transform: translateY(2rpx) scale(0.99); }

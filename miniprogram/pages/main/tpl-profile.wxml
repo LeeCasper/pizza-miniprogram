@@ -40,12 +40,13 @@
 
     <!-- 生日行 -->
     <view class="birthday-row {{isBirthdayToday ? 'birthday-today' : ''}}" wx:if="{{hasBirthday}}" bindtap="onBirthdayRowTap">
-      <text class="birthday-icon">{{isBirthdayToday ? '🎉' : '🎂'}}</text>
+      <image wx:if="{{!isBirthdayToday}}" class="birthday-icon-img" src="/images/birthday-cake.png" mode="aspectFit"></image>
+      <text wx:else class="birthday-icon">🎉</text>
       <text class="birthday-text" wx:if="{{!isBirthdayToday}}">{{birthdayDisplay}} · {{birthdayCountdown}}</text>
       <text class="birthday-celebration" wx:if="{{isBirthdayToday}}">今天是您的生日！生日快乐！ 🎉</text>
     </view>
     <view class="birthday-row birthday-unset" wx:if="{{!hasBirthday}}" bindtap="onBirthdayRowTap">
-      <text class="birthday-icon">🎂</text>
+      <image class="birthday-icon-img" src="/images/birthday-cake.png" mode="aspectFit"></image>
       <text class="birthday-prompt">设置生日，享会员生日专属福利</text>
       <text class="birthday-arrow">›</text>
     </view>
