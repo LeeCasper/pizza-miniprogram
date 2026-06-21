@@ -19,16 +19,29 @@
         <text class="profile-bio">{{userInfo.bio}}</text>
         <text class="profile-member-id">会员编号 #{{userInfo.memberId}}</text>
       </view>
-      <view class="profile-stats">
-        <view class="profile-stat" bindtap="onMenuItem" data-action="recharge">
-          <text class="profile-stat-label">余额</text>
-          <text class="profile-stat-value">{{userInfo.balanceText}}</text>
+    </view>
+
+    <!-- 钱包：余额 + 积分（粘土风 claymorphism，强视觉层次） -->
+    <view class="wallet-row">
+      <view class="wallet-card wallet-balance" bindtap="onMenuItem" data-action="recharge">
+        <view class="wallet-card-head">
+          <view class="wallet-icon wallet-icon-balance"><text class="wallet-icon-emoji">💰</text></view>
+          <text class="wallet-card-label">余额</text>
         </view>
-        <view class="profile-stats-divider"></view>
-        <view class="profile-stat" bindtap="onMenuItem" data-action="points">
-          <text class="profile-stat-label">积分</text>
-          <text class="profile-stat-value">{{userInfo.points || 0}}</text>
+        <text class="wallet-card-value">{{userInfo.balanceText}}</text>
+        <text class="wallet-card-action">点击充值 ›</text>
+      </view>
+
+      <view class="wallet-card wallet-points" bindtap="onMenuItem" data-action="points">
+        <view class="wallet-card-head">
+          <view class="wallet-icon wallet-icon-points"><text class="wallet-icon-emoji">⭐</text></view>
+          <text class="wallet-card-label">积分</text>
         </view>
+        <view class="wallet-card-value-row">
+          <text class="wallet-card-value">{{userInfo.points || 0}}</text>
+          <text class="wallet-card-unit-suffix">分</text>
+        </view>
+        <text class="wallet-card-action">去兑换 ›</text>
       </view>
     </view>
 
