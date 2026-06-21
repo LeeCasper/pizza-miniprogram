@@ -96,8 +96,6 @@
   display: flex; align-items: center; justify-content: center; gap: 16rpx;
   width: 100%; padding: 28rpx 40rpx;
   background: var(--glass-bg-primary-container);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   color: var(--color-on-primary-container);
   border-radius: var(--radius-card);
   border: var(--glass-border-colored);
@@ -147,8 +145,6 @@
 .category-icon-wrap {
   width: 96rpx; height: 96rpx; border-radius: var(--radius-full);
   background: var(--glass-bg-card);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   display: flex; align-items: center; justify-content: center;
   transition: all 0.3s; box-shadow: var(--glass-shadow-elevated);
   border: var(--glass-border-subtle);
@@ -166,8 +162,6 @@
 .product-card {
   display: flex; align-items: center; gap: 24rpx;
   background: var(--glass-bg-card);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
   border-radius: var(--radius-card);
   padding: 24rpx; box-shadow: var(--glass-shadow-card);
   border: var(--glass-border-subtle);
@@ -183,8 +177,6 @@
 .add-btn {
   width: 72rpx; height: 72rpx; border-radius: var(--radius-full);
   background: var(--glass-bg-light);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   box-shadow: var(--glass-shadow-elevated);
   border: var(--glass-border);
   display: flex; align-items: center; justify-content: center;
@@ -194,8 +186,6 @@
 .qty-stepper {
   display: flex; align-items: center; gap: 20rpx;
   background: var(--glass-bg-card);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   border-radius: var(--radius-full);
   padding: 8rpx 12rpx; box-shadow: var(--glass-shadow-elevated);
   border: var(--glass-border-subtle);
@@ -203,8 +193,6 @@
 .qty-btn {
   width: 56rpx; height: 56rpx; border-radius: var(--radius-full);
   background: var(--glass-bg-elevated);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.06);
   border: var(--glass-border-subtle);
@@ -225,8 +213,6 @@
 .cart-bar-inner {
   display: flex; align-items: center; justify-content: space-between;
   background: var(--glass-bg-dark);
-  -webkit-backdrop-filter: var(--glass-blur-lg);
-  backdrop-filter: var(--glass-blur-lg);
   color: #F2F0F0;
   border-radius: var(--radius-full); padding: 20rpx 20rpx 20rpx 40rpx;
   box-shadow: var(--shadow-modal);
@@ -245,8 +231,6 @@
 .cart-total { font-size: 32rpx; font-weight: var(--font-weight-bold); }
 .cart-bar-btn {
   background: var(--glass-bg-primary);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   color: var(--color-on-primary);
   padding: 20rpx 48rpx; border-radius: var(--radius-full);
   font-size: 28rpx; font-weight: var(--font-weight-bold);
@@ -260,16 +244,12 @@
 .cart-overlay::before {
   content: ''; position: absolute; inset: 0;
   background: var(--glass-bg-overlay);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
   opacity: 0; transition: opacity 0.3s;
 }
 .cart-overlay.show::before { opacity: 1; }
 .cart-drawer {
   position: absolute; left: 0; right: 0; bottom: 0;
   background: var(--glass-bg-elevated);
-  -webkit-backdrop-filter: var(--glass-blur-lg);
-  backdrop-filter: var(--glass-blur-lg);
   border-radius: 48rpx 48rpx 0 0;
   max-height: 80vh; display: flex; flex-direction: column;
   transform: translateY(100%); transition: transform 0.3s ease;
@@ -299,8 +279,6 @@
 .checkout-btn {
   width: 100%; padding: 28rpx;
   background: var(--glass-bg-primary);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   color: var(--color-on-primary);
   border-radius: var(--radius-full); text-align: center; font-size: 32rpx; font-weight: var(--font-weight-bold);
   box-shadow: var(--glass-shadow-button);
@@ -356,8 +334,6 @@
 .coupon-picker-overlay {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
   background: var(--glass-bg-overlay);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
   z-index: 1100;
   visibility: hidden; opacity: 0; transition: all 0.3s ease;
 }
@@ -365,8 +341,6 @@
 .coupon-picker {
   position: fixed; left: 0; right: 0; bottom: 0;
   max-height: 65vh; background: var(--glass-bg-elevated);
-  -webkit-backdrop-filter: var(--glass-blur-lg);
-  backdrop-filter: var(--glass-blur-lg);
   border: var(--glass-border);
   border-radius: 32rpx 32rpx 0 0;
   transform: translateY(100%); transition: transform 0.3s ease;
@@ -417,8 +391,6 @@
   position: sticky; top: 0; z-index: 5;
   margin: 0 -40rpx; padding: 16rpx 40rpx;
   background: var(--glass-bg-nav);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
   border-bottom: var(--glass-border-subtle);
 }
 .tabs-scroll { white-space: nowrap; background: transparent; }
@@ -429,8 +401,6 @@
   padding: 16rpx 36rpx; border-radius: var(--radius-full); font-size: 28rpx;
   font-weight: var(--font-weight-semibold); color: var(--color-on-surface-variant);
   background: var(--glass-bg-card);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   border: var(--glass-border-subtle);
   flex-shrink: 0;
   /* 丝滑过渡：底色/文字用 easeOutExpo 平滑渐变，缩放用轻微回弹曲线 */
@@ -484,16 +454,16 @@
 
 /* 取餐码 */
 .pickup-section { border-top: 1rpx solid var(--color-divider); padding: 28rpx 0 8rpx; }
-.pickup-btn { display: flex; align-items: center; justify-content: center; gap: 12rpx; padding: 24rpx; background: var(--glass-bg-primary-light); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); border-radius: var(--radius-card); border: 2rpx dashed rgba(0, 0, 0, 0.08); }
+.pickup-btn { display: flex; align-items: center; justify-content: center; gap: 12rpx; padding: 24rpx; background: var(--glass-bg-primary-light); border-radius: var(--radius-card); border: 2rpx dashed rgba(0, 0, 0, 0.08); }
 .pickup-btn:active { background: rgba(0, 0, 0, 0.04); transform: scale(0.98); }
 .pickup-btn-icon { width: 44rpx; height: 44rpx; }
 .pickup-btn-text { font-size: 28rpx; color: var(--color-primary); font-weight: var(--font-weight-semibold); }
-.pickup-revealed { display: flex; flex-direction: column; align-items: center; gap: 20rpx; padding: 24rpx; background: var(--glass-bg-card); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); border-radius: var(--radius-card); border: var(--glass-border-subtle); }
+.pickup-revealed { display: flex; flex-direction: column; align-items: center; gap: 20rpx; padding: 24rpx; background: var(--glass-bg-card); border-radius: var(--radius-card); border: var(--glass-border-subtle); }
 .pickup-label { font-size: 22rpx; color: var(--color-on-surface-variant); letter-spacing: 6rpx; text-transform: uppercase; }
 .pickup-code-row { display: flex; gap: 16rpx; }
-.pickup-digit { width: 64rpx; height: 80rpx; line-height: 80rpx; text-align: center; font-size: 40rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); background: var(--glass-bg-elevated); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); border-radius: 12rpx; box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.06); border: var(--glass-border-subtle); font-family: 'SF Mono', 'Menlo', 'Courier New', monospace; }
+.pickup-digit { width: 64rpx; height: 80rpx; line-height: 80rpx; text-align: center; font-size: 40rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); background: var(--glass-bg-elevated); border-radius: 12rpx; box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.06); border: var(--glass-border-subtle); font-family: 'SF Mono', 'Menlo', 'Courier New', monospace; }
 .pickup-hint { font-size: 22rpx; color: var(--color-on-surface-variant); opacity: 0.6; }
-.pickup-hide-btn { padding: 12rpx 40rpx; border-radius: var(--radius-full); background: var(--glass-bg-card); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); font-size: 24rpx; color: var(--color-on-surface-variant); font-weight: var(--font-weight-medium); border: var(--glass-border-subtle); }
+.pickup-hide-btn { padding: 12rpx 40rpx; border-radius: var(--radius-full); background: var(--glass-bg-card); font-size: 24rpx; color: var(--color-on-surface-variant); font-weight: var(--font-weight-medium); border: var(--glass-border-subtle); }
 .pickup-hide-btn:active { background: var(--color-surface-container-high); transform: scale(0.96); }
 
 .order-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1rpx solid var(--color-divider); padding-top: 24rpx; margin-top: 16rpx; flex-wrap: wrap; gap: 16rpx; }
@@ -501,8 +471,8 @@
 .total-price { font-size: 32rpx; font-weight: var(--font-weight-bold); color: var(--color-price); }
 .order-actions { display: flex; gap: 16rpx; flex-shrink: 0; }
 .order-action-btn { padding: 12rpx 32rpx; border-radius: var(--radius-full); font-size: 26rpx; font-weight: var(--font-weight-semibold); white-space: nowrap; }
-.order-action-btn.outline { color: var(--color-on-surface-variant); background: var(--glass-bg-light); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); box-shadow: var(--glass-shadow-elevated); border: var(--glass-border); }
-.order-action-btn.primary { background: var(--glass-bg-primary); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); color: var(--color-on-primary); border: 1rpx solid rgba(255, 255, 255, 0.2); }
+.order-action-btn.outline { color: var(--color-on-surface-variant); background: var(--glass-bg-light); box-shadow: var(--glass-shadow-elevated); border: var(--glass-border); }
+.order-action-btn.primary { background: var(--glass-bg-primary); color: var(--color-on-primary); border: 1rpx solid rgba(255, 255, 255, 0.2); }
 .order-action-btn.pay-btn { background: linear-gradient(135deg, #C583FF, #9B4DDB); color: #FFFFFF; box-shadow: 0 4rpx 16rpx rgba(197, 131, 255, 0.3); }
 .order-action-btn.pay-btn:active { transform: scale(0.96); opacity: 0.9; }
 
@@ -527,18 +497,18 @@
 /* ── 分类导航 ── */
 .shop-categories { display: flex; flex-wrap: wrap; justify-content: space-around; padding: 24rpx 0 8rpx; }
 .shop-cat-item { display: flex; flex-direction: column; align-items: center; gap: 12rpx; padding: 8rpx 16rpx; width: 20%; margin-bottom: 20rpx; }
-.shop-cat-icon-wrap { width: 96rpx; height: 96rpx; border-radius: var(--radius-full); background: var(--glass-bg-card); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); display: flex; align-items: center; justify-content: center; box-shadow: var(--glass-shadow-elevated); border: var(--glass-border-subtle); transition: all 0.3s; }
+.shop-cat-icon-wrap { width: 96rpx; height: 96rpx; border-radius: var(--radius-full); background: var(--glass-bg-card); display: flex; align-items: center; justify-content: center; box-shadow: var(--glass-shadow-elevated); border: var(--glass-border-subtle); transition: all 0.3s; }
 .shop-cat-icon-wrap.cat-active { background: var(--glass-bg-primary-light); border: var(--glass-border-colored); box-shadow: 0 2rpx 8rpx rgba(197, 131, 255, 0.15); }
 .shop-cat-icon { font-size: 48rpx; line-height: 1; }
 .shop-cat-name { font-size: 22rpx; color: var(--color-on-surface); font-weight: 500; }
 
 /* ── 限时优惠横条 ── */
-.shop-flash-bar { display: flex; align-items: center; justify-content: space-between; margin: 16rpx 0 24rpx; padding: 24rpx 28rpx; background: linear-gradient(135deg, rgba(240,224,255,0.4), rgba(197,131,255,0.15)); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); border-radius: var(--radius-card); border: var(--glass-border-colored); }
+.shop-flash-bar { display: flex; align-items: center; justify-content: space-between; margin: 16rpx 0 24rpx; padding: 24rpx 28rpx; background: linear-gradient(135deg, rgba(240,224,255,0.4), rgba(197,131,255,0.15)); border-radius: var(--radius-card); border: var(--glass-border-colored); }
 .flash-bar-left { display: flex; align-items: center; gap: 12rpx; flex: 1; min-width: 0; }
 .flash-icon { font-size: 36rpx; }
 .flash-title { font-size: 28rpx; font-weight: var(--font-weight-bold); color: var(--color-primary); flex-shrink: 0; }
 .flash-desc { font-size: 24rpx; color: var(--color-on-surface-variant); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.flash-bar-btn { padding: 14rpx 36rpx; background: var(--glass-bg-primary); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); color: var(--color-on-primary); border-radius: var(--radius-full); font-size: 26rpx; font-weight: var(--font-weight-bold); box-shadow: var(--glass-shadow-button); flex-shrink: 0; margin-left: 16rpx; }
+.flash-bar-btn { padding: 14rpx 36rpx; background: var(--glass-bg-primary); color: var(--color-on-primary); border-radius: var(--radius-full); font-size: 26rpx; font-weight: var(--font-weight-bold); box-shadow: var(--glass-shadow-button); flex-shrink: 0; margin-left: 16rpx; }
 .flash-bar-btn:active { transform: scale(0.95); opacity: 0.9; }
 
 /* ── 商品区域 ── */
@@ -549,7 +519,7 @@
 
 /* 商品网格 (2列) */
 .shop-product-grid { display: flex; flex-wrap: wrap; gap: 20rpx; }
-.shop-product-card { width: calc(50% - 10rpx); background: var(--glass-bg-card); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); border-radius: var(--radius-card); overflow: hidden; box-shadow: var(--glass-shadow-card); border: var(--glass-border-subtle); transition: transform 0.2s; }
+.shop-product-card { width: calc(50% - 10rpx); background: var(--glass-bg-card); border-radius: var(--radius-card); overflow: hidden; box-shadow: var(--glass-shadow-card); border: var(--glass-border-subtle); transition: transform 0.2s; }
 .shop-product-card:active { transform: scale(0.97); }
 .shop-product-img { width: 100%; height: 280rpx; background: var(--color-surface-container-low); }
 .shop-product-info { padding: 20rpx 20rpx 24rpx; display: flex; flex-direction: column; }
@@ -560,7 +530,7 @@
 .shop-product-price { font-size: 30rpx; font-weight: var(--font-weight-bold); color: var(--color-price); }
 .shop-product-original { font-size: 20rpx; color: var(--color-outline-variant); text-decoration: line-through; }
 
-.shop-add-btn { width: 56rpx; height: 56rpx; border-radius: var(--radius-full); background: var(--glass-bg-primary-light); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); display: flex; align-items: center; justify-content: center; box-shadow: var(--glass-shadow-elevated); border: var(--glass-border-colored); flex-shrink: 0; transition: all 0.2s; }
+.shop-add-btn { width: 56rpx; height: 56rpx; border-radius: var(--radius-full); background: var(--glass-bg-primary-light); display: flex; align-items: center; justify-content: center; box-shadow: var(--glass-shadow-elevated); border: var(--glass-border-colored); flex-shrink: 0; transition: all 0.2s; }
 .shop-add-btn:active { transform: scale(0.9); }
 .shop-add-icon { font-size: 36rpx; color: var(--color-primary); font-weight: 400; line-height: 1; }
 .shop-add-btn.has-qty { width: auto; padding: 4rpx 12rpx; border-radius: var(--radius-full); background: var(--glass-bg-card); border: var(--glass-border-subtle); }
@@ -576,14 +546,12 @@
 /* ===== 会员悬浮弹窗 ===== */
 .member-overlay { position: fixed; inset: 0; z-index: 2000; visibility: hidden; }
 .member-overlay.show { visibility: visible; }
-.member-overlay::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.5); -webkit-backdrop-filter: blur(12rpx); backdrop-filter: blur(12rpx); opacity: 0; transition: opacity 0.35s; }
+.member-overlay::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.5); opacity: 0; transition: opacity 0.35s; }
 .member-overlay.show::before { opacity: 1; }
 
 .member-overlay-card {
   position: absolute; left: 24rpx; right: 24rpx; top: 50%;
   background: var(--glass-bg-elevated);
-  -webkit-backdrop-filter: var(--glass-blur-lg);
-  backdrop-filter: var(--glass-blur-lg);
   border-radius: 48rpx;
   box-shadow: var(--shadow-modal), 0 0 0 2rpx rgba(255,255,255,0.5);
   max-height: 80vh;
@@ -951,8 +919,6 @@
   position: absolute;
   inset: 0;
   background: var(--glass-bg-overlay);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
   opacity: 0;
   transition: opacity 0.3s;
 }
@@ -974,8 +940,6 @@
   justify-content: center;
   border-radius: var(--radius-full);
   background: var(--glass-bg-light);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   border: var(--glass-border-subtle);
 }
 .detail-back-btn:active {
@@ -1002,8 +966,6 @@
   top: 190rpx;
   bottom: 0;
   background: var(--glass-bg-elevated);
-  -webkit-backdrop-filter: var(--glass-blur-lg);
-  backdrop-filter: var(--glass-blur-lg);
   border-radius: 48rpx 48rpx 0 0;
   display: flex;
   flex-direction: column;
@@ -1110,8 +1072,6 @@
   font-size: 24rpx;
   color: var(--color-on-surface);
   background: var(--glass-bg-card);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   padding: 10rpx 24rpx;
   border-radius: var(--radius-full);
   border: var(--glass-border-subtle);
@@ -1145,8 +1105,6 @@
   font-size: 24rpx;
   color: var(--color-on-surface-variant);
   background: var(--glass-bg-light);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   padding: 14rpx 28rpx;
   border-radius: var(--radius-full);
   border: var(--glass-border-subtle);
@@ -1159,8 +1117,6 @@
 }
 .restriction-chip.active {
   background: var(--glass-bg-primary-container);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   color: var(--color-on-primary-container);
   font-weight: var(--font-weight-semibold);
   border: var(--glass-border-colored);
@@ -1181,8 +1137,6 @@
   padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
   border-top: 1rpx solid rgba(0, 0, 0, 0.06);
   background: var(--glass-bg-elevated);
-  -webkit-backdrop-filter: var(--glass-blur-lg);
-  backdrop-filter: var(--glass-blur-lg);
   flex-shrink: 0;
 }
 
@@ -1191,8 +1145,6 @@
   align-items: center;
   gap: 24rpx;
   background: var(--glass-bg-card);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   border-radius: var(--radius-full);
   padding: 8rpx 16rpx;
   border: var(--glass-border-subtle);
@@ -1215,8 +1167,6 @@
 .detail-add-btn {
   flex: 1;
   background: var(--glass-bg-primary);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   color: var(--color-on-primary);
   border-radius: var(--radius-full);
   padding: 28rpx 32rpx;

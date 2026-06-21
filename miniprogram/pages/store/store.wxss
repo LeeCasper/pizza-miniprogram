@@ -81,8 +81,6 @@
   margin: 32rpx 40rpx;
   padding: 48rpx;
   background: var(--glass-bg-card);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
   border-radius: var(--radius-card);
   box-shadow: var(--glass-shadow-card);
   border: var(--glass-border-subtle);
@@ -165,8 +163,6 @@
   white-space: nowrap;
   align-self: center;
   background: var(--glass-bg-light);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   box-shadow: var(--glass-shadow-elevated);
   border: var(--glass-border);
 }
@@ -174,8 +170,6 @@
 .status-badge {
   padding: 8rpx 20rpx;
   background: var(--glass-bg-card);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   border-radius: 8rpx;
   font-size: 22rpx;
   font-weight: var(--font-weight-semibold);
@@ -192,8 +186,6 @@
   box-sizing: border-box;
   padding: 12rpx 24rpx;
   background: var(--glass-bg-primary-container);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   border-radius: var(--radius-full);
   display: flex;
   align-items: center;
@@ -226,8 +218,6 @@
   margin: 0 40rpx 32rpx;
   padding: 48rpx;
   background: var(--glass-bg-card);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
   border-radius: var(--radius-card);
   box-shadow: var(--glass-shadow-card);
   border: var(--glass-border-subtle);

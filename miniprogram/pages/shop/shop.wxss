@@ -7,8 +7,6 @@
   justify-content: center;
   padding: 0 40rpx 24rpx;
   background: var(--glass-bg-nav);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
   border-bottom: var(--glass-border-subtle);
   box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
   position: fixed;
@@ -68,8 +66,6 @@
   width: 96rpx; height: 96rpx;
   border-radius: var(--radius-full);
   background: var(--glass-bg-card);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   display: flex; align-items: center; justify-content: center;
   box-shadow: var(--glass-shadow-elevated);
   border: var(--glass-border-subtle);
@@ -91,8 +87,6 @@
   padding: 24rpx 28rpx;
   background: linear-gradient(135deg, rgba(240,224,255,0.4) 0%, rgba(197,131,255,0.15) 100%);
   border-radius: var(--radius-card);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   border: 2rpx solid var(--glass-border-colored);
 }
 .flash-bar-left { display: flex; align-items: center; gap: 12rpx; flex: 1; min-width: 0; }
@@ -102,8 +96,6 @@
 .flash-bar-btn {
   padding: 14rpx 36rpx;
   background: var(--glass-bg-primary);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   color: var(--color-on-primary);
   border-radius: var(--radius-full);
   font-size: 26rpx; font-weight: var(--font-weight-bold);
@@ -133,8 +125,6 @@
 .shop-product-card {
   width: calc(50% - 10rpx);
   background: var(--glass-bg-card);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
   border-radius: var(--radius-card);
   overflow: hidden;
   box-shadow: var(--glass-shadow-card);
@@ -179,8 +169,6 @@
   width: 56rpx; height: 56rpx;
   border-radius: var(--radius-full);
   background: var(--glass-bg-primary-light);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   display: flex; align-items: center; justify-content: center;
   box-shadow: var(--glass-shadow-elevated);
   border: var(--glass-border-colored);

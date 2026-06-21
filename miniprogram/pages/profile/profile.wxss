@@ -334,8 +334,6 @@
   padding: 28rpx 16rpx;
   border-radius: 24rpx;
   background: var(--glass-bg-card);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
   box-shadow: var(--glass-shadow-card);
   border: var(--glass-border-subtle);
 }
@@ -390,8 +388,6 @@
 .menu-card {
   border-radius: 24rpx;
   background: var(--glass-bg-card);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
   box-shadow: var(--glass-shadow-card);
   border: var(--glass-border-subtle);
   overflow: hidden;
@@ -442,8 +438,6 @@
   position: absolute;
   inset: 0;
   background: var(--glass-bg-overlay);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
   opacity: 0;
   transition: opacity 0.3s;
 }
@@ -455,8 +449,6 @@
   right: 0;
   bottom: 0;
   background: var(--glass-bg-elevated);
-  -webkit-backdrop-filter: var(--glass-blur-lg);
-  backdrop-filter: var(--glass-blur-lg);
   border-top: var(--glass-border);
   border-radius: 40rpx 40rpx 0 0;
   transform: translateY(100%);

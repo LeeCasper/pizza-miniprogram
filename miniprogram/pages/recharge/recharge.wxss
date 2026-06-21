@@ -86,8 +86,6 @@
   padding: 28rpx 0;
   border-radius: 20rpx;
   background: var(--glass-bg-card);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
   border: var(--glass-border-subtle);
   box-shadow: var(--glass-shadow-card);
   display: flex;
@@ -148,8 +146,6 @@
   gap: 16rpx;
   padding: 24rpx 28rpx;
   background: var(--glass-bg-card);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   border-radius: 20rpx;
   border: var(--glass-border-subtle);
   margin-bottom: 40rpx;

@@ -228,8 +228,6 @@
   position: absolute;
   inset: 0;
   background: var(--glass-bg-overlay);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
   opacity: 0;
   transition: opacity 0.3s;
 }
@@ -250,8 +248,6 @@
   justify-content: center;
   border-radius: var(--radius-full);
   background: var(--glass-bg-light);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   border: var(--glass-border-subtle);
 }
 .detail-back-btn:active {
@@ -276,8 +272,6 @@
   top: 190rpx;
   bottom: 0;
   background: var(--glass-bg-elevated);
-  -webkit-backdrop-filter: var(--glass-blur-lg);
-  backdrop-filter: var(--glass-blur-lg);
   border-radius: 48rpx 48rpx 0 0;
   display: flex;
   flex-direction: column;
@@ -412,8 +406,6 @@
   padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
   border-top: 1rpx solid rgba(0, 0, 0, 0.06);
   background: var(--glass-bg-elevated);
-  -webkit-backdrop-filter: var(--glass-blur-lg);
-  backdrop-filter: var(--glass-blur-lg);
   flex-shrink: 0;
 }
 
@@ -436,8 +428,6 @@
 .detail-redeem-btn {
   flex: 1;
   background: var(--glass-bg-primary);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   color: var(--color-on-primary);
   border-radius: var(--radius-full);
   padding: 28rpx 32rpx;
@@ -454,8 +444,6 @@
 }
 .detail-redeem-btn.disabled {
   background: var(--glass-bg-card);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   color: var(--color-on-surface-variant);
   border: var(--glass-border-subtle);
 }

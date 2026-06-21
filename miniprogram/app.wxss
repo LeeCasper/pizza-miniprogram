@@ -103,7 +103,10 @@ page {
   --glass-bg-dark: #1F2138;
   --glass-bg-overlay: rgba(0, 0, 0, 0.40);
 
-  /* 去模糊：全部 backdrop-filter: var(--glass-blur*) 引用就地变 none，一处灭全站闪烁 */
+  /* --glass-blur* 已无引用：所有元素的 backdrop-filter 声明均已物理删除。
+     关键教训：仅把值改 none 不够——WeChat 只要元素「声明了」backdrop-filter（哪怕解析成 none），
+     就把它留在切回前台会被 tear-down→重栅格化的合成层上，照样闪一帧。必须删掉声明本身。
+     这三个 token 保留为 none 仅作未来防御（万一有新代码再引用 var(--glass-blur*) 时不致出现模糊）。 */
   --glass-blur-sm: none;
   --glass-blur: none;
   --glass-blur-lg: none;
@@ -196,8 +199,6 @@ swiper, swiper-item {
 /* 卡片基础样式 — 毛玻璃 */
 .card {
   background: var(--glass-bg-card);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
   border-radius: var(--radius-card);
   box-shadow: var(--glass-shadow-card);
   border: var(--glass-border-subtle);
@@ -205,8 +206,6 @@ swiper, swiper-item {
 
 .card-cream {
   background: var(--glass-bg-light);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   border-radius: var(--radius-card);
   box-shadow: var(--glass-shadow-card);
   border: var(--glass-border-subtle);
@@ -215,8 +214,6 @@ swiper, swiper-item {
 /* 按钮样式 */
 .btn-primary {
   background: var(--glass-bg-primary);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   color: var(--color-on-primary);
   border-radius: var(--radius-full);
   font-weight: var(--font-weight-bold);
@@ -235,8 +232,6 @@ swiper, swiper-item {
 
 .btn-outline {
   background: var(--glass-bg-light);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   border-radius: var(--radius-card);
   color: var(--color-on-surface);
   display: flex;
