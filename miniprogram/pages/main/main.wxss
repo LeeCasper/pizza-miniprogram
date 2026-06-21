@@ -684,7 +684,7 @@
 
 /* ===== 个人中心 ===== */
 .profile-card { margin: 16rpx 0 8rpx; padding: 24rpx 32rpx; border-radius: 32rpx; background: transparent; }
-.profile-card-top { display: flex; align-items: stretch; gap: 20rpx; }
+.profile-card-top { display: flex; align-items: center; gap: 20rpx; }
 .avatar-wrap { width: 88rpx; height: 88rpx; border-radius: var(--radius-full); overflow: hidden; flex-shrink: 0;
   /* 粘土头像：白描边环 + 外柔影 + 顶微高光（鼓起浮起感） */
   box-shadow: 0 0 0 4rpx #FFFFFF, 0 8rpx 16rpx rgba(120, 108, 94, 0.20), 0 -1rpx 4rpx rgba(255, 255, 255, 0.6); }
@@ -734,10 +734,12 @@
 .profile-stats-divider { width: 56rpx; height: 1rpx; background: var(--color-divider); flex-shrink: 0; }
 
 /* ===== 钱包卡片：余额 / 积分（粘土风 claymorphism，个人信息右侧竖向堆叠） ===== */
-/* 钱包栏：余额(上)+积分(下)竖向；与信息栏 stretch 等高、space-between 首顶末底，实现两栏同顶同底对齐 */
+/* 钱包栏：余额(上)+积分(下)竖向；整组相对信息栏【垂直居中】。
+   居中在 DevTools(Chromium) 与真机渲染一致；旧方案「父级 align-items:stretch + 本列 justify-content:space-between
+   靠拉伸高度把余额钉顶、积分钉底」在真机不可靠——真机不 honor 嵌套列的拉伸高度，列塌成内容高度→两栏不再水平。 */
 .wallet-row {
   margin-left: auto; flex-shrink: 0; width: 232rpx;
-  display: flex; flex-direction: column; justify-content: space-between; gap: 14rpx;
+  display: flex; flex-direction: column; justify-content: center; gap: 14rpx;
 }
 .wallet-card {
   display: flex; flex-direction: row; align-items: center; gap: 12rpx;
@@ -778,7 +780,7 @@
   width: 40rpx; height: 40rpx; border-radius: 50%;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
-.wallet-icon-emoji { font-size: 24rpx; line-height: 1; }
+.wallet-icon-img { width: 32rpx; height: 32rpx; }
 .wallet-icon-balance {
   background: #FFE2AE;
   box-shadow:

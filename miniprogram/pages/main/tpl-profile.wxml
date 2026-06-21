@@ -22,14 +22,14 @@
       <!-- 钱包：余额(上)+积分(下)；与信息栏同顶同底——余额顶≈名称顶、积分底≈会员编号底 -->
       <view class="wallet-row">
         <view class="wallet-card wallet-balance" catchtap="onMenuItem" data-action="recharge">
-          <view class="wallet-icon wallet-icon-balance"><text class="wallet-icon-emoji">💰</text></view>
+          <view class="wallet-icon wallet-icon-balance"><image class="wallet-icon-img" src="/images/balance-icon.png" mode="aspectFit"/></view>
           <view class="wallet-card-body">
             <text class="wallet-card-label">余额</text>
             <text class="wallet-card-value">{{userInfo.balanceText}}</text>
           </view>
         </view>
         <view class="wallet-card wallet-points" catchtap="onMenuItem" data-action="points">
-          <view class="wallet-icon wallet-icon-points"><text class="wallet-icon-emoji">⭐</text></view>
+          <view class="wallet-icon wallet-icon-points"><image class="wallet-icon-img" src="/images/points-icon.png" mode="aspectFit"/></view>
           <view class="wallet-card-body">
             <text class="wallet-card-label">积分</text>
             <text class="wallet-card-value">{{userInfo.points || 0}}</text>
