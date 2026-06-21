@@ -33,7 +33,11 @@
    原 var(--color-background)（=lighten(主色,42%)≈近白）是不透明层，会盖住主题渐变，
    导致透明的 .order-tabs 等元素露出的是这层近白底而非背景色 —— 这正是「订单状态条还是白色」的真因。
    各 tab 的滚动区（.tab-scroll/.orders-scroll/...）本就自铺主题渐变，不受影响。 */
-.main-swiper { background: transparent; }
+/* transform 让 .main-swiper 成为内部 position:fixed 的「包含块」——
+   还原原 swiper-item 滑动 transform 提供的同款上下文。
+   否则首页详情弹层(.detail-overlay, fixed, 在 tab-scroll 内)会逃逸到整屏，
+   抽屉 bottom:0 落到屏幕最底、被底部 Tab 栏盖住，「加入购物车」按钮看不见。 */
+.main-swiper { background: transparent; transform: translateZ(0); }
 
 /* Tab 切换：swiper 横向滑动已关闭(duration=0 + disable-touch)，无重栅格化卡顿；
    切换瞬间给当前 pane 一个轻量淡入，丝滑不生硬。 */
