@@ -38,7 +38,7 @@ const columns: DataTableColumns<Banner> = [
     render(row) {
       return h(NSwitch, {
         value: !!row.isActive,
-        onUpdateValue: (val: boolean) => handleToggle(row.id!, val),
+        onUpdateValue: (val: boolean) => handleToggle(row, val),
       });
     }
   },
@@ -62,12 +62,15 @@ async function loadBanners() {
   loading.value = false;
 }
 
-async function handleToggle(id: number, val: boolean) {
-  const { error } = await fetchToggleBanner(id);
+async function handleToggle(row: Banner, val: boolean) {
+  const { data, error } = await fetchToggleBanner(row.id!);
   if (error) {
     window.$message?.error('切换状态失败');
     return;
   }
+  // 用后端返回的真实状态回写本地行，驱动受控 NSwitch 更新；
+  // 原来只弹 toast 不改 row.isActive → 开关 re-render 读旧值，弹回旧态（看着像“关不掉”）。
+  row.isActive = data?.isActive ?? val;
   window.$message?.success(val ? '已启用' : '已禁用');
 }
 
