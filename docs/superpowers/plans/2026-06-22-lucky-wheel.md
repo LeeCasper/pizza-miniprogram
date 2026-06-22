@@ -39,7 +39,7 @@
 | `src/routes/adminApi.js` | **Modify** — add lucky-wheel admin routes (config GET/PUT, records GET, prizes CRUD+toggle) |
 | `src/middleware/validation.js` | **Modify** — add `luckyDraw`, `luckyPrize`, `luckyPrizeUpdate`, `luckyConfig` schemas |
 | `src/app.js` | **Modify** — mount `app.use('/api/v1/lucky-wheel', luckyWheelRoutes)` |
-| `package.json` | **Modify** — add `"test": "node --test test/"` |
+| `package.json` | **Modify** — add `"test": "node --test"` |
 | `test/luckyWheel.logic.test.js` | **Create** — node:test coverage of the pure logic |
 | `soybean-admin-temp/deploy.py` | **Modify** — append migration path to the hardcoded list |
 
@@ -224,9 +224,9 @@ test('computeAwardText renders each prize type', () => {
 
 - [ ] **Step 2: Add the test script to package.json, run, verify it FAILS**
 
-In `pizza-server/package.json` `"scripts"`, add: `"test": "node --test test/"`.
+In `pizza-server/package.json` `"scripts"`, add: `"test": "node --test"`.
 
-Run (from `pizza-server/`): `node --test test/`
+Run (from `pizza-server/`): `node --test`
 Expected: FAIL — `Cannot find module '../src/services/luckyWheel.logic'`.
 
 - [ ] **Step 3: Write the implementation**
@@ -276,7 +276,7 @@ module.exports = { eligiblePrizes, pickWeightedPrize, computeAwardText };
 
 - [ ] **Step 4: Run the test, verify it PASSES**
 
-Run (from `pizza-server/`): `node --test test/`
+Run (from `pizza-server/`): `node --test`
 Expected: PASS — all tests pass (5 tests).
 
 - [ ] **Step 5: Commit**
@@ -922,7 +922,7 @@ Expected: `syntax OK`
 
 - [ ] **Step 6: Re-run the pure-logic tests (guard against accidental service break)**
 
-Run (from `pizza-server/`): `node --test test/`
+Run (from `pizza-server/`): `node --test`
 Expected: PASS (5 tests).
 
 - [ ] **Step 7: Commit**
