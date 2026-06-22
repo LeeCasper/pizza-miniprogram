@@ -165,6 +165,9 @@ app.use('/api/v1/banners', require('./routes/banners'));
 app.use('/api/v1/pay', require('./routes/payment'));
 app.use('/api/v1/config', require('./routes/config'));
 
+const luckyWheelRoutes = require('./routes/luckyWheel');
+app.use('/api/v1/lucky-wheel', luckyWheelRoutes);
+
 // ── Admin API routes (JSON, JWT) ─────────────────────
 app.use('/api/v1/admin', adminApiRoutes);
 

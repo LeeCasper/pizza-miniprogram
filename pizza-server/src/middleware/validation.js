@@ -1,6 +1,9 @@
 const Joi = require('joi');
 
 const schemas = {
+  luckyDraw: Joi.object({
+    source: Joi.string().valid('free', 'points').required(),
+  }),
   createAddress: Joi.object({
     name: Joi.string().required().max(50).messages({
       'string.empty': '请输入收货人姓名',
