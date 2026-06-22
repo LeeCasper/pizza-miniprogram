@@ -26,6 +26,7 @@ const discountTypeMap: Record<string, string> = {
   free_delivery: '免配送费',
   half_price: '半价',
   fixed_amount: '固定金额',
+  percentage: '百分比折扣',
 };
 
 const columns: DataTableColumns<CouponTemplate> = [
@@ -45,6 +46,21 @@ const columns: DataTableColumns<CouponTemplate> = [
   },
   { title: '最低消费', key: 'minSpend', width: 90, render(row) { return formatPrice(row.minSpend); } },
   { title: '有效天数', key: 'validDays', width: 80, render(row) { return `${row.validDays}天`; } },
+  {
+    title: '可领取', key: 'claimable', width: 80, align: 'center',
+    render(row) {
+      return row.claimable
+        ? h(NTag, { type: 'success', size: 'small', bordered: false }, () => '可领')
+        : h(NTag, { type: 'default', size: 'small', bordered: false }, () => '否');
+    }
+  },
+  {
+    title: '已领/库存', key: 'stock', width: 100, align: 'center',
+    render(row) {
+      const stock = row.totalStock == null ? '∞' : row.totalStock;
+      return `${row.claimedCount ?? 0}/${stock}`;
+    }
+  },
   {
     title: '状态', key: 'isActive', width: 80,
     render(row) {
