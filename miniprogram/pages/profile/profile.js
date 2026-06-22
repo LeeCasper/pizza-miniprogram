@@ -64,6 +64,7 @@ Page({
       settings: '/pages/settings/settings',
       about: '/pages/settings/settings',
       recharge: '/pages/recharge/recharge',
+      claimcenter: '/pages/claim-center/claim-center',
       lucky: '__toast__',
       service: '__toast__'
     };

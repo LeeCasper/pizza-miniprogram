@@ -258,13 +258,13 @@
         </view>
 
         <!-- 优惠券信息条 -->
-        <view class="coupon-banner">
+        <view class="coupon-banner" bindtap="onClaimCenter">
           <view class="coupon-banner-left">
             <text class="coupon-banner-icon">🎫</text>
             <text class="coupon-banner-text">会员每周可领取优惠券</text>
           </view>
-          <view class="coupon-banner-help" bindtap="onMemberHelp">
-            <text class="coupon-help-icon">?</text>
+          <view class="coupon-banner-help">
+            <text class="coupon-help-icon">›</text>
           </view>
         </view>
 

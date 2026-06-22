@@ -8,7 +8,8 @@
     "pages/address/address",
     "pages/settings/settings",
     "pages/tiers/tiers",
-    "pages/recharge/recharge"
+    "pages/recharge/recharge",
+    "pages/claim-center/claim-center"
   ],
   "window": {
     "navigationBarTitleText": "王姐手工披萨",

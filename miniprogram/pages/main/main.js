@@ -672,6 +672,7 @@ Page({
       address: '/pages/address/address', favorites: '/pages/address/address',
       settings: '/pages/settings/settings', about: '/pages/settings/settings',
       recharge: '/pages/recharge/recharge',
+      claimcenter: '/pages/claim-center/claim-center',
       lucky: '__toast__', service: '__toast__'
     };
     const target = routes[action];
@@ -681,6 +682,10 @@ Page({
       wx.showToast({ title: msgs[action] || '功能开发中', icon: 'none', duration: 2000 }); return;
     }
     target.tab !== undefined ? this.setData({ currentTab: target.tab }) : wx.navigateTo({ url: target });
+  },
+
+  onClaimCenter() {
+    wx.navigateTo({ url: '/pages/claim-center/claim-center' });
   },
 
   // ── 产品详情弹窗 ────────────────────────────
