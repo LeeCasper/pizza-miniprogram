@@ -139,6 +139,12 @@
       </view>
       <text class="grid-label">优惠券</text>
     </view>
+    <view class="grid-item" bindtap="onMenuItem" data-action="claimcenter">
+      <view class="grid-icon-wrap grid-icon-red">
+        <text class="grid-icon-emoji">🎫</text>
+      </view>
+      <text class="grid-label">领券中心</text>
+    </view>
     <view class="grid-item" bindtap="onMenuItem" data-action="lucky">
       <view class="grid-icon-wrap grid-icon-green">
         <image class="grid-icon" src="/images/grid-lucky.png" mode="aspectFit"></image>
