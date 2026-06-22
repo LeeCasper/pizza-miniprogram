@@ -109,6 +109,10 @@ const schemas = {
     notificationEnabled: Joi.boolean().optional(),
     phone: Joi.string().pattern(/^1[3-9]\d{9}$/).optional().allow(''),
   }),
+
+  claimCoupon: Joi.object({
+    templateId: Joi.number().integer().positive().required().messages({ 'any.required': '缺少模板ID' }),
+  }),
 };
 
 function validate(schemaName) {

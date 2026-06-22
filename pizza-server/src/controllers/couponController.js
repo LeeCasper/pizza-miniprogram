@@ -1,4 +1,5 @@
 const couponService = require('../services/couponService');
+const couponClaimService = require('../services/couponClaimService');
 
 const couponController = {
   async list(req, res, next) {
@@ -18,6 +19,27 @@ const couponController = {
         return res.status(400).json({ code: 400, message: result.error });
       }
       res.json({ code: 0, message: '已使用' });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async listClaimable(req, res, next) {
+    try {
+      const list = await couponClaimService.listClaimable(req.user.id);
+      res.json({ code: 0, data: list });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async claim(req, res, next) {
+    try {
+      const result = await couponClaimService.claim(req.user.id, req.body.templateId);
+      if (result.error) {
+        return res.status(400).json({ code: 400, message: result.error, reason: result.reason });
+      }
+      res.json({ code: 0, message: '领取成功', data: { couponId: result.couponId } });
     } catch (err) {
       next(err);
     }
