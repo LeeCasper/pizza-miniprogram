@@ -6,12 +6,19 @@ export interface CouponTemplate {
   desc: string;
   category: 'redeem' | 'discount';
   value: string;
-  discountType: string;
+  discountType: 'free_redeem' | 'buy_one_get_one' | 'free_delivery' | 'half_price' | 'fixed_amount' | 'percentage';
   discountValue: string;
   minSpend: number;
   validDays: number;
   color: string;
   useTip: string;
+  claimable?: boolean;
+  totalStock?: number | null;
+  claimedCount?: number;
+  perUserLimit?: number;
+  claimPeriod?: 'none' | 'weekly' | 'monthly';
+  minMemberLevel?: number;
+  maxDiscount?: number | null;
   isActive?: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -39,8 +46,4 @@ export function fetchDeleteCouponTemplate(id: number) {
 
 export function fetchToggleCouponTemplate(id: number) {
   return request<CouponTemplate>({ url: `/coupon-templates/${id}/toggle`, method: 'put' });
-}
-
-export function fetchAssignCoupon(templateId: number, userIds: number[]) {
-  return request<{ assigned: number }>({ url: '/coupons/assign', method: 'post', data: { templateId, userIds } });
 }
