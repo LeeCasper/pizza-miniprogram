@@ -188,9 +188,11 @@ CREATE TABLE IF NOT EXISTS coupons (
     source VARCHAR(100) DEFAULT '',
     status ENUM('available','used','expired') DEFAULT 'available',
     code VARCHAR(30) NOT NULL UNIQUE,
-    discount_type ENUM('free_redeem','buy_one_get_one','free_delivery','half_price','fixed_amount') NULL,
+    discount_type ENUM('free_redeem','buy_one_get_one','free_delivery','half_price','fixed_amount','percentage') NULL,
     discount_value VARCHAR(100) DEFAULT '',
     min_spend DECIMAL(10,2) DEFAULT 0.00,
+    template_id INT UNSIGNED NULL,
+    max_discount DECIMAL(10,2) NULL,
     redeem_product_name VARCHAR(100) DEFAULT '',
     redeem_product_price DECIMAL(10,2) NULL,
     redeem_product_image VARCHAR(500) DEFAULT '',
@@ -278,15 +280,37 @@ CREATE TABLE IF NOT EXISTS coupon_templates (
     `desc` VARCHAR(200) DEFAULT '',
     category ENUM('redeem','discount') NOT NULL DEFAULT 'discount',
     `value` VARCHAR(100) DEFAULT '',
-    discount_type ENUM('free_redeem','buy_one_get_one','free_delivery','half_price','fixed_amount') DEFAULT 'fixed_amount',
+    discount_type ENUM('free_redeem','buy_one_get_one','free_delivery','half_price','fixed_amount','percentage') DEFAULT 'fixed_amount',
     discount_value VARCHAR(100) DEFAULT '',
     min_spend DECIMAL(10,2) DEFAULT 0.00,
     valid_days INT DEFAULT 30,
     color VARCHAR(7) DEFAULT '#D32F2F',
     use_tip VARCHAR(300) DEFAULT '',
+    claimable TINYINT(1) NOT NULL DEFAULT 0,
+    total_stock INT UNSIGNED NULL,
+    claimed_count INT UNSIGNED NOT NULL DEFAULT 0,
+    per_user_limit INT UNSIGNED NOT NULL DEFAULT 1,
+    claim_period ENUM('none','weekly','monthly') NOT NULL DEFAULT 'none',
+    min_member_level INT NOT NULL DEFAULT 0,
+    max_discount DECIMAL(10,2) NULL,
     is_active TINYINT(1) DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =============================================
+-- 14b. coupon_claims (claim records for claimable templates)
+-- =============================================
+CREATE TABLE IF NOT EXISTS coupon_claims (
+    id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    template_id INT UNSIGNED NOT NULL,
+    user_id     INT UNSIGNED NOT NULL,
+    coupon_id   INT UNSIGNED NOT NULL,
+    period_key  VARCHAR(16)  NOT NULL DEFAULT '',
+    claimed_at  DATETIME     DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (template_id) REFERENCES coupon_templates(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id)     REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_tpl_user_period (template_id, user_id, period_key)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =============================================
