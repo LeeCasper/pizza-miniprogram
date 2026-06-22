@@ -172,6 +172,64 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
+    name: 'luckywheel',
+    path: '/luckywheel',
+    component: 'layout.base',
+    meta: {
+      title: 'luckywheel',
+      i18nKey: 'route.luckywheel'
+    },
+    children: [
+      {
+        name: 'luckywheel_prizes',
+        path: '/luckywheel/prizes',
+        meta: {
+          title: 'luckywheel_prizes',
+          i18nKey: 'route.luckywheel_prizes'
+        },
+        children: [
+          {
+            name: 'luckywheel_prizes_form',
+            path: '/luckywheel/prizes/form',
+            component: 'view.luckywheel_prizes_form',
+            meta: {
+              title: 'luckywheel_prizes_form',
+              i18nKey: 'route.luckywheel_prizes_form'
+            }
+          },
+          {
+            name: 'luckywheel_prizes_list',
+            path: '/luckywheel/prizes/list',
+            component: 'view.luckywheel_prizes_list',
+            meta: {
+              title: 'luckywheel_prizes_list',
+              i18nKey: 'route.luckywheel_prizes_list'
+            }
+          }
+        ]
+      },
+      {
+        name: 'luckywheel_records',
+        path: '/luckywheel/records',
+        meta: {
+          title: 'luckywheel_records',
+          i18nKey: 'route.luckywheel_records'
+        },
+        children: [
+          {
+            name: 'luckywheel_records_list',
+            path: '/luckywheel/records/list',
+            component: 'view.luckywheel_records_list',
+            meta: {
+              title: 'luckywheel_records_list',
+              i18nKey: 'route.luckywheel_records_list'
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     name: 'membertiers',
     path: '/membertiers',
     component: 'layout.base',

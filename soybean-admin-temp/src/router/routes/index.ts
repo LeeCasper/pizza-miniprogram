@@ -295,6 +295,58 @@ const customRoutes: CustomRoute[] = [
     ],
   },
   {
+    name: 'luckywheel',
+    path: '/lucky-wheel',
+    component: 'layout.base',
+    meta: {
+      title: '幸运转盘',
+      i18nKey: 'route.luckywheel',
+      icon: 'mdi:dharmachakra',
+      order: 6.5,
+    },
+    children: [
+      {
+        name: 'luckywheel_prizes_list',
+        path: '/lucky-wheel/prizes',
+        component: 'view.luckywheel_prizes_list',
+        meta: {
+          title: '奖品管理',
+          i18nKey: 'route.luckywheel_prizes_list',
+        },
+      },
+      {
+        name: 'luckywheel_prizes_create',
+        path: '/lucky-wheel/prizes/create',
+        component: 'view.luckywheel_prizes_form',
+        meta: {
+          title: '新建奖品',
+          i18nKey: 'route.luckywheel_prizes_create',
+          hideInMenu: true,
+        },
+      },
+      {
+        name: 'luckywheel_prizes_edit',
+        path: '/lucky-wheel/prizes/:id/edit',
+        component: 'view.luckywheel_prizes_form',
+        props: true,
+        meta: {
+          title: '编辑奖品',
+          i18nKey: 'route.luckywheel_prizes_edit',
+          hideInMenu: true,
+        },
+      },
+      {
+        name: 'luckywheel_records_list',
+        path: '/lucky-wheel/records',
+        component: 'view.luckywheel_records_list',
+        meta: {
+          title: '抽奖记录',
+          i18nKey: 'route.luckywheel_records_list',
+        },
+      },
+    ],
+  },
+  {
     name: 'membertiers',
     path: '/member-tiers',
     component: 'layout.base',

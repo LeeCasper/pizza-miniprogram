@@ -13,3 +13,4 @@ export * from './couponTemplate';
 export * from './memberTier';
 export * from './payment';
 export * from './settings';
+export * from './luckyWheel';

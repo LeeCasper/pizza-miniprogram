@@ -33,6 +33,12 @@ declare module "@elegant-router/types" {
     "files_list": "/files/list";
     "iframe-page": "/iframe-page/:url";
     "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?";
+    "luckywheel": "/luckywheel";
+    "luckywheel_prizes": "/luckywheel/prizes";
+    "luckywheel_prizes_form": "/luckywheel/prizes/form";
+    "luckywheel_prizes_list": "/luckywheel/prizes/list";
+    "luckywheel_records": "/luckywheel/records";
+    "luckywheel_records_list": "/luckywheel/records/list";
     "membertiers": "/membertiers";
     "membertiers_form": "/membertiers/form";
     "membertiers_list": "/membertiers/list";
@@ -96,6 +102,7 @@ declare module "@elegant-router/types" {
     | "files"
     | "iframe-page"
     | "login"
+    | "luckywheel"
     | "membertiers"
     | "orders"
     | "payments"
@@ -131,6 +138,9 @@ declare module "@elegant-router/types" {
     | "coupons_templates_list"
     | "dashboard"
     | "files_list"
+    | "luckywheel_prizes_form"
+    | "luckywheel_prizes_list"
+    | "luckywheel_records_list"
     | "membertiers_form"
     | "membertiers_list"
     | "orders_detail"
