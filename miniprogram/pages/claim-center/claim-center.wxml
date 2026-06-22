@@ -1,0 +1,41 @@
+<view class="page-container">
+  <!-- 顶栏（带返回） -->
+  <view class="top-bar" style="padding-top: {{statusBarHeight}}px;">
+    <view class="top-bar-inner">
+      <view class="back-btn" bindtap="onBack"><text class="back-icon">‹</text></view>
+      <text class="top-title">领券中心</text>
+      <view class="back-btn-placeholder"></view>
+    </view>
+  </view>
+
+  <scroll-view scroll-y class="claim-scroll" enhanced show-scrollbar="{{false}}"
+    style="height: calc(100vh - {{topBarTotalHeight}}px);">
+    <view wx:if="{{coupons.length > 0}}" class="coupon-list">
+      <view wx:for="{{coupons}}" wx:key="id" class="claim-card {{item.canClaim ? '' : 'disabled'}}">
+        <view class="claim-left" style="background: {{item.color}}">
+          <text class="claim-value">{{item.value}}</text>
+          <text class="claim-min" wx:if="{{item.minSpend > 0}}">满{{item.minSpend}}可用</text>
+        </view>
+        <view class="claim-mid">
+          <text class="claim-name">{{item.name}}</text>
+          <text class="claim-desc">{{item.desc}}</text>
+          <view class="claim-tags">
+            <text class="claim-tag">{{item.stockText}}</text>
+            <text class="claim-tag" wx:if="{{item.minMemberLevel > 0}}">需等级{{item.minMemberLevel}}+</text>
+            <text class="claim-tag" wx:if="{{item.claimPeriod === 'weekly'}}">每周限{{item.perUserLimit}}</text>
+            <text class="claim-tag" wx:if="{{item.claimPeriod === 'monthly'}}">每月限{{item.perUserLimit}}</text>
+          </view>
+        </view>
+        <view class="claim-btn {{item.canClaim ? '' : 'claim-btn-off'}}" bindtap="onClaim" data-id="{{item.id}}">
+          <text>{{item.btnText}}</text>
+        </view>
+      </view>
+      <view style="height: calc(40rpx + env(safe-area-inset-bottom))"></view>
+    </view>
+
+    <view wx:elif="{{!loading}}" class="empty-state">
+      <text class="empty-icon">🎫</text>
+      <text class="empty-text">暂无可领取的优惠券</text>
+    </view>
+  </scroll-view>
+</view>
