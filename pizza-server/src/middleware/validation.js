@@ -81,6 +81,30 @@ const schemas = {
     maxDiscount: Joi.number().min(0).allow(null).default(null),
   }),
 
+  // Partial-update schema: mirrors couponTemplate's fields/constraints but every field is
+  // optional with NO .default(...). This prevents Joi from injecting values for omitted keys,
+  // which (combined with the controller's `if (x !== undefined)` guards) would otherwise reset
+  // unrelated fields to defaults on a partial PUT. name is optional here (not required).
+  couponTemplateUpdate: Joi.object({
+    name: Joi.string().optional().max(100).messages({ 'string.empty': '请输入模板名称' }),
+    desc: Joi.string().allow('').max(200).optional(),
+    category: Joi.string().valid('discount', 'redeem').optional(),
+    value: Joi.string().allow('').max(100).optional(),
+    discountType: Joi.string().valid('free_redeem','buy_one_get_one','free_delivery','half_price','fixed_amount','percentage').optional(),
+    discountValue: Joi.string().allow('').max(100).optional(),
+    minSpend: Joi.number().min(0).optional(),
+    validDays: Joi.number().integer().min(1).optional(),
+    color: Joi.string().allow('').max(20).optional(),
+    useTip: Joi.string().allow('').max(300).optional(),
+    isActive: Joi.boolean().optional(),
+    claimable: Joi.boolean().optional(),
+    totalStock: Joi.number().integer().min(0).allow(null).optional(),
+    perUserLimit: Joi.number().integer().min(1).optional(),
+    claimPeriod: Joi.string().valid('none','weekly','monthly').optional(),
+    minMemberLevel: Joi.number().integer().min(0).optional(),
+    maxDiscount: Joi.number().min(0).allow(null).optional(),
+  }),
+
   updateSettings: Joi.object({
     notificationEnabled: Joi.boolean().optional(),
     phone: Joi.string().pattern(/^1[3-9]\d{9}$/).optional().allow(''),

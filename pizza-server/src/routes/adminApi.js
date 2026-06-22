@@ -47,7 +47,7 @@ router.get('/coupons', ctrl.listCoupons);
 router.get('/coupon-templates', ctrl.listCouponTemplates);
 router.get('/coupon-templates/:id', ctrl.getCouponTemplate);
 router.post('/coupon-templates', validate('couponTemplate'), ctrl.createCouponTemplate);
-router.put('/coupon-templates/:id', validate('couponTemplate'), ctrl.updateCouponTemplate);
+router.put('/coupon-templates/:id', validate('couponTemplateUpdate'), ctrl.updateCouponTemplate);
 router.delete('/coupon-templates/:id', ctrl.deleteCouponTemplate);
 router.put('/coupon-templates/:id/toggle', ctrl.toggleCouponTemplate);
 router.post('/coupons/assign', ctrl.assignCoupon);
