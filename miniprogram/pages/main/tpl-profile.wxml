@@ -141,7 +141,7 @@
     </view>
     <view class="grid-item" bindtap="onMenuItem" data-action="claimcenter">
       <view class="grid-icon-wrap grid-icon-red">
-        <text class="grid-icon-emoji">🎫</text>
+        <image class="grid-icon" src="/images/grid-claim.png" mode="aspectFit"></image>
       </view>
       <text class="grid-label">领券中心</text>
     </view>
