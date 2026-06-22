@@ -52,6 +52,17 @@ router.delete('/coupon-templates/:id', ctrl.deleteCouponTemplate);
 router.put('/coupon-templates/:id/toggle', ctrl.toggleCouponTemplate);
 router.post('/coupons/assign', ctrl.assignCoupon);
 
+// ── 幸运转盘 ──
+router.get('/lucky-wheel/config', ctrl.getLuckyConfig);
+router.put('/lucky-wheel/config', validate('luckyConfig'), ctrl.updateLuckyConfig);
+router.get('/lucky-wheel/records', ctrl.listLuckyRecords);
+router.get('/lucky-wheel/prizes', ctrl.listLuckyPrizes);
+router.get('/lucky-wheel/prizes/:id', ctrl.getLuckyPrize);
+router.post('/lucky-wheel/prizes', validate('luckyPrize'), ctrl.createLuckyPrize);
+router.put('/lucky-wheel/prizes/:id', validate('luckyPrizeUpdate'), ctrl.updateLuckyPrize);
+router.delete('/lucky-wheel/prizes/:id', ctrl.deleteLuckyPrize);
+router.put('/lucky-wheel/prizes/:id/toggle', ctrl.toggleLuckyPrize);
+
 // Member tiers
 router.get('/member-tiers', ctrl.listMemberTiers);
 router.get('/member-tiers/:id', ctrl.getMemberTier);

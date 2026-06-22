@@ -20,6 +20,7 @@ const systemConfigService = require('../services/systemConfigService');
 const storeService = require('../services/storeService');
 const auditService = require('../services/auditService');
 const reconciliationService = require('../services/reconciliationService');
+const luckyWheelService = require('../services/luckyWheelService');
 
 const adminApiController = {
   // ── Auth ────────────────────────────────────────────
@@ -1487,6 +1488,55 @@ const adminApiController = {
     } catch (err) {
       next(err);
     }
+  },
+
+  // ── 幸运转盘 ──
+  async getLuckyConfig(req, res, next) {
+    try { res.json({ code: 0, data: await luckyWheelService.adminGetLuckyConfig() }); }
+    catch (err) { next(err); }
+  },
+  async updateLuckyConfig(req, res, next) {
+    try { res.json({ code: 0, data: await luckyWheelService.saveLuckyConfig(req.body) }); }
+    catch (err) { next(err); }
+  },
+  async listLuckyPrizes(req, res, next) {
+    try { res.json({ code: 0, data: await luckyWheelService.adminListPrizes() }); }
+    catch (err) { next(err); }
+  },
+  async getLuckyPrize(req, res, next) {
+    try {
+      const data = await luckyWheelService.adminGetPrize(req.params.id);
+      if (!data) return res.status(404).json({ code: 404, message: '奖品不存在' });
+      res.json({ code: 0, data });
+    } catch (err) { next(err); }
+  },
+  async createLuckyPrize(req, res, next) {
+    try { res.json({ code: 0, data: await luckyWheelService.adminCreatePrize(req.body) }); }
+    catch (err) { next(err); }
+  },
+  async updateLuckyPrize(req, res, next) {
+    try {
+      const ok = await luckyWheelService.adminUpdatePrize(req.params.id, req.body);
+      if (!ok) return res.status(404).json({ code: 404, message: '奖品不存在或无变更' });
+      res.json({ code: 0, data: { updated: true } });
+    } catch (err) { next(err); }
+  },
+  async deleteLuckyPrize(req, res, next) {
+    try {
+      const ok = await luckyWheelService.adminDeletePrize(req.params.id);
+      if (!ok) return res.status(404).json({ code: 404, message: '奖品不存在' });
+      res.json({ code: 0, data: { deleted: true } });
+    } catch (err) { next(err); }
+  },
+  async toggleLuckyPrize(req, res, next) {
+    try { res.json({ code: 0, data: await luckyWheelService.adminTogglePrize(req.params.id) }); }
+    catch (err) { next(err); }
+  },
+  async listLuckyRecords(req, res, next) {
+    try {
+      const { page, limit } = req.query;
+      res.json({ code: 0, data: await luckyWheelService.adminListRecords(page, limit) });
+    } catch (err) { next(err); }
   },
 };
 

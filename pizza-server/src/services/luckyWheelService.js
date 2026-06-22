@@ -227,4 +227,124 @@ async function myRecords(userId, page = 1, limit = 20) {
   };
 }
 
-module.exports = { getLuckyConfig, getWheelConfig, draw, myRecords };
+// ───────────────────────── Admin ─────────────────────────
+
+function formatPrize(r) {
+  return {
+    id: r.id,
+    type: r.type,
+    name: r.name,
+    weight: r.weight,
+    stock: r.stock,
+    awardedCount: r.awarded_count,
+    couponTemplateId: r.coupon_template_id,
+    pointsAmount: r.points_amount,
+    balanceAmount: r.balance_amount,
+    color: r.color,
+    icon: r.icon,
+    sortOrder: r.sort_order,
+    isActive: !!r.is_active,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+  };
+}
+
+async function adminListPrizes() {
+  const [rows] = await pool.query('SELECT * FROM lucky_wheel_prizes ORDER BY sort_order, id');
+  return rows.map(formatPrize);
+}
+
+async function adminGetPrize(id) {
+  const [[row]] = await pool.query('SELECT * FROM lucky_wheel_prizes WHERE id = ?', [id]);
+  return row ? formatPrize(row) : null;
+}
+
+async function adminCreatePrize(d) {
+  const [r] = await pool.query(
+    `INSERT INTO lucky_wheel_prizes
+       (type, name, weight, stock, coupon_template_id, points_amount, balance_amount, color, icon, sort_order, is_active)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      d.type, d.name, d.weight ?? 1, d.stock ?? null,
+      d.couponTemplateId ?? null, d.pointsAmount ?? null, d.balanceAmount ?? null,
+      d.color ?? '#F5C518', d.icon ?? '', d.sortOrder ?? 0,
+      d.isActive === false ? 0 : 1,
+    ]
+  );
+  return { id: r.insertId };
+}
+
+async function adminUpdatePrize(id, d) {
+  const fields = [];
+  const vals = [];
+  const map = {
+    type: 'type', name: 'name', weight: 'weight', stock: 'stock',
+    couponTemplateId: 'coupon_template_id', pointsAmount: 'points_amount',
+    balanceAmount: 'balance_amount', color: 'color', icon: 'icon', sortOrder: 'sort_order',
+  };
+  for (const [k, col] of Object.entries(map)) {
+    if (d[k] !== undefined) { fields.push(`${col} = ?`); vals.push(d[k]); }
+  }
+  if (d.isActive !== undefined) { fields.push('is_active = ?'); vals.push(d.isActive ? 1 : 0); }
+  if (!fields.length) return false;
+  vals.push(id);
+  const [r] = await pool.query(`UPDATE lucky_wheel_prizes SET ${fields.join(', ')} WHERE id = ?`, vals);
+  return r.affectedRows > 0;
+}
+
+async function adminDeletePrize(id) {
+  // draws.prize_id is ON DELETE SET NULL → hard delete is safe (no errno 1451).
+  const [r] = await pool.query('DELETE FROM lucky_wheel_prizes WHERE id = ?', [id]);
+  return r.affectedRows > 0;
+}
+
+async function adminTogglePrize(id) {
+  await pool.query('UPDATE lucky_wheel_prizes SET is_active = 1 - is_active WHERE id = ?', [id]);
+  const [[row]] = await pool.query('SELECT is_active FROM lucky_wheel_prizes WHERE id = ?', [id]);
+  return { isActive: row ? !!row.is_active : false };
+}
+
+async function adminListRecords(page = 1, limit = 20) {
+  const p = Math.max(1, parseInt(page, 10) || 1);
+  const l = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
+  const offset = (p - 1) * l;
+  const [[c]] = await pool.query('SELECT COUNT(*) AS total FROM lucky_wheel_draws');
+  const [rows] = await pool.query(
+    `SELECT d.id, d.user_id AS userId, u.name AS userName, d.prize_type AS prizeType,
+            d.prize_name AS prizeName, d.source, d.cost_points AS costPoints,
+            d.coupon_id AS couponId, d.points_amount AS pointsAmount,
+            d.balance_amount AS balanceAmount, d.created_at AS createdAt
+       FROM lucky_wheel_draws d
+       LEFT JOIN users u ON u.id = d.user_id
+      ORDER BY d.id DESC LIMIT ? OFFSET ?`,
+    [l, offset]
+  );
+  return { total: Number(c.total), list: rows };
+}
+
+async function adminGetLuckyConfig() {
+  return getLuckyConfig();
+}
+
+async function saveLuckyConfig(d) {
+  const entries = [
+    ['lucky_enabled', d.enabled ? '1' : '0'],
+    ['lucky_free_per_day', String(d.freePerDay)],
+    ['lucky_points_cost', String(d.pointsCost)],
+    ['lucky_max_per_day', String(d.maxPerDay)],
+  ];
+  for (const [key, val] of entries) {
+    await pool.query(
+      'INSERT INTO system_config (config_key, config_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE config_value = ?',
+      [key, val, val]
+    );
+  }
+  return getLuckyConfig();
+}
+
+module.exports = {
+  getLuckyConfig, getWheelConfig, draw, myRecords,
+  adminListPrizes, adminGetPrize, adminCreatePrize, adminUpdatePrize,
+  adminDeletePrize, adminTogglePrize, adminListRecords,
+  adminGetLuckyConfig, saveLuckyConfig,
+};

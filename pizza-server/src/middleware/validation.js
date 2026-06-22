@@ -4,6 +4,38 @@ const schemas = {
   luckyDraw: Joi.object({
     source: Joi.string().valid('free', 'points').required(),
   }),
+  luckyPrize: Joi.object({
+    type: Joi.string().valid('coupon', 'points', 'balance', 'thanks', 'again').required(),
+    name: Joi.string().max(50).required(),
+    weight: Joi.number().integer().min(0).default(1),
+    stock: Joi.number().integer().min(0).allow(null),
+    couponTemplateId: Joi.number().integer().allow(null),
+    pointsAmount: Joi.number().integer().min(0).allow(null),
+    balanceAmount: Joi.number().min(0).allow(null),
+    color: Joi.string().max(16).allow(''),
+    icon: Joi.string().max(255).allow(''),
+    sortOrder: Joi.number().integer().default(0),
+    isActive: Joi.boolean().default(true),
+  }),
+  luckyPrizeUpdate: Joi.object({
+    type: Joi.string().valid('coupon', 'points', 'balance', 'thanks', 'again'),
+    name: Joi.string().max(50),
+    weight: Joi.number().integer().min(0),
+    stock: Joi.number().integer().min(0).allow(null),
+    couponTemplateId: Joi.number().integer().allow(null),
+    pointsAmount: Joi.number().integer().min(0).allow(null),
+    balanceAmount: Joi.number().min(0).allow(null),
+    color: Joi.string().max(16).allow(''),
+    icon: Joi.string().max(255).allow(''),
+    sortOrder: Joi.number().integer(),
+    isActive: Joi.boolean(),
+  }).min(1),
+  luckyConfig: Joi.object({
+    enabled: Joi.boolean().required(),
+    freePerDay: Joi.number().integer().min(0).required(),
+    pointsCost: Joi.number().integer().min(0).required(),
+    maxPerDay: Joi.number().integer().min(1).required(),
+  }),
   createAddress: Joi.object({
     name: Joi.string().required().max(50).messages({
       'string.empty': '请输入收货人姓名',
