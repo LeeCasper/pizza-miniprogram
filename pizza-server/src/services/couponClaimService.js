@@ -1,5 +1,5 @@
 const pool = require('../config/database');
-const { computeTier } = require('../utils/memberTier');
+const { computeTier, loadTiers } = require('../utils/memberTier');
 
 // ISO 周键 'YYYY-Www'（周一为周首）
 function isoWeekKey(d) {
@@ -46,7 +46,12 @@ function rowToTpl(t) {
   };
 }
 
-async function userLevelIndex(totalSpent) {
+async function userLevelIndex(totalSpent, memberLevel) {
+  const tiers = await loadTiers();
+  if (memberLevel) {
+    const t = tiers.find(x => x.levelKey === memberLevel);
+    if (t) return t.levelIndex || 0;
+  }
   const tier = await computeTier(parseFloat(totalSpent || 0));
   return tier.levelIndex || 0;
 }
@@ -59,8 +64,8 @@ const couponClaimService = {
     const [tpls] = await pool.query(
       'SELECT * FROM coupon_templates WHERE is_active = 1 AND claimable = 1 ORDER BY id DESC'
     );
-    const [[u]] = await pool.query('SELECT total_spent FROM users WHERE id = ?', [userId]);
-    const level = await userLevelIndex(u ? u.total_spent : 0);
+    const [[u]] = await pool.query('SELECT total_spent, member_level FROM users WHERE id = ?', [userId]);
+    const level = await userLevelIndex(u ? u.total_spent : 0, u ? u.member_level : null);
     const out = [];
     for (const t of tpls) {
       const periodKey = computePeriodKey(t.claim_period);
@@ -96,8 +101,8 @@ const couponClaimService = {
         await conn.rollback();
         return { error: '该优惠券不可领取', reason: 'not_claimable' };
       }
-      const [[u]] = await conn.query('SELECT total_spent FROM users WHERE id = ?', [userId]);
-      const level = await userLevelIndex(u ? u.total_spent : 0);
+      const [[u]] = await conn.query('SELECT total_spent, member_level FROM users WHERE id = ?', [userId]);
+      const level = await userLevelIndex(u ? u.total_spent : 0, u ? u.member_level : null);
       if (level < t.min_member_level) {
         await conn.rollback();
         return { error: '会员等级不足，无法领取', reason: 'level_too_low' };

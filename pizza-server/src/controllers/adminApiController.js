@@ -1045,12 +1045,13 @@ const adminApiController = {
     if (!templateId || !Array.isArray(userIds) || userIds.length === 0) {
       return res.status(400).json({ code: 400, message: '请选择模板和用户' });
     }
-    const template = await couponTemplateService.findById(templateId);
-    if (!template) {
-      return res.status(404).json({ code: 404, message: '优惠券模板不存在' });
-    }
-    const conn = await pool.getConnection();
+    let conn = null;
     try {
+      const template = await couponTemplateService.findById(templateId);
+      if (!template) {
+        return res.status(404).json({ code: 404, message: '优惠券模板不存在' });
+      }
+      conn = await pool.getConnection();
       await conn.beginTransaction();
       let assigned = 0;
       for (const userId of userIds) {
@@ -1060,11 +1061,11 @@ const adminApiController = {
       await conn.commit();
       return res.json({ code: 0, message: `已成功发放 ${assigned} 张优惠券`, data: { assigned } });
     } catch (err) {
-      await conn.rollback();
+      if (conn) await conn.rollback();
       log.error({ err }, 'AssignCoupon error');
       return res.status(500).json({ code: 500, message: err.message || '发放优惠券失败' });
     } finally {
-      conn.release();
+      if (conn) conn.release();
     }
   },
 
