@@ -59,7 +59,7 @@ const columns: DataTableColumns<CouponTemplate> = [
     render(row) {
       return h(NSpace, null, {
         default: () => [
-          h(NButton, { size: 'small', quaternary: true, onClick: () => router.push(`/coupon-templates/${row.id}/edit`) }, { icon: () => h(NIcon, null, () => h(EditOutlined)) }),
+          h(NButton, { size: 'small', quaternary: true, onClick: () => router.push(`/coupons/templates/${row.id}/edit`) }, { icon: () => h(NIcon, null, () => h(EditOutlined)) }),
           h(NButton, { size: 'small', quaternary: true, type: 'error', onClick: () => handleDelete(row.id!, row.name) }, { icon: () => h(NIcon, null, () => h(DeleteOutlined)) }),
         ]
       });
@@ -148,7 +148,7 @@ onMounted(() => { loadTemplates(); });
   <NCard title="优惠券模板" :bordered="false" class="card-wrapper">
     <template #header-extra>
       <NSpace>
-        <NButton type="primary" @click="router.push('/coupon-templates/create')">
+        <NButton type="primary" @click="router.push('/coupons/templates/create')">
           <template #icon><NIcon><PlusOutlined /></NIcon></template>
           新建模板
         </NButton>

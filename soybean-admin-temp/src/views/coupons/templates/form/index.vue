@@ -79,7 +79,7 @@ async function handleSave() {
   saving.value = false;
   if (!error) {
     window.$message?.success(isEdit.value ? '模板已更新' : '模板已创建');
-    router.push('/coupon-templates/list');
+    router.push('/coupons/templates/list');
   }
 }
 </script>
@@ -88,7 +88,7 @@ async function handleSave() {
   <NCard :title="isEdit ? '编辑模板' : '新建模板'" :bordered="false" class="card-wrapper">
     <template #header-extra>
       <NSpace>
-        <NButton @click="router.push('/coupon-templates/list')">返回</NButton>
+        <NButton @click="router.push('/coupons/templates/list')">返回</NButton>
         <NButton type="primary" :loading="saving" @click="handleSave">{{ isEdit ? '保存修改' : '创建' }}</NButton>
       </NSpace>
     </template>
