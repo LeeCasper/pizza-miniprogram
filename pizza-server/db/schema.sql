@@ -361,7 +361,7 @@ CREATE TABLE IF NOT EXISTS balance_history (
     user_id INT UNSIGNED NOT NULL,
     amount DECIMAL(10,2) NOT NULL COMMENT '充值金额',
     balance_after DECIMAL(10,2) NOT NULL COMMENT '充值后余额',
-    type ENUM('recharge','deduct','refund') DEFAULT 'recharge',
+    type ENUM('recharge','deduct','refund','reward') DEFAULT 'recharge',
     remark VARCHAR(128) DEFAULT '',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -408,3 +408,43 @@ INSERT INTO system_config (config_key, config_value, description) VALUES
 ('wx_pay_private_key', '', '商户私钥(PEM格式)'),
 ('wx_pay_platform_cert', '', '微信支付平台证书(PEM格式)'),
 ('wx_pay_notify_url', 'https://artaides.com/api/v1/pay/notify', '支付回调通知URL');
+
+-- =============================================
+-- 20. 幸运转盘 (Lucky Wheel)
+-- =============================================
+CREATE TABLE IF NOT EXISTS lucky_wheel_prizes (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  type ENUM('coupon','points','balance','thanks','again') NOT NULL,
+  name VARCHAR(50) NOT NULL,
+  weight INT UNSIGNED NOT NULL DEFAULT 1,
+  stock INT UNSIGNED NULL,
+  awarded_count INT UNSIGNED NOT NULL DEFAULT 0,
+  coupon_template_id INT UNSIGNED NULL,
+  points_amount INT UNSIGNED NULL,
+  balance_amount DECIMAL(10,2) NULL,
+  color VARCHAR(16) DEFAULT '#F5C518',
+  icon VARCHAR(255) DEFAULT '',
+  sort_order INT NOT NULL DEFAULT 0,
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (coupon_template_id) REFERENCES coupon_templates(id) ON DELETE SET NULL,
+  INDEX idx_active_sort (is_active, sort_order)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS lucky_wheel_draws (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id INT UNSIGNED NOT NULL,
+  prize_id INT UNSIGNED NULL,
+  prize_type ENUM('coupon','points','balance','thanks','again') NOT NULL,
+  prize_name VARCHAR(50) NOT NULL,
+  source ENUM('free','points','again') NOT NULL,
+  cost_points INT UNSIGNED NOT NULL DEFAULT 0,
+  coupon_id INT UNSIGNED NULL,
+  points_amount INT UNSIGNED NULL,
+  balance_amount DECIMAL(10,2) NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (prize_id) REFERENCES lucky_wheel_prizes(id) ON DELETE SET NULL,
+  INDEX idx_user_date (user_id, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
