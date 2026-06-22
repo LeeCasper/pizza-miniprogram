@@ -12,6 +12,7 @@ const userService = require('../services/userService');
 const pointsService = require('../services/pointsService');
 const bannerService = require('../services/bannerService');
 const couponTemplateService = require('../services/couponTemplateService');
+const couponClaimService = require('../services/couponClaimService');
 const memberTierService = require('../services/memberTierService');
 const { invalidateCache, getTierLevel } = require('../utils/memberTier');
 const paymentService = require('../services/paymentService');
@@ -1040,39 +1041,30 @@ const adminApiController = {
    * Body: { templateId, userIds: number[] }
    */
   async assignCoupon(req, res) {
+    const { templateId, userIds } = req.body;
+    if (!templateId || !Array.isArray(userIds) || userIds.length === 0) {
+      return res.status(400).json({ code: 400, message: '请选择模板和用户' });
+    }
+    const template = await couponTemplateService.findById(templateId);
+    if (!template) {
+      return res.status(404).json({ code: 404, message: '优惠券模板不存在' });
+    }
+    const conn = await pool.getConnection();
     try {
-      const { templateId, userIds } = req.body;
-      if (!templateId || !Array.isArray(userIds) || userIds.length === 0) {
-        return res.status(400).json({ code: 400, message: '请选择模板和用户' });
-      }
-
-      const template = await couponTemplateService.findById(templateId);
-      if (!template) {
-        return res.status(404).json({ code: 404, message: '优惠券模板不存在' });
-      }
-
-      const now = new Date();
-      const validFrom = now.toISOString().slice(0, 10);
-      const validTo = new Date(now.getTime() + template.validDays * 86400000).toISOString().slice(0, 10);
+      await conn.beginTransaction();
       let assigned = 0;
-
       for (const userId of userIds) {
-        const code = `CPN-${Date.now()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
-        await pool.query(
-          `INSERT INTO coupons (user_id, name, \`desc\`, category, \`value\`, status, code,
-           discount_type, discount_value, min_spend, valid_from, valid_to, use_tip, color, source)
-           VALUES (?, ?, ?, ?, ?, 'available', ?, ?, ?, ?, ?, ?, ?, ?, 'admin')`,
-          [userId, template.name, template.desc, template.category, template.value,
-           code, template.discountType, template.discountValue,
-           template.minSpend, validFrom, validTo, template.useTip, template.color]
-        );
+        await couponClaimService.mintCouponFromTemplate(conn, template, userId, 'admin');
         assigned++;
       }
-
+      await conn.commit();
       return res.json({ code: 0, message: `已成功发放 ${assigned} 张优惠券`, data: { assigned } });
     } catch (err) {
+      await conn.rollback();
       log.error({ err }, 'AssignCoupon error');
       return res.status(500).json({ code: 500, message: err.message || '发放优惠券失败' });
+    } finally {
+      conn.release();
     }
   },
 
