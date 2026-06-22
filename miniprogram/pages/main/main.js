@@ -387,6 +387,12 @@ Page({
         case 'fixed_amount':
           couponDiscount = parseFloat(coupon.discountValue) || 0;
           break;
+        case 'percentage': {
+          const pct = parseFloat(coupon.discountValue) || 0;
+          couponDiscount = cartTotal * pct / 100;
+          if (coupon.maxDiscount != null) couponDiscount = Math.min(couponDiscount, parseFloat(coupon.maxDiscount));
+          break;
+        }
         case 'buy_one_get_one': {
           const items = Object.values(app.globalData.cart);
           if (items.length > 0) couponDiscount = Math.min(...items.map(i => i.price));
@@ -394,8 +400,10 @@ Page({
         }
         case 'half_price': {
           const items = Object.values(app.globalData.cart);
-          const target = items[0];
-          if (target) couponDiscount = target.price * 0.5 * target.quantity;
+          if (items.length > 0) {
+            const cheapest = items.reduce((min, i) => i.price < min.price ? i : min, items[0]);
+            couponDiscount = cheapest.price * 0.5 * cheapest.quantity;
+          }
           break;
         }
         case 'free_delivery':
