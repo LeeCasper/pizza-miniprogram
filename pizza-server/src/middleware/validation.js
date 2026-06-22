@@ -61,6 +61,26 @@ const schemas = {
     productId: Joi.number().integer().positive().required(),
   }),
 
+  couponTemplate: Joi.object({
+    name: Joi.string().required().max(100).messages({ 'string.empty': '请输入模板名称' }),
+    desc: Joi.string().allow('').max(200).default(''),
+    category: Joi.string().valid('discount', 'redeem').default('discount'),
+    value: Joi.string().allow('').max(100).default(''),
+    discountType: Joi.string().valid('free_redeem','buy_one_get_one','free_delivery','half_price','fixed_amount','percentage').default('fixed_amount'),
+    discountValue: Joi.string().allow('').max(100).default(''),
+    minSpend: Joi.number().min(0).default(0),
+    validDays: Joi.number().integer().min(1).default(30),
+    color: Joi.string().allow('').max(20).default('#D32F2F'),
+    useTip: Joi.string().allow('').max(300).default(''),
+    isActive: Joi.boolean().optional(),
+    claimable: Joi.boolean().default(false),
+    totalStock: Joi.number().integer().min(0).allow(null).default(null),
+    perUserLimit: Joi.number().integer().min(1).default(1),
+    claimPeriod: Joi.string().valid('none','weekly','monthly').default('none'),
+    minMemberLevel: Joi.number().integer().min(0).default(0),
+    maxDiscount: Joi.number().min(0).allow(null).default(null),
+  }),
+
   updateSettings: Joi.object({
     notificationEnabled: Joi.boolean().optional(),
     phone: Joi.string().pattern(/^1[3-9]\d{9}$/).optional().allow(''),

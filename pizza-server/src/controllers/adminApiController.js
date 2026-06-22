@@ -806,18 +806,14 @@ const adminApiController = {
   async createCouponTemplate(req, res) {
     try {
       const { name, desc, category, value, discountType, discountValue,
-              minSpend, validDays, color, useTip } = req.body;
+              minSpend, validDays, color, useTip,
+              claimable, totalStock, perUserLimit, claimPeriod, minMemberLevel, maxDiscount } = req.body;
       const template = await couponTemplateService.create({
-        name,
-        desc,
-        category,
-        value,
-        discount_type: discountType,
-        discount_value: discountValue,
-        min_spend: minSpend,
-        valid_days: validDays,
-        color,
-        use_tip: useTip,
+        name, desc, category, value,
+        discount_type: discountType, discount_value: discountValue,
+        min_spend: minSpend, valid_days: validDays, color, use_tip: useTip,
+        claimable, total_stock: totalStock, per_user_limit: perUserLimit,
+        claim_period: claimPeriod, min_member_level: minMemberLevel, max_discount: maxDiscount,
       });
       return res.status(201).json({ code: 0, message: '优惠券模板已创建', data: template });
     } catch (err) {
@@ -832,7 +828,8 @@ const adminApiController = {
   async updateCouponTemplate(req, res) {
     try {
       const { name, desc, category, value, discountType, discountValue,
-              minSpend, validDays, color, useTip, isActive } = req.body;
+              minSpend, validDays, color, useTip, isActive,
+              claimable, totalStock, perUserLimit, claimPeriod, minMemberLevel, maxDiscount } = req.body;
       const updateData = {};
       if (name !== undefined) updateData.name = name;
       if (desc !== undefined) updateData.desc = desc;
@@ -845,6 +842,12 @@ const adminApiController = {
       if (color !== undefined) updateData.color = color;
       if (useTip !== undefined) updateData.use_tip = useTip;
       if (isActive !== undefined) updateData.is_active = isActive ? 1 : 0;
+      if (claimable !== undefined) updateData.claimable = claimable ? 1 : 0;
+      if (totalStock !== undefined) updateData.total_stock = totalStock;
+      if (perUserLimit !== undefined) updateData.per_user_limit = perUserLimit;
+      if (claimPeriod !== undefined) updateData.claim_period = claimPeriod;
+      if (minMemberLevel !== undefined) updateData.min_member_level = minMemberLevel;
+      if (maxDiscount !== undefined) updateData.max_discount = maxDiscount;
 
       const template = await couponTemplateService.update(req.params.id, updateData);
       if (!template) {

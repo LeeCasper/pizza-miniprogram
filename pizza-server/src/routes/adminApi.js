@@ -4,6 +4,7 @@ const uploadCtrl = require('../controllers/uploadController');
 const { auth } = require('../middleware/auth');
 const { adminOnly } = require('../middleware/roleGuard');
 const { adminUpload } = require('../config/multer');
+const { validate } = require('../middleware/validation');
 
 const router = Router();
 
@@ -45,8 +46,8 @@ router.get('/coupons', ctrl.listCoupons);
 // Coupon templates
 router.get('/coupon-templates', ctrl.listCouponTemplates);
 router.get('/coupon-templates/:id', ctrl.getCouponTemplate);
-router.post('/coupon-templates', ctrl.createCouponTemplate);
-router.put('/coupon-templates/:id', ctrl.updateCouponTemplate);
+router.post('/coupon-templates', validate('couponTemplate'), ctrl.createCouponTemplate);
+router.put('/coupon-templates/:id', validate('couponTemplate'), ctrl.updateCouponTemplate);
 router.delete('/coupon-templates/:id', ctrl.deleteCouponTemplate);
 router.put('/coupon-templates/:id/toggle', ctrl.toggleCouponTemplate);
 router.post('/coupons/assign', ctrl.assignCoupon);
