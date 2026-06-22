@@ -136,6 +136,8 @@ function formatCoupon(row) {
     discountType: row.discount_type,
     discountValue: row.discount_value,
     minSpend: parseFloat(row.min_spend || 0),
+    maxDiscount: row.max_discount == null ? null : parseFloat(row.max_discount),
+    templateId: row.template_id == null ? null : row.template_id,
     redeemProduct: row.redeem_product_name ? {
       name: row.redeem_product_name,
       price: row.redeem_product_price ? parseFloat(row.redeem_product_price) : 0,

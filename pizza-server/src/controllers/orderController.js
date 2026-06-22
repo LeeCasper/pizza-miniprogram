@@ -92,8 +92,16 @@ const orderController = {
               break;
             }
             case 'half_price': {
-              const target = cartItems.find(i => i.productId === coupon.product_id) || cartItems[0];
-              discountAmount = target.price * 0.5 * target.quantity;
+              const cheapest = cartItems.reduce((min, item) => item.price < min.price ? item : min, cartItems[0]);
+              discountAmount = cheapest.price * 0.5 * cheapest.quantity;
+              break;
+            }
+            case 'percentage': {
+              const pct = parseFloat(coupon.discount_value) || 0;
+              discountAmount = total * pct / 100;
+              if (coupon.max_discount != null) {
+                discountAmount = Math.min(discountAmount, parseFloat(coupon.max_discount));
+              }
               break;
             }
             case 'fixed_amount':
