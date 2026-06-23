@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { NButton, NSpace, NCard, NForm, NFormItem, NInput, NInputNumber, NSelect, NColorPicker, NSpin, NSwitch } from 'naive-ui';
 import { fetchCouponTemplate, fetchCreateCouponTemplate, fetchUpdateCouponTemplate, fetchProducts, type CouponTemplate, type AdminProduct } from '@/service/api';
@@ -107,17 +107,16 @@ async function loadProducts() {
   }
 }
 
-function onProductSelect(productId: number | null) {
-  form.value.productId = productId;
-  if (productId) {
-    const product = productOptions.value.find(p => p.value === productId);
+watch(() => form.value.productId, (newVal) => {
+  if (newVal) {
+    const product = productOptions.value.find(p => p.value === newVal);
     if (product) {
       form.value.redeemProductName = product.label.replace(/\s*\(¥[\d.]+\)\s*$/, '');
       form.value.redeemProductPrice = Number(product.price);
       form.value.redeemProductImage = product.image || '';
     }
   }
-}
+});
 
 async function handleSave() {
   saving.value = true;
@@ -191,7 +190,6 @@ async function handleSave() {
               clearable
               filterable
               style="width: 360px"
-              @update:value="onProductSelect"
             />
             <span style="margin-left:8px;color:#999;font-size:12px;">选商品后自动填充下方字段</span>
           </NFormItem>

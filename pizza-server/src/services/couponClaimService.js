@@ -65,7 +65,7 @@ function rowToTpl(t) {
     redeemProductName: t.redeem_product_name || '',
     redeemProductPrice: t.redeem_product_price,
     redeemProductImage: t.redeem_product_image || '',
-    productId: t.product_id || null,
+    productId: t.product_id ?? null,
   };
 }
 

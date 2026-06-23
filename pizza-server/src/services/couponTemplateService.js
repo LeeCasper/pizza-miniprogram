@@ -88,7 +88,7 @@ function formatTemplate(row) {
     redeemProductName: row.redeem_product_name || '',
     redeemProductPrice: row.redeem_product_price ? parseFloat(row.redeem_product_price) : null,
     redeemProductImage: row.redeem_product_image || '',
-    productId: row.product_id || null,
+    productId: row.product_id ?? null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
