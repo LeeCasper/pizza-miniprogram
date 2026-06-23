@@ -122,7 +122,7 @@
       <text class="result-emoji">{{resultBonus ? '🎡' : (resultThanks ? '😔' : '🎉')}}</text>
       <text class="result-title {{resultThanks ? 'result-title-miss' : ''}}">{{resultBonus ? '再来一次！' : (resultThanks ? '很遗憾，未中奖' : '恭喜中奖')}}</text>
       <text class="result-text">{{resultText}}</text>
-      <button class="result-btn" hover-class="none" bindtap="onCloseResult">{{resultBonus ? '继续抽奖' : '知道了'}}</button>
+      <button class="result-btn" hover-class="none" bindtap="onResultBtn">{{resultBonus ? '继续抽奖' : '知道了'}}</button>
     </view>
   </view>
 

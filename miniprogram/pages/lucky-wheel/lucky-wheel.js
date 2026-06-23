@@ -157,6 +157,15 @@ Page({
 
   onCloseResult() { this.setData({ showResult: false }); },
 
+  // 结果弹窗按钮：中「再来一次」(resultBonus) 时点「继续抽奖」自动开抽，无需再点开始抽奖。
+  // 复用 onSpin —— 服务端已把本次免费/积分额度退还(recordedSource='again',effectiveCost=0),
+  // 故 onSpin 会据刷新后的 freeRemaining 自动免费抽;无免费时仍弹积分确认,不会静默扣分。
+  // 切勿改成发 source:'again' —— 后端只认 {'free','points'},'again' 会被当积分加抽扣分。
+  onResultBtn() {
+    this.setData({ showResult: false });
+    if (this.data.resultBonus) this.onSpin();
+  },
+
   // ── Rules modal ──
   onOpenRules() { this.setData({ showRules: true }); },
   onCloseRules() { this.setData({ showRules: false }); },
