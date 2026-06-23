@@ -149,7 +149,7 @@ Page({
         freeRemaining: result.freeRemaining,
         drawsRemaining: result.drawsRemaining,
       });
-    }, 4100); // matches CSS transition-duration 4s + buffer
+    }, 5100); // matches CSS transition-duration 5s + buffer
   },
 
   onCloseResult() { this.setData({ showResult: false }); },

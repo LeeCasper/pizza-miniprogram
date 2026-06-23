@@ -55,7 +55,7 @@
         <view class="wheel-outer">
           <view class="bulb {{spinning ? 'flash' : ''}}" wx:for="{{bulbs}}" wx:key="*this" style="{{item}}"></view>
           <view class="wheel-inner">
-            <view class="wheel" style="background-image: {{wheelBg}}; transform: rotate({{rotation}}deg); transition-duration: {{spinning ? '4s' : '0s'}};">
+            <view class="wheel" style="background-image: {{wheelBg}}; transform: rotate({{rotation}}deg); transition-duration: {{spinning ? '5s' : '0s'}};">
               <view wx:for="{{labels}}" wx:key="id" class="seg-label" style="{{item.style}}">
                 <text class="seg-name">{{item.name}}</text>
               </view>
