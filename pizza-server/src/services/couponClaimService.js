@@ -26,12 +26,15 @@ async function mintCouponFromTemplate(conn, tpl, userId, source) {
   const [result] = await conn.query(
     `INSERT INTO coupons
        (user_id, template_id, name, \`desc\`, category, \`value\`, status, code,
-        discount_type, discount_value, min_spend, max_discount, valid_from, valid_to, use_tip, color, source)
-     VALUES (?, ?, ?, ?, ?, ?, 'available', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        discount_type, discount_value, min_spend, max_discount, valid_from, valid_to, use_tip, color, source,
+        redeem_product_name, redeem_product_price, redeem_product_image)
+     VALUES (?, ?, ?, ?, ?, ?, 'available', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+             ?, ?, ?)`,
     [userId, tpl.id, tpl.name, tpl.desc || '', tpl.category, tpl.value || '', code,
      tpl.discountType, tpl.discountValue || '', tpl.minSpend || 0,
      tpl.maxDiscount == null ? null : tpl.maxDiscount,
-     validFrom, validTo, tpl.useTip || '', tpl.color || '#D32F2F', source]
+     validFrom, validTo, tpl.useTip || '', tpl.color || '#D32F2F', source,
+     tpl.redeemProductName || '', tpl.redeemProductPrice ?? null, tpl.redeemProductImage || '']
   );
   return result.insertId;
 }
@@ -43,6 +46,9 @@ function rowToTpl(t) {
     discountType: t.discount_type, discountValue: t.discount_value,
     minSpend: t.min_spend, maxDiscount: t.max_discount, validDays: t.valid_days,
     useTip: t.use_tip, color: t.color,
+    redeemProductName: t.redeem_product_name || '',
+    redeemProductPrice: t.redeem_product_price,
+    redeemProductImage: t.redeem_product_image || '',
   };
 }
 

@@ -293,6 +293,10 @@ CREATE TABLE IF NOT EXISTS coupon_templates (
     claim_period ENUM('none','weekly','monthly') NOT NULL DEFAULT 'none',
     min_member_level INT NOT NULL DEFAULT 0,
     max_discount DECIMAL(10,2) NULL,
+    image VARCHAR(500) DEFAULT '' COMMENT '模板封面图',
+    redeem_product_name VARCHAR(100) DEFAULT '' COMMENT '兑换商品名称',
+    redeem_product_price DECIMAL(10,2) NULL COMMENT '兑换商品价格',
+    redeem_product_image VARCHAR(500) DEFAULT '' COMMENT '兑换商品图片',
     is_active TINYINT(1) DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP

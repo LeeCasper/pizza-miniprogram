@@ -19,6 +19,10 @@ export interface CouponTemplate {
   claimPeriod?: 'none' | 'weekly' | 'monthly';
   minMemberLevel?: number;
   maxDiscount?: number | null;
+  image?: string;
+  redeemProductName?: string;
+  redeemProductPrice?: number | null;
+  redeemProductImage?: string;
   isActive?: boolean;
   createdAt?: string;
   updatedAt?: string;

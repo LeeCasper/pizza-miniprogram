@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { NButton, NSpace, NCard, NForm, NFormItem, NInput, NInputNumber, NSelect, NColorPicker, NSpin, NSwitch } from 'naive-ui';
 import { fetchCouponTemplate, fetchCreateCouponTemplate, fetchUpdateCouponTemplate, type CouponTemplate } from '@/service/api';
+import ImageUpload from '@/components/common/ImageUpload.vue';
 
 defineOptions({ name: 'CouponTemplatesForm' });
 
@@ -29,6 +30,10 @@ const form = ref<Partial<CouponTemplate>>({
   claimPeriod: 'none',
   minMemberLevel: 0,
   maxDiscount: null,
+  image: '',
+  redeemProductName: '',
+  redeemProductPrice: null,
+  redeemProductImage: '',
 });
 
 const categoryOptions = [
@@ -75,6 +80,10 @@ onMounted(async () => {
         claimPeriod: data.claimPeriod,
         minMemberLevel: data.minMemberLevel,
         maxDiscount: data.maxDiscount,
+        image: data.image,
+        redeemProductName: data.redeemProductName,
+        redeemProductPrice: data.redeemProductPrice,
+        redeemProductImage: data.redeemProductImage,
       };
     }
     loading.value = false;
@@ -141,6 +150,20 @@ async function handleSave() {
         <NFormItem label="颜色">
           <NColorPicker v-model:value="form.color" />
         </NFormItem>
+        <NFormItem label="封面图">
+          <ImageUpload v-model="form.image" :width="200" :height="120" />
+        </NFormItem>
+        <template v-if="form.category === 'redeem'">
+          <NFormItem label="兑换商品图">
+            <ImageUpload v-model="form.redeemProductImage" :width="160" :height="160" />
+          </NFormItem>
+          <NFormItem label="兑换商品名">
+            <NInput v-model:value="form.redeemProductName" placeholder="如：12英寸至尊披萨" />
+          </NFormItem>
+          <NFormItem label="兑换商品价格">
+            <NInputNumber v-model:value="form.redeemProductPrice" :min="0" :step="0.01" placeholder="商品价值" style="width: 200px" />
+          </NFormItem>
+        </template>
         <NFormItem label="使用提示">
           <NInput v-model:value="form.useTip" placeholder="使用须知" type="textarea" />
         </NFormItem>

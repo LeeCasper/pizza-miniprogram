@@ -13,18 +13,21 @@ const couponTemplateService = {
 
   async create(data) {
     const { name, desc, category, value, discount_type, discount_value, min_spend, valid_days, color, use_tip,
-            claimable, total_stock, per_user_limit, claim_period, min_member_level, max_discount } = data;
+            claimable, total_stock, per_user_limit, claim_period, min_member_level, max_discount,
+            image, redeem_product_name, redeem_product_price, redeem_product_image } = data;
     const [result] = await pool.query(
       `INSERT INTO coupon_templates
          (name, \`desc\`, category, \`value\`, discount_type, discount_value, min_spend, valid_days, color, use_tip,
-          claimable, total_stock, per_user_limit, claim_period, min_member_level, max_discount)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          claimable, total_stock, per_user_limit, claim_period, min_member_level, max_discount,
+          image, redeem_product_name, redeem_product_price, redeem_product_image)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [name, desc || '', category || 'discount', value || '',
        discount_type || 'fixed_amount', discount_value || '',
        min_spend || 0, valid_days || 30, color || '#D32F2F', use_tip || '',
        claimable ? 1 : 0, total_stock == null ? null : total_stock,
        per_user_limit == null ? 1 : per_user_limit, claim_period || 'none',
-       min_member_level == null ? 0 : min_member_level, max_discount == null ? null : max_discount]
+       min_member_level == null ? 0 : min_member_level, max_discount == null ? null : max_discount,
+       image || '', redeem_product_name || '', redeem_product_price ?? null, redeem_product_image || '']
     );
     return this.findById(result.insertId);
   },
@@ -32,7 +35,8 @@ const couponTemplateService = {
   async update(id, data) {
     const fields = ['name', 'desc', 'category', 'value', 'discount_type', 'discount_value',
       'min_spend', 'valid_days', 'color', 'use_tip', 'is_active',
-      'claimable', 'total_stock', 'per_user_limit', 'claim_period', 'min_member_level', 'max_discount'];
+      'claimable', 'total_stock', 'per_user_limit', 'claim_period', 'min_member_level', 'max_discount',
+      'image', 'redeem_product_name', 'redeem_product_price', 'redeem_product_image'];
     const sets = [];
     const values = [];
     for (const f of fields) {
@@ -79,6 +83,10 @@ function formatTemplate(row) {
     claimPeriod: row.claim_period || 'none',
     minMemberLevel: row.min_member_level || 0,
     maxDiscount: row.max_discount == null ? null : parseFloat(row.max_discount),
+    image: row.image || '',
+    redeemProductName: row.redeem_product_name || '',
+    redeemProductPrice: row.redeem_product_price ? parseFloat(row.redeem_product_price) : null,
+    redeemProductImage: row.redeem_product_image || '',
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

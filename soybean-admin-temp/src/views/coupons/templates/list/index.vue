@@ -31,6 +31,14 @@ const discountTypeMap: Record<string, string> = {
 
 const columns: DataTableColumns<CouponTemplate> = [
   { title: 'ID', key: 'id', width: 60, align: 'center' },
+  {
+    title: '封面', key: 'image', width: 70, align: 'center',
+    render(row: CouponTemplate) {
+      return row.image
+        ? h('img', { src: row.image, style: 'width:48px;height:48px;object-fit:cover;border-radius:6px;' })
+        : h('span', { style: 'color:#ccc;font-size:20px;' }, '🖼');
+    }
+  },
   { title: '名称', key: 'name', width: 160 },
   {
     title: '类别', key: 'category', width: 80,
