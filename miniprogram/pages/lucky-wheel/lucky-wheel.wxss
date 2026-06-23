@@ -82,7 +82,7 @@
 }
 .deco-gift {
   position: absolute; left: -14rpx; bottom: -6rpx; z-index: 20;
-  font-size: 64rpx; transform: rotate(-12deg);
+  width: 88rpx; height: 88rpx; transform: rotate(-12deg);
   filter: drop-shadow(0 4rpx 8rpx rgba(120,108,94,0.25));
 }
 .deco-star {
@@ -110,12 +110,15 @@
   transition-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
 }
 .seg-label {
-  position: absolute; top: 50%; left: 50%; width: 0; height: 0;
-  display: flex; justify-content: center;
+  position: absolute; top: 50%; left: 50%;
+  width: 150rpx; height: 110rpx;
+  margin-left: -75rpx; margin-top: -55rpx;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
+.seg-icon { width: 46rpx; height: 46rpx; margin-bottom: 6rpx; }
 .seg-name {
-  font-size: 24rpx; font-weight: 600; color: #5A3A1A;
-  white-space: nowrap; transform: translateX(-50%);
+  font-size: 22rpx; font-weight: 600; color: #5A3A1A;
+  white-space: nowrap;
 }
 
 /* Light bulbs around the gold rim */

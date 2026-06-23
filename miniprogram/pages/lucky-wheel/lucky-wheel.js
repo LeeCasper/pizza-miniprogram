@@ -1,4 +1,4 @@
-const { api } = require('../../utils/api');
+const { api, fixImageUrl } = require('../../utils/api');
 const { getSimpleTopBar } = require('../../utils/layout');
 
 const SOURCE_TEXT = { free: '免费', points: '积分加抽', again: '再来一次' };
@@ -91,8 +91,9 @@ Page({
       return {
         id: s.id,
         name: s.name,
-        // rotate to the segment center, push text out toward the rim
-        style: `transform: rotate(${center.toFixed(3)}deg) translateY(-200rpx);`,
+        icon: fixImageUrl(s.icon),
+        // 旋到扇区中心方向→外移到边缘→反旋同角度抵消，使图标+文字组在盘内水平正立
+        style: `transform: rotate(${center.toFixed(3)}deg) translateY(-184rpx) rotate(${(-center).toFixed(3)}deg);`,
       };
     });
   },

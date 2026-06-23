@@ -49,7 +49,7 @@
       <view class="wheel-zone">
         <view class="pedestal-glow"></view>
         <view class="pedestal"></view>
-        <text class="deco-gift">🎁</text>
+        <image class="deco-gift" src="/images/lucky-gift.png" mode="aspectFit"></image>
         <text class="deco-star">⭐</text>
 
         <view class="wheel-outer">
@@ -57,6 +57,7 @@
           <view class="wheel-inner">
             <view class="wheel" style="background-image: {{wheelBg}}; transform: rotate({{rotation}}deg); transition-duration: {{spinning ? '5s' : '0s'}};">
               <view wx:for="{{labels}}" wx:key="id" class="seg-label" style="{{item.style}}">
+                <image wx:if="{{item.icon}}" class="seg-icon" src="{{item.icon}}" mode="aspectFit"></image>
                 <text class="seg-name">{{item.name}}</text>
               </view>
             </view>
