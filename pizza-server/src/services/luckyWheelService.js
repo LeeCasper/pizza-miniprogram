@@ -141,6 +141,13 @@ async function draw(userId, source) {
       if (!tpl || !tpl.isActive) {
         resultType = 'thanks'; // graceful degrade — never fail the draw on a misconfigured prize
         log.warn({ prizeId: prize.id, tplId: prize.coupon_template_id }, 'coupon prize template missing/inactive — degraded to thanks');
+        // Refund the stock unit burned by the pick-time CAS: a finite-stock coupon prize
+        // incremented awarded_count when picked, but is degrading to 'thanks', so give the unit
+        // back — a misconfigured prize must not silently exhaust its stock. Unlimited-stock prizes
+        // (stock == null) were taken without incrementing, so they are skipped. Same tx, row still locked.
+        if (prize.stock != null) {
+          await conn.query('UPDATE lucky_wheel_prizes SET awarded_count = awarded_count - 1 WHERE id = ?', [prize.id]);
+        }
       } else {
         couponId = await mintCouponFromTemplate(conn, tpl, userId, 'lucky_wheel');
       }
