@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { NButton, NSpace, NCard, NForm, NFormItem, NInput, NInputNumber, NSelect, NColorPicker, NSpin, NSwitch } from 'naive-ui';
-import { fetchCouponTemplate, fetchCreateCouponTemplate, fetchUpdateCouponTemplate, type CouponTemplate } from '@/service/api';
+import { fetchCouponTemplate, fetchCreateCouponTemplate, fetchUpdateCouponTemplate, fetchProducts, type CouponTemplate, type AdminProduct } from '@/service/api';
 import ImageUpload from '@/components/common/ImageUpload.vue';
 
 defineOptions({ name: 'CouponTemplatesForm' });
@@ -34,7 +34,10 @@ const form = ref<Partial<CouponTemplate>>({
   redeemProductName: '',
   redeemProductPrice: null,
   redeemProductImage: '',
+  productId: null,
 });
+
+const productOptions = ref<{ label: string; value: number; price: string; image: string }[]>([]);
 
 const categoryOptions = [
   { label: '满减券', value: 'discount' },
@@ -57,6 +60,7 @@ const claimPeriodOptions = [
 ];
 
 onMounted(async () => {
+  loadProducts();
   const id = route.params.id as string;
   if (id && id !== 'create') {
     isEdit.value = true;
@@ -84,11 +88,36 @@ onMounted(async () => {
         redeemProductName: data.redeemProductName,
         redeemProductPrice: data.redeemProductPrice,
         redeemProductImage: data.redeemProductImage,
+        productId: data.productId,
       };
     }
     loading.value = false;
   }
 });
+
+async function loadProducts() {
+  const { data, error } = await fetchProducts();
+  if (!error && data) {
+    productOptions.value = data.map((p: AdminProduct) => ({
+      label: `${p.name} (¥${Number(p.price).toFixed(2)})`,
+      value: p.id,
+      price: p.price,
+      image: p.image,
+    }));
+  }
+}
+
+function onProductSelect(productId: number | null) {
+  form.value.productId = productId;
+  if (productId) {
+    const product = productOptions.value.find(p => p.value === productId);
+    if (product) {
+      form.value.redeemProductName = product.label.replace(/\s*\(¥[\d.]+\)\s*$/, '');
+      form.value.redeemProductPrice = Number(product.price);
+      form.value.redeemProductImage = product.image || '';
+    }
+  }
+}
 
 async function handleSave() {
   saving.value = true;
@@ -154,6 +183,18 @@ async function handleSave() {
           <ImageUpload v-model="form.image" :width="200" :height="120" />
         </NFormItem>
         <template v-if="form.category === 'redeem'">
+          <NFormItem label="关联商品">
+            <NSelect
+              v-model:value="form.productId"
+              :options="productOptions"
+              placeholder="选择商品自动填充(或留空手动填写)"
+              clearable
+              filterable
+              style="width: 360px"
+              @update:value="onProductSelect"
+            />
+            <span style="margin-left:8px;color:#999;font-size:12px;">选商品后自动填充下方字段</span>
+          </NFormItem>
           <NFormItem label="兑换商品图">
             <ImageUpload v-model="form.redeemProductImage" :width="160" :height="160" />
           </NFormItem>

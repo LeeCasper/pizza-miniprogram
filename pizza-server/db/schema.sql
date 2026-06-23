@@ -297,6 +297,7 @@ CREATE TABLE IF NOT EXISTS coupon_templates (
     redeem_product_name VARCHAR(100) DEFAULT '' COMMENT '兑换商品名称',
     redeem_product_price DECIMAL(10,2) NULL COMMENT '兑换商品价格',
     redeem_product_image VARCHAR(500) DEFAULT '' COMMENT '兑换商品图片',
+    product_id INT UNSIGNED NULL COMMENT '关联商品ID(兑换券可关联商品自动填充信息)',
     is_active TINYINT(1) DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP

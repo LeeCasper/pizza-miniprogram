@@ -22,6 +22,22 @@ async function mintCouponFromTemplate(conn, tpl, userId, source) {
   const now = new Date();
   const validFrom = now.toISOString().slice(0, 10);
   const validTo = new Date(now.getTime() + (tpl.validDays || 30) * 86400000).toISOString().slice(0, 10);
+  // 若模板关联了商品，从商品表实时取名称/价格/图片；否则用模板手动填的信息
+  let redeemProductName = tpl.redeemProductName || '';
+  let redeemProductPrice = tpl.redeemProductPrice ?? null;
+  let redeemProductImage = tpl.redeemProductImage || '';
+  if (tpl.productId) {
+    const [[product]] = await conn.query(
+      'SELECT name, price, image FROM products WHERE id = ? AND is_deleted = 0',
+      [tpl.productId]
+    );
+    if (product) {
+      redeemProductName = product.name || '';
+      redeemProductPrice = product.price ?? null;
+      redeemProductImage = product.image || '';
+    }
+  }
+
   const code = `CPN-${Date.now()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
   const [result] = await conn.query(
     `INSERT INTO coupons
@@ -34,7 +50,7 @@ async function mintCouponFromTemplate(conn, tpl, userId, source) {
      tpl.discountType, tpl.discountValue || '', tpl.minSpend || 0,
      tpl.maxDiscount == null ? null : tpl.maxDiscount,
      validFrom, validTo, tpl.useTip || '', tpl.color || '#D32F2F', source,
-     tpl.redeemProductName || '', tpl.redeemProductPrice ?? null, tpl.redeemProductImage || '']
+     redeemProductName, redeemProductPrice, redeemProductImage]
   );
   return result.insertId;
 }
@@ -49,6 +65,7 @@ function rowToTpl(t) {
     redeemProductName: t.redeem_product_name || '',
     redeemProductPrice: t.redeem_product_price,
     redeemProductImage: t.redeem_product_image || '',
+    productId: t.product_id || null,
   };
 }
 

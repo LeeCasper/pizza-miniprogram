@@ -810,7 +810,7 @@ const adminApiController = {
       const { name, desc, category, value, discountType, discountValue,
               minSpend, validDays, color, useTip,
               claimable, totalStock, perUserLimit, claimPeriod, minMemberLevel, maxDiscount,
-              image, redeemProductName, redeemProductPrice, redeemProductImage } = req.body;
+              image, redeemProductName, redeemProductPrice, redeemProductImage, productId } = req.body;
       const template = await couponTemplateService.create({
         name, desc, category, value,
         discount_type: discountType, discount_value: discountValue,
@@ -819,6 +819,7 @@ const adminApiController = {
         claim_period: claimPeriod, min_member_level: minMemberLevel, max_discount: maxDiscount,
         image, redeem_product_name: redeemProductName,
         redeem_product_price: redeemProductPrice, redeem_product_image: redeemProductImage,
+        product_id: productId,
       });
       return res.status(201).json({ code: 0, message: '优惠券模板已创建', data: template });
     } catch (err) {
@@ -835,7 +836,7 @@ const adminApiController = {
       const { name, desc, category, value, discountType, discountValue,
               minSpend, validDays, color, useTip, isActive,
               claimable, totalStock, perUserLimit, claimPeriod, minMemberLevel, maxDiscount,
-              image, redeemProductName, redeemProductPrice, redeemProductImage } = req.body;
+              image, redeemProductName, redeemProductPrice, redeemProductImage, productId } = req.body;
       const updateData = {};
       if (name !== undefined) updateData.name = name;
       if (desc !== undefined) updateData.desc = desc;
@@ -858,6 +859,7 @@ const adminApiController = {
       if (redeemProductName !== undefined) updateData.redeem_product_name = redeemProductName;
       if (redeemProductPrice !== undefined) updateData.redeem_product_price = redeemProductPrice;
       if (redeemProductImage !== undefined) updateData.redeem_product_image = redeemProductImage;
+      if (productId !== undefined) updateData.product_id = productId;
 
       const template = await couponTemplateService.update(req.params.id, updateData);
       if (!template) {

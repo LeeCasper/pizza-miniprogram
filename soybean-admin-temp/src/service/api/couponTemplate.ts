@@ -23,6 +23,7 @@ export interface CouponTemplate {
   redeemProductName?: string;
   redeemProductPrice?: number | null;
   redeemProductImage?: string;
+  productId?: number | null;
   isActive?: boolean;
   createdAt?: string;
   updatedAt?: string;
