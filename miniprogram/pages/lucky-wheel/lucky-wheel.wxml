@@ -1,0 +1,69 @@
+<view class="page-container" style="padding-top: {{topBarTotalHeight}}px;">
+  <!-- Top bar with back -->
+  <view class="top-bar" style="padding-top: {{statusBarHeight}}px;">
+    <view class="back-btn" bindtap="onBack">
+      <image src="/images/back.png" class="back-icon" mode="aspectFit"></image>
+    </view>
+    <text class="top-title">幸运转盘</text>
+    <view class="top-spacer"></view>
+  </view>
+
+  <scroll-view scroll-y enhanced bounces="{{false}}" show-scrollbar="{{false}}" style="height: {{scrollViewHeight}}px;">
+    <view class="lw-body">
+      <!-- Wheel -->
+      <view class="wheel-wrap">
+        <view class="pointer"></view>
+        <view class="wheel" style="background-image: {{wheelBg}}; transform: rotate({{rotation}}deg); transition-duration: {{spinning ? '4s' : '0s'}};">
+          <view wx:for="{{labels}}" wx:key="id" class="seg-label" style="{{item.style}}">
+            <text class="seg-name">{{item.name}}</text>
+          </view>
+        </view>
+        <view class="wheel-go {{spinning ? 'disabled' : ''}}" bindtap="onSpin">
+          <text class="go-text">{{spinning ? '...' : '抽奖'}}</text>
+        </view>
+      </view>
+
+      <!-- Status line -->
+      <view class="status-line">
+        <text wx:if="{{freeRemaining > 0}}">今日免费剩 {{freeRemaining}} 次</text>
+        <text wx:elif="{{drawsRemaining > 0}}">加抽 {{pointsCost}} 积分/次 · 当前 {{userPoints}} 积分</text>
+        <text wx:else>今日次数已用完，明天再来~</text>
+      </view>
+
+      <!-- Records entry -->
+      <view class="records-entry" bindtap="onOpenRecords">中奖记录 ›</view>
+
+      <view style="height: calc(120rpx + env(safe-area-inset-bottom))"></view>
+    </view>
+  </scroll-view>
+
+  <!-- Result modal -->
+  <view class="result-overlay {{showResult ? 'show' : ''}}" catchtap="onCloseResult">
+    <view class="result-card" catchtap="noop">
+      <text class="result-title">{{resultBonus ? '再来一次！' : '恭喜'}}</text>
+      <text class="result-text">{{resultText}}</text>
+      <button class="result-btn" bindtap="onCloseResult">{{resultBonus ? '继续抽奖' : '知道了'}}</button>
+    </view>
+  </view>
+
+  <!-- Records modal -->
+  <view class="records-overlay {{showRecords ? 'show' : ''}}" catchtap="onCloseRecords">
+    <view class="records-drawer {{showRecords ? 'show' : ''}}" catchtap="noop">
+      <view class="records-head">
+        <text>中奖记录</text>
+        <text class="records-close" bindtap="onCloseRecords">✕</text>
+      </view>
+      <scroll-view scroll-y enhanced show-scrollbar="{{false}}" class="records-scroll">
+        <view wx:if="{{records.length === 0}}" class="records-empty">暂无记录</view>
+        <view wx:for="{{records}}" wx:key="id" class="record-item">
+          <view class="record-main">
+            <text class="record-name">{{item.prizeName}}</text>
+            <text class="record-time">{{item.createdAt}}</text>
+          </view>
+          <text class="record-src">{{item.sourceText}}</text>
+        </view>
+        <view style="height: calc(40rpx + env(safe-area-inset-bottom))"></view>
+      </scroll-view>
+    </view>
+  </view>
+</view>

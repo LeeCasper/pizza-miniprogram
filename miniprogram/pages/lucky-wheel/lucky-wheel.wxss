@@ -1,0 +1,105 @@
+.page-container { min-height: 100vh; box-sizing: border-box; }
+
+.top-bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; padding: 0 24rpx 16rpx;
+  background: var(--glass-bg-nav);
+}
+.back-btn { width: 64rpx; height: 64rpx; display: flex; align-items: center; }
+.back-icon { width: 40rpx; height: 40rpx; }
+.top-title { flex: 1; text-align: center; font-size: 34rpx; font-weight: 700; color: var(--color-on-surface); }
+.top-spacer { width: 64rpx; }
+
+.lw-body { display: flex; flex-direction: column; align-items: center; padding: 40rpx 32rpx; }
+
+.wheel-wrap { position: relative; width: 600rpx; height: 600rpx; margin-top: 40rpx; }
+
+.pointer {
+  position: absolute; top: -10rpx; left: 50%; transform: translateX(-50%);
+  width: 0; height: 0; z-index: 3;
+  border-left: 28rpx solid transparent;
+  border-right: 28rpx solid transparent;
+  border-top: 56rpx solid var(--color-primary);
+}
+
+.wheel {
+  width: 600rpx; height: 600rpx; border-radius: 50%;
+  position: relative;
+  border: 8rpx solid #FFFFFF;
+  box-shadow: var(--glass-shadow-card);
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.seg-label {
+  position: absolute; top: 50%; left: 50%; width: 0; height: 0;
+  display: flex; justify-content: center;
+}
+.seg-name {
+  font-size: 24rpx; font-weight: 600; color: #5A3A1A;
+  white-space: nowrap; transform: translateX(-50%);
+}
+
+.wheel-go {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 150rpx; height: 150rpx; border-radius: 50%;
+  background: var(--color-primary);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 2; box-shadow: var(--glass-shadow-button);
+}
+.wheel-go.disabled { opacity: 0.6; }
+.go-text { color: #FFFFFF; font-size: 36rpx; font-weight: 700; }
+
+.status-line { margin-top: 56rpx; font-size: 28rpx; color: var(--color-on-surface); }
+.records-entry { margin-top: 32rpx; font-size: 28rpx; color: var(--color-primary); }
+
+/* Result modal */
+.result-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.45);
+  display: flex; align-items: center; justify-content: center;
+  visibility: hidden; opacity: 0; transition: opacity 0.2s;
+}
+.result-overlay.show { visibility: visible; opacity: 1; }
+.result-card {
+  width: 560rpx; background: var(--glass-bg-elevated);
+  border-radius: var(--radius-card); padding: 56rpx 40rpx;
+  display: flex; flex-direction: column; align-items: center;
+}
+.result-title { font-size: 40rpx; font-weight: 700; color: var(--color-primary); }
+.result-text { margin-top: 24rpx; font-size: 30rpx; color: var(--color-on-surface); text-align: center; }
+.result-btn {
+  margin-top: 48rpx; width: 320rpx; height: 80rpx; line-height: 80rpx;
+  background: var(--color-primary); color: #FFFFFF; border-radius: var(--radius-full);
+  font-size: 30rpx;
+}
+
+/* Records modal */
+.records-overlay {
+  position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.45);
+  visibility: hidden; opacity: 0; transition: opacity 0.2s;
+}
+.records-overlay.show { visibility: visible; opacity: 1; }
+.records-drawer {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  max-height: 70vh; background: var(--glass-bg-elevated);
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  transform: translateY(100%); transition: transform 0.25s;
+  display: flex; flex-direction: column;
+}
+.records-drawer.show { transform: translateY(0); }
+.records-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 32rpx; font-size: 32rpx; font-weight: 700; color: var(--color-on-surface);
+}
+.records-close { font-size: 36rpx; color: #999; }
+.records-scroll { max-height: 56vh; padding: 0 32rpx; }
+.records-empty { text-align: center; color: #999; padding: 80rpx 0; font-size: 28rpx; }
+.record-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 24rpx 0; border-bottom: 1rpx solid var(--glass-border-subtle);
+}
+.record-main { display: flex; flex-direction: column; }
+.record-name { font-size: 30rpx; color: var(--color-on-surface); font-weight: 600; }
+.record-time { font-size: 24rpx; color: #999; margin-top: 8rpx; }
+.record-src { font-size: 26rpx; color: var(--color-primary); }
