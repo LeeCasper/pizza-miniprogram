@@ -44,14 +44,12 @@
   flex: 1; position: relative;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
-.stat-deco {
-  position: absolute; top: 50%; left: 12rpx; transform: translateY(-50%);
-  width: 52rpx; height: 52rpx; opacity: 0.9;
-}
-.deco-ticket { transform: translateY(-50%) rotate(-12deg); }
-.stat-label { font-size: 22rpx; color: var(--color-on-surface-variant); margin-bottom: 6rpx; }
+.stat-head { display: flex; align-items: center; justify-content: center; gap: 8rpx; margin-bottom: 8rpx; }
+.stat-deco { width: 34rpx; height: 34rpx; opacity: 0.95; flex-shrink: 0; }
+.deco-ticket { transform: rotate(-8deg); }
+.stat-label { font-size: 22rpx; color: var(--color-on-surface-variant); }
 .stat-num-wrap { display: flex; align-items: flex-end; margin-bottom: 12rpx; }
-.stat-num { font-size: 60rpx; line-height: 1; font-weight: 700; }
+.stat-num { font-size: 48rpx; line-height: 1; font-weight: 700; }
 .stat-unit { font-size: 22rpx; margin-left: 4rpx; margin-bottom: 8rpx; }
 .c-draw { color: var(--color-primary); }
 .c-point { color: #C6873A; }
