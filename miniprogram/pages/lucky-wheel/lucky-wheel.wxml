@@ -1,25 +1,64 @@
 <view class="page-container" style="padding-top: {{topBarTotalHeight}}px;">
-  <!-- Top bar with back -->
+  <!-- Top bar -->
   <view class="top-bar" style="padding-top: {{statusBarHeight}}px;">
     <view class="back-btn" bindtap="onBack">
       <image src="/images/back.png" class="back-icon" mode="aspectFit"></image>
     </view>
-    <text class="top-title">幸运转盘</text>
-    <view class="top-spacer"></view>
+    <view class="top-title-wrap">
+      <text class="spark">✨</text>
+      <text class="top-title">幸运转盘</text>
+      <text class="spark">✨</text>
+    </view>
+    <view class="rule-pill" bindtap="onOpenRules">活动规则</view>
   </view>
 
   <scroll-view scroll-y enhanced bounces="{{false}}" show-scrollbar="{{false}}" style="height: {{scrollViewHeight}}px;">
     <view class="lw-body">
-      <!-- Wheel -->
-      <view class="wheel-wrap">
-        <view class="pointer"></view>
-        <view class="wheel" style="background-image: {{wheelBg}}; transform: rotate({{rotation}}deg); transition-duration: {{spinning ? '4s' : '0s'}};">
-          <view wx:for="{{labels}}" wx:key="id" class="seg-label" style="{{item.style}}">
-            <text class="seg-name">{{item.name}}</text>
+
+      <!-- User stats card -->
+      <view class="stats-card">
+        <view class="stat-col" bindtap="onGetMore">
+          <text class="stat-deco deco-ticket">🎟️</text>
+          <text class="stat-label">剩余抽奖次数</text>
+          <view class="stat-num-wrap">
+            <text class="stat-num c-draw">{{drawsRemaining}}</text>
+            <text class="stat-unit c-draw">次</text>
           </view>
+          <view class="stat-btn b-draw">+ 获取更多 ›</view>
         </view>
-        <view class="wheel-go {{spinning ? 'disabled' : ''}}" bindtap="onSpin">
-          <text class="go-text">{{spinning ? '...' : '抽奖'}}</text>
+        <view class="stat-divider"></view>
+        <view class="stat-col" bindtap="onPointsDetail">
+          <text class="stat-deco deco-coin">🪙</text>
+          <text class="stat-label">我的积分</text>
+          <view class="stat-num-wrap">
+            <text class="stat-num c-point">{{userPoints}}</text>
+            <text class="stat-unit c-point">分</text>
+          </view>
+          <view class="stat-btn b-point">积分明细 ›</view>
+        </view>
+      </view>
+
+      <!-- The wheel -->
+      <view class="wheel-zone">
+        <view class="pedestal-glow"></view>
+        <view class="pedestal"></view>
+        <text class="deco-gift">🎁</text>
+        <text class="deco-star">⭐</text>
+
+        <view class="wheel-outer">
+          <view class="bulb {{spinning ? 'flash' : ''}}" wx:for="{{bulbs}}" wx:key="*this" style="{{item}}"></view>
+          <view class="wheel-inner">
+            <view class="wheel" style="background-image: {{wheelBg}}; transform: rotate({{rotation}}deg); transition-duration: {{spinning ? '4s' : '0s'}};">
+              <view wx:for="{{labels}}" wx:key="id" class="seg-label" style="{{item.style}}">
+                <text class="seg-name">{{item.name}}</text>
+              </view>
+            </view>
+          </view>
+          <view class="pointer"></view>
+          <view class="spin-btn {{spinning ? 'disabled' : ''}}" bindtap="onSpin">
+            <text class="spin-go">{{spinning ? '抽奖' : '开始'}}</text>
+            <text class="spin-go2">{{spinning ? '中…' : '抽奖'}}</text>
+          </view>
         </view>
       </view>
 
@@ -30,8 +69,39 @@
         <text wx:else>今日次数已用完，明天再来~</text>
       </view>
 
-      <!-- Records entry -->
-      <view class="records-entry" bindtap="onOpenRecords">中奖记录 ›</view>
+      <!-- Info links -->
+      <view class="info-card">
+        <view class="info-item" bindtap="onOpenRules">
+          <view class="info-icon icon-rule">📋</view>
+          <view class="info-text">
+            <text class="info-title">活动规则</text>
+            <text class="info-sub">查看详细活动说明</text>
+          </view>
+          <text class="info-arrow">›</text>
+        </view>
+        <view class="info-vline"></view>
+        <view class="info-item" bindtap="onOpenRecords">
+          <view class="info-icon icon-rec">🏆</view>
+          <view class="info-text">
+            <text class="info-title">中奖记录</text>
+            <text class="info-sub">看看谁中奖了</text>
+          </view>
+          <text class="info-arrow">›</text>
+        </view>
+      </view>
+
+      <!-- Share -->
+      <button class="share-btn" open-type="share" hover-class="none">
+        <text class="share-icon">📤</text>
+        <view class="share-mid">
+          <text class="share-title">分享活动 邀请好友</text>
+          <text class="share-sub">邀请好友一起抽大奖</text>
+        </view>
+        <text class="share-arrow">›</text>
+      </button>
+
+      <!-- Footer -->
+      <view class="lw-footer">🛡 公平公正公开 · 中奖概率透明</view>
 
       <view style="height: calc(120rpx + env(safe-area-inset-bottom))"></view>
     </view>
@@ -40,13 +110,29 @@
   <!-- Result modal -->
   <view class="result-overlay {{showResult ? 'show' : ''}}" catchtap="onCloseResult">
     <view class="result-card" catchtap="noop">
-      <text class="result-title">{{resultBonus ? '再来一次！' : '恭喜'}}</text>
+      <text class="result-emoji">{{resultBonus ? '🎡' : '🎉'}}</text>
+      <text class="result-title">{{resultBonus ? '再来一次！' : '恭喜中奖'}}</text>
       <text class="result-text">{{resultText}}</text>
-      <button class="result-btn" bindtap="onCloseResult">{{resultBonus ? '继续抽奖' : '知道了'}}</button>
+      <button class="result-btn" hover-class="none" bindtap="onCloseResult">{{resultBonus ? '继续抽奖' : '知道了'}}</button>
     </view>
   </view>
 
-  <!-- Records modal -->
+  <!-- Rules modal -->
+  <view class="result-overlay {{showRules ? 'show' : ''}}" catchtap="onCloseRules">
+    <view class="rules-card" catchtap="noop">
+      <text class="result-emoji">📋</text>
+      <text class="result-title">活动规则</text>
+      <view class="rules-list">
+        <view class="rules-row"><text class="rules-dot">①</text><text class="rules-txt">每日有免费抽奖次数，用完后可消耗 {{pointsCost}} 积分加抽一次。</text></view>
+        <view class="rules-row"><text class="rules-dot">②</text><text class="rules-txt">中奖奖品（优惠券 / 积分 / 余额）会自动发放到你的账户。</text></view>
+        <view class="rules-row"><text class="rules-dot">③</text><text class="rules-txt">抽奖结果由服务器随机产生，公平公正公开。</text></view>
+        <view class="rules-row"><text class="rules-dot">④</text><text class="rules-txt">今日剩余可抽 {{drawsRemaining}} 次。</text></view>
+      </view>
+      <button class="result-btn" hover-class="none" bindtap="onCloseRules">知道了</button>
+    </view>
+  </view>
+
+  <!-- Records drawer -->
   <view class="records-overlay {{showRecords ? 'show' : ''}}" catchtap="onCloseRecords">
     <view class="records-drawer {{showRecords ? 'show' : ''}}" catchtap="noop">
       <view class="records-head">

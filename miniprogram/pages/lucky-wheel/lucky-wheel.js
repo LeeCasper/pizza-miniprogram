@@ -4,11 +4,24 @@ const { getSimpleTopBar } = require('../../utils/layout');
 const SOURCE_TEXT = { free: '免费', points: '积分加抽', again: '再来一次' };
 const FALLBACK_COLORS = ['#F5C518', '#FFE08A', '#F7B733', '#FFD75E'];
 
+// Static decorative bulb positions around the gold rim (inline style strings)
+const BULBS = [
+  'top: 6rpx; left: 50%; transform: translateX(-50%);',
+  'right: 6rpx; top: 50%; transform: translateY(-50%);',
+  'bottom: 6rpx; left: 50%; transform: translateX(-50%);',
+  'left: 6rpx; top: 50%; transform: translateY(-50%);',
+  'top: 14%; left: 14%;',
+  'top: 14%; right: 14%;',
+  'bottom: 14%; right: 14%;',
+  'bottom: 14%; left: 14%;',
+];
+
 Page({
   data: {
     statusBarHeight: 0,
     topBarTotalHeight: 0,
     scrollViewHeight: 0,
+    bulbs: BULBS,
     segments: [],
     labels: [],
     wheelBg: '',
@@ -22,6 +35,7 @@ Page({
     showResult: false,
     resultText: '',
     resultBonus: false,
+    showRules: false,
     showRecords: false,
     records: [],
   },
@@ -42,7 +56,6 @@ Page({
       if (!res || res.code !== 0 || !res.data) return;
       const d = res.data;
       const segments = d.segments || [];
-      const n = segments.length;
       this.setData({
         enabled: d.enabled,
         pointsCost: d.pointsCost,
@@ -98,6 +111,7 @@ Page({
       wx.showModal({
         title: '加抽确认',
         content: `本次将消耗 ${this.data.pointsCost} 积分，确定吗？`,
+        confirmColor: '#C0563A',
         success: r => { if (r.confirm) this.doDraw('points'); },
       });
     }
@@ -140,6 +154,36 @@ Page({
 
   onCloseResult() { this.setData({ showResult: false }); },
 
+  // ── Rules modal ──
+  onOpenRules() { this.setData({ showRules: true }); },
+  onCloseRules() { this.setData({ showRules: false }); },
+
+  // ── Stats card actions ──
+  onGetMore() {
+    if (this.data.freeRemaining > 0) {
+      wx.showToast({ title: `今日还有 ${this.data.freeRemaining} 次免费抽奖`, icon: 'none' });
+    } else if (this.data.drawsRemaining > 0) {
+      wx.showToast({ title: `可消耗 ${this.data.pointsCost} 积分加抽一次`, icon: 'none' });
+    } else {
+      wx.showToast({ title: '今日次数已用完，明天再来~', icon: 'none' });
+    }
+  },
+
+  onPointsDetail() {
+    wx.navigateTo({
+      url: '/pages/points/points',
+      fail: () => wx.showToast({ title: '暂时无法打开', icon: 'none' }),
+    });
+  },
+
+  onShareAppMessage() {
+    return {
+      title: '王姐手工披萨 · 幸运转盘，快来抽大奖！',
+      path: '/pages/lucky-wheel/lucky-wheel',
+    };
+  },
+
+  // ── Records drawer ──
   onOpenRecords() {
     this.setData({ showRecords: true });
     api.get('/lucky-wheel/records').then(res => {
