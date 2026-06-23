@@ -9,7 +9,8 @@
     "pages/settings/settings",
     "pages/tiers/tiers",
     "pages/recharge/recharge",
-    "pages/claim-center/claim-center"
+    "pages/claim-center/claim-center",
+    "pages/lucky-wheel/lucky-wheel"
   ],
   "window": {
     "navigationBarTitleText": "王姐手工披萨",

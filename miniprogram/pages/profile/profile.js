@@ -65,14 +65,13 @@ Page({
       about: '/pages/settings/settings',
       recharge: '/pages/recharge/recharge',
       claimcenter: '/pages/claim-center/claim-center',
-      lucky: '__toast__',
+      lucky: '/pages/lucky-wheel/lucky-wheel',
       service: '__toast__'
     };
 
     if (actions[action]) {
       if (actions[action] === '__toast__') {
         const messages = {
-          lucky: '幸运转盘即将上线，敬请期待！',
           service: '客服热线: 400-888-8888'
         };
         wx.showToast({ title: messages[action] || '功能开发中', icon: 'none', duration: 2000 });
