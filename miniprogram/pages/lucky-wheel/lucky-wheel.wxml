@@ -21,7 +21,7 @@
       <!-- User stats card -->
       <view class="stats-card">
         <view class="stat-col" bindtap="onGetMore">
-          <text class="stat-deco deco-ticket">🎟️</text>
+          <image class="stat-deco deco-ticket" src="/images/lucky-ticket.png" mode="aspectFit"></image>
           <text class="stat-label">剩余抽奖次数</text>
           <view class="stat-num-wrap">
             <text class="stat-num c-draw">{{drawsRemaining}}</text>
@@ -31,7 +31,7 @@
         </view>
         <view class="stat-divider"></view>
         <view class="stat-col" bindtap="onPointsDetail">
-          <text class="stat-deco deco-coin">🪙</text>
+          <image class="stat-deco deco-coin" src="/images/lucky-points.png" mode="aspectFit"></image>
           <text class="stat-label">我的积分</text>
           <view class="stat-num-wrap">
             <text class="stat-num c-point">{{userPoints}}</text>
