@@ -58,6 +58,7 @@ def deploy_backend():
         'pizza-server/db/migrate_store_pickup_notice.sql',
         'pizza-server/db/migrate_coupon_claimable.sql',
         'pizza-server/db/migrate_lucky_wheel.sql',
+        'pizza-server/db/migrate_coupon_template_images.sql',
     ]
     for m in migrations:
         stdin, stdout, stderr = ssh.exec_command(
