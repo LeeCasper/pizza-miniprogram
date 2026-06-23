@@ -4,6 +4,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { NButton, NSpace, NCard, NForm, NFormItem, NInput, NInputNumber, NSelect, NColorPicker, NSpin, NSwitch } from 'naive-ui';
 import { fetchLuckyPrize, fetchCreateLuckyPrize, fetchUpdateLuckyPrize, fetchCouponTemplates } from '@/service/api';
 import type { LuckyPrize, CouponTemplate } from '@/service/api';
+import ImageUpload from '@/components/common/ImageUpload.vue';
 
 defineOptions({ name: 'LuckyWheelPrizesForm' });
 
@@ -132,8 +133,8 @@ async function handleSave() {
         <NFormItem label="颜色">
           <NColorPicker v-model:value="form.color" />
         </NFormItem>
-        <NFormItem label="图标URL">
-          <NInput v-model:value="form.icon" placeholder="可选，转盘扇区图标" />
+        <NFormItem label="图标">
+          <ImageUpload v-model="form.icon" :width="120" :height="120" />
         </NFormItem>
         <NFormItem label="排序">
           <NInputNumber v-model:value="form.sortOrder" style="width: 160px" />
