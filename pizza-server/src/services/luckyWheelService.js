@@ -27,16 +27,18 @@ async function getLuckyConfig() {
   };
 }
 
-/** Today's draw counts for a user: total rows + free-source rows (gates entitlements). */
+/** Today's draw counts for a user. `billable` = non-'again' rows → gates the daily
+ *  ceiling (maxPerDay); `freeCnt` = source='free' rows → gates the free sub-quota.
+ *  "再来一次" wins are free re-spins recorded as 'again' and count toward NEITHER. */
 async function todayCounts(conn, userId) {
   const [[row]] = await conn.query(
-    `SELECT COUNT(*) AS total,
+    `SELECT COALESCE(SUM(source <> 'again'), 0) AS billable,
             COALESCE(SUM(source = 'free'), 0) AS freeCnt
        FROM lucky_wheel_draws
       WHERE user_id = ? AND DATE(created_at) = CURDATE()`,
     [userId]
   );
-  return { total: Number(row.total), freeCnt: Number(row.freeCnt) };
+  return { billable: Number(row.billable), freeCnt: Number(row.freeCnt) };
 }
 
 /** Wheel config for the front-end. NEVER exposes weight/stock. */
@@ -46,15 +48,15 @@ async function getWheelConfig(userId) {
     'SELECT id, type, name, color, icon FROM lucky_wheel_prizes WHERE is_active = 1 ORDER BY sort_order, id'
   );
   const [[counts]] = await pool.query(
-    `SELECT COUNT(*) AS total, COALESCE(SUM(source = 'free'), 0) AS freeCnt
+    `SELECT COALESCE(SUM(source <> 'again'), 0) AS billable, COALESCE(SUM(source = 'free'), 0) AS freeCnt
        FROM lucky_wheel_draws WHERE user_id = ? AND DATE(created_at) = CURDATE()`,
     [userId]
   );
   const [[u]] = await pool.query('SELECT points FROM users WHERE id = ?', [userId]);
-  const total = Number(counts.total);
+  const billable = Number(counts.billable);
   const freeCnt = Number(counts.freeCnt);
   const freeRemaining = Math.max(0, cfg.freePerDay - freeCnt);
-  const drawsRemaining = Math.max(0, cfg.maxPerDay - total);
+  const drawsRemaining = Math.max(0, cfg.maxPerDay - billable); // 'again' re-spins excluded from the ceiling
   return {
     enabled: cfg.enabled,
     pointsCost: cfg.pointsCost,
@@ -82,9 +84,9 @@ async function draw(userId, source) {
     const [[u]] = await conn.query('SELECT id, points FROM users WHERE id = ? FOR UPDATE', [userId]);
     if (!u) { await conn.rollback(); return { error: '用户不存在', reason: 'no_user' }; }
 
-    // Daily ledger gates.
-    const { total, freeCnt } = await todayCounts(conn, userId);
-    if (total >= cfg.maxPerDay) { await conn.rollback(); return { error: '今日抽奖次数已达上限', reason: 'reach_max' }; }
+    // Daily ledger gates. `billable` excludes 'again' re-spins from the ceiling.
+    const { billable, freeCnt } = await todayCounts(conn, userId);
+    if (billable >= cfg.maxPerDay) { await conn.rollback(); return { error: '今日抽奖次数已达上限', reason: 'reach_max' }; }
 
     let cost = 0;
     if (source === 'free') {
@@ -113,8 +115,8 @@ async function draw(userId, source) {
     }
     if (!prize) { await conn.rollback(); return { error: '今日奖品已抽完', reason: 'no_prize' }; }
 
-    // "再来一次" refunds the entitlement: recorded as 'again', costs nothing,
-    // does NOT consume the free sub-quota but DOES count toward the hard daily ceiling.
+    // "再来一次" is a free re-spin: recorded as 'again', costs nothing,
+    // counts toward NEITHER the free sub-quota NOR the daily billable ceiling.
     const isAgain = prize.type === 'again';
     const recordedSource = isAgain ? 'again' : source;
     const effectiveCost = isAgain ? 0 : cost;
@@ -187,7 +189,8 @@ async function draw(userId, source) {
 
     // Post-commit: recompute remaining for the response.
     const cfg2 = cfg; // unchanged within request
-    const newTotal = total + 1;
+    // 'again' is a free re-spin — it does NOT advance the daily ceiling.
+    const newBillable = isAgain ? billable : billable + 1;
     const newFree = recordedSource === 'free' ? freeCnt + 1 : freeCnt;
     return {
       prizeId: prize.id,
@@ -198,7 +201,7 @@ async function draw(userId, source) {
       userPoints,
       balanceText: balanceAmount != null ? `¥${balanceAmount.toFixed(2)}` : null,
       freeRemaining: Math.max(0, cfg2.freePerDay - newFree),
-      drawsRemaining: Math.max(0, cfg2.maxPerDay - newTotal),
+      drawsRemaining: Math.max(0, cfg2.maxPerDay - newBillable),
     };
   } catch (err) {
     await conn.rollback();
