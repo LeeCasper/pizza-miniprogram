@@ -1,4 +1,7 @@
 <view class="page-container" style="padding-top: {{topBarTotalHeight}}px;">
+  <!-- Full-screen background photo (reliable <image> layer, not WXSS url()) -->
+  <image class="bg-img" src="/images/lucky-bg.jpg" mode="aspectFill"></image>
+
   <!-- Top bar -->
   <view class="top-bar" style="padding-top: {{statusBarHeight}}px;">
     <view class="back-btn" bindtap="onBack">
@@ -12,7 +15,7 @@
     <view class="rule-pill" bindtap="onOpenRules">活动规则</view>
   </view>
 
-  <scroll-view scroll-y enhanced bounces="{{false}}" show-scrollbar="{{false}}" style="height: {{scrollViewHeight}}px;">
+  <scroll-view scroll-y enhanced bounces="{{false}}" show-scrollbar="{{false}}" style="height: {{scrollViewHeight}}px; position: relative; z-index: 1;">
     <view class="lw-body">
 
       <!-- User stats card -->
