@@ -12,7 +12,7 @@
       <text class="top-title">幸运转盘</text>
       <text class="spark">✨</text>
     </view>
-    <view class="rule-pill" bindtap="onOpenRules">活动规则</view>
+    <view class="top-spacer"></view>
   </view>
 
   <scroll-view scroll-y enhanced bounces="{{false}}" show-scrollbar="{{false}}" style="height: {{scrollViewHeight}}px; position: relative; z-index: 1;">
