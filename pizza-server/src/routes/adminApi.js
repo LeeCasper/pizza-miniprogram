@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const ctrl = require('../controllers/adminApiController');
+const shopCtrl = require('../controllers/adminShopController');
 const uploadCtrl = require('../controllers/uploadController');
 const { auth } = require('../middleware/auth');
 const { adminOnly } = require('../middleware/roleGuard');
@@ -34,6 +35,20 @@ router.get('/categories', ctrl.listCategories);
 router.post('/categories', ctrl.createCategory);
 router.put('/categories/:key', ctrl.updateCategory);
 router.delete('/categories/:key', ctrl.deleteCategory);
+
+// ───── 会员商城：商品 ─────
+router.get('/shop/products', shopCtrl.listProducts);
+router.get('/shop/products/:id', shopCtrl.getProduct);
+router.post('/shop/products', shopCtrl.createProduct);
+router.put('/shop/products/:id', shopCtrl.updateProduct);
+router.delete('/shop/products/:id', shopCtrl.deleteProduct);
+router.put('/shop/products/:id/toggle', shopCtrl.toggleProduct);
+
+// ───── 会员商城：分类 ─────
+router.get('/shop/categories', shopCtrl.listCategories);
+router.post('/shop/categories', shopCtrl.createCategory);
+router.put('/shop/categories/:key', shopCtrl.updateCategory);
+router.delete('/shop/categories/:key', shopCtrl.deleteCategory);
 
 // Orders
 router.get('/orders', ctrl.listOrders);
