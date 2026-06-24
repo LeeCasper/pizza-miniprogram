@@ -114,6 +114,11 @@ const schemas = {
     claimPeriod: Joi.string().valid('none','weekly','monthly').default('none'),
     minMemberLevel: Joi.number().integer().min(0).default(0),
     maxDiscount: Joi.number().min(0).allow(null).default(null),
+    image: Joi.string().allow('').max(500).default(''),
+    redeemProductName: Joi.string().allow('').max(100).default(''),
+    redeemProductPrice: Joi.number().min(0).allow(null).default(null),
+    redeemProductImage: Joi.string().allow('').max(500).default(''),
+    productId: Joi.number().integer().allow(null).default(null),
   }),
 
   // Partial-update schema: mirrors couponTemplate's fields/constraints but every field is
@@ -138,6 +143,11 @@ const schemas = {
     claimPeriod: Joi.string().valid('none','weekly','monthly').optional(),
     minMemberLevel: Joi.number().integer().min(0).optional(),
     maxDiscount: Joi.number().min(0).allow(null).optional(),
+    image: Joi.string().allow('').max(500).optional(),
+    redeemProductName: Joi.string().allow('').max(100).optional(),
+    redeemProductPrice: Joi.number().min(0).allow(null).optional(),
+    redeemProductImage: Joi.string().allow('').max(500).optional(),
+    productId: Joi.number().integer().allow(null).optional(),
   }),
 
   updateSettings: Joi.object({
