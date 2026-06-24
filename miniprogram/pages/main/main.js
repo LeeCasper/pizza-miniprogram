@@ -46,7 +46,6 @@ Page({
     shopBanners: [], shopCategories: SHOP_CATEGORIES,
     shopActiveCat: 'all', shopActiveCatName: '精选好物',
     shopProducts: [], shopFilteredProducts: [],
-    shopFlashDeal: null,
     // 优惠券
     availableCoupons: [], selectedCoupon: null, couponPickerOpen: false,
     couponDiscountAmount: 0, couponDiscountText: '0.00',
@@ -138,10 +137,6 @@ Page({
           shopProducts: products,
           shopFilteredProducts: products,
           shopBanners: banners,
-          shopFlashDeal: (() => {
-            const fp = products.find(p => p.originalPrice);
-            return fp ? { desc: fp.name + ' 限时立减' + (fp.originalPrice - fp.price).toFixed(1) + '元', productId: fp.id } : null;
-          })(),
         });
       }
     }).catch(() => {});
@@ -632,13 +627,6 @@ Page({
   onShopAddToCart(e) { app.addToCart(e.currentTarget.dataset.product); },
   onShopDecrease(e) { app.decreaseQuantity(e.currentTarget.dataset.id); },
   onShopBannerTap() { wx.showToast({ title: '促销活动即将上线', icon: 'none' }); },
-  onFlashTap() {
-    const deal = this.data.shopFlashDeal;
-    if (deal && deal.productId) {
-      const product = this.data.shopProducts.find(p => p.id === deal.productId);
-      if (product) { app.addToCart(product); wx.showToast({ title: '已加入购物车', icon: 'success' }); }
-    }
-  },
   onShopProductTap(e) {
     const { product } = e.currentTarget.dataset;
     const cart = app.globalData.cart;

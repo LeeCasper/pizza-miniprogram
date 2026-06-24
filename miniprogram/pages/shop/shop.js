@@ -15,7 +15,6 @@ Page({
     shopActiveCatName: '精选好物',
     shopProducts: [],
     shopFilteredProducts: [],
-    shopFlashDeal: null,
     loading: true,
   },
 
@@ -51,18 +50,10 @@ Page({
           subtitle: p.desc || '手工现做，新鲜食材',
         }));
 
-        // Flash deal — first discounted product
-        const flashProduct = products.find(p => p.originalPrice);
-        const flashDeal = flashProduct ? {
-          desc: flashProduct.name + ' 限时立减' + (flashProduct.originalPrice - flashProduct.price).toFixed(1) + '元',
-          productId: flashProduct.id,
-        } : null;
-
         this.setData({
           shopProducts: products,
           shopFilteredProducts: products,
           shopBanners: banners,
-          shopFlashDeal: flashDeal,
           loading: false,
         });
       }
@@ -111,17 +102,6 @@ Page({
   // ── Banner ──
   onShopBannerTap(e) {
     wx.showToast({ title: '促销活动即将上线', icon: 'none' });
-  },
-
-  // ── 限时抢购 ──
-  onFlashTap() {
-    if (this.data.shopFlashDeal && this.data.shopFlashDeal.productId) {
-      const product = this.data.shopProducts.find(p => p.id === this.data.shopFlashDeal.productId);
-      if (product) {
-        app.addToCart(product);
-        wx.showToast({ title: '已加入购物车', icon: 'success' });
-      }
-    }
   },
 
   // ── 商品详情 ──
