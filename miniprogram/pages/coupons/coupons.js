@@ -11,9 +11,11 @@ Page({
     redeemCoupons: [],
     redeemFiltered: [],
     redeemTab: 'available',
+    redeemAvailableCount: 0,
     discountCoupons: [],
     discountFiltered: [],
     discountTab: 'available',
+    discountAvailableCount: 0,
     activeCategory: 'redeem',
     detailProduct: null,
     detailOpen: false,
@@ -38,12 +40,16 @@ Page({
         });
         const redeem = all.filter(c => c.category === 'redeem');
         const discount = all.filter(c => c.category === 'discount');
+        const redeemAvail = redeem.filter(c => c.status === 'available');
+        const discountAvail = discount.filter(c => c.status === 'available');
         this.setData({
           allCoupons: all,
           redeemCoupons: redeem,
-          redeemFiltered: redeem.filter(c => c.status === 'available'),
+          redeemFiltered: redeem.filter(c => c.status === this.data.redeemTab),
+          redeemAvailableCount: redeemAvail.length,
           discountCoupons: discount,
-          discountFiltered: discount.filter(c => c.status === 'available'),
+          discountFiltered: discount.filter(c => c.status === this.data.discountTab),
+          discountAvailableCount: discountAvail.length,
           loading: false,
         });
       } else {

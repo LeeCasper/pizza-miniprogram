@@ -20,7 +20,7 @@
         >
           <text class="cat-icon">🎫</text>
           <text class="cat-label">兑换券</text>
-          <text class="cat-count">{{redeemCoupons.length}}</text>
+          <text class="cat-count">{{redeemAvailableCount}}</text>
         </view>
         <view
           class="category-tab {{activeCategory === 'discount' ? 'active' : ''}}"
@@ -29,7 +29,7 @@
         >
           <text class="cat-icon">🏷️</text>
           <text class="cat-label">优惠券</text>
-          <text class="cat-count">{{discountCoupons.length}}</text>
+          <text class="cat-count">{{discountAvailableCount}}</text>
         </view>
       </view>
 
