@@ -1,5 +1,5 @@
 // pages/coupons/coupons.js
-const { api } = require('../../utils/api');
+const { api, fixImageUrl } = require('../../utils/api');
 const app = getApp();
 const { getBackBtnTopBar } = require('../../utils/layout');
 
@@ -30,7 +30,12 @@ Page({
     this.setData({ loading: true });
     api.get('/coupons').then(res => {
       if (res.code === 0) {
-        const all = res.data || [];
+        const all = (res.data || []).map(c => {
+          if (c.redeemProduct) {
+            c.redeemProduct.image = fixImageUrl(c.redeemProduct.image);
+          }
+          return c;
+        });
         const redeem = all.filter(c => c.category === 'redeem');
         const discount = all.filter(c => c.category === 'discount');
         this.setData({
