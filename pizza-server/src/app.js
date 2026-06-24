@@ -23,6 +23,7 @@ const cronLog = createLogger('Cron');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const productRoutes = require('./routes/products');
+const shopRoutes = require('./routes/shop');
 const cartRoutes = require('./routes/cart');
 const orderRoutes = require('./routes/orders');
 const addressRoutes = require('./routes/addresses');
@@ -154,6 +155,7 @@ app.use(session({
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/products', productRoutes);
+app.use('/api/v1/shop', shopRoutes);
 app.use('/api/v1/cart', cartRoutes);
 app.use('/api/v1/orders', orderRoutes);
 app.use('/api/v1/addresses', addressRoutes);
