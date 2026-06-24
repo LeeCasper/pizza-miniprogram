@@ -376,7 +376,9 @@ const orderController = {
       }
 
       const message = refund
-        ? (refund.method === 'balance' ? '订单已取消，退款已到账' : '订单已取消，微信退款处理中')
+        ? (refund.method === 'balance' ? '订单已取消，退款已到账'
+           : refund.method === 'coupon' ? refund.message
+           : '订单已取消，微信退款处理中')
         : '订单已取消';
 
       res.json({ code: 0, data: cancelled, refund, message });

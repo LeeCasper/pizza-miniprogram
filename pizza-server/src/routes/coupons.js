@@ -12,5 +12,6 @@ router.post('/claim', validate('claimCoupon'), controller.claim);
 
 router.get('/', controller.list);
 router.put('/:id/use', controller.use);
+router.post('/:id/redeem', controller.redeem);
 
 module.exports = router;

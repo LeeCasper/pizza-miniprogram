@@ -58,6 +58,11 @@ const refundService = {
         const result = await this._refundBalance(conn, order, reason);
         await conn.commit();
         return result;
+      } else if (order.payment_method === 'coupon') {
+        // 兑换券订单：无真金退款，仅恢复券 + 回补库存
+        const result = await this._refundCoupon(conn, order, reason);
+        await conn.commit();
+        return result;
       } else if (order.payment_method === 'wechat') {
         // Must commit before calling WeChat API (callback may arrive first)
         const result = await this._initiateWechatRefund(conn, order, reason);
@@ -142,6 +147,48 @@ const refundService = {
       pointsReversed,
       couponRestored,
       message: '余额退款已到账',
+    };
+  },
+
+  // ──────────────────────────────────────────────────────────
+  // Coupon refund — 兑换券订单取消：恢复券 + 回补库存，无金额退款、不写 refund_records
+  // ──────────────────────────────────────────────────────────
+  async _refundCoupon(conn, order, reason) {
+    const orderId = order.id;
+
+    // 1. 恢复兑换券（未过期才恢复）
+    const couponRestored = await this._restoreCoupon(conn, order.coupon_used_id);
+
+    // 2. 回补库存（快照型订单 product_id 可能为 NULL，跳过）
+    const [orderItems] = await conn.query(
+      'SELECT product_id, quantity FROM order_items WHERE order_id = ?',
+      [orderId]
+    );
+    for (const item of orderItems) {
+      if (item.product_id == null) continue;
+      await conn.query(
+        'UPDATE products SET stock = stock + ? WHERE id = ? AND stock >= 0',
+        [item.quantity, item.product_id]
+      );
+    }
+
+    // 3. 审计（无资金流动，不落 refund_records；幂等由订单状态保证）
+    await auditService.record({
+      actorType: 'system',
+      action: 'refund.completed',
+      entityType: 'order',
+      entityId: orderId,
+      after: { method: 'coupon', refundAmount: 0, couponRestored, reason },
+    }, conn);
+
+    log.info({ orderId, couponRestored }, 'coupon order cancel — coupon restored, no money refund');
+
+    return {
+      success: true,
+      method: 'coupon',
+      refundAmount: 0,
+      couponRestored,
+      message: couponRestored ? '订单已取消，兑换券已退回' : '订单已取消',
     };
   },
 

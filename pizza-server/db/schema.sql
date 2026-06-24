@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS orders (
     paid_amount DECIMAL(10,2) DEFAULT 0.00,
     pickup_code VARCHAR(10) NOT NULL,
     store_name VARCHAR(100) DEFAULT '爱家店',
-    payment_method ENUM('wechat','balance') NULL COMMENT '支付方式(NULL=未支付)',
+    payment_method ENUM('wechat','balance','coupon') NULL COMMENT '支付方式(NULL=未支付)',
     transaction_id VARCHAR(64) NULL COMMENT '微信支付交易号',
     paid_at DATETIME NULL COMMENT '支付完成时间',
     coupon_used_id INT UNSIGNED NULL,
@@ -117,7 +117,7 @@ CREATE TABLE IF NOT EXISTS orders (
 CREATE TABLE IF NOT EXISTS order_items (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     order_id VARCHAR(20) NOT NULL,
-    product_id INT UNSIGNED NOT NULL,
+    product_id INT UNSIGNED NULL,
     product_name VARCHAR(100) NOT NULL,
     price DECIMAL(10,2) NOT NULL,
     quantity INT UNSIGNED NOT NULL DEFAULT 1,

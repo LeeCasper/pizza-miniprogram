@@ -73,8 +73,8 @@ onMounted(() => { loadOrder(); });
         <NDescriptionsItem label="总金额">{{ formatPrice(order.total) }}</NDescriptionsItem>
         <NDescriptionsItem label="实付">{{ formatPrice(order.paidAmount || order.total) }}</NDescriptionsItem>
         <NDescriptionsItem label="支付方式">
-          <NTag v-if="order.paymentMethod" :type="order.paymentMethod === 'wechat' ? 'info' : 'success'" size="small" :bordered="false">
-            {{ order.paymentMethod === 'wechat' ? '微信支付' : '余额支付' }}
+          <NTag v-if="order.paymentMethod" :type="order.paymentMethod === 'wechat' ? 'info' : (order.paymentMethod === 'coupon' ? 'warning' : 'success')" size="small" :bordered="false">
+            {{ order.paymentMethod === 'wechat' ? '微信支付' : (order.paymentMethod === 'coupon' ? '兑换券' : '余额支付') }}
           </NTag>
           <span v-else style="color: var(--n-text-color-3)">待支付</span>
         </NDescriptionsItem>

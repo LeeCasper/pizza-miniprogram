@@ -17,7 +17,10 @@ function formatOrder(o) {
     codeDigits: String(o.pickupCode || '').split(''),
     time: o.createdAt || o.time || '',
     statusText: ORDER_STATUS_MAP[o.status] || o.status,
-    paymentStatusText: o.paymentMethod ? (o.paymentMethod === 'wechat' ? '微信支付' : '余额支付') : '待支付',
+    paymentStatusText: o.paymentMethod === 'wechat' ? '微信支付'
+      : o.paymentMethod === 'balance' ? '余额支付'
+      : o.paymentMethod === 'coupon' ? '兑换券'
+      : '待支付',
     isPaid: !!o.paymentMethod,
     canCancel: !!o.canCancel,
     cancelDeadline: o.cancelDeadline || null,

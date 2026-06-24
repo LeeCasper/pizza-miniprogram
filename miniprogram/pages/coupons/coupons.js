@@ -104,12 +104,19 @@ Page({
       success: (res) => {
         if (res.confirm) {
           wx.showLoading({ title: '兑换中...' });
-          api.put('/coupons/' + item.id + '/use').then(result => {
+          api.post('/coupons/' + item.id + '/redeem').then(result => {
             wx.hideLoading();
             if (result.code === 0) {
-              wx.showToast({ title: '兑换成功！', icon: 'success' });
               this.fetchCoupons();
               this.setData({ detailOpen: false, detailProduct: null });
+              wx.showModal({
+                title: '兑换成功',
+                content: '已生成订单，可在「订单」中查看取餐码。',
+                showCancel: false,
+                confirmText: '知道了',
+              });
+            } else {
+              wx.showToast({ title: result.message || '兑换失败', icon: 'none' });
             }
           }).catch(() => {
             wx.hideLoading();

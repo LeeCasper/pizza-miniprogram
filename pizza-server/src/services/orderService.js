@@ -1,5 +1,6 @@
 const pool = require('../config/database');
 const { validateTransition } = require('../utils/orderStateMachine');
+const { generatePickupCode } = require('../utils/pickupCode');
 const auditService = require('./auditService');
 
 const orderService = {
@@ -93,6 +94,111 @@ const orderService = {
 
       await conn.commit();
       return this.findById(data.id);
+    } catch (err) {
+      await conn.rollback();
+      throw err;
+    } finally {
+      conn.release();
+    }
+  },
+
+  /**
+   * 使用兑换券生成订单（即时结算，支付方式=coupon）。
+   * 从券所属模板解析真实在售商品以扣库存，并让订单列表缩略图经 products join 显示；
+   * 无关联在售商品时降级为快照（product_id=NULL，不扣库存）。
+   */
+  async createRedeemOrder(userId, couponId) {
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+
+      // 1. 锁定并校验兑换券
+      const [[coupon]] = await conn.query(
+        'SELECT * FROM coupons WHERE id = ? AND user_id = ? FOR UPDATE',
+        [couponId, userId]
+      );
+      if (!coupon) { await conn.rollback(); return { error: '兑换券不存在' }; }
+      if (coupon.category !== 'redeem') { await conn.rollback(); return { error: '该券不是兑换券' }; }
+      if (coupon.status !== 'available') { await conn.rollback(); return { error: '兑换券不可用' }; }
+      // 过期：用 SQL 比较 CURDATE() 避免时区歧义
+      const [[{ expired }]] = await conn.query(
+        'SELECT (valid_to < CURDATE()) AS expired FROM coupons WHERE id = ?',
+        [couponId]
+      );
+      if (expired) {
+        await conn.query("UPDATE coupons SET status = 'expired' WHERE id = ?", [couponId]);
+        await conn.commit();
+        return { error: '兑换券已过期' };
+      }
+
+      // 2. 解析兑换商品 + 扣库存（仅当券所属模板关联了在售商品）
+      let productId = null;
+      const productName = coupon.redeem_product_name || '兑换商品';
+      const value = coupon.redeem_product_price != null ? parseFloat(coupon.redeem_product_price) : 0;
+      if (coupon.template_id) {
+        const [[tpl]] = await conn.query(
+          'SELECT product_id FROM coupon_templates WHERE id = ?',
+          [coupon.template_id]
+        );
+        if (tpl && tpl.product_id) {
+          const [[product]] = await conn.query(
+            'SELECT id, stock FROM products WHERE id = ? AND is_deleted = 0 FOR UPDATE',
+            [tpl.product_id]
+          );
+          if (product) {
+            productId = product.id;
+            if (product.stock >= 0) { // stock<0 视为不限量（沿用下单逻辑）
+              if (product.stock < 1) { await conn.rollback(); return { error: '兑换商品库存不足' }; }
+              await conn.query(
+                'UPDATE products SET stock = stock - 1 WHERE id = ? AND stock >= 1',
+                [product.id]
+              );
+            }
+          }
+        }
+      }
+
+      // 3. 订单号 + 取餐码
+      const now = new Date();
+      const orderId = await generateOrderId(conn, now);
+      const pickupCode = await generateUniquePickupCode(conn);
+
+      // 4. 插订单：合计=商品价值，实付0，支付方式=coupon（即时结算）
+      await conn.query(
+        `INSERT INTO orders (id, user_id, status, total, discount_amount, paid_amount, pickup_code, store_name, coupon_used_id, note, payment_method, paid_at)
+         VALUES (?, ?, 'waiting', ?, ?, 0, ?, ?, ?, ?, 'coupon', ?)`,
+        [orderId, userId, value.toFixed(2), value.toFixed(2), pickupCode,
+         require('../config').business.storeName, couponId, '兑换券订单', now]
+      );
+
+      // 5. 插明细（数量固定 1）
+      await conn.query(
+        `INSERT INTO order_items (order_id, product_id, product_name, price, quantity, restrictions)
+         VALUES (?, ?, ?, ?, 1, ?)`,
+        [orderId, productId, productName, value.toFixed(2), JSON.stringify([])]
+      );
+
+      // 6. 标记兑换券已用
+      await conn.query("UPDATE coupons SET status = 'used', used_at = NOW() WHERE id = ?", [couponId]);
+
+      await conn.commit();
+
+      // —— 事务外 best-effort：审计 + 即时打印（不阻断结果）——
+      await auditService.record({
+        actorType: 'user',
+        actorId: userId,
+        action: 'order.created',
+        entityType: 'order',
+        entityId: orderId,
+        after: { total: value, paidAmount: 0, paymentMethod: 'coupon', via: 'redeem_coupon', pickupCode },
+      });
+
+      if (require('../config').printer.enabled) {
+        const order = await this.findById(orderId);
+        require('../services/printerService').printOrderTicket(order).catch(() => {});
+      }
+
+      return { success: true, orderId };
     } catch (err) {
       await conn.rollback();
       throw err;
@@ -263,6 +369,31 @@ const orderService = {
     };
   },
 };
+
+// 事务内生成订单号：日期前缀 + 当日 3 位序号（与 orderController.create 同规则）
+async function generateOrderId(conn, now) {
+  const datePrefix = now.getFullYear().toString()
+    + String(now.getMonth() + 1).padStart(2, '0')
+    + String(now.getDate()).padStart(2, '0');
+  const [rows] = await conn.query(
+    "SELECT MAX(CAST(SUBSTRING(id, 9) AS UNSIGNED)) AS maxSeq FROM orders WHERE id LIKE ?",
+    [`${datePrefix}%`]
+  );
+  return datePrefix + String((rows[0].maxSeq || 0) + 1).padStart(3, '0');
+}
+
+// 事务内生成当日唯一取餐码
+async function generateUniquePickupCode(conn) {
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const code = generatePickupCode();
+    const [rows] = await conn.query(
+      "SELECT id FROM orders WHERE pickup_code = ? AND DATE(created_at) = CURDATE()",
+      [code]
+    );
+    if (rows.length === 0) return code;
+  }
+}
 
 function formatOrder(row, cancelMinutes) {
   if (!row) return null;

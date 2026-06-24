@@ -1,5 +1,6 @@
 const couponService = require('../services/couponService');
 const couponClaimService = require('../services/couponClaimService');
+const orderService = require('../services/orderService');
 
 const couponController = {
   async list(req, res, next) {
@@ -19,6 +20,19 @@ const couponController = {
         return res.status(400).json({ code: 400, message: result.error });
       }
       res.json({ code: 0, message: '已使用' });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  // 使用兑换券 → 生成兑换商品订单（支付方式=coupon）
+  async redeem(req, res, next) {
+    try {
+      const result = await orderService.createRedeemOrder(req.user.id, req.params.id);
+      if (result.error) {
+        return res.status(400).json({ code: 400, message: result.error });
+      }
+      res.json({ code: 0, message: '兑换成功', data: { orderId: result.orderId } });
     } catch (err) {
       next(err);
     }

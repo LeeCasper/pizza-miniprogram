@@ -52,8 +52,10 @@ const columns: DataTableColumns<any> = [
       if (!row.paymentMethod) {
         return h(NTag, { type: 'error', size: 'small', bordered: false }, () => '待支付');
       }
-      const label = row.paymentMethod === 'wechat' ? '微信支付' : '余额支付';
-      const type = row.paymentMethod === 'wechat' ? 'info' : 'success';
+      const labelMap = { wechat: '微信支付', balance: '余额支付', coupon: '兑换券' };
+      const typeMap = { wechat: 'info', balance: 'success', coupon: 'warning' };
+      const label = labelMap[row.paymentMethod] || row.paymentMethod;
+      const type = typeMap[row.paymentMethod] || 'default';
       return h(NTag, { type, size: 'small', bordered: false }, () => label);
     }
   },
