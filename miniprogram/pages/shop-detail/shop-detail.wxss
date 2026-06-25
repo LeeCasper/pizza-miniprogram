@@ -1,0 +1,75 @@
+/* pages/shop-detail/shop-detail.wxss — 商城商品详情（黏土风；无 backdrop-filter） */
+.sd-page { min-height: 100vh; box-sizing: border-box; }
+
+/* 顶部返回栏（固定；不透明底 + 内阴影做"假玻璃"，无 backdrop-filter） */
+.sd-top-bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24rpx 20rpx;
+  background: var(--glass-bg-nav);
+  border-bottom: var(--glass-border-subtle);
+  box-shadow: 0 2rpx 16rpx rgba(120, 108, 94, 0.10);
+}
+.sd-back-btn {
+  width: 64rpx; height: 64rpx; border-radius: var(--radius-full);
+  background: var(--glass-bg-card); border: var(--glass-border-subtle);
+  display: flex; align-items: center; justify-content: center;
+}
+.sd-back-placeholder { background: transparent; border: none; box-shadow: none; }
+.sd-back-icon { font-size: 48rpx; line-height: 1; color: var(--color-on-surface); }
+.sd-top-title { font-size: 34rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); }
+
+/* 内容 */
+.sd-body { padding-bottom: 24rpx; }
+
+/* 图片轮播 */
+.sd-gallery { width: 100%; }
+.sd-swiper { width: 100%; height: 600rpx; }
+.sd-img { width: 100%; height: 100%; }
+
+/* 信息卡（复用 app.wxss .card 工具类） */
+.sd-info { margin: 24rpx 32rpx; padding: 28rpx; display: flex; flex-direction: column; gap: 12rpx; }
+.sd-price-row { display: flex; align-items: baseline; gap: 8rpx; }
+.sd-price-sym { font-size: 28rpx; font-weight: var(--font-weight-bold); color: var(--color-price); }
+.sd-price { font-size: 48rpx; font-weight: var(--font-weight-bold); color: var(--color-price); }
+.sd-original { font-size: 24rpx; color: var(--color-on-surface-variant); text-decoration: line-through; margin-left: 6rpx; }
+.sd-tag { margin-left: auto; padding: 4rpx 16rpx; border-radius: var(--radius-full); background: var(--glass-bg-primary); }
+.sd-tag text { font-size: 20rpx; color: #FFFFFF; font-weight: var(--font-weight-bold); }
+.sd-name { font-size: 36rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); }
+.sd-subtitle { font-size: 26rpx; color: var(--color-on-surface-variant); }
+.sd-meta { display: flex; gap: 32rpx; margin-top: 8rpx; }
+.sd-meta-item { font-size: 24rpx; color: var(--color-on-surface-variant); }
+
+/* 详情描述 */
+.sd-desc { margin: 0 32rpx 24rpx; padding: 28rpx; display: flex; flex-direction: column; gap: 16rpx; }
+.sd-desc-title { font-size: 30rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); }
+.sd-desc-text { font-size: 26rpx; color: var(--color-on-surface-variant); line-height: 1.7; white-space: pre-wrap; }
+
+/* 加载态 */
+.sd-loading { display: flex; align-items: center; justify-content: center; padding-top: 240rpx; color: var(--color-on-surface-variant); font-size: 28rpx; }
+
+/* 底部操作栏（固定；不透明底 + 内阴影，无 backdrop-filter） */
+.sd-bottom-bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 100;
+  display: flex; align-items: center; gap: 20rpx;
+  padding: 16rpx 32rpx;
+  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
+  background: var(--glass-bg-nav);
+  border-top: var(--glass-border-subtle);
+  box-shadow: 0 -2rpx 16rpx rgba(120, 108, 94, 0.12);
+}
+.sd-fav {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  width: 96rpx; flex-shrink: 0;
+}
+.sd-fav-icon { font-size: 40rpx; line-height: 1.1; color: var(--color-on-surface-variant); }
+.sd-fav.active .sd-fav-icon { color: var(--color-primary); }
+.sd-fav-label { font-size: 20rpx; color: var(--color-on-surface-variant); }
+.sd-buy-btn {
+  flex: 1; height: 88rpx; border-radius: var(--radius-full);
+  background: var(--glass-bg-primary);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--glass-shadow-button);
+}
+.sd-buy-btn text { font-size: 32rpx; font-weight: var(--font-weight-bold); color: #FFFFFF; }
+.sd-buy-btn:active { transform: scale(0.98); }

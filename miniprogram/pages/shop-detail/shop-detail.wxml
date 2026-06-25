@@ -1,0 +1,58 @@
+<!-- pages/shop-detail/shop-detail.wxml — 商城商品详情（黏土风，无 backdrop-filter；页面原生滚动） -->
+<view class="sd-page" style="padding-top: {{topBarTotalHeight}}px">
+  <!-- 顶部返回栏（固定） -->
+  <view class="sd-top-bar" style="padding-top: {{statusBarHeight}}px;">
+    <view class="sd-back-btn" bindtap="onBack"><text class="sd-back-icon">‹</text></view>
+    <text class="sd-top-title">商品详情</text>
+    <view class="sd-back-btn sd-back-placeholder"></view>
+  </view>
+
+  <!-- 内容（依赖页面原生滚动，非 swiper/scroll-view） -->
+  <view class="sd-body" wx:if="{{product}}">
+    <!-- 图片轮播 -->
+    <view class="sd-gallery" wx:if="{{images.length > 0}}">
+      <swiper class="sd-swiper" circular="{{images.length > 1}}" indicator-dots="{{images.length > 1}}" indicator-color="rgba(255,255,255,0.4)" indicator-active-color="#C0563A">
+        <swiper-item wx:for="{{images}}" wx:key="*this">
+          <image class="sd-img" src="{{item}}" mode="aspectFill"></image>
+        </swiper-item>
+      </swiper>
+    </view>
+
+    <!-- 信息卡 -->
+    <view class="sd-info card">
+      <view class="sd-price-row">
+        <text class="sd-price-sym">¥</text>
+        <text class="sd-price">{{product.price}}</text>
+        <text class="sd-original" wx:if="{{product.original_price}}">¥{{product.original_price}}</text>
+        <view class="sd-tag" wx:if="{{product.tag}}"><text>{{product.tag}}</text></view>
+      </view>
+      <text class="sd-name">{{product.name}}</text>
+      <text class="sd-subtitle" wx:if="{{product.subtitle}}">{{product.subtitle}}</text>
+      <view class="sd-meta">
+        <text class="sd-meta-item">库存 {{product.stock}}</text>
+        <text class="sd-meta-item">已售 {{product.sales}}</text>
+      </view>
+    </view>
+
+    <!-- 商品详情描述 -->
+    <view class="sd-desc card" wx:if="{{product.detail_desc}}">
+      <text class="sd-desc-title">商品详情</text>
+      <text class="sd-desc-text">{{product.detail_desc}}</text>
+    </view>
+
+    <!-- 底部固定栏占位 -->
+    <view style="height: calc(180rpx + env(safe-area-inset-bottom))"></view>
+  </view>
+
+  <!-- 加载态 -->
+  <view class="sd-loading" wx:elif="{{loading}}"><text>加载中…</text></view>
+
+  <!-- 底部操作栏（固定）：收藏 + 立即购买（Phase 2 占位） -->
+  <view class="sd-bottom-bar" wx:if="{{product}}">
+    <view class="sd-fav {{product.isFavorited ? 'active' : ''}}" bindtap="onToggleFav">
+      <text class="sd-fav-icon">{{product.isFavorited ? '♥' : '♡'}}</text>
+      <text class="sd-fav-label">收藏</text>
+    </view>
+    <view class="sd-buy-btn" bindtap="onBuy"><text>立即购买</text></view>
+  </view>
+</view>
