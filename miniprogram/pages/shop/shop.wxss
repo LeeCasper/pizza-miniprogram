@@ -162,6 +162,14 @@
 .shop-mini-btn:active { transform: scale(0.9); }
 .shop-mini-plus { background: var(--glass-bg-primary-light); border: var(--glass-border-colored); color: var(--color-primary); }
 .shop-mini-qty { font-size: 28rpx; font-weight: var(--font-weight-bold); min-width: 36rpx; text-align: center; }
+/* 商城收藏按钮（替代购物车步进器） */
+.shop-fav-btn { width: 60rpx; height: 60rpx; border-radius: var(--radius-full); background: var(--glass-bg-card); display: flex; align-items: center; justify-content: center; box-shadow: var(--glass-shadow-card); border: var(--glass-border-subtle); flex-shrink: 0; transition: all 0.2s; }
+.shop-fav-btn:active { transform: scale(0.9); }
+.shop-fav-btn.active { background: var(--glass-bg-primary-light); border: var(--glass-border-colored); }
+.shop-fav-icon { font-size: 34rpx; line-height: 1; color: var(--color-on-surface-variant); }
+.shop-fav-btn.active .shop-fav-icon { color: var(--color-primary); }
+/* 分类图标改用图片（替代 emoji） */
+.shop-cat-icon { width: 36rpx; height: 36rpx; border-radius: var(--radius-sm); }
 
 /* ── 列表末尾 ── */
 .shop-list-end { display: flex; justify-content: center; padding: 36rpx 0 8rpx; }

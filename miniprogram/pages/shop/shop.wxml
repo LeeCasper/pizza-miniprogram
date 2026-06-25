@@ -1,13 +1,11 @@
-<!-- pages/shop/shop.wxml — 会员商城（黏土风，仿 Stitch 商城首页布局） -->
+<!-- pages/shop/shop.wxml — 会员商城（黏土风；与 pages/main 商城 tab 同步。商品不入购物车，可收藏） -->
 <view class="shop-page" style="padding-top: {{topBarTotalHeight}}px">
-  <!-- 顶部导航 -->
   <view class="shop-top-bar" style="padding-top: {{statusBarHeight}}px;">
     <text class="shop-top-title">会员商城</text>
   </view>
 
   <scroll-view scroll-y class="shop-scroll" enhanced show-scrollbar="{{false}}" style="height: {{scrollViewHeight}}px;">
     <view class="shop-scroll-inner">
-      <!-- 顶部 Hero（促销 Banner） -->
       <view class="shop-hero" wx:if="{{shopBanners.length > 0}}">
         <swiper class="shop-hero-swiper" autoplay interval="4000" circular indicator-dots indicator-color="rgba(255,255,255,0.35)" indicator-active-color="#C0563A">
           <swiper-item wx:for="{{shopBanners}}" wx:key="id">
@@ -22,7 +20,6 @@
         </swiper>
       </view>
 
-      <!-- 分类 Tab（下划线式横向滚动） -->
       <scroll-view scroll-x enhanced show-scrollbar="{{false}}" class="shop-cat-tabs">
         <view
           wx:for="{{shopCategories}}"
@@ -31,67 +28,53 @@
           bindtap="onShopCategory"
           data-key="{{item.key}}"
         >
-          <text class="shop-cat-emoji">{{item.icon}}</text>
+          <image wx:if="{{item.icon}}" class="shop-cat-icon" src="{{item.icon}}" mode="aspectFill"></image>
           <text>{{item.name}}</text>
         </view>
       </scroll-view>
 
-      <!-- 节标题 -->
       <view class="shop-section-header">
         <text class="shop-section-title">{{shopActiveCat === 'all' ? '精选好物' : shopActiveCatName}}</text>
         <text class="shop-section-count">{{shopFilteredProducts.length}}件</text>
       </view>
 
-      <!-- 商品列表：第 1 件 = Featured 大图卡，其余 = 横向列表卡 -->
       <view class="shop-list" wx:if="{{shopFilteredProducts.length > 0}}">
         <block wx:for="{{shopFilteredProducts}}" wx:key="id">
-          <!-- Featured -->
-          <view wx:if="{{index === 0}}" class="shop-feat-card" bindtap="onShopProductTap" data-product="{{item}}">
+          <view wx:if="{{index === 0}}" class="shop-feat-card" bindtap="onShopProductTap" data-id="{{item.id}}">
             <view class="shop-feat-imgwrap">
-              <image class="shop-feat-img" src="{{item.image}}" mode="aspectFill"></image>
-              <view class="shop-feat-badge"><text>人气优选</text></view>
+              <image class="shop-feat-img" src="{{item.main_image}}" mode="aspectFill"></image>
+              <view class="shop-feat-badge" wx:if="{{item.tag}}"><text>{{item.tag}}</text></view>
             </view>
             <view class="shop-feat-body">
               <text class="shop-feat-name">{{item.name}}</text>
-              <text class="shop-feat-desc">{{item.desc || '手工现做，新鲜食材'}}</text>
+              <text class="shop-feat-desc">{{item.subtitle || '精选好物，新鲜上架'}}</text>
               <view class="shop-feat-divider"></view>
               <view class="shop-feat-bottom">
                 <view class="shop-price-row">
                   <text class="shop-price-sym">¥</text>
                   <text class="shop-price">{{item.price}}</text>
-                  <text class="shop-original" wx:if="{{item.originalPrice}}">¥{{item.originalPrice}}</text>
+                  <text class="shop-original" wx:if="{{item.original_price}}">¥{{item.original_price}}</text>
                 </view>
-                <view class="shop-add-btn {{item.quantity > 0 ? 'has-qty' : ''}}" catchtap="onShopAddToCart" data-product="{{item}}">
-                  <text class="shop-add-icon" wx:if="{{item.quantity === 0}}">+</text>
-                  <view class="shop-mini-stepper" wx:else>
-                    <view class="shop-mini-btn" catchtap="onShopDecrease" data-id="{{item.id}}"><text>−</text></view>
-                    <text class="shop-mini-qty">{{item.quantity}}</text>
-                    <view class="shop-mini-btn shop-mini-plus" catchtap="onShopAddToCart" data-product="{{item}}"><text>+</text></view>
-                  </view>
+                <view class="shop-fav-btn {{item.isFavorited ? 'active' : ''}}" catchtap="onShopToggleFav" data-id="{{item.id}}">
+                  <text class="shop-fav-icon">{{item.isFavorited ? '♥' : '♡'}}</text>
                 </view>
               </view>
             </view>
           </view>
 
-          <!-- 横向列表卡 -->
-          <view wx:else class="shop-list-card" bindtap="onShopProductTap" data-product="{{item}}">
-            <image class="shop-list-img" src="{{item.image}}" mode="aspectFill"></image>
+          <view wx:else class="shop-list-card" bindtap="onShopProductTap" data-id="{{item.id}}">
+            <image class="shop-list-img" src="{{item.main_image}}" mode="aspectFill"></image>
             <view class="shop-list-body">
               <text class="shop-list-name">{{item.name}}</text>
-              <text class="shop-list-desc">{{item.desc || '手工现做，新鲜食材'}}</text>
+              <text class="shop-list-desc">{{item.subtitle || '精选好物，新鲜上架'}}</text>
               <view class="shop-list-bottom">
                 <view class="shop-price-row">
                   <text class="shop-price-sym">¥</text>
                   <text class="shop-price">{{item.price}}</text>
-                  <text class="shop-original" wx:if="{{item.originalPrice}}">¥{{item.originalPrice}}</text>
+                  <text class="shop-original" wx:if="{{item.original_price}}">¥{{item.original_price}}</text>
                 </view>
-                <view class="shop-add-btn {{item.quantity > 0 ? 'has-qty' : ''}}" catchtap="onShopAddToCart" data-product="{{item}}">
-                  <text class="shop-add-icon" wx:if="{{item.quantity === 0}}">+</text>
-                  <view class="shop-mini-stepper" wx:else>
-                    <view class="shop-mini-btn" catchtap="onShopDecrease" data-id="{{item.id}}"><text>−</text></view>
-                    <text class="shop-mini-qty">{{item.quantity}}</text>
-                    <view class="shop-mini-btn shop-mini-plus" catchtap="onShopAddToCart" data-product="{{item}}"><text>+</text></view>
-                  </view>
+                <view class="shop-fav-btn {{item.isFavorited ? 'active' : ''}}" catchtap="onShopToggleFav" data-id="{{item.id}}">
+                  <text class="shop-fav-icon">{{item.isFavorited ? '♥' : '♡'}}</text>
                 </view>
               </view>
             </view>
@@ -101,7 +84,6 @@
         <view class="shop-list-end"><text class="shop-list-end-text">没有更多商品了</text></view>
       </view>
 
-      <!-- 空状态 -->
       <view class="shop-empty" wx:else>
         <text class="shop-empty-icon">🛍️</text>
         <text class="shop-empty-text">暂无商品</text>
