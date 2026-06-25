@@ -47,12 +47,94 @@
   <!-- 加载态 -->
   <view class="sd-loading" wx:elif="{{loading}}"><text>加载中…</text></view>
 
-  <!-- 底部操作栏（固定）：收藏 + 立即购买（Phase 2 占位） -->
+  <!-- 底部操作栏（固定）：收藏 + 立即购买 -->
   <view class="sd-bottom-bar" wx:if="{{product}}">
     <view class="sd-fav {{product.isFavorited ? 'active' : ''}}" bindtap="onToggleFav">
       <text class="sd-fav-icon">{{product.isFavorited ? '♥' : '♡'}}</text>
       <text class="sd-fav-label">收藏</text>
     </view>
     <view class="sd-buy-btn" bindtap="onBuy"><text>立即购买</text></view>
+  </view>
+
+  <!-- 结账抽屉 -->
+  <view class="checkout-overlay {{checkoutOpen ? 'show' : ''}}" catchtap="onCloseCheckout">
+    <view class="checkout-drawer {{checkoutOpen ? 'show' : ''}}" catchtap="noop">
+      <view class="checkout-header">
+        <text class="checkout-title">确认订单</text>
+        <view class="checkout-close" catchtap="onCloseCheckout"><text>✕</text></view>
+      </view>
+
+      <view class="checkout-body">
+        <!-- 商品摘要 -->
+        <view class="checkout-product">
+          <image class="checkout-prod-img" src="{{product.main_image}}" mode="aspectFill"></image>
+          <view class="checkout-prod-info">
+            <text class="checkout-prod-name">{{product.name}}</text>
+            <text class="checkout-prod-price">¥{{product.price}}</text>
+          </view>
+        </view>
+
+        <!-- 数量 -->
+        <view class="checkout-row">
+          <text class="checkout-label">数量</text>
+          <view class="checkout-qty">
+            <view class="checkout-qty-btn {{quantity <= 1 ? 'disabled' : ''}}" catchtap="onQtyMinus"><text>−</text></view>
+            <text class="checkout-qty-val">{{quantity}}</text>
+            <view class="checkout-qty-btn" catchtap="onQtyPlus"><text>+</text></view>
+          </view>
+        </view>
+
+        <!-- 收货信息 -->
+        <view class="checkout-row">
+          <text class="checkout-label">收货人</text>
+          <input class="checkout-input" placeholder="请输入姓名" value="{{recipientName}}" data-field="recipientName" bindinput="onRecipientInput"/>
+        </view>
+        <view class="checkout-row">
+          <text class="checkout-label">手机号</text>
+          <input class="checkout-input" type="number" placeholder="请输入手机号" value="{{recipientPhone}}" data-field="recipientPhone" bindinput="onRecipientInput"/>
+        </view>
+        <view class="checkout-row">
+          <text class="checkout-label">收货地址</text>
+          <input class="checkout-input" placeholder="请输入详细地址" value="{{recipientAddress}}" data-field="recipientAddress" bindinput="onRecipientInput"/>
+        </view>
+
+        <!-- 备注 -->
+        <view class="checkout-row">
+          <text class="checkout-label">备注</text>
+          <input class="checkout-input" placeholder="选填" value="{{note}}" bindinput="onNoteInput"/>
+        </view>
+
+        <!-- 支付方式 -->
+        <view class="checkout-row">
+          <text class="checkout-label">支付方式</text>
+        </view>
+        <view class="checkout-pay-methods">
+          <view class="checkout-pay-opt {{paymentMethod === 'wechat' ? 'active' : ''}}" data-method="wechat" catchtap="onPaymentMethodChange">
+            <text class="checkout-pay-opt-icon">💚</text>
+            <text>微信支付</text>
+          </view>
+          <view class="checkout-pay-opt {{paymentMethod === 'balance' ? 'active' : ''}}" data-method="balance" catchtap="onPaymentMethodChange">
+            <text class="checkout-pay-opt-icon">💰</text>
+            <text>余额支付</text>
+          </view>
+        </view>
+
+        <!-- 金额汇总 -->
+        <view class="checkout-summary">
+          <text class="checkout-summary-label">合计</text>
+          <view class="checkout-summary-price">
+            <text class="checkout-summary-sym">¥</text>
+            <text class="checkout-summary-val">{{(product.price * quantity).toFixed(2)}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 提交按钮 -->
+      <view class="checkout-submit-bar">
+        <view class="checkout-submit-btn {{submitting ? 'loading' : ''}}" bindtap="onSubmitOrder">
+          <text>{{submitting ? '提交中…' : (paymentMethod === 'balance' ? '余额支付 ¥' + (product.price * quantity).toFixed(2) : '微信支付 ¥' + (product.price * quantity).toFixed(2))}}</text>
+        </view>
+      </view>
+    </view>
   </view>
 </view>

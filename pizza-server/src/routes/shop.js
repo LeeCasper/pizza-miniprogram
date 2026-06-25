@@ -14,4 +14,15 @@ router.get('/favorites', auth, shopController.listFavorites);
 router.post('/favorites/:productId', auth, shopController.addFavorite);
 router.delete('/favorites/:productId', auth, shopController.removeFavorite);
 
+// ───── 商城订单（需登录）─────
+router.post('/orders', auth, shopController.createOrder);
+router.get('/orders', auth, shopController.listMyOrders);
+router.get('/orders/:id', auth, shopController.getOrder);
+router.put('/orders/:id/cancel', auth, shopController.cancelOrder);
+
+// ───── 商城支付（需登录）─────
+router.post('/pay', auth, shopController.createPayment);
+router.get('/pay/:orderId/status', auth, shopController.paymentStatus);
+router.post('/pay/balance', auth, shopController.payWithBalance);
+
 module.exports = router;

@@ -18,6 +18,15 @@
   font-weight: var(--font-weight-bold);
   color: var(--color-primary);
 }
+.shop-top-right {
+  position: absolute; right: 32rpx;
+  display: flex; align-items: center; gap: 6rpx;
+  padding: 8rpx 20rpx;
+  border-radius: var(--radius-full);
+  background: var(--glass-bg-card); border: var(--glass-border-subtle);
+}
+.shop-top-right-icon { font-size: 28rpx; }
+.shop-top-right-label { font-size: 24rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
 
 /* ── 滚动区 ── */
 .shop-scroll { overflow-x: hidden; box-sizing: border-box; }

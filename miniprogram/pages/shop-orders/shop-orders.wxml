@@ -1,0 +1,69 @@
+<!-- pages/shop-orders/shop-orders.wxml — 商城订单列表（黏土风，无 backdrop-filter） -->
+<view class="so-page" style="padding-top: {{topBarTotalHeight}}px">
+  <!-- 顶部返回栏 -->
+  <view class="so-top-bar" style="padding-top: {{statusBarHeight}}px;">
+    <view class="so-back-btn" bindtap="onBack"><text class="so-back-icon">‹</text></view>
+    <text class="so-top-title">商城订单</text>
+    <view class="so-back-btn so-back-placeholder"></view>
+  </view>
+
+  <!-- 状态筛选 tabs -->
+  <scroll-view class="so-tabs" scroll-x enhanced show-scrollbar="{{false}}">
+    <view
+      class="so-tab {{currentTab === item.key ? 'active' : ''}}"
+      wx:for="{{tabs}}" wx:key="key"
+      data-tab="{{item.key}}"
+      bindtap="onTabChange"
+    ><text>{{item.label}}</text></view>
+  </scroll-view>
+
+  <!-- 列表 -->
+  <view class="so-list" wx:if="{{orders.length > 0}}">
+    <view
+      class="so-card"
+      wx:for="{{orders}}" wx:key="id"
+      bindtap="onTapOrder"
+      data-id="{{item.id}}"
+    >
+      <!-- 订单头 -->
+      <view class="so-card-hd">
+        <text class="so-card-id">{{item.id}}</text>
+        <text class="so-card-status status-{{item.status}}">{{item.statusLabel}}</text>
+      </view>
+      <!-- 商品 -->
+      <view class="so-card-body" wx:for="{{item.items}}" wx:for-item="it" wx:key="id">
+        <image class="so-item-img" src="{{it.productImage}}" mode="aspectFill"></image>
+        <view class="so-item-info">
+          <text class="so-item-name">{{it.productName}}</text>
+          <view class="so-item-bottom">
+            <text class="so-item-price">¥{{it.price}}</text>
+            <text class="so-item-qty">×{{it.quantity}}</text>
+          </view>
+        </view>
+      </view>
+      <!-- 订单底 -->
+      <view class="so-card-ft">
+        <text class="so-card-total">合计 ¥{{item.totalAmount}}</text>
+        <view class="so-card-actions">
+          <view class="so-action-btn outline" catchtap="onPayOrder" data-id="{{item.id}}" wx:if="{{item.status === 'pending'}}">
+            <text>去支付</text>
+          </view>
+          <view class="so-action-btn outline" catchtap="onCancelOrder" data-id="{{item.id}}" wx:if="{{item.status === 'pending'}}">
+            <text>取消</text>
+          </view>
+          <view class="so-action-btn outline" wx:if="{{item.status === 'shipped'}}">
+            <text>确认收货</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view style="height: calc(60rpx + env(safe-area-inset-bottom))"></view>
+  </view>
+
+  <!-- 空态 -->
+  <view class="so-empty" wx:elif="{{!loading}}">
+    <text class="so-empty-icon">📦</text>
+    <text class="so-empty-text">暂无订单</text>
+    <text class="so-empty-sub">去商城逛逛，好物等着你</text>
+  </view>
+</view>

@@ -236,6 +236,26 @@ const customRoutes: CustomRoute[] = [
           hideInMenu: true,
         },
       },
+      {
+        name: 'shop_orders_list',
+        path: '/shop/orders',
+        component: 'view.shop_orders_list',
+        meta: {
+          title: '商城订单',
+          i18nKey: 'route.shop_orders_list',
+        },
+      },
+      {
+        name: 'shop_orders_detail',
+        path: '/shop/orders/:id',
+        component: 'view.shop_orders_detail',
+        props: true,
+        meta: {
+          title: '订单详情',
+          i18nKey: 'route.shop_orders_detail',
+          hideInMenu: true,
+        },
+      },
     ],
   },
   {

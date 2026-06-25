@@ -1,6 +1,7 @@
 // src/controllers/adminShopController.js — 会员商城管理接口（/api/v1/admin/shop/*）
 const shopProductService = require('../services/shopProductService');
 const shopCategoryService = require('../services/shopCategoryService');
+const shopOrderService = require('../services/shopOrderService');
 const { createLogger } = require('../utils/logger');
 const log = createLogger('AdminShop');
 
@@ -156,6 +157,67 @@ const adminShopController = {
       }
       log.error({ err }, 'admin delete shop category failed');
       res.status(500).json({ code: 500, message: '删除商城分类失败' });
+    }
+  },
+
+  // ───── 订单 ─────
+
+  async listOrders(req, res) {
+    try {
+      const { status, paymentMethod, page = 1, limit = 20 } = req.query;
+      const data = await shopOrderService.adminList({
+        status, paymentMethod,
+        page: parseInt(page), limit: parseInt(limit),
+      });
+      res.json({ code: 0, data });
+    } catch (err) {
+      log.error({ err }, 'admin list shop orders failed');
+      res.status(500).json({ code: 500, message: '获取商城订单失败' });
+    }
+  },
+
+  async getOrder(req, res) {
+    try {
+      const data = await shopOrderService.findById(req.params.id);
+      if (!data) return res.status(404).json({ code: 404, message: '订单不存在' });
+      res.json({ code: 0, data });
+    } catch (err) {
+      log.error({ err }, 'admin get shop order failed');
+      res.status(500).json({ code: 500, message: '获取商城订单失败' });
+    }
+  },
+
+  async updateOrderStatus(req, res) {
+    try {
+      const { status } = req.body;
+      if (!status) {
+        return res.status(400).json({ code: 400, message: '请提供目标状态' });
+      }
+      const data = await shopOrderService.adminUpdateStatus(req.params.id, status, req.user);
+      res.json({ code: 0, data });
+    } catch (err) {
+      if (err.code === 'INVALID_TRANSITION') {
+        return res.status(400).json({ code: 400, message: err.message });
+      }
+      log.error({ err }, 'admin update shop order status failed');
+      res.status(500).json({ code: 500, message: '更新商城订单状态失败' });
+    }
+  },
+
+  async updateShipping(req, res) {
+    try {
+      const { shippingCompany, trackingNo } = req.body;
+      if (!shippingCompany || !trackingNo) {
+        return res.status(400).json({ code: 400, message: '请填写物流公司和运单号' });
+      }
+      const data = await shopOrderService.adminUpdateShipping(req.params.id, {
+        shippingCompany, trackingNo,
+      });
+      res.json({ code: 0, data });
+    } catch (err) {
+      if (err.statusCode) return res.status(err.statusCode).json({ code: err.statusCode, message: err.message });
+      log.error({ err }, 'admin update shop order shipping failed');
+      res.status(500).json({ code: 500, message: '更新物流信息失败' });
     }
   },
 };

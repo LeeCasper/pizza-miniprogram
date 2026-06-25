@@ -1,0 +1,77 @@
+/* pages/shop-order-detail/shop-order-detail.wxss — 商城订单详情（黏土风；无 backdrop-filter） */
+.sod-page { min-height: 100vh; box-sizing: border-box; }
+
+/* 顶部返回栏 */
+.sod-top-bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24rpx 20rpx;
+  background: var(--glass-bg-nav);
+  border-bottom: var(--glass-border-subtle);
+  box-shadow: 0 2rpx 16rpx rgba(120, 108, 94, 0.10);
+}
+.sod-back-btn {
+  width: 64rpx; height: 64rpx; border-radius: var(--radius-full);
+  background: var(--glass-bg-card); border: var(--glass-border-subtle);
+  display: flex; align-items: center; justify-content: center;
+}
+.sod-back-placeholder { background: transparent; border: none; box-shadow: none; }
+.sod-back-icon { font-size: 48rpx; line-height: 1; color: var(--color-on-surface); }
+.sod-top-title { font-size: 34rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); }
+
+/* 状态头部 */
+.sod-status-card {
+  margin: 24rpx 32rpx; padding: 36rpx 28rpx; border-radius: var(--radius-card);
+  display: flex; flex-direction: column; align-items: center; gap: 8rpx;
+  background: var(--glass-bg-card); border: var(--glass-border-subtle); box-shadow: var(--glass-shadow-card);
+}
+.sod-status-card.status-pending { border-color: #F0A030; }
+.sod-status-card.status-paid { border-color: #4A90D9; }
+.sod-status-card.status-shipped { border-color: #7B5BB8; }
+.sod-status-card.status-completed { border-color: #52A854; }
+.sod-status-card.status-cancelled { border-color: #C0C0C0; }
+.sod-status-icon { font-size: 72rpx; line-height: 1.2; }
+.sod-status-label { font-size: 34rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); }
+.sod-status-desc { font-size: 24rpx; color: var(--color-on-surface-variant); }
+
+/* section */
+.sod-section { margin: 0 32rpx 20rpx; padding: 24rpx 28rpx; display: flex; flex-direction: column; gap: 16rpx; }
+.sod-section-title { font-size: 28rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); padding-bottom: 12rpx; border-bottom: var(--glass-border-subtle); }
+
+/* 收货信息 */
+.sod-recipient { display: flex; flex-direction: column; gap: 6rpx; }
+.sod-recipient-name { font-size: 28rpx; color: var(--color-on-surface); }
+.sod-recipient-addr { font-size: 24rpx; color: var(--color-on-surface-variant); }
+
+/* 物流 */
+.sod-shipping { display: flex; flex-direction: column; gap: 6rpx; font-size: 26rpx; color: var(--color-on-surface); }
+.sod-tracking { font-size: 24rpx; color: var(--color-on-surface-variant); }
+
+/* 商品 */
+.sod-item { display: flex; gap: 16rpx; }
+.sod-item + .sod-item { padding-top: 16rpx; border-top: var(--glass-border-subtle); }
+.sod-item-img { width: 120rpx; height: 120rpx; border-radius: var(--radius-sm); flex-shrink: 0; background: var(--color-surface-container); }
+.sod-item-info { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 8rpx; min-width: 0; }
+.sod-item-name { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
+.sod-item-bottom { display: flex; align-items: baseline; justify-content: space-between; }
+.sod-item-price { font-size: 26rpx; font-weight: var(--font-weight-bold); color: var(--color-price); }
+.sod-item-qty { font-size: 24rpx; color: var(--color-on-surface-variant); }
+
+/* 订单信息 */
+.sod-info-row { display: flex; justify-content: space-between; align-items: center; padding: 4rpx 0; }
+.sod-info-label { font-size: 26rpx; color: var(--color-on-surface-variant); }
+.sod-info-val { font-size: 26rpx; color: var(--color-on-surface); }
+.sod-info-total { padding-top: 16rpx; border-top: var(--glass-border-subtle); }
+.sod-info-price { display: flex; align-items: baseline; gap: 2rpx; }
+.sod-price-sym { font-size: 24rpx; font-weight: var(--font-weight-bold); color: var(--color-price); }
+.sod-price-val { font-size: 40rpx; font-weight: var(--font-weight-bold); color: var(--color-price); }
+
+/* 操作栏 */
+.sod-actions { display: flex; gap: 16rpx; padding: 20rpx 32rpx; }
+.sod-action-btn { flex: 1; height: 80rpx; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-size: 28rpx; font-weight: var(--font-weight-semibold); }
+.sod-action-btn.primary { background: var(--glass-bg-primary); color: #FFFFFF; box-shadow: var(--glass-shadow-button); }
+.sod-action-btn.outline { border: 1rpx solid var(--color-primary); color: var(--color-primary); background: transparent; }
+.sod-action-btn:active { transform: scale(0.97); }
+
+/* 加载态 */
+.sod-loading { display: flex; align-items: center; justify-content: center; padding-top: 240rpx; color: var(--color-on-surface-variant); font-size: 28rpx; }

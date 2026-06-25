@@ -109,4 +109,8 @@ Page({
       wx.showToast({ title: '操作失败', icon: 'none' });
     });
   },
+
+  onGoOrders() {
+    wx.navigateTo({ url: '/pages/shop-orders/shop-orders' });
+  },
 });

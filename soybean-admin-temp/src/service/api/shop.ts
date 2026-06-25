@@ -70,3 +70,55 @@ export function fetchUpdateShopCategory(key: string, data: Record<string, any>) 
 export function fetchDeleteShopCategory(key: string) {
   return request<void>({ url: `/shop/categories/${key}`, method: 'delete' });
 }
+
+// ───── Shop Order Types ─────
+export interface AdminShopOrderItem {
+  id: number;
+  orderId: string;
+  shopProductId: number | null;
+  productName: string;
+  productImage: string | null;
+  price: string;
+  quantity: number;
+  subtotal: string;
+}
+
+export interface AdminShopOrder {
+  id: string;
+  userId: number;
+  userName?: string;
+  totalAmount: string;
+  paidAmount: string;
+  paymentMethod: string | null;
+  status: string;
+  statusLabel?: string;
+  recipientName: string | null;
+  recipientPhone: string | null;
+  recipientAddress: string | null;
+  shippingCompany: string | null;
+  trackingNo: string | null;
+  note: string | null;
+  paidAt: string | null;
+  shippedAt: string | null;
+  completedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  items?: AdminShopOrderItem[];
+}
+
+// ───── Shop Order API ─────
+export function fetchShopOrders(params?: Record<string, any>) {
+  return request<{ list: AdminShopOrder[]; total: number }>({ url: '/shop/orders', params });
+}
+
+export function fetchShopOrder(id: string) {
+  return request<AdminShopOrder>({ url: `/shop/orders/${id}` });
+}
+
+export function fetchUpdateShopOrderStatus(id: string, status: string) {
+  return request<AdminShopOrder>({ url: `/shop/orders/${id}/status`, method: 'put', data: { status } });
+}
+
+export function fetchUpdateShopOrderShipping(id: string, data: { shippingCompany: string; trackingNo: string }) {
+  return request<AdminShopOrder>({ url: `/shop/orders/${id}/shipping`, method: 'put', data });
+}

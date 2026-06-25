@@ -44,7 +44,7 @@
 
 /* ── 余额卡片 ── */
 .balance-card {
-  background: linear-gradient(160deg, #7A6F61 0%, #5C5249 100%);
+  background: linear-gradient(160deg, #dc5f58 0%, #db6550 100%);
   border-radius: 24rpx;
   padding: 40rpx 36rpx;
   margin-bottom: 40rpx;
@@ -82,7 +82,7 @@
 }
 
 .amount-item {
-  width: calc(33.33% - 14rpx);
+  width: calc(33.33% -  16rpx);
   padding: 28rpx 0;
   border-radius: 20rpx;
   background: var(--glass-bg-card);
@@ -179,7 +179,7 @@
   width: 100%;
   padding: 28rpx 0;
   border-radius: var(--radius-full);
-  background: linear-gradient(160deg, #7A6F61 0%, #5C5249 100%);
+  background: linear-gradient(160deg, #e65744 0%, #e65a41 100%);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -26,7 +26,7 @@ DROP PROCEDURE add_payment_columns;
 CREATE TABLE IF NOT EXISTS payment_records (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     user_id INT UNSIGNED NOT NULL,
-    type ENUM('order','recharge') NOT NULL COMMENT '支付类型',
+    type ENUM('order','recharge','shop_order') NOT NULL COMMENT '支付类型',
     reference_id VARCHAR(64) NOT NULL COMMENT '关联ID(订单号/充值流水号)',
     out_trade_no VARCHAR(64) NOT NULL UNIQUE COMMENT '商户订单号',
     transaction_id VARCHAR(64) NULL COMMENT '微信支付交易号',

@@ -1,0 +1,84 @@
+<!-- pages/shop-order-detail/shop-order-detail.wxml — 商城订单详情（黏土风，无 backdrop-filter） -->
+<view class="sod-page" style="padding-top: {{topBarTotalHeight}}px">
+  <!-- 顶部返回栏 -->
+  <view class="sod-top-bar" style="padding-top: {{statusBarHeight}}px;">
+    <view class="sod-back-btn" bindtap="onBack"><text class="sod-back-icon">‹</text></view>
+    <text class="sod-top-title">订单详情</text>
+    <view class="sod-back-btn sod-back-placeholder"></view>
+  </view>
+
+  <view wx:if="{{order}}">
+    <!-- 状态头部 -->
+    <view class="sod-status-card status-{{order.status}}">
+      <text class="sod-status-icon">
+        <block wx:if="{{order.status === 'pending'}}">🕐</block>
+        <block wx:elif="{{order.status === 'paid'}}">✅</block>
+        <block wx:elif="{{order.status === 'shipped'}}">🚚</block>
+        <block wx:elif="{{order.status === 'completed'}}">🎉</block>
+        <block wx:elif="{{order.status === 'cancelled'}}">❌</block>
+      </text>
+      <text class="sod-status-label">{{order.statusLabel}}</text>
+      <text class="sod-status-desc" wx:if="{{order.status === 'pending'}}">等待付款</text>
+      <text class="sod-status-desc" wx:elif="{{order.status === 'paid'}}">已支付，等待发货</text>
+      <text class="sod-status-desc" wx:elif="{{order.status === 'shipped'}}">商品已发出，正在派送中</text>
+      <text class="sod-status-desc" wx:elif="{{order.status === 'completed'}}">交易已完成</text>
+      <text class="sod-status-desc" wx:elif="{{order.status === 'cancelled'}}">订单已取消</text>
+    </view>
+
+    <!-- 收货信息 -->
+    <view class="sod-section card" wx:if="{{order.recipientName}}">
+      <text class="sod-section-title">收货信息</text>
+      <view class="sod-recipient">
+        <text class="sod-recipient-name">{{order.recipientName}} {{order.recipientPhone}}</text>
+        <text class="sod-recipient-addr">{{order.recipientAddress}}</text>
+      </view>
+    </view>
+
+    <!-- 物流信息 -->
+    <view class="sod-section card" wx:if="{{order.shippingCompany}}">
+      <text class="sod-section-title">物流信息</text>
+      <view class="sod-shipping">
+        <text>{{order.shippingCompany}}</text>
+        <text class="sod-tracking">运单号: {{order.trackingNo}}</text>
+      </view>
+    </view>
+
+    <!-- 商品列表 -->
+    <view class="sod-section card">
+      <text class="sod-section-title">商品信息</text>
+      <view class="sod-item" wx:for="{{order.items}}" wx:key="id">
+        <image class="sod-item-img" src="{{item.productImage}}" mode="aspectFill"></image>
+        <view class="sod-item-info">
+          <text class="sod-item-name">{{item.productName}}</text>
+          <view class="sod-item-bottom">
+            <text class="sod-item-price">¥{{item.price}}</text>
+            <text class="sod-item-qty">×{{item.quantity}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 订单信息 -->
+    <view class="sod-section card">
+      <text class="sod-section-title">订单信息</text>
+      <view class="sod-info-row"><text class="sod-info-label">订单编号</text><text class="sod-info-val">{{order.id}}</text></view>
+      <view class="sod-info-row"><text class="sod-info-label">下单时间</text><text class="sod-info-val">{{order.createdAt}}</text></view>
+      <view class="sod-info-row" wx:if="{{order.paidAt}}"><text class="sod-info-label">支付时间</text><text class="sod-info-val">{{order.paidAt}}</text></view>
+      <view class="sod-info-row" wx:if="{{order.shippedAt}}"><text class="sod-info-label">发货时间</text><text class="sod-info-val">{{order.shippedAt}}</text></view>
+      <view class="sod-info-row" wx:if="{{order.paymentMethod}}"><text class="sod-info-label">支付方式</text><text class="sod-info-val">{{order.paymentMethod === 'wechat' ? '微信支付' : '余额支付'}}</text></view>
+      <view class="sod-info-row" wx:if="{{order.note}}"><text class="sod-info-label">备注</text><text class="sod-info-val">{{order.note}}</text></view>
+      <view class="sod-info-row sod-info-total"><text class="sod-info-label">实付金额</text><view class="sod-info-price"><text class="sod-price-sym">¥</text><text class="sod-price-val">{{order.paidAmount || order.totalAmount}}</text></view></view>
+    </view>
+
+    <!-- 底部操作栏 -->
+    <view class="sod-actions" wx:if="{{order.status === 'pending'}}">
+      <view class="sod-action-btn outline" bindtap="onCancel"><text>取消订单</text></view>
+      <view class="sod-action-btn primary" bindtap="onPay"><text>{{paying ? '支付中…' : '去支付'}}</text></view>
+    </view>
+
+    <view style="height: calc(60rpx + env(safe-area-inset-bottom))"></view>
+  </view>
+
+  <!-- 加载态 -->
+  <view class="sod-loading" wx:elif="{{loading}}"><text>加载中…</text></view>
+</view>

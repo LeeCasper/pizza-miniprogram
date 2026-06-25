@@ -449,6 +449,34 @@ export const generatedRoutes: GeneratedRoute[] = [
         }
       },
       {
+        name: 'shop_orders',
+        path: '/shop/orders',
+        meta: {
+          title: 'shop_orders',
+          i18nKey: 'route.shop_orders'
+        },
+        children: [
+          {
+            name: 'shop_orders_detail',
+            path: '/shop/orders/detail',
+            component: 'view.shop_orders_detail',
+            meta: {
+              title: 'shop_orders_detail',
+              i18nKey: 'route.shop_orders_detail'
+            }
+          },
+          {
+            name: 'shop_orders_list',
+            path: '/shop/orders/list',
+            component: 'view.shop_orders_list',
+            meta: {
+              title: 'shop_orders_list',
+              i18nKey: 'route.shop_orders_list'
+            }
+          }
+        ]
+      },
+      {
         name: 'shop_products',
         path: '/shop/products',
         meta: {

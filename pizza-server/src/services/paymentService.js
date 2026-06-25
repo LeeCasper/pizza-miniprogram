@@ -297,6 +297,11 @@ const paymentService = {
           entityId: record.reference_id,
           after: { paymentMethod: 'wechat', amount: parseFloat(record.amount), transactionId: transactionId },
         }, conn);
+      } else if (record.type === 'shop_order') {
+        // Delegate to shop payment service
+        const shopPaymentService = require('./shopPaymentService');
+        const shopResult = await shopPaymentService.settleShopOrder(conn, record, transactionId);
+        detail = shopResult.detail;
       } else if (record.type === 'recharge') {
         // Add balance to user + update growth progress (total_spent)
         const amount = parseFloat(record.amount);

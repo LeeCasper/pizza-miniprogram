@@ -1,6 +1,7 @@
-// pages/shop-detail/shop-detail.js — 会员商城商品详情（不入购物车，可收藏，单独支付 Phase 2）
+// pages/shop-detail/shop-detail.js — 会员商城商品详情（不入购物车，可收藏，支持下单）
 const { api, fixImageUrl } = require('../../utils/api');
 const { getBackBtnTopBar } = require('../../utils/layout');
+const { payShopOrder } = require('../../utils/shopPay');
 
 Page({
   data: {
@@ -11,6 +12,16 @@ Page({
     images: [],
     loading: true,
     favLoading: false,
+
+    // 结账抽屉
+    checkoutOpen: false,
+    quantity: 1,
+    recipientName: '',
+    recipientPhone: '',
+    recipientAddress: '',
+    note: '',
+    paymentMethod: 'wechat',
+    submitting: false,
   },
 
   onLoad(options) {
@@ -67,7 +78,119 @@ Page({
     });
   },
 
+  // ── 结账抽屉 ──
+
   onBuy() {
-    wx.showToast({ title: '下单功能即将上线', icon: 'none' });
+    const p = this.data.product;
+    if (!p) return;
+    // 重置表单
+    this.setData({
+      checkoutOpen: true,
+      quantity: 1,
+      paymentMethod: 'wechat',
+      submitting: false,
+    });
+  },
+
+  onCloseCheckout() {
+    this.setData({ checkoutOpen: false });
+  },
+
+  onQtyMinus() {
+    if (this.data.quantity > 1) {
+      this.setData({ quantity: this.data.quantity - 1 });
+    }
+  },
+
+  onQtyPlus() {
+    const p = this.data.product;
+    const max = (p && p.stock >= 0) ? Math.min(p.stock, 99) : 99;
+    if (this.data.quantity < max) {
+      this.setData({ quantity: this.data.quantity + 1 });
+    }
+  },
+
+  onPaymentMethodChange(e) {
+    this.setData({ paymentMethod: e.currentTarget.dataset.method });
+  },
+
+  onRecipientInput(e) {
+    const { field } = e.currentTarget.dataset;
+    this.setData({ [`${field}`]: e.detail.value });
+  },
+
+  onNoteInput(e) {
+    this.setData({ note: e.detail.value });
+  },
+
+  onSubmitOrder() {
+    const { product, quantity, recipientName, recipientPhone, recipientAddress, paymentMethod, submitting } = this.data;
+    if (submitting) return;
+
+    // 校验
+    if (!recipientName.trim()) {
+      wx.showToast({ title: '请填写收货人姓名', icon: 'none' });
+      return;
+    }
+    if (!/^1\d{10}$/.test(recipientPhone.trim())) {
+      wx.showToast({ title: '请填写正确的手机号', icon: 'none' });
+      return;
+    }
+    if (!recipientAddress.trim()) {
+      wx.showToast({ title: '请填写收货地址', icon: 'none' });
+      return;
+    }
+
+    this.setData({ submitting: true });
+
+    api.post('/shop/orders', {
+      productId: product.id,
+      quantity,
+      recipientName: recipientName.trim(),
+      recipientPhone: recipientPhone.trim(),
+      recipientAddress: recipientAddress.trim(),
+      note: this.data.note.trim() || null,
+      paymentMethod,
+    }).then(res => {
+      if (res.code !== 0) {
+        wx.showToast({ title: res.message || '下单失败', icon: 'none' });
+        this.setData({ submitting: false });
+        return;
+      }
+
+      const order = res.data;
+      this.setData({ checkoutOpen: false });
+
+      if (paymentMethod === 'balance' || order.paymentStatus === 'paid') {
+        // 余额支付已即时完成
+        wx.showToast({ title: '支付成功', icon: 'success' });
+        setTimeout(() => {
+          wx.redirectTo({ url: '/pages/shop-order-detail/shop-order-detail?id=' + order.id });
+        }, 800);
+      } else {
+        // 微信支付：调起支付
+        payShopOrder(order.id).then(payResult => {
+          if (payResult && payResult.success) {
+            wx.showToast({ title: '支付成功', icon: 'success' });
+            setTimeout(() => {
+              wx.redirectTo({ url: '/pages/shop-order-detail/shop-order-detail?id=' + order.id });
+            }, 800);
+          } else {
+            wx.showToast({ title: '支付未完成，可在订单列表继续支付', icon: 'none' });
+            setTimeout(() => {
+              wx.redirectTo({ url: '/pages/shop-orders/shop-orders' });
+            }, 1200);
+          }
+        }).catch(() => {
+          wx.showToast({ title: '支付未完成，可在订单列表继续支付', icon: 'none' });
+          setTimeout(() => {
+            wx.redirectTo({ url: '/pages/shop-orders/shop-orders' });
+          }, 1200);
+        });
+      }
+    }).catch(() => {
+      wx.showToast({ title: '网络异常，请重试', icon: 'none' });
+      this.setData({ submitting: false });
+    });
   },
 });

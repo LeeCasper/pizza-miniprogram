@@ -62,6 +62,9 @@ declare module "@elegant-router/types" {
     "settings_store": "/settings/store";
     "shop": "/shop";
     "shop_categories": "/shop/categories";
+    "shop_orders": "/shop/orders";
+    "shop_orders_detail": "/shop/orders/detail";
+    "shop_orders_list": "/shop/orders/list";
     "shop_products": "/shop/products";
     "shop_products_form": "/shop/products/form";
     "shop_products_list": "/shop/products/list";
@@ -163,6 +166,8 @@ declare module "@elegant-router/types" {
     | "settings_printer"
     | "settings_store"
     | "shop_categories"
+    | "shop_orders_detail"
+    | "shop_orders_list"
     | "shop_products_form"
     | "shop_products_list"
     | "users_list"

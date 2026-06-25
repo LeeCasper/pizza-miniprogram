@@ -4,6 +4,8 @@
     "pages/shop/shop",
     "pages/shop-detail/shop-detail",
     "pages/favorites/favorites",
+    "pages/shop-orders/shop-orders",
+    "pages/shop-order-detail/shop-order-detail",
     "pages/store/store",
     "pages/points/points",
     "pages/coupons/coupons",

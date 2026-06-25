@@ -61,6 +61,7 @@ Page({
       coupons: '/pages/coupons/coupons',
       address: '/pages/address/address',
       favorites: '/pages/favorites/favorites',
+      shopOrders: '/pages/shop-orders/shop-orders',
       settings: '/pages/settings/settings',
       about: '/pages/settings/settings',
       recharge: '/pages/recharge/recharge',

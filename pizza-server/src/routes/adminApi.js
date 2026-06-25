@@ -50,6 +50,12 @@ router.post('/shop/categories', shopCtrl.createCategory);
 router.put('/shop/categories/:key', shopCtrl.updateCategory);
 router.delete('/shop/categories/:key', shopCtrl.deleteCategory);
 
+// ───── 会员商城：订单 ─────
+router.get('/shop/orders', shopCtrl.listOrders);
+router.get('/shop/orders/:id', shopCtrl.getOrder);
+router.put('/shop/orders/:id/status', shopCtrl.updateOrderStatus);
+router.put('/shop/orders/:id/shipping', shopCtrl.updateShipping);
+
 // Orders
 router.get('/orders', ctrl.listOrders);
 router.get('/orders/:id', ctrl.getOrder);

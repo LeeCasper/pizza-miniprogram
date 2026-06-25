@@ -286,6 +286,8 @@ const local: App.I18n.Schema = {
     shop_products_create: '新建商品',
     shop_products_edit: '编辑商品',
     shop_categories: '商城分类',
+    shop_orders_list: '商城订单',
+    shop_orders_detail: '订单详情',
   },
   page: {
     login: {

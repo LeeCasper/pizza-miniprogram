@@ -290,6 +290,8 @@ const local: App.I18n.Schema = {
     shop_products_create: 'New Product',
     shop_products_edit: 'Edit Product',
     shop_categories: 'Shop Categories',
+    shop_orders_list: 'Shop Orders',
+    shop_orders_detail: 'Order Detail',
   },
   page: {
     login: {
