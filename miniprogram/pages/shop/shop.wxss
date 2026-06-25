@@ -23,20 +23,22 @@
 .shop-fab {
   position: fixed;
   z-index: 99;
-  width: 84rpx; height: 84rpx;
+  display: flex; align-items: center; gap: 8rpx;
+  padding: 14rpx 24rpx;
   border-radius: var(--radius-full);
   background: var(--glass-bg-card);
   border: var(--glass-border-subtle);
   box-shadow: var(--glass-shadow-elevated);
-  display: flex; align-items: center; justify-content: center;
+  white-space: nowrap;
   transition: left 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .shop-fab.fab-dragging {
   transition: none;
-  transform: scale(1.12);
+  transform: scale(1.06);
   box-shadow: 0 14rpx 44rpx rgba(0,0,0,0.16), 0 2rpx 8rpx rgba(0,0,0,0.08);
 }
-.shop-fab-icon { font-size: 38rpx; line-height: 1; }
+.shop-fab-icon { font-size: 30rpx; line-height: 1; }
+.shop-fab-label { font-size: 24rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
 
 /* ── 滚动区 ── */
 .shop-scroll { overflow-x: hidden; box-sizing: border-box; }

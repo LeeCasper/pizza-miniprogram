@@ -67,12 +67,12 @@ Page({
     // 可拖动订单浮窗：初始位置靠右，垂直居中偏上
     const win = wx.getWindowInfo();
     const rpx = win.windowWidth / 750;
-    this._fabSize = 42 * rpx;       // 84rpx → px
+    this._fabSize = 180 * rpx;      // 约 180rpx 宽（📋 + 我的订单）
     this._fabWinW = win.windowWidth;
     this._fabMinY = layout.topBarTotalHeight + 12 * rpx;
     this._fabMaxY = win.windowHeight - 120 * rpx; // 高于底部 tab 栏
     this.setData({
-      fabX: win.windowWidth - this._fabSize - 20 * rpx,
+      fabX: win.windowWidth - this._fabSize - 24 * rpx,
       fabY: win.windowHeight * 0.38,
     });
     this.fetchProducts();
