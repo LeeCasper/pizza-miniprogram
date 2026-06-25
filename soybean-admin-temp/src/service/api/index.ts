@@ -2,6 +2,7 @@ export * from './auth';
 export * from './route';
 export * from './dashboard';
 export * from './product';
+export * from './shop';
 export * from './category';
 export * from './order';
 export * from './coupon';
