@@ -187,6 +187,58 @@ const customRoutes: CustomRoute[] = [
     ],
   },
   {
+    name: 'shop',
+    path: '/shop',
+    component: 'layout.base',
+    meta: {
+      title: '会员商城',
+      i18nKey: 'route.shop',
+      icon: 'mdi:storefront',
+      order: 2.5,
+    },
+    children: [
+      {
+        name: 'shop_products_list',
+        path: '/shop/products',
+        component: 'view.shop_products_list',
+        meta: {
+          title: '商城商品',
+          i18nKey: 'route.shop_products_list',
+        },
+      },
+      {
+        name: 'shop_categories',
+        path: '/shop/categories',
+        component: 'view.shop_categories',
+        meta: {
+          title: '商城分类',
+          i18nKey: 'route.shop_categories',
+        },
+      },
+      {
+        name: 'shop_products_create',
+        path: '/shop/products/create',
+        component: 'view.shop_products_form',
+        meta: {
+          title: '新建商品',
+          i18nKey: 'route.shop_products_create',
+          hideInMenu: true,
+        },
+      },
+      {
+        name: 'shop_products_edit',
+        path: '/shop/products/:id/edit',
+        component: 'view.shop_products_form',
+        props: true,
+        meta: {
+          title: '编辑商品',
+          i18nKey: 'route.shop_products_edit',
+          hideInMenu: true,
+        },
+      },
+    ],
+  },
+  {
     name: 'orders',
     path: '/orders',
     component: 'layout.base',

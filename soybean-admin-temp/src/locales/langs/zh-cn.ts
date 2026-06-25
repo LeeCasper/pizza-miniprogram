@@ -280,6 +280,12 @@ const local: App.I18n.Schema = {
     settings_printer: '打印机配置',
     settings_store: '门店设置',
     settings_business: '业务配置',
+    shop: '会员商城',
+    shop_products_list: '商城商品',
+    shop_products_form: '商品表单',
+    shop_products_create: '新建商品',
+    shop_products_edit: '编辑商品',
+    shop_categories: '商城分类',
   },
   page: {
     login: {

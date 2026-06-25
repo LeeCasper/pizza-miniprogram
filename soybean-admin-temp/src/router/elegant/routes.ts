@@ -431,6 +431,54 @@ export const generatedRoutes: GeneratedRoute[] = [
     ]
   },
   {
+    name: 'shop',
+    path: '/shop',
+    component: 'layout.base',
+    meta: {
+      title: 'shop',
+      i18nKey: 'route.shop'
+    },
+    children: [
+      {
+        name: 'shop_categories',
+        path: '/shop/categories',
+        component: 'view.shop_categories',
+        meta: {
+          title: 'shop_categories',
+          i18nKey: 'route.shop_categories'
+        }
+      },
+      {
+        name: 'shop_products',
+        path: '/shop/products',
+        meta: {
+          title: 'shop_products',
+          i18nKey: 'route.shop_products'
+        },
+        children: [
+          {
+            name: 'shop_products_form',
+            path: '/shop/products/form',
+            component: 'view.shop_products_form',
+            meta: {
+              title: 'shop_products_form',
+              i18nKey: 'route.shop_products_form'
+            }
+          },
+          {
+            name: 'shop_products_list',
+            path: '/shop/products/list',
+            component: 'view.shop_products_list',
+            meta: {
+              title: 'shop_products_list',
+              i18nKey: 'route.shop_products_list'
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     name: 'users',
     path: '/users',
     component: 'layout.base',
