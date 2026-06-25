@@ -384,21 +384,57 @@ Tier logic is centralized in `utils/tiers.js` (single source of truth). Three pa
   - JPEG: lossy, good for photographic backgrounds, much smaller (quality 80 is a good balance)
 - **Image dimensions**: Card background images at 1260×680px (2x retina) strike a good balance between quality and file size. Full-resolution PNGs at 1890×1020 can easily push the package over 2MB.
 
-### Glassmorphism Design System
+### Clay Style Design System (黏土风) — 会员商城专属
 
-Defined in `app.wxss` as CSS custom properties on `page`. Key tokens:
+会员商城（shop / shop-detail / shop-orders / shop-order-detail + main 页商城 tab）统一使用**黏土风**，
+替代毛玻璃效果。Token 定义在 `app.wxss` 的 `page{}` 中（`--clay-*` 变量族），与全局 `--glass-*` 并存。
 
-| Category | Variables |
-|----------|-----------|
-| Colors | `--color-primary: #D32F2F`, `--color-secondary`, `--color-tertiary`, `--color-on-surface` |
-| Glass BG | `--glass-bg-card: rgba(255,255,255,0.78)`, `--glass-bg-elevated`, `--glass-bg-nav`, `--glass-bg-primary` |
-| Glass blur | `--glass-blur: saturate(180%) blur(20px)`, `--glass-blur-sm`, `--glass-blur-lg` |
-| Glass border | `--glass-border`, `--glass-border-subtle`, `--glass-border-colored` |
-| Radius | `--radius-card: 24rpx`, `--radius-full: 9999rpx`, `--radius-sm: 16rpx` |
-| Font | `--font-weight-bold: 700`, `--font-weight-semibold: 600` |
-| Shadows | `--glass-shadow-card`, `--glass-shadow-button`, `--glass-shadow-elevated` |
+**核心原则**：
+- **不透明暖色底** — 无 `backdrop-filter`，无透明度。底色为暖白/暖米渐变，模拟黏土质感。
+- **暖棕投影** — 所有 `box-shadow` 使用 `rgba(120, 108, 94, ...)` 暖棕色，不用冷黑。
+- **顶缘内高光** — `inset 0 1~2rpx rgba(255,255,255,0.7~0.9)` 模拟顶光打在凸面上的高光线。
+- **凸面渐变** — 按钮/卡片用 `linear-gradient(180deg, 上亮 → 下暗)` 产生立体凸起感。
 
-Utility classes: `.card`, `.card-cream`, `.btn-primary`, `.btn-outline`, `.section-title`, `.page-container`
+**Clay Token 表**：
+
+| 类别 | Token | 值 | 用途 |
+|------|-------|----|------|
+| 背景-导航栏 | `--clay-bg-nav` | `#FEFCF8` | 顶栏/底栏固定背景 |
+| 背景-卡片 | `--clay-bg-card` | `#FDFBF7` | 卡片/列表项底色 |
+| 背景-浮层 | `--clay-bg-elevated` | `#F8F3EA` | 抽屉/弹层/高亮区 |
+| 背景-浅色 | `--clay-bg-light` | `#F5EFE5` | 禁用态/次级底色 |
+| 背景-主按钮 | `--clay-bg-primary` | `linear-gradient(180deg, #D4846B, #C0563A)` | 主操作按钮渐变 |
+| 背景-主色浅 | `--clay-bg-primary-light` | `#FDF0EB` | 收藏激活/选中态浅底 |
+| 边框-通用 | `--clay-border` | `2rpx solid rgba(180,160,140,0.28)` | 卡片/按钮通用边框 |
+| 边框-淡 | `--clay-border-subtle` | `2rpx solid rgba(180,160,140,0.18)` | 分隔线/次要边框 |
+| 边框-主色 | `--clay-border-colored` | `2rpx solid rgba(192,86,58,0.30)` | 主色强调边框 |
+| 阴影-卡片 | `--clay-shadow-card` | `inset 0 1rpx 1rpx rgba(255,255,255,0.9), 0 4rpx 12rpx rgba(120,108,94,0.12), 0 2rpx 4rpx rgba(120,108,94,0.06)` | 卡片浮起 |
+| 阴影-抬高 | `--clay-shadow-elevated` | `inset 0 1rpx 1rpx rgba(255,255,255,0.85), 0 8rpx 24rpx rgba(120,108,94,0.16), 0 2rpx 6rpx rgba(120,108,94,0.08)` | Hero/Featured 卡 |
+| 阴影-按钮 | `--clay-shadow-button` | `inset 0 1rpx 1rpx rgba(255,255,255,0.7), 0 4rpx 12rpx rgba(192,86,58,0.25), 0 1rpx 3rpx rgba(120,108,94,0.12)` | 主按钮投影 |
+| 阴影-导航 | `--clay-shadow-nav` | `inset 0 1rpx 0 rgba(255,255,255,0.8), 0 2rpx 16rpx rgba(120,108,94,0.10)` | 固定顶栏/底栏 |
+
+**FAB 悬浮按钮**（订单入口）直接使用内联 clay 值，不走 token：
+```css
+background: linear-gradient(180deg, #FEFCF8 0%, #F0E9DC 100%);
+box-shadow: inset 0 2rpx 4rpx rgba(255,255,255,0.85), 0 6rpx 18rpx rgba(120,108,94,0.18), 0 2rpx 4rpx rgba(120,108,94,0.08);
+```
+
+**Clay 页面清单**：
+| 页面 | WXSS | 备注 |
+|------|------|------|
+| 商城主页 | `pages/shop/shop.wxss` | 商品列表 + 分类 + Banner |
+| 商城( main tab ) | `pages/main/main.wxss` §商城 | 与 shop.wxss 同步，样式在 main.wxss 557-627 行 |
+| 商品详情 | `pages/shop-detail/shop-detail.wxss` | 图片轮播 + 结账抽屉，覆盖全局 `.card` |
+| 订单列表 | `pages/shop-orders/shop-orders.wxss` | 状态 tabs + 订单卡片 |
+| 订单详情 | `pages/shop-order-detail/shop-order-detail.wxss` | 状态头 + 商品行 + 退款信息，覆盖全局 `.card` |
+
+**⚠ 全局 `.card` 覆盖规则**：`app.wxss` 的 `.card` 使用 `--glass-*` token。
+`shop-detail` 和 `shop-order-detail` 在对应页面级 class（`.sd-info` / `.sd-desc` / `.sod-section`）中显式设置
+`background: var(--clay-bg-card)` + `box-shadow: var(--clay-shadow-card)` + `border: var(--clay-border-subtle)`，
+利用页面 WXSS 后加载规则覆盖全局 `.card`，不需要修改 `app.wxss`。
+
+**⚠ 与其他页面的关系**：`--glass-*` token 族**保留不动**，供首页/订单/会员/个人中心等其他页面继续使用。
+黏土风仅限会员商城模块。两个 token 族在 `app.wxss` 中并列共存，互不冲突。
 
 ### Data Layer
 
@@ -439,6 +475,7 @@ miniprogram/
 │   ├── orders.js       — ORDER_STATUS_MAP, formatOrder (adds canCancel, isPaid, statusText, etc.)
 │   ├── layout.js       — Shared top bar height calculations (getSimpleTopBar, getBackBtnTopBar, getSwiperLayout)
 │   ├── pay.js          — WeChat Pay flow: payOrder, rechargeBalance (with retry polling)
+│   ├── shopPay.js      — 商城订单支付: payShopOrder (WeChat Pay + 余额) 
 │   ├── mapConfig.js    — Tencent Maps API wrapper (walking distance, reverse geocode)
 │   ├── auth.js         — Shared logout logic with confirmation modal
 │   └── profileShared.js — Profile mixin: profileMethods (avatar/edit/tier/announce/birthday) + loadProfileCore(page, hooks) + computeBirthdayInfo()
@@ -453,7 +490,10 @@ miniprogram/
 │   ├── coupons/        — 兑换券/优惠券
 │   ├── address/        — 收货地址 (list/form CRUD, validation)
 │   ├── store/          — 门店信息
-│   ├── shop/           — 会员商城独立页
+│   ├── shop/           — 会员商城独立页（黏土风 🌸）
+│   ├── shop-detail/    — 商品详情 + 结账抽屉（黏土风 🌸）
+│   ├── shop-orders/    — 商城订单列表（黏土风 🌸）
+│   ├── shop-order-detail/ — 商城订单详情 + 退款（黏土风 🌸）
 │   ├── settings/       — 设置页
 │   ├── tiers/          — 会员权益页 (hero card + horizontal compare + 2-col benefits grid + rules)
 │   └── recharge/       — 余额充值 (preset amounts + custom input + confirm modal)

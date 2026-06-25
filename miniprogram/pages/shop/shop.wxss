@@ -6,9 +6,9 @@
   align-items: center;
   justify-content: center;
   padding: 0 40rpx 24rpx;
-  background: var(--glass-bg-nav);
-  border-bottom: var(--glass-border-subtle);
-  box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
+  background: var(--clay-bg-nav);
+  border-bottom: var(--clay-border-subtle);
+  box-shadow: 0 2rpx 16rpx rgba(120, 108, 94, 0.10);
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 100;
@@ -63,8 +63,8 @@
   margin: 24rpx 0 28rpx;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: var(--glass-shadow-elevated);
-  border: var(--glass-border-subtle);
+  box-shadow: var(--clay-shadow-elevated);
+  border: var(--clay-border-subtle);
 }
 .shop-hero-swiper { height: 300rpx; }
 .shop-hero-slide { width: 100%; height: 100%; position: relative; }
@@ -106,11 +106,11 @@
 
 /* Featured 大图卡 */
 .shop-feat-card {
-  background: var(--glass-bg-card);
+  background: var(--clay-bg-card);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: var(--glass-shadow-elevated);
-  border: var(--glass-border-subtle);
+  box-shadow: var(--clay-shadow-elevated);
+  border: var(--clay-border-subtle);
   transition: transform 0.2s;
 }
 .shop-feat-card:active { transform: scale(0.98); }
@@ -119,9 +119,9 @@
 .shop-feat-badge {
   position: absolute; top: 20rpx; left: 20rpx;
   padding: 6rpx 18rpx; border-radius: var(--radius-full);
-  background: var(--glass-bg-primary); color: #FFFFFF;
+  background: var(--clay-bg-primary); color: #FFFFFF;
   font-size: 20rpx; font-weight: var(--font-weight-bold); letter-spacing: 2rpx;
-  box-shadow: var(--glass-shadow-button);
+  box-shadow: var(--clay-shadow-button);
 }
 .shop-feat-body { padding: 24rpx 28rpx 28rpx; display: flex; flex-direction: column; gap: 8rpx; }
 .shop-feat-name { font-size: 32rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); }
@@ -136,10 +136,10 @@
 .shop-list-card {
   display: flex; gap: 24rpx; align-items: center;
   padding: 20rpx;
-  background: var(--glass-bg-card);
+  background: var(--clay-bg-card);
   border-radius: var(--radius-card);
-  box-shadow: var(--glass-shadow-card);
-  border: var(--glass-border-subtle);
+  box-shadow: var(--clay-shadow-card);
+  border: var(--clay-border-subtle);
   transition: transform 0.2s;
 }
 .shop-list-card:active { transform: scale(0.98); }
@@ -170,10 +170,10 @@
 .shop-add-btn {
   width: 60rpx; height: 60rpx;
   border-radius: var(--radius-full);
-  background: var(--glass-bg-primary-light);
+  background: var(--clay-bg-primary-light);
   display: flex; align-items: center; justify-content: center;
-  box-shadow: var(--glass-shadow-elevated);
-  border: var(--glass-border-colored);
+  box-shadow: var(--clay-shadow-elevated);
+  border: var(--clay-border-colored);
   flex-shrink: 0;
   transition: all 0.2s;
 }
@@ -182,25 +182,25 @@
 .shop-add-btn.has-qty {
   width: auto; padding: 6rpx 14rpx;
   border-radius: var(--radius-full);
-  background: var(--glass-bg-elevated);
-  border: var(--glass-border-subtle);
+  background: var(--clay-bg-elevated);
+  border: var(--clay-border-subtle);
 }
 .shop-mini-stepper { display: flex; align-items: center; gap: 14rpx; }
 .shop-mini-btn {
   width: 48rpx; height: 48rpx;
   border-radius: var(--radius-full);
-  background: var(--glass-bg-card);
+  background: var(--clay-bg-card);
   display: flex; align-items: center; justify-content: center;
   font-size: 30rpx; color: var(--color-on-surface);
-  border: var(--glass-border-subtle);
+  border: var(--clay-border-subtle);
 }
 .shop-mini-btn:active { transform: scale(0.9); }
-.shop-mini-plus { background: var(--glass-bg-primary-light); border: var(--glass-border-colored); color: var(--color-primary); }
+.shop-mini-plus { background: var(--clay-bg-primary-light); border: var(--clay-border-colored); color: var(--color-primary); }
 .shop-mini-qty { font-size: 28rpx; font-weight: var(--font-weight-bold); min-width: 36rpx; text-align: center; }
 /* 商城收藏按钮（替代购物车步进器） */
-.shop-fav-btn { width: 60rpx; height: 60rpx; border-radius: var(--radius-full); background: var(--glass-bg-card); display: flex; align-items: center; justify-content: center; box-shadow: var(--glass-shadow-card); border: var(--glass-border-subtle); flex-shrink: 0; transition: all 0.2s; }
+.shop-fav-btn { width: 60rpx; height: 60rpx; border-radius: var(--radius-full); background: var(--clay-bg-card); display: flex; align-items: center; justify-content: center; box-shadow: var(--clay-shadow-card); border: var(--clay-border-subtle); flex-shrink: 0; transition: all 0.2s; }
 .shop-fav-btn:active { transform: scale(0.9); }
-.shop-fav-btn.active { background: var(--glass-bg-primary-light); border: var(--glass-border-colored); }
+.shop-fav-btn.active { background: var(--clay-bg-primary-light); border: var(--clay-border-colored); }
 .shop-fav-icon { font-size: 34rpx; line-height: 1; color: var(--color-on-surface-variant); }
 .shop-fav-btn.active .shop-fav-icon { color: var(--color-primary); }
 /* 分类图标改用图片（替代 emoji） */

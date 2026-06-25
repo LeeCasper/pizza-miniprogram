@@ -121,6 +121,40 @@ page {
   --glass-shadow-elevated: inset 0 1rpx 0 rgba(255, 255, 255, 0.9), 0 6rpx 28rpx rgba(120, 108, 94, 0.14);
   --glass-shadow-button: inset 0 1rpx 0 rgba(255, 255, 255, 0.35), 0 6rpx 20rpx rgba(120, 108, 94, 0.20);
 
+  /* ── 黏土风 Tokens (Clay Style) ──
+     暖色凸面质感 · 无 backdrop-filter · 暖棕投影 + 顶缘内高光
+     用 Warm Terracotta / Warm Cream 色板，模拟黏土手工质感。
+     会员商城专属（shop / shop-detail / shop-orders / shop-order-detail）。 */
+  --clay-bg-nav: #FEFCF8;
+  --clay-bg-card: #FDFBF7;
+  --clay-bg-elevated: #F8F3EA;
+  --clay-bg-light: #F5EFE5;
+  --clay-bg-primary: linear-gradient(180deg, #D4846B 0%, #C0563A 100%);
+  --clay-bg-primary-solid: #C0563A;
+  --clay-bg-primary-light: #FDF0EB;
+  --clay-bg-primary-container: #F5E2D8;
+
+  --clay-border: 2rpx solid rgba(180, 160, 140, 0.28);
+  --clay-border-subtle: 2rpx solid rgba(180, 160, 140, 0.18);
+  --clay-border-colored: 2rpx solid rgba(192, 86, 58, 0.30);
+
+  /* 黏土阴影：顶缘暖白内高光 + 暖棕外投影 = 凸面立体感 */
+  --clay-shadow-card:
+    inset 0 1rpx 1rpx rgba(255, 255, 255, 0.90),
+    0 4rpx 12rpx rgba(120, 108, 94, 0.12),
+    0 2rpx 4rpx rgba(120, 108, 94, 0.06);
+  --clay-shadow-elevated:
+    inset 0 1rpx 1rpx rgba(255, 255, 255, 0.85),
+    0 8rpx 24rpx rgba(120, 108, 94, 0.16),
+    0 2rpx 6rpx rgba(120, 108, 94, 0.08);
+  --clay-shadow-button:
+    inset 0 1rpx 1rpx rgba(255, 255, 255, 0.70),
+    0 4rpx 12rpx rgba(192, 86, 58, 0.25),
+    0 1rpx 3rpx rgba(120, 108, 94, 0.12);
+  --clay-shadow-nav:
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.80),
+    0 2rpx 16rpx rgba(120, 108, 94, 0.10);
+
   /* ── 渐变色变量 - 暖奶油 ── */
   --gradient-1: #FBF6EE;
   --gradient-2: #F3ECE0;

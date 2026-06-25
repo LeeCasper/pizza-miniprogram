@@ -34,7 +34,7 @@
   z-index: 99;
   border-radius: 42rpx;
   /* 黏土凸面渐变：顶部亮、底部暗 */
-  background: linear-gradient(180deg, #FEFCF8 0%, #F0E9DC 100%);
+  background: linear-gradient(180deg, #f8534e 0%, #ec4747 100%);
   /* 外投影 + 顶部内高光 */
   box-shadow:
     inset 0 2rpx 4rpx rgba(255, 255, 255, 0.85),
@@ -59,7 +59,7 @@
 .fab-label {
   font-size: 26rpx;
   font-weight: var(--font-weight-bold);
-  color: #6B5A4E;
+  color: #ffffff;
   letter-spacing: 2rpx;
 }
 
@@ -554,12 +554,12 @@
 .empty-text { font-size: 32rpx; color: var(--color-on-surface-variant); margin-bottom: 16rpx; }
 .empty-sub { font-size: 26rpx; color: var(--color-on-surface-variant); opacity: 0.7; }
 
-/* ===== 商城（黏土风，仿 Stitch 商城首页布局；与 pages/shop 同步） ===== */
+/* ===== 商城（黏土风 Clay Style — 暖色凸面质感 · 无 backdrop-filter · 与 pages/shop 同步） ===== */
 .shop-scroll { overflow-x: hidden; box-sizing: border-box; }
 .shop-scroll-inner { padding: 0 32rpx; }
 
 /* ── 顶部 Hero（促销 Banner，黏土卡） ── */
-.shop-hero { margin: 24rpx 0 28rpx; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--glass-shadow-elevated); border: var(--glass-border-subtle); }
+.shop-hero { margin: 24rpx 0 28rpx; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--clay-shadow-elevated); border: var(--clay-border-subtle); }
 .shop-hero-swiper { height: 300rpx; }
 .shop-hero-slide { width: 100%; height: 100%; position: relative; }
 .shop-hero-img { width: 100%; height: 100%; }
@@ -581,17 +581,17 @@
 
 /* ── 商品列表 ── */
 .shop-list { display: flex; flex-direction: column; gap: 24rpx; }
-.shop-feat-card { background: var(--glass-bg-card); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--glass-shadow-elevated); border: var(--glass-border-subtle); transition: transform 0.2s; }
+.shop-feat-card { background: var(--clay-bg-card); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--clay-shadow-elevated); border: var(--clay-border-subtle); transition: transform 0.2s; }
 .shop-feat-card:active { transform: scale(0.98); }
 .shop-feat-imgwrap { position: relative; width: 100%; height: 320rpx; background: var(--color-surface-container-low); }
 .shop-feat-img { width: 100%; height: 100%; }
-.shop-feat-badge { position: absolute; top: 20rpx; left: 20rpx; padding: 6rpx 18rpx; border-radius: var(--radius-full); background: var(--glass-bg-primary); color: #FFFFFF; font-size: 20rpx; font-weight: var(--font-weight-bold); letter-spacing: 2rpx; box-shadow: var(--glass-shadow-button); }
+.shop-feat-badge { position: absolute; top: 20rpx; left: 20rpx; padding: 6rpx 18rpx; border-radius: var(--radius-full); background: var(--clay-bg-primary); color: #FFFFFF; font-size: 20rpx; font-weight: var(--font-weight-bold); letter-spacing: 2rpx; box-shadow: var(--clay-shadow-button); }
 .shop-feat-body { padding: 24rpx 28rpx 28rpx; display: flex; flex-direction: column; gap: 8rpx; }
 .shop-feat-name { font-size: 32rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); }
 .shop-feat-desc { font-size: 24rpx; color: var(--color-on-surface-variant); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .shop-feat-divider { height: 1rpx; background: var(--color-divider); margin: 16rpx 0; }
 .shop-feat-bottom { display: flex; align-items: center; justify-content: space-between; }
-.shop-list-card { display: flex; gap: 24rpx; align-items: center; padding: 20rpx; background: var(--glass-bg-card); border-radius: var(--radius-card); box-shadow: var(--glass-shadow-card); border: var(--glass-border-subtle); transition: transform 0.2s; }
+.shop-list-card { display: flex; gap: 24rpx; align-items: center; padding: 20rpx; background: var(--clay-bg-card); border-radius: var(--radius-card); box-shadow: var(--clay-shadow-card); border: var(--clay-border-subtle); transition: transform 0.2s; }
 .shop-list-card:active { transform: scale(0.98); }
 .shop-list-img { width: 180rpx; height: 180rpx; border-radius: var(--radius-sm); background: var(--color-surface-container-low); flex-shrink: 0; }
 .shop-list-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6rpx; padding: 4rpx 0; }
@@ -602,19 +602,19 @@
 .shop-price-sym { font-size: 22rpx; font-weight: var(--font-weight-bold); color: var(--color-price); }
 .shop-price { font-size: 32rpx; font-weight: var(--font-weight-bold); color: var(--color-price); }
 .shop-original { font-size: 20rpx; color: var(--color-outline-variant); text-decoration: line-through; margin-left: 4rpx; }
-.shop-add-btn { width: 60rpx; height: 60rpx; border-radius: var(--radius-full); background: var(--glass-bg-primary-light); display: flex; align-items: center; justify-content: center; box-shadow: var(--glass-shadow-elevated); border: var(--glass-border-colored); flex-shrink: 0; transition: all 0.2s; }
+.shop-add-btn { width: 60rpx; height: 60rpx; border-radius: var(--radius-full); background: var(--clay-bg-primary-light); display: flex; align-items: center; justify-content: center; box-shadow: var(--clay-shadow-elevated); border: var(--clay-border-colored); flex-shrink: 0; transition: all 0.2s; }
 .shop-add-btn:active { transform: scale(0.9); }
 .shop-add-icon { font-size: 40rpx; color: var(--color-primary); font-weight: 400; line-height: 1; }
-.shop-add-btn.has-qty { width: auto; padding: 6rpx 14rpx; border-radius: var(--radius-full); background: var(--glass-bg-elevated); border: var(--glass-border-subtle); }
+.shop-add-btn.has-qty { width: auto; padding: 6rpx 14rpx; border-radius: var(--radius-full); background: var(--clay-bg-elevated); border: var(--clay-border-subtle); }
 .shop-mini-stepper { display: flex; align-items: center; gap: 14rpx; }
-.shop-mini-btn { width: 48rpx; height: 48rpx; border-radius: var(--radius-full); background: var(--glass-bg-card); display: flex; align-items: center; justify-content: center; font-size: 30rpx; color: var(--color-on-surface); border: var(--glass-border-subtle); }
+.shop-mini-btn { width: 48rpx; height: 48rpx; border-radius: var(--radius-full); background: var(--clay-bg-card); display: flex; align-items: center; justify-content: center; font-size: 30rpx; color: var(--color-on-surface); border: var(--clay-border-subtle); }
 .shop-mini-btn:active { transform: scale(0.9); }
-.shop-mini-plus { background: var(--glass-bg-primary-light); border: var(--glass-border-colored); color: var(--color-primary); }
+.shop-mini-plus { background: var(--clay-bg-primary-light); border: var(--clay-border-colored); color: var(--color-primary); }
 .shop-mini-qty { font-size: 28rpx; font-weight: var(--font-weight-bold); min-width: 36rpx; text-align: center; }
-/* 商城收藏按钮（替代购物车步进器） */
-.shop-fav-btn { width: 60rpx; height: 60rpx; border-radius: var(--radius-full); background: var(--glass-bg-card); display: flex; align-items: center; justify-content: center; box-shadow: var(--glass-shadow-card); border: var(--glass-border-subtle); flex-shrink: 0; transition: all 0.2s; }
+/* 商城收藏按钮（黏土风） */
+.shop-fav-btn { width: 60rpx; height: 60rpx; border-radius: var(--radius-full); background: var(--clay-bg-card); display: flex; align-items: center; justify-content: center; box-shadow: var(--clay-shadow-card); border: var(--clay-border-subtle); flex-shrink: 0; transition: all 0.2s; }
 .shop-fav-btn:active { transform: scale(0.9); }
-.shop-fav-btn.active { background: var(--glass-bg-primary-light); border: var(--glass-border-colored); }
+.shop-fav-btn.active { background: var(--clay-bg-primary-light); border: var(--clay-border-colored); }
 .shop-fav-icon { font-size: 34rpx; line-height: 1; color: var(--color-on-surface-variant); }
 .shop-fav-btn.active .shop-fav-icon { color: var(--color-primary); }
 /* 分类图标改用图片（替代 emoji） */
