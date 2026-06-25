@@ -10,6 +10,7 @@
     </block>
     <block wx:elif="{{currentTab === 2}}">
       <text class="top-title">会员商城</text>
+      <view class="top-bar-right" bindtap="onGoShopOrders"><text class="top-bar-right-icon">📋</text><text class="top-bar-right-label">订单</text></view>
     </block>
     <block wx:else>
       <text class="top-title">个人中心</text>

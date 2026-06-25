@@ -663,6 +663,7 @@ Page({
     this.setData({ shopActiveCat: key, shopActiveCatName: cat ? cat.name : '精选好物', shopFilteredProducts: filtered });
   },
   onShopBannerTap() { wx.showToast({ title: '促销活动即将上线', icon: 'none' }); },
+  onGoShopOrders() { wx.navigateTo({ url: '/pages/shop-orders/shop-orders' }); },
   onShopProductTap(e) {
     const { id } = e.currentTarget.dataset;
     wx.navigateTo({ url: '/pages/shop-detail/shop-detail?id=' + id });

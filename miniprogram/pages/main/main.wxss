@@ -27,6 +27,15 @@
 
 .brand-title { font-size: 36rpx; font-weight: var(--font-weight-bold); color: var(--color-primary); }
 .top-title { font-size: 36rpx; font-weight: var(--font-weight-bold); color: var(--color-primary); }
+.top-bar-right {
+  position: absolute; right: 40rpx;
+  display: flex; align-items: center; gap: 6rpx;
+  padding: 8rpx 20rpx;
+  border-radius: var(--radius-full);
+  background: var(--glass-bg-card); border: var(--glass-border-subtle);
+}
+.top-bar-right-icon { font-size: 28rpx; }
+.top-bar-right-label { font-size: 24rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
 
 
 /* ===== Swiper ===== */
