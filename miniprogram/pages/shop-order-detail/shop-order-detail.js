@@ -88,4 +88,49 @@ Page({
       },
     });
   },
+
+  onRequestRefund() {
+    wx.showModal({
+      title: '申请退款',
+      content: '确定要申请退款吗？款项将原路退回。',
+      editable: true,
+      placeholderText: '请输入退款原因（选填）',
+      success: (res) => {
+        if (res.confirm) {
+          const reason = res.content || '用户申请退款';
+          api.post('/shop/orders/' + this.data.orderId + '/refund', { reason }).then(res => {
+            if (res.code === 0) {
+              wx.showToast({ title: res.data.message || '退款已提交', icon: 'success' });
+              this.fetchOrder();
+            } else {
+              wx.showToast({ title: res.message || '退款申请失败', icon: 'none' });
+            }
+          }).catch(() => {
+            wx.showToast({ title: '网络异常', icon: 'none' });
+          });
+        }
+      },
+    });
+  },
+
+  onConfirmReceipt() {
+    wx.showModal({
+      title: '确认收货',
+      content: '确定已收到商品吗？',
+      success: (res) => {
+        if (res.confirm) {
+          api.put('/shop/orders/' + this.data.orderId + '/complete').then(res => {
+            if (res.code === 0) {
+              wx.showToast({ title: '已确认收货', icon: 'success' });
+              this.fetchOrder();
+            } else {
+              wx.showToast({ title: res.message || '操作失败', icon: 'none' });
+            }
+          }).catch(() => {
+            wx.showToast({ title: '网络异常', icon: 'none' });
+          });
+        }
+      },
+    });
+  },
 });

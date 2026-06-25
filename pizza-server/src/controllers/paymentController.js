@@ -249,6 +249,20 @@ const paymentController = {
         return res.status(200).json({ code: 'FAIL', message: 'Signature verification failed' });
       }
 
+      // 先尝试商城退款（shopRefundService 内部按 SR 前缀路由）
+      const shopRefundService = require('../services/shopRefundService');
+      const shopResult = await shopRefundService.handleRefundNotify(rawBody);
+      if (shopResult.success || shopResult.reason !== 'Not a shop refund') {
+        const elapsed = Date.now() - startTime;
+        if (shopResult.success) {
+          log.info({ elapsedMs: elapsed, detail: shopResult.detail }, 'shop refund notify SUCCESS');
+        } else {
+          log.error({ elapsedMs: elapsed, reason: shopResult.reason }, 'shop refund notify FAILED');
+        }
+        return res.status(200).json({ code: 'SUCCESS', message: 'OK' });
+      }
+
+      // 非商城退款 → 走原有 pizza 订单退款
       const result = await refundService.handleRefundNotify(rawBody);
       const elapsed = Date.now() - startTime;
 

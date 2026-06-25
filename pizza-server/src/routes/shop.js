@@ -19,6 +19,8 @@ router.post('/orders', auth, shopController.createOrder);
 router.get('/orders', auth, shopController.listMyOrders);
 router.get('/orders/:id', auth, shopController.getOrder);
 router.put('/orders/:id/cancel', auth, shopController.cancelOrder);
+router.put('/orders/:id/complete', auth, shopController.confirmReceipt);
+router.post('/orders/:id/refund', auth, shopController.requestRefund);
 
 // ───── 商城支付（需登录）─────
 router.post('/pay', auth, shopController.createPayment);

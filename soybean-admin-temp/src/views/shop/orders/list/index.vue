@@ -49,6 +49,19 @@ const columns: DataTableColumns<any> = [
     }
   },
   {
+    title: '退款', key: 'refundStatus', width: 80,
+    render(row) {
+      if (!row.refundStatus) return '—';
+      const refundMap: Record<string, { label: string; type: 'warning' | 'success' | 'error' | 'default' }> = {
+        processing: { label: '处理中', type: 'warning' },
+        success: { label: '已退款', type: 'success' },
+        failed: { label: '失败', type: 'error' },
+      };
+      const s = refundMap[row.refundStatus] || { label: row.refundStatus, type: 'default' as const };
+      return h(NTag, { type: s.type, size: 'small', bordered: false }, () => s.label);
+    }
+  },
+  {
     title: '支付', key: 'paymentMethod', width: 90,
     render(row) {
       if (!row.paymentMethod) {

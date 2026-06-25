@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, h } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { NCard, NDescriptions, NDescriptionsItem, NTag, NSelect, NButton, NSpace, NDataTable, NDivider, NInput } from 'naive-ui';
+import { NCard, NDescriptions, NDescriptionsItem, NTag, NSelect, NButton, NSpace, NDataTable, NDivider, NInput, useDialog } from 'naive-ui';
 import { fetchShopOrder, fetchUpdateShopOrderStatus, fetchUpdateShopOrderShipping } from '@/service/api/shop';
 import { formatPrice } from '@/utils/format';
 
@@ -9,11 +9,13 @@ defineOptions({ name: 'ShopOrdersDetail' });
 
 const route = useRoute();
 const router = useRouter();
+const dialog = useDialog();
 const order = ref<any>(null);
 const loading = ref(false);
 const shippingCompany = ref('');
 const trackingNo = ref('');
 const shippingLoading = ref(false);
+const refundReason = ref('');
 
 const statusOptionsMap: Record<string, { label: string; value: string; type: 'warning' | 'info' | 'success' | 'error' | 'default' }[]> = {
   pending: [
@@ -59,6 +61,43 @@ async function loadOrder() {
 }
 
 async function handleStatusChange(status: string) {
+  // 取消已支付订单 → 弹窗确认退款
+  if (status === 'cancelled' && order.value?.paymentMethod) {
+    dialog.warning({
+      title: '确认取消并退款',
+      content: () => {
+        return h('div', { style: 'padding: 12px 0' }, [
+          h('p', '该订单已支付，取消将自动触发退款。'),
+          h('p', { style: 'margin-top: 8px; color: var(--n-text-color-3); font-size: 13px' },
+            `支付方式: ${order.value.paymentMethod === 'wechat' ? '微信支付' : '余额支付'}, 金额: ¥${Number(order.value.paidAmount || order.value.totalAmount).toFixed(2)}`
+          ),
+          h(NInput, {
+            placeholder: '退款原因（选填）',
+            value: refundReason.value,
+            onUpdateValue: (v: string) => { refundReason.value = v; },
+            style: 'margin-top: 12px',
+          }),
+        ]);
+      },
+      positiveText: '确认取消并退款',
+      negativeText: '取消',
+      onPositiveClick: async () => {
+        const { error } = await fetchUpdateShopOrderStatus(
+          route.params.id as string,
+          status,
+          refundReason.value || undefined,
+        );
+        if (!error) {
+          window.$message?.success('已取消并退款');
+          refundReason.value = '';
+          loadOrder();
+        }
+      },
+    });
+    return;
+  }
+
+  // 普通状态变更
   const { error } = await fetchUpdateShopOrderStatus(route.params.id as string, status);
   if (!error) {
     window.$message?.success('状态已更新');
@@ -115,6 +154,14 @@ onMounted(() => { loadOrder(); });
         <NDescriptionsItem label="物流公司">{{ order.shippingCompany || '—' }}</NDescriptionsItem>
         <NDescriptionsItem label="运单号">{{ order.trackingNo || '—' }}</NDescriptionsItem>
         <NDescriptionsItem label="备注">{{ order.note || '—' }}</NDescriptionsItem>
+        <NDescriptionsItem v-if="order.refundStatus" label="退款状态">
+          <NTag :type="order.refundStatus === 'success' ? 'success' : order.refundStatus === 'processing' ? 'warning' : 'error'" size="small" :bordered="false">
+            {{ order.refundStatus === 'success' ? '已退款' : order.refundStatus === 'processing' ? '处理中' : '失败' }}
+          </NTag>
+        </NDescriptionsItem>
+        <NDescriptionsItem v-if="order.refundAmount" label="退款金额">{{ formatPrice(order.refundAmount) }}</NDescriptionsItem>
+        <NDescriptionsItem v-if="order.refundReason" label="退款原因" :span="2">{{ order.refundReason }}</NDescriptionsItem>
+        <NDescriptionsItem v-if="order.refundedAt" label="退款时间">{{ order.refundedAt }}</NDescriptionsItem>
         <NDescriptionsItem label="支付时间">{{ order.paidAt || '—' }}</NDescriptionsItem>
         <NDescriptionsItem label="发货时间">{{ order.shippedAt || '—' }}</NDescriptionsItem>
         <NDescriptionsItem label="完成时间">{{ order.completedAt || '—' }}</NDescriptionsItem>

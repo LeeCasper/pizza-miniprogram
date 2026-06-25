@@ -70,10 +70,37 @@
       <view class="sod-info-row sod-info-total"><text class="sod-info-label">实付金额</text><view class="sod-info-price"><text class="sod-price-sym">¥</text><text class="sod-price-val">{{order.paidAmount || order.totalAmount}}</text></view></view>
     </view>
 
+    <!-- 退款信息（已有退款时展示） -->
+    <view class="sod-section card" wx:if="{{order.refundStatus}}">
+      <text class="sod-section-title">退款信息</text>
+      <view class="sod-info-row">
+        <text class="sod-info-label">退款状态</text>
+        <text class="sod-info-val sod-refund-{{order.refundStatus}}">
+          <block wx:if="{{order.refundStatus === 'success'}}">已退款</block>
+          <block wx:elif="{{order.refundStatus === 'processing'}}">处理中</block>
+          <block wx:elif="{{order.refundStatus === 'failed'}}">退款失败</block>
+        </text>
+      </view>
+      <view class="sod-info-row" wx:if="{{order.refundAmount}}">
+        <text class="sod-info-label">退款金额</text>
+        <text class="sod-info-val">¥{{order.refundAmount}}</text>
+      </view>
+      <view class="sod-info-row" wx:if="{{order.refundReason}}">
+        <text class="sod-info-label">退款原因</text>
+        <text class="sod-info-val">{{order.refundReason}}</text>
+      </view>
+    </view>
+
     <!-- 底部操作栏 -->
     <view class="sod-actions" wx:if="{{order.status === 'pending'}}">
       <view class="sod-action-btn outline" bindtap="onCancel"><text>取消订单</text></view>
       <view class="sod-action-btn primary" bindtap="onPay"><text>{{paying ? '支付中…' : '去支付'}}</text></view>
+    </view>
+    <view class="sod-actions" wx:elif="{{order.status === 'paid' && !order.refundStatus}}">
+      <view class="sod-action-btn outline" bindtap="onRequestRefund"><text>申请退款</text></view>
+    </view>
+    <view class="sod-actions" wx:elif="{{order.status === 'shipped'}}">
+      <view class="sod-action-btn primary" bindtap="onConfirmReceipt"><text>确认收货</text></view>
     </view>
 
     <view style="height: calc(60rpx + env(safe-area-inset-bottom))"></view>

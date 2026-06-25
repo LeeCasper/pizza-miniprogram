@@ -51,7 +51,7 @@
           <view class="so-action-btn outline" catchtap="onCancelOrder" data-id="{{item.id}}" wx:if="{{item.status === 'pending'}}">
             <text>取消</text>
           </view>
-          <view class="so-action-btn outline" wx:if="{{item.status === 'shipped'}}">
+          <view class="so-action-btn outline" catchtap="onConfirmReceipt" data-id="{{item.id}}" wx:if="{{item.status === 'shipped'}}">
             <text>确认收货</text>
           </view>
         </view>

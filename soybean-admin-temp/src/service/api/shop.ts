@@ -101,6 +101,10 @@ export interface AdminShopOrder {
   paidAt: string | null;
   shippedAt: string | null;
   completedAt: string | null;
+  refundAmount: string | null;
+  refundReason: string | null;
+  refundStatus: string | null;
+  refundedAt: string | null;
   createdAt: string;
   updatedAt: string;
   items?: AdminShopOrderItem[];
@@ -115,8 +119,8 @@ export function fetchShopOrder(id: string) {
   return request<AdminShopOrder>({ url: `/shop/orders/${id}` });
 }
 
-export function fetchUpdateShopOrderStatus(id: string, status: string) {
-  return request<AdminShopOrder>({ url: `/shop/orders/${id}/status`, method: 'put', data: { status } });
+export function fetchUpdateShopOrderStatus(id: string, status: string, reason?: string) {
+  return request<AdminShopOrder>({ url: `/shop/orders/${id}/status`, method: 'put', data: { status, reason: reason || undefined } });
 }
 
 export function fetchUpdateShopOrderShipping(id: string, data: { shippingCompany: string; trackingNo: string }) {

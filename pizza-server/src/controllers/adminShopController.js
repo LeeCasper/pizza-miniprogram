@@ -193,14 +193,65 @@ const adminShopController = {
       if (!status) {
         return res.status(400).json({ code: 400, message: '请提供目标状态' });
       }
+
+      // 取消已支付订单 → 先改状态，再退款（退款失败不阻塞）)
+      let refund = null;
+      if (status === 'cancelled') {
+        const existing = await shopOrderService.findById(req.params.id);
+        if (existing && existing.paymentMethod) {
+          // 先更新状态
+          let order;
+          try {
+            order = await shopOrderService.adminUpdateStatus(req.params.id, status, req.user);
+          } catch (err) {
+            if (err.code === 'INVALID_TRANSITION') {
+              return res.status(400).json({ code: 400, message: err.message });
+            }
+            throw err;
+          }
+          // 再退款（独立 try/catch）
+          try {
+            const shopRefundService = require('../services/shopRefundService');
+            refund = await shopRefundService.refund(
+              req.params.id,
+              req.body.reason || '管理员取消订单',
+              req.user
+            );
+          } catch (refundErr) {
+            log.error({ err: refundErr }, 'admin shop refund failed');
+            refund = { success: false, message: refundErr.message };
+          }
+          return res.json({
+            code: 0,
+            message: '订单已取消' + (refund?.success ? '，退款已处理' : ''),
+            data: order,
+            refund,
+          });
+        }
+      }
+
+      // 普通状态变更（无需退款）
       const data = await shopOrderService.adminUpdateStatus(req.params.id, status, req.user);
-      res.json({ code: 0, data });
+      res.json({ code: 0, data, message: '状态已更新' });
     } catch (err) {
       if (err.code === 'INVALID_TRANSITION') {
         return res.status(400).json({ code: 400, message: err.message });
       }
       log.error({ err }, 'admin update shop order status failed');
       res.status(500).json({ code: 500, message: '更新商城订单状态失败' });
+    }
+  },
+
+  async refundOrder(req, res) {
+    try {
+      const { reason } = req.body;
+      const shopRefundService = require('../services/shopRefundService');
+      const result = await shopRefundService.refund(req.params.id, reason || '管理员退款', req.user);
+      res.json({ code: 0, data: result, message: '退款已处理' });
+    } catch (err) {
+      if (err.statusCode) return res.status(err.statusCode).json({ code: err.statusCode, message: err.message });
+      log.error({ err }, 'admin shop refund failed');
+      res.status(500).json({ code: 500, message: '退款处理失败' });
     }
   },
 

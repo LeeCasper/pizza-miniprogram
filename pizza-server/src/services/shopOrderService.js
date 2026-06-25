@@ -471,6 +471,41 @@ const shopOrderService = {
     return this.findById(orderId);
   },
 
+  // ── 确认收货 ──────────────────────────────────────
+  /**
+   * @param {string} orderId
+   * @param {number} userId
+   * @returns {object} completed order
+   */
+  async confirmReceipt(orderId, userId) {
+    const [[order]] = await pool.query(
+      'SELECT * FROM shop_orders WHERE id = ? AND user_id = ?', [orderId, userId]
+    );
+    if (!order) {
+      throw Object.assign(new Error('订单不存在'), { statusCode: 404 });
+    }
+    if (order.status !== 'shipped') {
+      throw Object.assign(new Error('只能确认已发货的订单'), { statusCode: 400 });
+    }
+
+    await pool.query(
+      `UPDATE shop_orders SET status = 'completed', completed_at = NOW(), updated_at = NOW() WHERE id = ?`,
+      [orderId]
+    );
+
+    auditService.record({
+      actorType: 'user',
+      actorId: String(userId),
+      action: 'shop_order.completed',
+      entityType: 'shop_order',
+      entityId: orderId,
+    }).catch(() => {});
+
+    log.info({ orderId, userId }, 'Shop order confirmed receipt');
+
+    return this.findById(orderId);
+  },
+
   // ── 获取支付状态 ──────────────────────────────────────
   async getPaymentStatus(orderId) {
     const [[order]] = await pool.query(
@@ -516,6 +551,10 @@ function formatShopOrder(row, items = [], includeUserName = false) {
     paidAt: row.paid_at,
     shippedAt: row.shipped_at,
     completedAt: row.completed_at,
+    refundAmount: row.refund_amount ? parseFloat(row.refund_amount) : null,
+    refundReason: row.refund_reason || null,
+    refundStatus: row.refund_status || null,
+    refundedAt: row.refunded_at || null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     items: items.map(formatShopOrderItem),

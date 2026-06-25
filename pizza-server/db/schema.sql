@@ -524,6 +524,10 @@ CREATE TABLE IF NOT EXISTS shop_orders (
   paid_at TIMESTAMP NULL DEFAULT NULL,
   shipped_at TIMESTAMP NULL DEFAULT NULL,
   completed_at TIMESTAMP NULL DEFAULT NULL,
+  refund_amount DECIMAL(10,2) NULL COMMENT '退款金额',
+  refund_reason VARCHAR(200) NULL COMMENT '退款原因',
+  refund_status VARCHAR(20) NULL COMMENT '退款状态: processing/success/failed',
+  refunded_at DATETIME NULL COMMENT '退款完成时间',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
@@ -548,4 +552,27 @@ CREATE TABLE IF NOT EXISTS shop_order_items (
     REFERENCES shop_orders(id) ON DELETE CASCADE,
   CONSTRAINT fk_shop_item_product FOREIGN KEY (shop_product_id)
     REFERENCES shop_products(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS shop_refund_records (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  order_id VARCHAR(20) NOT NULL COMMENT '商城订单号 (SH+...)',
+  user_id INT UNSIGNED NOT NULL,
+  out_refund_no VARCHAR(64) NOT NULL UNIQUE COMMENT '商户退款单号 SR+orderId',
+  refund_id VARCHAR(64) NULL COMMENT '微信退款单号',
+  transaction_id VARCHAR(64) NULL COMMENT '原微信支付交易号',
+  payment_method ENUM('wechat','balance') NOT NULL COMMENT '原支付方式',
+  refund_amount DECIMAL(10,2) NOT NULL COMMENT '退款金额',
+  reason VARCHAR(200) DEFAULT NULL COMMENT '退款原因',
+  status ENUM('pending','processing','success','failed') DEFAULT 'pending' COMMENT '退款状态',
+  points_reversed INT DEFAULT 0 COMMENT '已回退积分数',
+  total_spent_reversed DECIMAL(10,2) DEFAULT 0 COMMENT '已回退累计消费额',
+  raw_notify JSON NULL COMMENT '微信退款回调原始数据',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (order_id) REFERENCES shop_orders(id),
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  INDEX idx_sr_order (order_id),
+  INDEX idx_sr_user (user_id),
+  INDEX idx_sr_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

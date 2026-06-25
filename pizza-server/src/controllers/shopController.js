@@ -195,6 +195,37 @@ const shopController = {
       next(err);
     }
   },
+
+  // ───── 确认收货 ─────
+  async confirmReceipt(req, res, next) {
+    try {
+      const order = await shopOrderService.confirmReceipt(req.params.id, req.user.id);
+      res.json({ code: 0, data: order, message: '已确认收货' });
+    } catch (err) {
+      if (err.statusCode) return res.status(err.statusCode).json({ code: err.statusCode, message: err.message });
+      next(err);
+    }
+  },
+
+  // ───── 申请退款 ─────
+  async requestRefund(req, res, next) {
+    try {
+      const order = await shopOrderService.findById(req.params.id);
+      if (!order) return res.status(404).json({ code: 404, message: '订单不存在' });
+      if (order.userId !== req.user.id) return res.status(403).json({ code: 403, message: '无权操作' });
+      if (order.status !== 'paid') return res.status(400).json({ code: 400, message: '只能为已支付但未发货的订单申请退款' });
+      if (order.refundStatus === 'processing' || order.refundStatus === 'success') {
+        return res.status(400).json({ code: 400, message: '已申请退款，请勿重复操作' });
+      }
+
+      const shopRefundService = require('../services/shopRefundService');
+      const result = await shopRefundService.refund(req.params.id, req.body.reason || '用户申请退款', req.user);
+      res.json({ code: 0, data: result, message: result.message });
+    } catch (err) {
+      if (err.statusCode) return res.status(err.statusCode).json({ code: err.statusCode, message: err.message });
+      next(err);
+    }
+  },
 };
 
 module.exports = shopController;
