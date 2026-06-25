@@ -16,7 +16,7 @@
     </block>
   </view>
 
-  <!-- 商城订单悬浮按钮 — 可拖动小浮窗，松手吸附边缘 -->
+  <!-- 商城订单悬浮按钮 — 黏土风可拖动浮窗 -->
   <view wx:if="{{currentTab === 2}}"
     class="shop-fab {{fabDragging ? 'fab-dragging' : ''}}"
     style="left: {{fabX}}px; top: {{fabY}}px;"
@@ -24,7 +24,10 @@
     bindtouchmove="onFabMove"
     bindtouchend="onFabEnd"
   >
-    <text class="shop-fab-icon">📋</text>
+    <view class="fab-inner">
+      <text class="fab-icon">📋</text>
+      <text class="fab-label">订单</text>
+    </view>
   </view>
 
   <!-- Tab 内容区：不用 swiper，杜绝左右滑动切页（原生 swiper 的 disable-touch 多版本被忽略）。

@@ -4,14 +4,17 @@
     <text class="shop-top-title">会员商城</text>
   </view>
 
-  <!-- 订单悬浮按钮 — 可拖动小浮窗，松手吸附边缘 -->
+  <!-- 订单悬浮按钮 — 黏土风可拖动浮窗 -->
   <view class="shop-fab {{fabDragging ? 'fab-dragging' : ''}}"
     style="left: {{fabX}}px; top: {{fabY}}px;"
     bindtouchstart="onFabStart"
     bindtouchmove="onFabMove"
     bindtouchend="onFabEnd"
   >
-    <text class="shop-fab-icon">📋</text>
+    <view class="fab-inner">
+      <text class="fab-icon">📋</text>
+      <text class="fab-label">订单</text>
+    </view>
   </view>
 
   <scroll-view scroll-y class="shop-scroll" enhanced show-scrollbar="{{false}}" style="height: {{scrollViewHeight}}px;">

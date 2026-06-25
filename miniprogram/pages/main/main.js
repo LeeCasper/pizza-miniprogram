@@ -67,7 +67,7 @@ Page({
     // 可拖动订单浮窗：初始位置靠右，垂直居中偏上
     const win = wx.getWindowInfo();
     const rpx = win.windowWidth / 750;
-    this._fabSize = 44 * rpx;       // 88rpx 圆形
+    this._fabSize = 156 * rpx;      // 📋 + 订单 pill 宽
     this._fabWinW = win.windowWidth;
     this._fabMinY = layout.topBarTotalHeight + 12 * rpx;
     this._fabMaxY = win.windowHeight - 120 * rpx; // 高于底部 tab 栏
