@@ -25,7 +25,6 @@
     bindtouchend="onFabEnd"
   >
     <text class="shop-fab-icon">📋</text>
-    <text class="shop-fab-label">我的订单</text>
   </view>
 
   <!-- Tab 内容区：不用 swiper，杜绝左右滑动切页（原生 swiper 的 disable-touch 多版本被忽略）。
