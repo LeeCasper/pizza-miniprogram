@@ -32,7 +32,11 @@ Page({
   },
 
   onLoad() {
-    this.setData(getSimpleTopBar(app.globalData.statusBarHeight));
+    const layout = getSimpleTopBar(app.globalData.statusBarHeight);
+    const rpx = wx.getWindowInfo().windowWidth / 750;
+    // 修正顶栏高度：按钮 64rpx + 底边距 20rpx = 84rpx，补齐 layout 中固定 36px 的差额
+    const delta = Math.max(0, 84 * rpx - 36);
+    this.setData({ ...layout, topBarTotalHeight: layout.topBarTotalHeight + delta });
   },
 
   onShow() {
