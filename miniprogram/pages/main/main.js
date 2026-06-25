@@ -4,7 +4,7 @@ const pay = require('../../utils/pay');
 const { computeTier } = require('../../utils/tiers');
 const { getSwiperLayout } = require('../../utils/layout');
 const { formatOrder } = require('../../utils/orders');
-const { CATEGORY_ICON_MAP, dietaryRestrictions, SHOP_CATEGORIES } = require('../../utils/data');
+const { CATEGORY_ICON_MAP, dietaryRestrictions } = require('../../utils/data');
 const { profileMethods, loadProfileCore } = require('../../utils/profileShared');
 const app = getApp();
 
@@ -43,9 +43,9 @@ Page({
     // 会员订阅（商城 tab 会员弹窗）
     selectedPlan: 'monthly',
     memberOverlayOpen: false,
-    shopBanners: [], shopCategories: SHOP_CATEGORIES,
+    shopBanners: [], shopCategories: [],
     shopActiveCat: 'all', shopActiveCatName: '精选好物',
-    shopProducts: [], shopFilteredProducts: [],
+    shopProducts: [], shopFilteredProducts: [], shopLoaded: false,
     // 优惠券
     availableCoupons: [], selectedCoupon: null, couponPickerOpen: false,
     couponDiscountAmount: 0, couponDiscountText: '0.00',
@@ -64,6 +64,7 @@ Page({
   onLoad() {
     this.setData(getSwiperLayout());
     this.fetchProducts();
+    this.fetchShopData();
     this.fetchOrders();
     this.loadProfileData();
     this._ready = true;
@@ -74,6 +75,8 @@ Page({
     this.loadProfileData();
     // Refresh orders when showing
     this.fetchOrders();
+    // Refresh shop favorites when returning from detail page
+    if (this.data.currentTab === 2 && this.data.shopLoaded) this.fetchShopData();
   },
 
   // ── 数据加载 ─────────────────────────────────
@@ -134,9 +137,45 @@ Page({
             })),
           ],
           productsLoaded: true,
+        });
+      }
+    }).catch(() => {});
+  },
+
+  fetchShopData() {
+    Promise.all([
+      api.get('/shop/products'),
+      api.get('/shop/categories'),
+    ]).then(([prodRes, catRes]) => {
+      if (prodRes.code === 0) {
+        const products = (prodRes.data || []).map(p => ({
+          ...p,
+          main_image: fixImageUrl(p.main_image),
+        }));
+        const withImg = products.filter(p => p.main_image);
+        const banners = withImg.slice(0, 3).map((p, i) => ({
+          id: i,
+          image: p.main_image,
+          title: p.name,
+          subtitle: p.subtitle || '精选好物，新鲜上架',
+        }));
+        const cats = [
+          { key: 'all', name: '精选好物', icon: '' },
+          ...(catRes && catRes.code === 0 ? (catRes.data || []) : []).map(c => ({
+            ...c,
+            icon: fixImageUrl(c.icon),
+          })),
+        ];
+        const { shopActiveCat } = this.data;
+        const filtered = shopActiveCat === 'all'
+          ? products
+          : products.filter(p => p.shop_category_key === shopActiveCat);
+        this.setData({
           shopProducts: products,
-          shopFilteredProducts: products,
+          shopFilteredProducts: filtered,
           shopBanners: banners,
+          shopCategories: cats,
+          shopLoaded: true,
         });
       }
     }).catch(() => {});
@@ -183,11 +222,13 @@ Page({
     if (this.data.currentTab === index) return;
     this.setData({ currentTab: index });
     if (index === 1) this.fetchOrders();
+    if (index === 2 && !this.data.shopLoaded) this.fetchShopData();
   },
   onSwiperChange(e) {
     const idx = e.detail.current;
     this.setData({ currentTab: idx });
     if (idx === 1) this.fetchOrders();
+    if (idx === 2 && !this.data.shopLoaded) this.fetchShopData();
   },
 
   // ── 购物车 ──────────────────────────────────
@@ -197,10 +238,7 @@ Page({
     const { activeCategory } = this.data;
     const updatedProducts = this.data.products.map(p => ({ ...p, quantity: cart[p.id] ? cart[p.id].quantity : 0 }));
     const filtered = activeCategory === 'all' ? updatedProducts : updatedProducts.filter(p => p.category === activeCategory || (p.category_key && p.category_key === activeCategory));
-    // Also sync shop data
-    const updatedShopProducts = this.data.shopProducts.map(p => ({ ...p, quantity: cart[p.id] ? cart[p.id].quantity : 0 }));
-    const shopFiltered = this.data.shopActiveCat === 'all' ? updatedShopProducts : updatedShopProducts.filter(p => p.category === this.data.shopActiveCat || (p.category_key && p.category_key === this.data.shopActiveCat));
-    this.setData({ products: updatedProducts, filteredProducts: filtered, shopProducts: updatedShopProducts, shopFilteredProducts: shopFiltered, cartItems: Object.values(cart), cartCount: app.globalData.cartCount, cartTotal: app.globalData.cartTotal });
+    this.setData({ products: updatedProducts, filteredProducts: filtered, cartItems: Object.values(cart), cartCount: app.globalData.cartCount, cartTotal: app.globalData.cartTotal });
     this.recalcPrice();
   },
   updateCart() { this.syncCart(); },
@@ -621,27 +659,34 @@ Page({
     const { key } = e.currentTarget.dataset;
     const cat = this.data.shopCategories.find(c => c.key === key);
     const products = this.data.shopProducts;
-    const filtered = key === 'all' ? products : products.filter(p => p.category === key || (p.category_key && p.category_key === key));
+    const filtered = key === 'all' ? products : products.filter(p => p.shop_category_key === key);
     this.setData({ shopActiveCat: key, shopActiveCatName: cat ? cat.name : '精选好物', shopFilteredProducts: filtered });
   },
-  onShopAddToCart(e) { app.addToCart(e.currentTarget.dataset.product); },
-  onShopDecrease(e) { app.decreaseQuantity(e.currentTarget.dataset.id); },
   onShopBannerTap() { wx.showToast({ title: '促销活动即将上线', icon: 'none' }); },
   onShopProductTap(e) {
-    const { product } = e.currentTarget.dataset;
-    const cart = app.globalData.cart;
-    const currentQty = cart[product.id] ? cart[product.id].quantity : 0;
-    this.setData({
-      detailProduct: product, detailOpen: true, detailQuantity: currentQty || 1,
-      selectedRestrictions: { ...this.data.selectedRestrictions, [product.id]: this.data.selectedRestrictions[product.id] || {} }
-    });
+    const { id } = e.currentTarget.dataset;
+    wx.navigateTo({ url: '/pages/shop-detail/shop-detail?id=' + id });
   },
-  // Sync shop cart quantities
-  syncShopCart() {
-    const cart = app.globalData.cart;
-    const updated = this.data.shopProducts.map(p => ({ ...p, quantity: cart[p.id] ? cart[p.id].quantity : 0 }));
-    const filtered = this.data.shopActiveCat === 'all' ? updated : updated.filter(p => p.category === this.data.shopActiveCat || (p.category_key && p.category_key === this.data.shopActiveCat));
-    this.setData({ shopProducts: updated, shopFilteredProducts: filtered });
+  onShopToggleFav(e) {
+    const { id } = e.currentTarget.dataset;
+    const target = this.data.shopProducts.find(p => p.id === id);
+    if (!target) return;
+    const next = !target.isFavorited;
+    const apply = (val) => (list) => list.map(p => (p.id === id ? { ...p, isFavorited: val } : p));
+    this.setData({
+      shopProducts: apply(next)(this.data.shopProducts),
+      shopFilteredProducts: apply(next)(this.data.shopFilteredProducts),
+    });
+    const req = next ? api.post('/shop/favorites/' + id) : api.del('/shop/favorites/' + id);
+    req.then(res => {
+      if (!res || res.code !== 0) throw new Error('fav failed');
+    }).catch(() => {
+      this.setData({
+        shopProducts: apply(!next)(this.data.shopProducts),
+        shopFilteredProducts: apply(!next)(this.data.shopFilteredProducts),
+      });
+      wx.showToast({ title: '操作失败', icon: 'none' });
+    });
   },
 
   // ── 个人中心 ────────────────────────────────
@@ -665,7 +710,7 @@ Page({
     const routes = {
       orders: { tab: 1 }, store: '/pages/store/store', shop: { tab: 2 },
       points: '/pages/points/points', coupons: '/pages/coupons/coupons',
-      address: '/pages/address/address', favorites: '/pages/address/address',
+      address: '/pages/address/address', favorites: '/pages/favorites/favorites',
       settings: '/pages/settings/settings', about: '/pages/settings/settings',
       recharge: '/pages/recharge/recharge',
       claimcenter: '/pages/claim-center/claim-center',

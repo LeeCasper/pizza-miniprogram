@@ -254,7 +254,7 @@
 .cart-total { font-size: 32rpx; font-weight: var(--font-weight-bold); }
 .cart-bar-btn {
   /* 粘土紫按钮 */
-  background: linear-gradient(160deg, #7A6F61 0%, #5C5249 100%);
+  background: linear-gradient(160deg, #ff5b3e 0%, #e14d33 100%);
   color: var(--color-on-primary);
   padding: 20rpx 48rpx; border-radius: var(--radius-full);
   font-size: 28rpx; font-weight: var(--font-weight-bold);
@@ -305,7 +305,7 @@
 .cart-footer { padding: 24rpx 40rpx; padding-bottom: calc(24rpx + env(safe-area-inset-bottom)); border-top: 1rpx solid var(--color-divider); }
 .checkout-btn {
   width: 100%; padding: 28rpx;
-  background: linear-gradient(160deg, #7A6F61 0%, #5C5249 100%);
+  background: linear-gradient(160deg, #f45746 0%, #ed5247 100%);
   color: #FFFFFF;
   border-radius: var(--radius-full); text-align: center; font-size: 32rpx; font-weight: var(--font-weight-bold);
   /* 浓咖主操作：外投影浮起 + 斜向内高光/内暗影模制立体边 */
@@ -576,6 +576,14 @@
 .shop-mini-btn:active { transform: scale(0.9); }
 .shop-mini-plus { background: var(--glass-bg-primary-light); border: var(--glass-border-colored); color: var(--color-primary); }
 .shop-mini-qty { font-size: 28rpx; font-weight: var(--font-weight-bold); min-width: 36rpx; text-align: center; }
+/* 商城收藏按钮（替代购物车步进器） */
+.shop-fav-btn { width: 60rpx; height: 60rpx; border-radius: var(--radius-full); background: var(--glass-bg-card); display: flex; align-items: center; justify-content: center; box-shadow: var(--glass-shadow-card); border: var(--glass-border-subtle); flex-shrink: 0; transition: all 0.2s; }
+.shop-fav-btn:active { transform: scale(0.9); }
+.shop-fav-btn.active { background: var(--glass-bg-primary-light); border: var(--glass-border-colored); }
+.shop-fav-icon { font-size: 34rpx; line-height: 1; color: var(--color-on-surface-variant); }
+.shop-fav-btn.active .shop-fav-icon { color: var(--color-primary); }
+/* 分类图标改用图片（替代 emoji） */
+.shop-cat-icon { width: 36rpx; height: 36rpx; border-radius: var(--radius-sm); }
 .shop-list-end { display: flex; justify-content: center; padding: 36rpx 0 8rpx; }
 .shop-list-end-text { font-size: 24rpx; color: var(--color-on-surface-variant); opacity: 0.7; }
 .shop-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 160rpx; }
