@@ -60,7 +60,7 @@ Page({
       points: '/pages/points/points',
       coupons: '/pages/coupons/coupons',
       address: '/pages/address/address',
-      favorites: '/pages/address/address',
+      favorites: '/pages/favorites/favorites',
       settings: '/pages/settings/settings',
       about: '/pages/settings/settings',
       recharge: '/pages/recharge/recharge',

@@ -1,0 +1,50 @@
+/* pages/favorites/favorites.wxss — 我的收藏（黏土风；无 backdrop-filter） */
+.fav-page { min-height: 100vh; box-sizing: border-box; }
+
+/* 顶部返回栏（固定） */
+.fav-top-bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24rpx 20rpx;
+  background: var(--glass-bg-nav);
+  border-bottom: var(--glass-border-subtle);
+  box-shadow: 0 2rpx 16rpx rgba(120, 108, 94, 0.10);
+}
+.fav-back-btn {
+  width: 64rpx; height: 64rpx; border-radius: var(--radius-full);
+  background: var(--glass-bg-card); border: var(--glass-border-subtle);
+  display: flex; align-items: center; justify-content: center;
+}
+.fav-back-placeholder { background: transparent; border: none; box-shadow: none; }
+.fav-back-icon { font-size: 48rpx; line-height: 1; color: var(--color-on-surface); }
+.fav-top-title { font-size: 34rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); }
+
+/* 列表 */
+.fav-list { padding: 24rpx 32rpx 0; display: flex; flex-direction: column; gap: 20rpx; }
+.fav-card {
+  display: flex; gap: 20rpx; padding: 20rpx;
+  background: var(--glass-bg-card); border: var(--glass-border-subtle);
+  border-radius: var(--radius-card); box-shadow: var(--glass-shadow-card);
+}
+.fav-img { width: 160rpx; height: 160rpx; border-radius: var(--radius-sm); flex-shrink: 0; background: var(--color-surface-container); }
+.fav-body { flex: 1; display: flex; flex-direction: column; gap: 8rpx; min-width: 0; }
+.fav-name { font-size: 30rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); }
+.fav-sub { font-size: 24rpx; color: var(--color-on-surface-variant); }
+.fav-bottom { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
+.fav-price-row { display: flex; align-items: baseline; gap: 6rpx; }
+.fav-price-sym { font-size: 24rpx; font-weight: var(--font-weight-bold); color: var(--color-price); }
+.fav-price { font-size: 38rpx; font-weight: var(--font-weight-bold); color: var(--color-price); }
+.fav-original { font-size: 22rpx; color: var(--color-on-surface-variant); text-decoration: line-through; margin-left: 4rpx; }
+.fav-remove {
+  width: 60rpx; height: 60rpx; border-radius: var(--radius-full);
+  background: var(--glass-bg-primary-light); border: var(--glass-border-colored);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.fav-remove:active { transform: scale(0.9); }
+.fav-remove-icon { font-size: 34rpx; line-height: 1; color: var(--color-primary); }
+
+/* 空态 */
+.fav-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 200rpx; gap: 12rpx; }
+.fav-empty-icon { font-size: 96rpx; line-height: 1; }
+.fav-empty-text { font-size: 30rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); }
+.fav-empty-sub { font-size: 24rpx; color: var(--color-on-surface-variant); }

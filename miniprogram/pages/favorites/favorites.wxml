@@ -1,0 +1,45 @@
+<!-- pages/favorites/favorites.wxml — 我的收藏（黏土风，无 backdrop-filter；页面原生滚动） -->
+<view class="fav-page" style="padding-top: {{topBarTotalHeight}}px">
+  <!-- 顶部返回栏（固定） -->
+  <view class="fav-top-bar" style="padding-top: {{statusBarHeight}}px;">
+    <view class="fav-back-btn" bindtap="onBack"><text class="fav-back-icon">‹</text></view>
+    <text class="fav-top-title">我的收藏</text>
+    <view class="fav-back-btn fav-back-placeholder"></view>
+  </view>
+
+  <!-- 列表 -->
+  <view class="fav-list" wx:if="{{favorites.length > 0}}">
+    <view
+      class="fav-card"
+      wx:for="{{favorites}}"
+      wx:key="id"
+      bindtap="onTapProduct"
+      data-id="{{item.id}}"
+    >
+      <image class="fav-img" src="{{item.main_image}}" mode="aspectFill"></image>
+      <view class="fav-body">
+        <text class="fav-name">{{item.name}}</text>
+        <text class="fav-sub" wx:if="{{item.subtitle}}">{{item.subtitle}}</text>
+        <view class="fav-bottom">
+          <view class="fav-price-row">
+            <text class="fav-price-sym">¥</text>
+            <text class="fav-price">{{item.price}}</text>
+            <text class="fav-original" wx:if="{{item.original_price}}">¥{{item.original_price}}</text>
+          </view>
+          <view class="fav-remove" catchtap="onRemove" data-id="{{item.id}}">
+            <text class="fav-remove-icon">♥</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view style="height: calc(60rpx + env(safe-area-inset-bottom))"></view>
+  </view>
+
+  <!-- 空态（加载完成后才显示，避免闪烁） -->
+  <view class="fav-empty" wx:elif="{{!loading}}">
+    <text class="fav-empty-icon">🤍</text>
+    <text class="fav-empty-text">还没有收藏的好物</text>
+    <text class="fav-empty-sub">去商城逛逛，点心形即可收藏</text>
+  </view>
+</view>
