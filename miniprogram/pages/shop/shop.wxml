@@ -4,14 +4,14 @@
     <text class="shop-top-title">会员商城</text>
   </view>
 
-  <!-- 订单悬浮入口 — 玻璃态漂浮卡片 -->
-  <view class="shop-float-order" style="top: {{floatOrderTop}}px;" bindtap="onGoOrders">
-    <view class="sfo-icon-wrap"><text class="sfo-icon">📋</text></view>
-    <view class="sfo-text">
-      <text class="sfo-title">我的订单</text>
-      <text class="sfo-sub">查看全部</text>
-    </view>
-    <text class="sfo-arrow">→</text>
+  <!-- 订单悬浮按钮 — 可拖动小浮窗，松手吸附边缘 -->
+  <view class="shop-fab {{fabDragging ? 'fab-dragging' : ''}}"
+    style="left: {{fabX}}px; top: {{fabY}}px;"
+    bindtouchstart="onFabStart"
+    bindtouchmove="onFabMove"
+    bindtouchend="onFabEnd"
+  >
+    <text class="shop-fab-icon">📋</text>
   </view>
 
   <scroll-view scroll-y class="shop-scroll" enhanced show-scrollbar="{{false}}" style="height: {{scrollViewHeight}}px;">

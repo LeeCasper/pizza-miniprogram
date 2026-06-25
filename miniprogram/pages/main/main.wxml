@@ -16,14 +16,15 @@
     </block>
   </view>
 
-  <!-- 商城订单悬浮入口 — 玻璃态漂浮卡片，悬于内容区右上角 -->
-  <view wx:if="{{currentTab === 2}}" class="shop-float-order" style="top: {{floatOrderTop}}px;" bindtap="onGoShopOrders">
-    <view class="sfo-icon-wrap"><text class="sfo-icon">📋</text></view>
-    <view class="sfo-text">
-      <text class="sfo-title">我的订单</text>
-      <text class="sfo-sub">查看全部</text>
-    </view>
-    <text class="sfo-arrow">→</text>
+  <!-- 商城订单悬浮按钮 — 可拖动小浮窗，松手吸附边缘 -->
+  <view wx:if="{{currentTab === 2}}"
+    class="shop-fab {{fabDragging ? 'fab-dragging' : ''}}"
+    style="left: {{fabX}}px; top: {{fabY}}px;"
+    bindtouchstart="onFabStart"
+    bindtouchmove="onFabMove"
+    bindtouchend="onFabEnd"
+  >
+    <text class="shop-fab-icon">📋</text>
   </view>
 
   <!-- Tab 内容区：不用 swiper，杜绝左右滑动切页（原生 swiper 的 disable-touch 多版本被忽略）。

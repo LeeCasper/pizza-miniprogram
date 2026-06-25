@@ -64,9 +64,17 @@ Page({
   onLoad() {
     const layout = getSwiperLayout();
     this.setData(layout);
-    // 商城订单悬浮按钮：紧贴顶栏下方，右对齐内容边距
-    const rpx = wx.getWindowInfo().windowWidth / 750;
-    this.setData({ floatOrderTop: layout.topBarTotalHeight + 20 * rpx });
+    // 可拖动订单浮窗：初始位置靠右，垂直居中偏上
+    const win = wx.getWindowInfo();
+    const rpx = win.windowWidth / 750;
+    this._fabSize = 42 * rpx;       // 84rpx → px
+    this._fabWinW = win.windowWidth;
+    this._fabMinY = layout.topBarTotalHeight + 12 * rpx;
+    this._fabMaxY = win.windowHeight - 120 * rpx; // 高于底部 tab 栏
+    this.setData({
+      fabX: win.windowWidth - this._fabSize - 20 * rpx,
+      fabY: win.windowHeight * 0.38,
+    });
     this.fetchProducts();
     this.fetchShopData();
     this.fetchOrders();
@@ -667,7 +675,41 @@ Page({
     this.setData({ shopActiveCat: key, shopActiveCatName: cat ? cat.name : '精选好物', shopFilteredProducts: filtered });
   },
   onShopBannerTap() { wx.showToast({ title: '促销活动即将上线', icon: 'none' }); },
-  onGoShopOrders() { wx.navigateTo({ url: '/pages/shop-orders/shop-orders' }); },
+  // ── 可拖动订单浮窗 ──
+  onFabStart(e) {
+    const t = e.touches[0];
+    this._fabMoved = false;
+    this._fabSX = t.clientX;
+    this._fabSY = t.clientY;
+    this._fabOrigX = this.data.fabX;
+    this._fabOrigY = this.data.fabY;
+    this.setData({ fabDragging: true });
+  },
+  onFabMove(e) {
+    const t = e.touches[0];
+    const dx = Math.abs(t.clientX - this._fabSX);
+    const dy = Math.abs(t.clientY - this._fabSY);
+    if (dx > 4 || dy > 4) this._fabMoved = true;
+    let nx = this._fabOrigX + (t.clientX - this._fabSX);
+    let ny = this._fabOrigY + (t.clientY - this._fabSY);
+    // 限制在屏幕内
+    nx = Math.max(0, Math.min(nx, this._fabWinW - this._fabSize));
+    ny = Math.max(this._fabMinY, Math.min(ny, this._fabMaxY));
+    this.setData({ fabX: nx, fabY: ny });
+  },
+  onFabEnd() {
+    this.setData({ fabDragging: false });
+    if (!this._fabMoved) {
+      // 未拖动 = 点击 → 进入订单列表
+      wx.navigateTo({ url: '/pages/shop-orders/shop-orders' });
+      return;
+    }
+    // 吸附到最近边缘
+    const mid = this._fabWinW / 2;
+    const cx = this.data.fabX + this._fabSize / 2; // 浮窗中心
+    const snapX = cx < mid ? 16 * (this._fabWinW / 750) : this._fabWinW - this._fabSize - 16 * (this._fabWinW / 750);
+    this.setData({ fabX: snapX });
+  },
   onShopProductTap(e) {
     const { id } = e.currentTarget.dataset;
     wx.navigateTo({ url: '/pages/shop-detail/shop-detail?id=' + id });

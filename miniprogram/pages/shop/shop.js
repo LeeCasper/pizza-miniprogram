@@ -19,9 +19,17 @@ Page({
   onLoad() {
     const layout = getSwiperLayout();
     this.setData(layout);
-    // 商城订单悬浮按钮：紧贴顶栏下方
-    const rpx = wx.getWindowInfo().windowWidth / 750;
-    this.setData({ floatOrderTop: layout.topBarTotalHeight + 20 * rpx });
+    // 可拖动订单浮窗：初始位置靠右，垂直居中偏上
+    const win = wx.getWindowInfo();
+    const rpx = win.windowWidth / 750;
+    this._fabSize = 42 * rpx;
+    this._fabWinW = win.windowWidth;
+    this._fabMinY = layout.topBarTotalHeight + 12 * rpx;
+    this._fabMaxY = win.windowHeight - 120 * rpx;
+    this.setData({
+      fabX: win.windowWidth - this._fabSize - 20 * rpx,
+      fabY: win.windowHeight * 0.38,
+    });
     this.fetchShopData();
   },
 
@@ -114,7 +122,33 @@ Page({
     });
   },
 
-  onGoOrders() {
-    wx.navigateTo({ url: '/pages/shop-orders/shop-orders' });
+  // ── 可拖动订单浮窗 ──
+  onFabStart(e) {
+    const t = e.touches[0];
+    this._fabMoved = false;
+    this._fabSX = t.clientX; this._fabSY = t.clientY;
+    this._fabOrigX = this.data.fabX; this._fabOrigY = this.data.fabY;
+    this.setData({ fabDragging: true });
+  },
+  onFabMove(e) {
+    const t = e.touches[0];
+    if (Math.abs(t.clientX - this._fabSX) > 4 || Math.abs(t.clientY - this._fabSY) > 4) this._fabMoved = true;
+    let nx = this._fabOrigX + (t.clientX - this._fabSX);
+    let ny = this._fabOrigY + (t.clientY - this._fabSY);
+    nx = Math.max(0, Math.min(nx, this._fabWinW - this._fabSize));
+    ny = Math.max(this._fabMinY, Math.min(ny, this._fabMaxY));
+    this.setData({ fabX: nx, fabY: ny });
+  },
+  onFabEnd() {
+    this.setData({ fabDragging: false });
+    if (!this._fabMoved) {
+      wx.navigateTo({ url: '/pages/shop-orders/shop-orders' });
+      return;
+    }
+    const mid = this._fabWinW / 2;
+    const cx = this.data.fabX + this._fabSize / 2;
+    const rpx = this._fabWinW / 750;
+    const snapX = cx < mid ? 16 * rpx : this._fabWinW - this._fabSize - 16 * rpx;
+    this.setData({ fabX: snapX });
   },
 });
