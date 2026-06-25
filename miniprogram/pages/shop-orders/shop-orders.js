@@ -32,7 +32,12 @@ Page({
   },
 
   onLoad() {
-    this.setData(getSimpleTopBar(app.globalData.statusBarHeight));
+    const layout = getSimpleTopBar(app.globalData.statusBarHeight);
+    const reduction = Math.max(layout.statusBarHeight - 40, 0);
+    this.setData({
+      statusBarHeight: layout.statusBarHeight - reduction,
+      topBarTotalHeight: layout.topBarTotalHeight - reduction,
+    });
   },
 
   onShow() {
