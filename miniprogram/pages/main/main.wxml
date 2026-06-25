@@ -16,10 +16,14 @@
     </block>
   </view>
 
-  <!-- 商城订单入口（固定定位，紧贴微信胶囊左侧） -->
-  <view wx:if="{{currentTab === 2}}" class="top-bar-order-btn" style="top: {{orderBtnTop}}px; right: {{orderBtnRight}}px; height: {{orderBtnHeight}}px;" bindtap="onGoShopOrders">
-    <text class="top-bar-order-icon">📋</text>
-    <text class="top-bar-order-label">订单</text>
+  <!-- 商城订单悬浮入口 — 玻璃态漂浮卡片，悬于内容区右上角 -->
+  <view wx:if="{{currentTab === 2}}" class="shop-float-order" style="top: {{floatOrderTop}}px;" bindtap="onGoShopOrders">
+    <view class="sfo-icon-wrap"><text class="sfo-icon">📋</text></view>
+    <view class="sfo-text">
+      <text class="sfo-title">我的订单</text>
+      <text class="sfo-sub">查看全部</text>
+    </view>
+    <text class="sfo-arrow">→</text>
   </view>
 
   <!-- Tab 内容区：不用 swiper，杜绝左右滑动切页（原生 swiper 的 disable-touch 多版本被忽略）。

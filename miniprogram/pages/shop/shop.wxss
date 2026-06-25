@@ -19,19 +19,36 @@
   color: var(--color-primary);
 }
 
-/* 订单入口 — 固定定位在微信胶囊左侧，与胶囊同高 */
-.shop-order-btn {
+/* ── 订单悬浮入口（玻璃态漂浮卡片）── */
+.shop-float-order {
   position: fixed;
-  z-index: 101;
-  display: flex; align-items: center; gap: 8rpx;
-  padding: 0 20rpx;
-  border-radius: 32rpx;
+  right: 32rpx;
+  z-index: 99;
+  display: flex; align-items: center; gap: 16rpx;
+  padding: 18rpx 28rpx;
+  border-radius: 44rpx;
   background: var(--glass-bg-card);
   border: var(--glass-border-subtle);
+  box-shadow: var(--glass-shadow-elevated);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.shop-float-order:active {
+  transform: scale(0.96);
   box-shadow: var(--glass-shadow-card);
 }
-.shop-order-icon { font-size: 26rpx; }
-.shop-order-label { font-size: 22rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
+.sfo-icon-wrap {
+  width: 56rpx; height: 56rpx;
+  border-radius: var(--radius-full);
+  background: var(--glass-bg-primary-light);
+  border: var(--glass-border-colored);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.sfo-icon { font-size: 28rpx; }
+.sfo-text { display: flex; flex-direction: column; gap: 2rpx; }
+.sfo-title { font-size: 26rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
+.sfo-sub { font-size: 20rpx; color: var(--color-on-surface-variant); }
+.sfo-arrow { font-size: 24rpx; color: var(--color-primary); font-weight: var(--font-weight-bold); margin-left: -4rpx; }
 
 /* ── 滚动区 ── */
 .shop-scroll { overflow-x: hidden; box-sizing: border-box; }

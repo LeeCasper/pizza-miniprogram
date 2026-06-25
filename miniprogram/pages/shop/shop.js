@@ -17,15 +17,11 @@ Page({
   },
 
   onLoad() {
-    this.setData(getSwiperLayout());
-    // 微信胶囊位置 → 订单按钮对齐胶囊左侧
-    const capsule = wx.getMenuButtonBoundingClientRect();
-    const win = wx.getWindowInfo();
-    this.setData({
-      orderBtnTop: capsule.top,
-      orderBtnRight: win.windowWidth - capsule.left + 14,
-      orderBtnHeight: capsule.height,
-    });
+    const layout = getSwiperLayout();
+    this.setData(layout);
+    // 商城订单悬浮按钮：紧贴顶栏下方
+    const rpx = wx.getWindowInfo().windowWidth / 750;
+    this.setData({ floatOrderTop: layout.topBarTotalHeight + 20 * rpx });
     this.fetchShopData();
   },
 

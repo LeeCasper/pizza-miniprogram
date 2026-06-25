@@ -4,10 +4,14 @@
     <text class="shop-top-title">会员商城</text>
   </view>
 
-  <!-- 订单入口 — 固定定位在微信胶囊左侧 -->
-  <view class="shop-order-btn" style="top: {{orderBtnTop}}px; right: {{orderBtnRight}}px; height: {{orderBtnHeight}}px;" bindtap="onGoOrders">
-    <text class="shop-order-icon">📋</text>
-    <text class="shop-order-label">订单</text>
+  <!-- 订单悬浮入口 — 玻璃态漂浮卡片 -->
+  <view class="shop-float-order" style="top: {{floatOrderTop}}px;" bindtap="onGoOrders">
+    <view class="sfo-icon-wrap"><text class="sfo-icon">📋</text></view>
+    <view class="sfo-text">
+      <text class="sfo-title">我的订单</text>
+      <text class="sfo-sub">查看全部</text>
+    </view>
+    <text class="sfo-arrow">→</text>
   </view>
 
   <scroll-view scroll-y class="shop-scroll" enhanced show-scrollbar="{{false}}" style="height: {{scrollViewHeight}}px;">
