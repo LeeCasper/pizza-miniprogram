@@ -63,6 +63,14 @@ Page({
 
   onLoad() {
     this.setData(getSwiperLayout());
+    // 微信胶囊位置 → 商城订单按钮对齐胶囊左侧
+    const capsule = wx.getMenuButtonBoundingClientRect();
+    const win = wx.getWindowInfo();
+    this.setData({
+      orderBtnTop: capsule.top,
+      orderBtnRight: win.windowWidth - capsule.left + 14, // 14px 间距
+      orderBtnHeight: capsule.height,
+    });
     this.fetchProducts();
     this.fetchShopData();
     this.fetchOrders();

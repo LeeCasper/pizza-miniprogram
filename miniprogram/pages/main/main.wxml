@@ -10,11 +10,16 @@
     </block>
     <block wx:elif="{{currentTab === 2}}">
       <text class="top-title">会员商城</text>
-      <view class="top-bar-right" bindtap="onGoShopOrders"><text class="top-bar-right-icon">📋</text><text class="top-bar-right-label">订单</text></view>
     </block>
     <block wx:else>
       <text class="top-title">个人中心</text>
     </block>
+  </view>
+
+  <!-- 商城订单入口（固定定位，紧贴微信胶囊左侧） -->
+  <view wx:if="{{currentTab === 2}}" class="top-bar-order-btn" style="top: {{orderBtnTop}}px; right: {{orderBtnRight}}px; height: {{orderBtnHeight}}px;" bindtap="onGoShopOrders">
+    <text class="top-bar-order-icon">📋</text>
+    <text class="top-bar-order-label">订单</text>
   </view>
 
   <!-- Tab 内容区：不用 swiper，杜绝左右滑动切页（原生 swiper 的 disable-touch 多版本被忽略）。

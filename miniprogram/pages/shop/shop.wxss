@@ -18,15 +18,20 @@
   font-weight: var(--font-weight-bold);
   color: var(--color-primary);
 }
-.shop-top-right {
-  position: absolute; right: 32rpx;
-  display: flex; align-items: center; gap: 6rpx;
-  padding: 8rpx 20rpx;
-  border-radius: var(--radius-full);
-  background: var(--glass-bg-card); border: var(--glass-border-subtle);
+
+/* 订单入口 — 固定定位在微信胶囊左侧，与胶囊同高 */
+.shop-order-btn {
+  position: fixed;
+  z-index: 101;
+  display: flex; align-items: center; gap: 8rpx;
+  padding: 0 20rpx;
+  border-radius: 32rpx;
+  background: var(--glass-bg-card);
+  border: var(--glass-border-subtle);
+  box-shadow: var(--glass-shadow-card);
 }
-.shop-top-right-icon { font-size: 28rpx; }
-.shop-top-right-label { font-size: 24rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
+.shop-order-icon { font-size: 26rpx; }
+.shop-order-label { font-size: 22rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
 
 /* ── 滚动区 ── */
 .shop-scroll { overflow-x: hidden; box-sizing: border-box; }

@@ -2,7 +2,12 @@
 <view class="shop-page" style="padding-top: {{topBarTotalHeight}}px">
   <view class="shop-top-bar" style="padding-top: {{statusBarHeight}}px;">
     <text class="shop-top-title">会员商城</text>
-    <view class="shop-top-right" bindtap="onGoOrders"><text class="shop-top-right-icon">📋</text><text class="shop-top-right-label">订单</text></view>
+  </view>
+
+  <!-- 订单入口 — 固定定位在微信胶囊左侧 -->
+  <view class="shop-order-btn" style="top: {{orderBtnTop}}px; right: {{orderBtnRight}}px; height: {{orderBtnHeight}}px;" bindtap="onGoOrders">
+    <text class="shop-order-icon">📋</text>
+    <text class="shop-order-label">订单</text>
   </view>
 
   <scroll-view scroll-y class="shop-scroll" enhanced show-scrollbar="{{false}}" style="height: {{scrollViewHeight}}px;">
