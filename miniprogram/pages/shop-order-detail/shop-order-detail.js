@@ -15,12 +15,7 @@ Page({
   },
 
   onLoad(options) {
-    const layout = getBackBtnTopBar();
-    const reduction = Math.max(layout.statusBarHeight - 40, 0);
-    this.setData({
-      statusBarHeight: layout.statusBarHeight - reduction,
-      topBarTotalHeight: layout.topBarTotalHeight - reduction,
-    });
+    this.setData(getBackBtnTopBar());
     const id = options.id;
     if (!id) {
       wx.showToast({ title: '订单不存在', icon: 'none' });
