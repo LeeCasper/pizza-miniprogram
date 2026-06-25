@@ -124,7 +124,7 @@
           <text class="checkout-summary-label">合计</text>
           <view class="checkout-summary-price">
             <text class="checkout-summary-sym">¥</text>
-            <text class="checkout-summary-val">{{(product.price * quantity).toFixed(2)}}</text>
+            <text class="checkout-summary-val">{{totalPrice}}</text>
           </view>
         </view>
       </view>
@@ -132,7 +132,7 @@
       <!-- 提交按钮 -->
       <view class="checkout-submit-bar">
         <view class="checkout-submit-btn {{submitting ? 'loading' : ''}}" bindtap="onSubmitOrder">
-          <text>{{submitting ? '提交中…' : (paymentMethod === 'balance' ? '余额支付 ¥' + (product.price * quantity).toFixed(2) : '微信支付 ¥' + (product.price * quantity).toFixed(2))}}</text>
+          <text>{{submitBtnText}}</text>
         </view>
       </view>
     </view>

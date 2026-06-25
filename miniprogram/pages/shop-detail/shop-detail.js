@@ -22,6 +22,8 @@ Page({
     note: '',
     paymentMethod: 'wechat',
     submitting: false,
+    totalPrice: '0.00',
+    submitBtnText: '微信支付 ¥0.00',
   },
 
   onLoad(options) {
@@ -80,6 +82,17 @@ Page({
 
   // ── 结账抽屉 ──
 
+  updateCheckoutSummary() {
+    const { product, quantity, paymentMethod, submitting } = this.data;
+    const price = product ? product.price : 0;
+    const total = (price * quantity).toFixed(2);
+    const label = paymentMethod === 'balance' ? '余额支付' : '微信支付';
+    this.setData({
+      totalPrice: total,
+      submitBtnText: submitting ? '提交中…' : (label + ' ¥' + total),
+    });
+  },
+
   onBuy() {
     const p = this.data.product;
     if (!p) return;
@@ -90,6 +103,7 @@ Page({
       paymentMethod: 'wechat',
       submitting: false,
     });
+    this.updateCheckoutSummary();
   },
 
   onCloseCheckout() {
@@ -99,6 +113,7 @@ Page({
   onQtyMinus() {
     if (this.data.quantity > 1) {
       this.setData({ quantity: this.data.quantity - 1 });
+      this.updateCheckoutSummary();
     }
   },
 
@@ -107,11 +122,13 @@ Page({
     const max = (p && p.stock >= 0) ? Math.min(p.stock, 99) : 99;
     if (this.data.quantity < max) {
       this.setData({ quantity: this.data.quantity + 1 });
+      this.updateCheckoutSummary();
     }
   },
 
   onPaymentMethodChange(e) {
     this.setData({ paymentMethod: e.currentTarget.dataset.method });
+    this.updateCheckoutSummary();
   },
 
   onRecipientInput(e) {
@@ -142,6 +159,7 @@ Page({
     }
 
     this.setData({ submitting: true });
+    this.updateCheckoutSummary();
 
     api.post('/shop/orders', {
       productId: product.id,
