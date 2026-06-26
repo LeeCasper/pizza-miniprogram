@@ -279,10 +279,7 @@ const adminShopController = {
       if (!trackingNo || !trackingNo.trim()) {
         return res.status(400).json({ code: 400, message: '请提供运单号' });
       }
-      const config = require('../config');
-      const customer = config.logistics?.customer || '';
-      const key = config.logistics?.key || '';
-      const data = await autoDetectCarrier(trackingNo.trim(), customer, key);
+      const data = await autoDetectCarrier(trackingNo.trim());
       res.json({ code: 0, data });
     } catch (err) {
       if (err.statusCode) {

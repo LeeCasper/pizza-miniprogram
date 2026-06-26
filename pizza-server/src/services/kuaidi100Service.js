@@ -140,95 +140,26 @@ function clearCache() {
 /**
  * Auto-detect carrier company from a tracking number.
  *
- * Uses kuaidi100's query endpoint with com="autonumber" when credentials are available
- * (same MD5-signing as queryTracking). Falls back to public endpoint if no credentials.
+ * Uses local prefix matching against known carrier tracking-number patterns.
+ * No network calls — fast and reliable.
+ *
+ * Prefix rules are defined in carrierMap.js (PREFIX_RULES).
  *
  * @param {string} trackingNo
- * @param {string} [customer] - kuaidi100 customer ID
- * @param {string} [key] - kuaidi100 API key
- * @returns {Promise<object>} { com, auto, state } with each item having .name
+ * @returns {Promise<object>} { com, auto, state } with each item having .name, .comCode
  */
-async function autoDetectCarrier(trackingNo, customer, key) {
-  log.info({ trackingNo, hasAuth: !!(customer && key) }, 'kuaidi100 auto-detect carrier');
+async function autoDetectCarrier(trackingNo) {
+  const { detectByTrackingNo } = require('./carrierMap');
 
-  try {
-    let result;
+  const carriers = detectByTrackingNo(trackingNo);
 
-    if (customer && key) {
-      // Authenticated endpoint — same MD5-signing as queryTracking
-      const paramJson = JSON.stringify({ com: 'autonumber', num: trackingNo });
-      const sign = generateSign(paramJson, key, customer);
-      const body = buildFormBody(customer, sign, paramJson);
+  log.info({ trackingNo, count: carriers.length, carriers }, 'local prefix auto-detect');
 
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body,
-        signal: AbortSignal.timeout(5000),
-      });
-
-      if (response.ok) {
-        const raw = await response.json();
-        log.info({ trackingNo, returnCode: raw.returnCode }, 'kuaidi100 auto-detect (auth) response');
-
-        if (raw.returnCode === '200' && raw.data) {
-          // Auth API returns data[] with { comCode, name? } per item
-          result = {
-            com: (raw.data || []).map(item => ({
-              comCode: item.comCode,
-              name: item.name || item.comCode,
-              lengthPre: item.lengthPre,
-            })),
-            auto: [],
-            state: 'ok',
-          };
-        }
-      }
-    }
-
-    // Fallback to public endpoint if auth not configured or failed
-    if (!result) {
-      const body = new URLSearchParams({ text: trackingNo }).toString();
-
-      const response = await fetch('https://www.kuaidi100.com/autonumber/autoComNum', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body,
-        signal: AbortSignal.timeout(5000),
-      });
-
-      if (!response.ok) {
-        throw new Error(`快递100 HTTP ${response.status}`);
-      }
-
-      const raw = await response.json();
-
-      // Enrich public API results
-      const { getCarrierName } = require('./carrierMap');
-      if (Array.isArray(raw.com)) {
-        raw.com = raw.com.map(item => ({
-          ...item,
-          name: getCarrierName(item.comCode) || item.comCode,
-        }));
-      }
-      if (Array.isArray(raw.auto)) {
-        raw.auto = raw.auto.map(item => ({
-          ...item,
-          name: getCarrierName(item.comCode) || item.comCode,
-        }));
-      }
-
-      result = raw;
-    }
-
-    return result;
-  } catch (err) {
-    log.error({ err, trackingNo }, 'kuaidi100 auto-detect carrier failed');
-    throw Object.assign(
-      new Error('识别物流公司失败，请手动输入'),
-      { statusCode: 502 }
-    );
-  }
+  return {
+    com: carriers.map(c => ({ comCode: c.comCode, name: c.name })),
+    auto: [],
+    state: carriers.length > 0 ? 'ok' : 'no_match',
+  };
 }
 
 module.exports = { queryTracking, clearCache, autoDetectCarrier };

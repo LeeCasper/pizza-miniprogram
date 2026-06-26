@@ -178,4 +178,78 @@ function getCarrierName(code) {
   return CODE_TO_NAME[code.trim().toLowerCase()] || code;
 }
 
-module.exports = { getCarrierCode, getCarrierName, CARRIER_MAP };
+// ── Tracking Number Prefix Detection ─────────────────
+
+/**
+ * Tracking number prefix → carrier rules.
+ * Each rule has one or more letter prefixes to match against
+ * the start of the tracking number (case-insensitive).
+ *
+ * Priority: rules are tested in order; the first match wins.
+ * More specific prefixes (longer/more chars) should come first.
+ */
+const PREFIX_RULES = [
+  // 德邦小件 — DPK 前缀
+  { prefixes: ['DPK'], name: '德邦快递', comCode: 'debangwuliu' },
+  // 德邦大件 — DPL 前缀
+  { prefixes: ['DPL'], name: '德邦快递', comCode: 'debangwuliu' },
+  // 顺丰 — SF / SFEX
+  { prefixes: ['SFEX', 'SF'], name: '顺丰速运', comCode: 'shunfeng' },
+  // 京东 — JDX / JD (JDX before JD)
+  { prefixes: ['JDX', 'JDV', 'JD'], name: '京东物流', comCode: 'jd' },
+  // 极兔 — JT
+  { prefixes: ['JT'], name: '极兔速递', comCode: 'jtexpress' },
+  // 中通 — ZTO
+  { prefixes: ['ZTO'], name: '中通快递', comCode: 'zhongtong' },
+  // 申通 — STO
+  { prefixes: ['STO'], name: '申通快递', comCode: 'shentong' },
+  // 圆通 — YT
+  { prefixes: ['YT'], name: '圆通速递', comCode: 'yuantong' },
+  // 韵达 — YD
+  { prefixes: ['YD'], name: '韵达快递', comCode: 'yunda' },
+  // 百世旧单 — HTKY
+  { prefixes: ['HTKY'], name: '百世快递', comCode: 'huitongkuaidi' },
+  // EMS 国际 — EE/EA/EB/E… 开头 + CN 结尾
+  { prefixes: ['EE', 'EA', 'EB', 'EC', 'ED', 'EF', 'EG', 'EH', 'EI', 'EJ', 'EK', 'EL', 'EM', 'EN', 'EO', 'EP', 'EQ', 'ER', 'ES', 'ET', 'EU', 'EV', 'EW', 'EX', 'EY', 'EZ'], name: 'EMS', comCode: 'ems', suffix: 'CN' },
+  // 邮政平邮 — KA/PA/XA/SB
+  { prefixes: ['KA', 'PA', 'XA', 'SB'], name: '邮政快递包裹', comCode: 'youzhengguonei' },
+  // UPS — 1Z 开头
+  { prefixes: ['1Z'], name: 'UPS', comCode: 'ups' },
+  // 阿里跨境小包 — LP
+  { prefixes: ['LP'], name: '菜鸟裹裹', comCode: 'cainiao' },
+  // 邮政/EMS 纯数字常见前缀
+  { prefixes: ['99', '98', '97', '96', '95'], name: 'EMS', comCode: 'ems' },
+];
+
+/**
+ * Detect carriers from a tracking number by prefix matching.
+ *
+ * Returns an array of matched carriers (usually 1, may be more for
+ * ambiguous prefixes — the user picks). Matches are tested in rule
+ * order; all matches from the first matching rule are returned.
+ *
+ * @param {string} trackingNo - The tracking number to analyze
+ * @returns {Array<{comCode: string, name: string}>}
+ */
+function detectByTrackingNo(trackingNo) {
+  if (!trackingNo || typeof trackingNo !== 'string') return [];
+
+  const num = trackingNo.trim().toUpperCase();
+  if (!num) return [];
+
+  for (const rule of PREFIX_RULES) {
+    for (const prefix of rule.prefixes) {
+      if (!num.startsWith(prefix)) continue;
+
+      // If rule has a suffix requirement, check it
+      if (rule.suffix && !num.endsWith(rule.suffix)) continue;
+
+      // All prefixes in this rule share the same carrier info
+      return [{ comCode: rule.comCode, name: rule.name }];
+    }
+  }
+
+  return [];
+}
+
+module.exports = { getCarrierCode, getCarrierName, CARRIER_MAP, detectByTrackingNo };
