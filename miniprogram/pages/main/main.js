@@ -6,6 +6,11 @@ const { getSwiperLayout } = require('../../utils/layout');
 const { formatOrder } = require('../../utils/orders');
 const { CATEGORY_ICON_MAP, dietaryRestrictions } = require('../../utils/data');
 const { profileMethods, loadProfileCore } = require('../../utils/profileShared');
+const CAT_EMOJI_MAP = {
+  pizza: '🍕', dessert: '🍰', drink: '🥤', snack: '🍗',
+  gift: '🎁', salad: '🥗', bread: '🍞', coffee: '☕',
+  all: '🏠',
+};
 const app = getApp();
 
 Page({
@@ -44,7 +49,7 @@ Page({
     selectedPlan: 'monthly',
     memberOverlayOpen: false,
     shopBanners: [], shopCategories: [],
-    shopActiveCat: 'all', shopActiveCatName: '精选好物',
+    shopActiveCat: 'all',
     shopProducts: [], shopFilteredProducts: [], shopLoaded: false,
     // 优惠券
     availableCoupons: [], selectedCoupon: null, couponPickerOpen: false,
@@ -53,6 +58,7 @@ Page({
     finalPrice: '0.00',
     // 加载态
     productsLoaded: false, ordersLoaded: false,
+    gridPage: 0, gridSwiperHeight: 380,
   },
 
   // ── 共享 profile 方法（头像、编辑、公告、等级轮播、退出等）──
@@ -63,18 +69,9 @@ Page({
 
   onLoad() {
     const layout = getSwiperLayout();
-    this.setData(layout);
-    // 可拖动订单浮窗：初始位置靠右，垂直居中偏上
     const win = wx.getWindowInfo();
     const rpx = win.windowWidth / 750;
-    this._fabSize = 156 * rpx;      // 📋 + 订单 pill 宽
-    this._fabWinW = win.windowWidth;
-    this._fabMinY = layout.topBarTotalHeight + 12 * rpx;
-    this._fabMaxY = win.windowHeight - 120 * rpx; // 高于底部 tab 栏
-    this.setData({
-      fabX: win.windowWidth - this._fabSize - 24 * rpx,
-      fabY: win.windowHeight * 0.38,
-    });
+    this.setData(layout);
     this.fetchProducts();
     this.fetchShopData();
     this.fetchOrders();
@@ -172,10 +169,12 @@ Page({
           subtitle: p.subtitle || '精选好物，新鲜上架',
         }));
         const cats = [
-          { key: 'all', name: '精选好物', icon: '' },
+          { key: 'all', name: '全部', icon: '/images/cat-all.png', emoji: CAT_EMOJI_MAP.all, productCount: products.length },
           ...(catRes && catRes.code === 0 ? (catRes.data || []) : []).map(c => ({
             ...c,
             icon: fixImageUrl(c.icon),
+            emoji: CAT_EMOJI_MAP[c.key] || '📦',
+            productCount: products.filter(p => p.shop_category_key === c.key).length,
           })),
         ];
         const { shopActiveCat } = this.data;
@@ -669,47 +668,11 @@ Page({
 
   onShopCategory(e) {
     const { key } = e.currentTarget.dataset;
-    const cat = this.data.shopCategories.find(c => c.key === key);
     const products = this.data.shopProducts;
     const filtered = key === 'all' ? products : products.filter(p => p.shop_category_key === key);
-    this.setData({ shopActiveCat: key, shopActiveCatName: cat ? cat.name : '精选好物', shopFilteredProducts: filtered });
+    this.setData({ shopActiveCat: key, shopFilteredProducts: filtered });
   },
   onShopBannerTap() { wx.showToast({ title: '促销活动即将上线', icon: 'none' }); },
-  // ── 可拖动订单浮窗 ──
-  onFabStart(e) {
-    const t = e.touches[0];
-    this._fabMoved = false;
-    this._fabSX = t.clientX;
-    this._fabSY = t.clientY;
-    this._fabOrigX = this.data.fabX;
-    this._fabOrigY = this.data.fabY;
-    this.setData({ fabDragging: true });
-  },
-  onFabMove(e) {
-    const t = e.touches[0];
-    const dx = Math.abs(t.clientX - this._fabSX);
-    const dy = Math.abs(t.clientY - this._fabSY);
-    if (dx > 4 || dy > 4) this._fabMoved = true;
-    let nx = this._fabOrigX + (t.clientX - this._fabSX);
-    let ny = this._fabOrigY + (t.clientY - this._fabSY);
-    // 限制在屏幕内
-    nx = Math.max(0, Math.min(nx, this._fabWinW - this._fabSize));
-    ny = Math.max(this._fabMinY, Math.min(ny, this._fabMaxY));
-    this.setData({ fabX: nx, fabY: ny });
-  },
-  onFabEnd() {
-    this.setData({ fabDragging: false });
-    if (!this._fabMoved) {
-      // 未拖动 = 点击 → 进入订单列表
-      wx.navigateTo({ url: '/pages/shop-orders/shop-orders' });
-      return;
-    }
-    // 吸附到最近边缘
-    const mid = this._fabWinW / 2;
-    const cx = this.data.fabX + this._fabSize / 2; // 浮窗中心
-    const snapX = cx < mid ? 16 * (this._fabWinW / 750) : this._fabWinW - this._fabSize - 16 * (this._fabWinW / 750);
-    this.setData({ fabX: snapX });
-  },
   onShopProductTap(e) {
     const { id } = e.currentTarget.dataset;
     wx.navigateTo({ url: '/pages/shop-detail/shop-detail?id=' + id });
@@ -761,16 +724,19 @@ Page({
       settings: '/pages/settings/settings', about: '/pages/settings/settings',
       recharge: '/pages/recharge/recharge',
       claimcenter: '/pages/claim-center/claim-center',
-      lucky: '/pages/lucky-wheel/lucky-wheel', service: '__toast__'
+      lucky: '/pages/lucky-wheel/lucky-wheel', service: '__toast__',
+      shopOrders: '/pages/shop-orders/shop-orders', logistics: '__toast__'
     };
     const target = routes[action];
     if (!target) { wx.showToast({ title: '功能开发中', icon: 'none' }); return; }
     if (target === '__toast__') {
-      const msgs = { service: '客服热线: 400-888-8888' };
+      const msgs = { service: '客服热线: 400-888-8888', logistics: '物流功能开发中，敬请期待' };
       wx.showToast({ title: msgs[action] || '功能开发中', icon: 'none', duration: 2000 }); return;
     }
     target.tab !== undefined ? this.setData({ currentTab: target.tab }) : wx.navigateTo({ url: target });
   },
+
+  onGridSwiperChange(e) { this.setData({ gridPage: e.detail.current }); },
 
   onClaimCenter() {
     wx.navigateTo({ url: '/pages/claim-center/claim-center' });

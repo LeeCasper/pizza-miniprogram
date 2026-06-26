@@ -73,5 +73,10 @@
 .sod-action-btn.outline { border: 1rpx solid var(--color-primary); color: var(--color-primary); background: transparent; }
 .sod-action-btn:active { transform: scale(0.97); }
 
+/* 退款状态颜色 */
+.sod-refund-success { color: #52A854; font-weight: var(--font-weight-semibold); }
+.sod-refund-processing { color: #F0A030; font-weight: var(--font-weight-semibold); }
+.sod-refund-failed { color: #BA1A1A; font-weight: var(--font-weight-semibold); }
+
 /* 加载态 */
 .sod-loading { display: flex; align-items: center; justify-content: center; padding-top: 240rpx; color: var(--color-on-surface-variant); font-size: 28rpx; }

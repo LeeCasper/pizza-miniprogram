@@ -130,37 +130,66 @@
       </view>
     </view>
 
-    <!-- 金刚区 - 快捷入口 -->
-    <view class="grid-actions">
-      <view class="grid-item" bindtap="onMenuItem" data-action="points">
-        <view class="grid-icon-wrap grid-icon-red">
-          <image class="grid-icon" src="/images/grid-points.png" mode="aspectFit"></image>
-        </view>
-        <text class="grid-label">积分商城</text>
-      </view>
-      <view class="grid-item" bindtap="onMenuItem" data-action="coupons">
-        <view class="grid-icon-wrap grid-icon-gold">
-          <image class="grid-icon" src="/images/grid-coupons.png" mode="aspectFit"></image>
-        </view>
-        <text class="grid-label">优惠券</text>
-      </view>
-      <view class="grid-item" bindtap="onMenuItem" data-action="lucky">
-        <view class="grid-icon-wrap grid-icon-green">
-          <image class="grid-icon" src="/images/grid-lucky.png" mode="aspectFit"></image>
-        </view>
-        <text class="grid-label">幸运转盘</text>
-      </view>
-      <view class="grid-item" bindtap="onMenuItem" data-action="service">
-        <view class="grid-icon-wrap grid-icon-gray">
-          <image class="grid-icon" src="/images/grid-service.png" mode="aspectFit"></image>
-        </view>
-        <text class="grid-label">联系客服</text>
-      </view>
-      <view class="grid-item" bindtap="onMenuItem" data-action="recharge">
-        <view class="grid-icon-wrap grid-icon-blue">
-          <image class="grid-icon" src="/images/grid-recharge.png" mode="aspectFit"></image>
-        </view>
-        <text class="grid-label">余额充值</text>
+    <!-- 金刚区 - 快捷入口（可左右滑动切换两页） -->
+    <view class="grid-swiper-wrap">
+      <swiper class="grid-swiper" bindchange="onGridSwiperChange" current="{{gridPage}}" indicator-dots="{{false}}" duration="300" style="height: {{gridSwiperHeight}}rpx;">
+        <swiper-item>
+          <view class="grid-actions">
+            <view class="grid-item" bindtap="onMenuItem" data-action="points">
+              <view class="grid-icon-wrap grid-icon-red">
+                <image class="grid-icon" src="/images/grid-points.png" mode="aspectFit"></image>
+              </view>
+              <text class="grid-label">积分商城</text>
+            </view>
+            <view class="grid-item" bindtap="onMenuItem" data-action="coupons">
+              <view class="grid-icon-wrap grid-icon-gold">
+                <image class="grid-icon" src="/images/grid-coupons.png" mode="aspectFit"></image>
+              </view>
+              <text class="grid-label">优惠券</text>
+            </view>
+            <view class="grid-item" bindtap="onMenuItem" data-action="lucky">
+              <view class="grid-icon-wrap grid-icon-green">
+                <image class="grid-icon" src="/images/grid-lucky.png" mode="aspectFit"></image>
+              </view>
+              <text class="grid-label">幸运转盘</text>
+            </view>
+            <view class="grid-item" bindtap="onMenuItem" data-action="service">
+              <view class="grid-icon-wrap grid-icon-gray">
+                <image class="grid-icon" src="/images/grid-service.png" mode="aspectFit"></image>
+              </view>
+              <text class="grid-label">联系客服</text>
+            </view>
+            <view class="grid-item" bindtap="onMenuItem" data-action="recharge">
+              <view class="grid-icon-wrap grid-icon-blue">
+                <image class="grid-icon" src="/images/grid-recharge.png" mode="aspectFit"></image>
+              </view>
+              <text class="grid-label">余额充值</text>
+            </view>
+            <view class="grid-item grid-item-placeholder"></view>
+          </view>
+        </swiper-item>
+        <swiper-item>
+          <view class="grid-actions">
+            <view class="grid-item" bindtap="onMenuItem" data-action="shopOrders">
+              <view class="grid-icon-wrap grid-icon-red">
+                <text class="grid-icon-emoji">📋</text>
+              </view>
+              <text class="grid-label">会员订单</text>
+            </view>
+            <view class="grid-item" bindtap="onMenuItem" data-action="logistics">
+              <view class="grid-icon-wrap grid-icon-blue">
+                <text class="grid-icon-emoji">🚚</text>
+              </view>
+              <text class="grid-label">我的物流</text>
+            </view>
+            <view class="grid-item grid-item-placeholder"></view>
+          </view>
+        </swiper-item>
+      </swiper>
+      <!-- 页面指示点 -->
+      <view class="grid-dots">
+        <view class="grid-dot {{gridPage === 0 ? 'active' : ''}}"></view>
+        <view class="grid-dot {{gridPage === 1 ? 'active' : ''}}"></view>
       </view>
     </view>
 

@@ -16,20 +16,6 @@
     </block>
   </view>
 
-  <!-- 商城订单悬浮按钮 — 黏土风可拖动浮窗 -->
-  <view wx:if="{{currentTab === 2}}"
-    class="shop-fab {{fabDragging ? 'fab-dragging' : ''}}"
-    style="left: {{fabX}}px; top: {{fabY}}px;"
-    bindtouchstart="onFabStart"
-    bindtouchmove="onFabMove"
-    bindtouchend="onFabEnd"
-  >
-    <view class="fab-inner">
-      <text class="fab-icon">📋</text>
-      <text class="fab-label">订单</text>
-    </view>
-  </view>
-
   <!-- Tab 内容区：不用 swiper，杜绝左右滑动切页（原生 swiper 的 disable-touch 多版本被忽略）。
        显隐用 inline style 的 display 控制，不用 hidden 属性——hidden 靠 [hidden]{display:none}
        生效，会被 Tab1 自己的 inline display:flex 顶掉，导致订单面板永不隐藏、盖住商城/我的。

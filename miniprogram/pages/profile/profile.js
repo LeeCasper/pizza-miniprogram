@@ -18,6 +18,7 @@ Page({
     birthdayCountdown: '',
     isBirthdayToday: false,
     hasBirthday: false,
+    gridPage: 0, gridSwiperHeight: 380,
   },
 
   // ── 共享 profile 方法（头像、编辑、公告、等级轮播、退出等）──
@@ -62,6 +63,7 @@ Page({
       address: '/pages/address/address',
       favorites: '/pages/favorites/favorites',
       shopOrders: '/pages/shop-orders/shop-orders',
+      logistics: '__toast__',
       settings: '/pages/settings/settings',
       about: '/pages/settings/settings',
       recharge: '/pages/recharge/recharge',
@@ -73,7 +75,8 @@ Page({
     if (actions[action]) {
       if (actions[action] === '__toast__') {
         const messages = {
-          service: '客服热线: 400-888-8888'
+          service: '客服热线: 400-888-8888',
+          logistics: '物流功能开发中，敬请期待'
         };
         wx.showToast({ title: messages[action] || '功能开发中', icon: 'none', duration: 2000 });
         return;
@@ -88,5 +91,7 @@ Page({
       wx.showToast({ title: '功能开发中', icon: 'none' });
     }
   },
+
+  onGridSwiperChange(e) { this.setData({ gridPage: e.detail.current }); },
 
 });

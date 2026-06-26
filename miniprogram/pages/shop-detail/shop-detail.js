@@ -1,4 +1,4 @@
-// pages/shop-detail/shop-detail.js — 会员商城商品详情（不入购物车，可收藏，支持下单）
+// pages/shop-detail/shop-detail.js — 商品详情（Stitch 设计稿 1:1 还原）
 const { api, fixImageUrl } = require('../../utils/api');
 const { getBackBtnTopBar } = require('../../utils/layout');
 const { payShopOrder } = require('../../utils/shopPay');
@@ -13,9 +13,21 @@ Page({
     loading: true,
     favLoading: false,
 
+    // Hero 轮播
+    currentImageIndex: 0,
+
+    // 规格选择
+    sizeOptions: ['9寸(标准)', '6寸(迷你)'],
+    selectedSize: 0,
+    crustOptions: ['经典手拍', '薄脆'],
+    selectedCrust: 0,
+    quantity: 1,
+
+    // Tab 切换
+    activeTab: 'detail', // detail | ingredients | reviews
+
     // 结账抽屉
     checkoutOpen: false,
-    quantity: 1,
     recipientName: '',
     recipientPhone: '',
     recipientAddress: '',
@@ -27,7 +39,15 @@ Page({
   },
 
   onLoad(options) {
-    this.setData(getBackBtnTopBar());
+    const layout = getBackBtnTopBar();
+    // 计算滚动区高度：窗口高度 − 顶栏 − 底栏(约 140rpx)
+    const win = wx.getWindowInfo();
+    const rpx = win.windowWidth / 750;
+    const bottomBarPx = 140 * rpx;
+    // padding-top 已处理顶栏偏移，高度只需减底栏
+    const scrollViewHeight = win.windowHeight - bottomBarPx;
+    this.setData({ ...layout, scrollViewHeight });
+
     const id = options.id;
     if (!id) {
       wx.showToast({ title: '商品不存在', icon: 'none' });
@@ -51,6 +71,7 @@ Page({
           images: imgs,
           loading: false,
         });
+        this.updateTotalPrice();
       } else {
         this.setData({ loading: false });
         wx.showToast({ title: '商品不存在', icon: 'none' });
@@ -62,6 +83,21 @@ Page({
 
   onBack() { wx.navigateBack(); },
 
+  onMore() {
+    wx.showActionSheet({
+      itemList: ['分享', '举报'],
+      success(res) {
+        // 预留
+      }
+    });
+  },
+
+  // ── Hero 轮播 ──
+  onHeroSwiperChange(e) {
+    this.setData({ currentImageIndex: e.detail.current });
+  },
+
+  // ── 收藏 ──
   onToggleFav() {
     const p = this.data.product;
     if (!p || this.data.favLoading) return;
@@ -80,9 +116,93 @@ Page({
     });
   },
 
-  // ── 结账抽屉 ──
+  // ── 规格选择 ──
+  onSizeSelect(e) {
+    this.setData({ selectedSize: parseInt(e.currentTarget.dataset.index) });
+  },
 
-  updateCheckoutSummary() {
+  onCrustSelect(e) {
+    this.setData({ selectedCrust: parseInt(e.currentTarget.dataset.index) });
+  },
+
+  // ── 数量 ──
+  onQtyMinus() {
+    if (this.data.quantity > 1) {
+      this.setData({ quantity: this.data.quantity - 1 });
+      this.updateTotalPrice();
+    }
+  },
+
+  onQtyPlus() {
+    const p = this.data.product;
+    const max = (p && p.stock >= 0) ? Math.min(p.stock, 99) : 99;
+    if (this.data.quantity < max) {
+      this.setData({ quantity: this.data.quantity + 1 });
+      this.updateTotalPrice();
+    }
+  },
+
+  // ── 配送信息 ──
+  onDeliveryTap() {
+    wx.showToast({ title: '配送信息', icon: 'none' });
+  },
+
+  // ── Tab 切换 ──
+  onTabChange(e) {
+    this.setData({ activeTab: e.currentTarget.dataset.tab });
+  },
+
+  // ── 客服 ──
+  onContactService() {
+    wx.showToast({ title: '请联系客服', icon: 'none' });
+  },
+
+  // ── 加入购物车 ──
+  onAddToCart() {
+    const p = this.data.product;
+    if (!p) return;
+    const sizeName = this.data.sizeOptions[this.data.selectedSize];
+    const crustName = this.data.crustOptions[this.data.selectedCrust];
+    const qty = this.data.quantity;
+
+    // 添加到全局购物车（兼容现有 cart 结构）
+    const app = getApp();
+    if (!app.globalData.shopCart) app.globalData.shopCart = {};
+    const cartKey = p.id + '_' + this.data.selectedSize + '_' + this.data.selectedCrust;
+    const existing = app.globalData.shopCart[cartKey];
+    app.globalData.shopCart[cartKey] = {
+      productId: p.id,
+      name: p.name,
+      mainImage: p.main_image,
+      price: p.price,
+      size: sizeName,
+      crust: crustName,
+      sizeIndex: this.data.selectedSize,
+      crustIndex: this.data.selectedCrust,
+      quantity: existing ? existing.quantity + qty : qty,
+    };
+
+    wx.showToast({ title: '已加入购物车', icon: 'success' });
+    this.setData({ quantity: 1 });
+  },
+
+  // ── 立即购买 → 打开结账抽屉 ──
+  onBuy() {
+    const p = this.data.product;
+    if (!p) return;
+    this.setData({
+      checkoutOpen: true,
+      paymentMethod: 'wechat',
+      submitting: false,
+    });
+    this.updateTotalPrice();
+  },
+
+  onCloseCheckout() {
+    this.setData({ checkoutOpen: false });
+  },
+
+  updateTotalPrice() {
     const { product, quantity, paymentMethod, submitting } = this.data;
     const price = product ? product.price : 0;
     const total = (price * quantity).toFixed(2);
@@ -93,42 +213,9 @@ Page({
     });
   },
 
-  onBuy() {
-    const p = this.data.product;
-    if (!p) return;
-    // 重置表单
-    this.setData({
-      checkoutOpen: true,
-      quantity: 1,
-      paymentMethod: 'wechat',
-      submitting: false,
-    });
-    this.updateCheckoutSummary();
-  },
-
-  onCloseCheckout() {
-    this.setData({ checkoutOpen: false });
-  },
-
-  onQtyMinus() {
-    if (this.data.quantity > 1) {
-      this.setData({ quantity: this.data.quantity - 1 });
-      this.updateCheckoutSummary();
-    }
-  },
-
-  onQtyPlus() {
-    const p = this.data.product;
-    const max = (p && p.stock >= 0) ? Math.min(p.stock, 99) : 99;
-    if (this.data.quantity < max) {
-      this.setData({ quantity: this.data.quantity + 1 });
-      this.updateCheckoutSummary();
-    }
-  },
-
   onPaymentMethodChange(e) {
     this.setData({ paymentMethod: e.currentTarget.dataset.method });
-    this.updateCheckoutSummary();
+    this.updateTotalPrice();
   },
 
   onRecipientInput(e) {
@@ -144,7 +231,6 @@ Page({
     const { product, quantity, recipientName, recipientPhone, recipientAddress, paymentMethod, submitting } = this.data;
     if (submitting) return;
 
-    // 校验
     if (!recipientName.trim()) {
       wx.showToast({ title: '请填写收货人姓名', icon: 'none' });
       return;
@@ -159,7 +245,7 @@ Page({
     }
 
     this.setData({ submitting: true });
-    this.updateCheckoutSummary();
+    this.updateTotalPrice();
 
     api.post('/shop/orders', {
       productId: product.id,
@@ -180,13 +266,11 @@ Page({
       this.setData({ checkoutOpen: false });
 
       if (paymentMethod === 'balance' || order.paymentStatus === 'paid') {
-        // 余额支付已即时完成
         wx.showToast({ title: '支付成功', icon: 'success' });
         setTimeout(() => {
           wx.redirectTo({ url: '/pages/shop-order-detail/shop-order-detail?id=' + order.id });
         }, 800);
       } else {
-        // 微信支付：调起支付
         payShopOrder(order.id).then(payResult => {
           if (payResult && payResult.success) {
             wx.showToast({ title: '支付成功', icon: 'success' });

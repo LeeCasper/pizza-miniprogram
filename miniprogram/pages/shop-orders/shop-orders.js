@@ -48,7 +48,14 @@ Page({
     const status = this.data.currentTab;
     api.get('/shop/orders', { status }).then(res => {
       if (res.code === 0 && res.data) {
-        this.setData({ orders: res.data.list || [], loading: false });
+        const orders = (res.data.list || []).map(o => ({
+          ...o,
+          items: (o.items || []).map(it => ({
+            ...it,
+            productImage: fixImageUrl(it.productImage),
+          })),
+        }));
+        this.setData({ orders, loading: false });
       } else {
         this.setData({ orders: [], loading: false });
       }

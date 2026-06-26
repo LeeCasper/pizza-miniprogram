@@ -1,62 +1,187 @@
-<!-- pages/shop-detail/shop-detail.wxml — 商城商品详情（黏土风，无 backdrop-filter；页面原生滚动） -->
-<view class="sd-page" style="padding-top: {{topBarTotalHeight}}px">
-  <!-- 顶部返回栏（固定） -->
+<!-- pages/shop-detail/shop-detail.wxml — 商品详情（Stitch 设计稿 1:1 还原） -->
+<view class="sd-page" wx:if="{{product}}">
+
+  <!-- ═══ 顶部导航栏（固定 · 黏土风，与 shop-orders 一致） ═══ -->
   <view class="sd-top-bar" style="padding-top: {{statusBarHeight}}px;">
     <view class="sd-back-btn" bindtap="onBack"><text class="sd-back-icon">‹</text></view>
     <text class="sd-top-title">商品详情</text>
     <view class="sd-back-btn sd-back-placeholder"></view>
   </view>
 
-  <!-- 内容（依赖页面原生滚动，非 swiper/scroll-view） -->
-  <view class="sd-body" wx:if="{{product}}">
-    <!-- 图片轮播 -->
-    <view class="sd-gallery" wx:if="{{images.length > 0}}">
-      <swiper class="sd-swiper" circular="{{images.length > 1}}" indicator-dots="{{images.length > 1}}" indicator-color="rgba(255,255,255,0.4)" indicator-active-color="#C0563A">
+  <!-- ═══ 内容滚动区 ═══ -->
+  <scroll-view
+    class="sd-scroll"
+    scroll-y enhanced show-scrollbar="{{false}}"
+    style="height: {{scrollViewHeight}}px; padding-top: {{topBarTotalHeight}}px;"
+  >
+
+    <!-- ── Hero 大图轮播 ── -->
+    <view class="sd-hero">
+      <swiper
+        class="sd-hero-swiper"
+        circular="{{images.length > 1}}"
+        indicator-dots="{{false}}"
+        bindchange="onHeroSwiperChange"
+      >
         <swiper-item wx:for="{{images}}" wx:key="*this">
-          <image class="sd-img" src="{{item}}" mode="aspectFill"></image>
+          <image class="sd-hero-img" src="{{item}}" mode="aspectFill"></image>
         </swiper-item>
       </swiper>
+      <!-- 页标 -->
+      <view class="sd-hero-counter" wx:if="{{images.length > 1}}">
+        <text>{{currentImageIndex + 1}}/{{images.length}}</text>
+      </view>
+      <!-- 底部渐变过渡 -->
+      <view class="sd-hero-fade"></view>
     </view>
 
-    <!-- 信息卡 -->
-    <view class="sd-info card">
+    <!-- ── 商品信息卡（叠加 Hero，负 margin 上移） ── -->
+    <view class="sd-info-card">
+      <!-- 标题行：名称 + 收藏 -->
+      <view class="sd-info-header">
+        <view class="sd-info-titles">
+          <text class="sd-name">{{product.name}}</text>
+          <text class="sd-subtitle" wx:if="{{product.subtitle}}">{{product.subtitle}}</text>
+        </view>
+        <view class="sd-fav-btn {{product.isFavorited ? 'active' : ''}}" bindtap="onToggleFav">
+          <text>{{product.isFavorited ? '♥' : '♡'}}</text>
+        </view>
+      </view>
+
+      <!-- 价格行 -->
       <view class="sd-price-row">
-        <text class="sd-price-sym">¥</text>
-        <text class="sd-price">{{product.price}}</text>
-        <text class="sd-original" wx:if="{{product.original_price}}">¥{{product.original_price}}</text>
-        <view class="sd-tag" wx:if="{{product.tag}}"><text>{{product.tag}}</text></view>
+        <view class="sd-price-main">
+          <text class="sd-price-sym">¥</text>
+          <text class="sd-price">{{product.price}}</text>
+          <text class="sd-original" wx:if="{{product.original_price}}">¥{{product.original_price}}</text>
+        </view>
+        <text class="sd-sales">月销 {{product.sales || 0}}+</text>
       </view>
-      <text class="sd-name">{{product.name}}</text>
-      <text class="sd-subtitle" wx:if="{{product.subtitle}}">{{product.subtitle}}</text>
-      <view class="sd-meta">
-        <text class="sd-meta-item">库存 {{product.stock}}</text>
-        <text class="sd-meta-item">已售 {{product.sales}}</text>
+
+      <!-- 评分 -->
+      <view class="sd-rating" wx:if="{{product.rating}}">
+        <text>⭐ {{product.rating}} ({{product.reviewCount || 0}} 条评价)</text>
       </view>
     </view>
 
-    <!-- 商品详情描述 -->
-    <view class="sd-desc card" wx:if="{{product.detail_desc}}">
-      <text class="sd-desc-title">商品详情</text>
-      <text class="sd-desc-text">{{product.detail_desc}}</text>
+    <!-- ── 规格选择区 ── -->
+    <view class="sd-selection">
+      <!-- 尺寸 -->
+      <view class="sd-sel-row">
+        <text class="sd-sel-label">规格</text>
+        <view class="sd-sel-chips">
+          <view
+            class="sd-chip {{selectedSize === index ? 'active' : ''}}"
+            wx:for="{{sizeOptions}}" wx:key="*this"
+            data-index="{{index}}"
+            bindtap="onSizeSelect"
+          ><text>{{item}}</text></view>
+        </view>
+      </view>
+
+      <!-- 饼底 -->
+      <view class="sd-sel-row">
+        <text class="sd-sel-label">饼底</text>
+        <view class="sd-sel-chips">
+          <view
+            class="sd-chip {{selectedCrust === index ? 'active' : ''}}"
+            wx:for="{{crustOptions}}" wx:key="*this"
+            data-index="{{index}}"
+            bindtap="onCrustSelect"
+          ><text>{{item}}</text></view>
+        </view>
+      </view>
+
+      <!-- 数量 -->
+      <view class="sd-sel-row">
+        <text class="sd-sel-label">数量</text>
+        <view class="sd-qty-stepper">
+          <view class="sd-qty-btn {{quantity <= 1 ? 'disabled' : ''}}" catchtap="onQtyMinus"><text>−</text></view>
+          <text class="sd-qty-val">{{quantity}}</text>
+          <view class="sd-qty-btn" catchtap="onQtyPlus"><text>+</text></view>
+        </view>
+      </view>
+
+      <!-- 配送信息 -->
+      <view class="sd-sel-row sd-delivery-row" catchtap="onDeliveryTap">
+        <text class="sd-sel-label">配送</text>
+        <text class="sd-delivery-text">最快30分钟送达</text>
+        <text class="sd-delivery-arrow">›</text>
+      </view>
     </view>
 
-    <!-- 底部固定栏占位 -->
-    <view style="height: calc(180rpx + env(safe-area-inset-bottom))"></view>
+    <!-- ── Tab 切换区 ── -->
+    <view class="sd-tabs">
+      <view class="sd-tab-headers">
+        <view
+          class="sd-tab-header {{activeTab === 'detail' ? 'active' : ''}}"
+          data-tab="detail" bindtap="onTabChange"
+        ><text>详情</text></view>
+        <view
+          class="sd-tab-header {{activeTab === 'ingredients' ? 'active' : ''}}"
+          data-tab="ingredients" bindtap="onTabChange"
+        ><text>配料</text></view>
+        <view
+          class="sd-tab-header {{activeTab === 'reviews' ? 'active' : ''}}"
+          data-tab="reviews" bindtap="onTabChange"
+        ><text>评价({{product.reviewCount || '0'}})</text></view>
+      </view>
+
+      <!-- Tab 内容：详情 -->
+      <view class="sd-tab-content" hidden="{{activeTab !== 'detail'}}">
+        <!-- 特色图文卡 -->
+        <view class="sd-feature-card">
+          <view class="sd-feature-text">
+            <text class="sd-feature-title">精选食材\n美味看得见</text>
+            <text class="sd-feature-desc">新鲜食材 现做现烤\n每一口都充满幸福感</text>
+          </view>
+          <view class="sd-feature-img-wrap">
+            <image class="sd-feature-img" src="{{images[0] || product.main_image}}" mode="aspectFill"></image>
+          </view>
+        </view>
+
+        <!-- 详情描述 -->
+        <text class="sd-desc-text" wx:if="{{product.detail_desc}}">{{product.detail_desc}}</text>
+
+        <!-- 底部工艺图（使用第二张图或占位） -->
+        <image
+          class="sd-detail-img"
+          src="{{images[1] || images[0] || product.main_image}}"
+          mode="aspectFill"
+          wx:if="{{images.length > 0}}"
+        ></image>
+      </view>
+
+      <!-- Tab 内容：配料 -->
+      <view class="sd-tab-content sd-tab-placeholder" hidden="{{activeTab !== 'ingredients'}}">
+        <text class="sd-placeholder-text">暂无配料信息</text>
+      </view>
+
+      <!-- Tab 内容：评价 -->
+      <view class="sd-tab-content sd-tab-placeholder" hidden="{{activeTab !== 'reviews'}}">
+        <text class="sd-placeholder-text">暂无评价</text>
+      </view>
+    </view>
+
+    <!-- 底部占位 -->
+    <view style="height: calc(200rpx + env(safe-area-inset-bottom));"></view>
+  </scroll-view>
+
+  <!-- ═══ 底部操作栏（固定）═ 三按钮：客服 | 加入购物车 | 立即购买 ═══ -->
+  <view class="sd-bottom-bar">
+    <view class="sd-service-btn" bindtap="onContactService">
+      <text class="sd-service-icon">🎧</text>
+      <text class="sd-service-label">客服</text>
+    </view>
+    <view class="sd-cart-btn" bindtap="onAddToCart">
+      <text>加入购物车</text>
+    </view>
+    <view class="sd-buy-btn" bindtap="onBuy">
+      <text>立即购买 ¥{{product.price}}</text>
+    </view>
   </view>
 
-  <!-- 加载态 -->
-  <view class="sd-loading" wx:elif="{{loading}}"><text>加载中…</text></view>
-
-  <!-- 底部操作栏（固定）：收藏 + 立即购买 -->
-  <view class="sd-bottom-bar" wx:if="{{product}}">
-    <view class="sd-fav {{product.isFavorited ? 'active' : ''}}" bindtap="onToggleFav">
-      <text class="sd-fav-icon">{{product.isFavorited ? '♥' : '♡'}}</text>
-      <text class="sd-fav-label">收藏</text>
-    </view>
-    <view class="sd-buy-btn" bindtap="onBuy"><text>立即购买</text></view>
-  </view>
-
-  <!-- 结账抽屉 -->
+  <!-- ═══ 结账抽屉（保留原有交互） ═══ -->
   <view class="checkout-overlay {{checkoutOpen ? 'show' : ''}}" catchtap="onCloseCheckout">
     <view class="checkout-drawer {{checkoutOpen ? 'show' : ''}}" catchtap="noop">
       <view class="checkout-header">
@@ -64,23 +189,16 @@
         <view class="checkout-close" catchtap="onCloseCheckout"><text>✕</text></view>
       </view>
 
-      <view class="checkout-body">
+      <scroll-view class="checkout-body" scroll-y enhanced show-scrollbar="{{false}}">
         <!-- 商品摘要 -->
         <view class="checkout-product">
           <image class="checkout-prod-img" src="{{product.main_image}}" mode="aspectFill"></image>
           <view class="checkout-prod-info">
             <text class="checkout-prod-name">{{product.name}}</text>
+            <text class="checkout-prod-spec" wx:if="{{sizeOptions[selectedSize] || crustOptions[selectedCrust]}}">
+              {{sizeOptions[selectedSize]}} / {{crustOptions[selectedCrust]}} × {{quantity}}
+            </text>
             <text class="checkout-prod-price">¥{{product.price}}</text>
-          </view>
-        </view>
-
-        <!-- 数量 -->
-        <view class="checkout-row">
-          <text class="checkout-label">数量</text>
-          <view class="checkout-qty">
-            <view class="checkout-qty-btn {{quantity <= 1 ? 'disabled' : ''}}" catchtap="onQtyMinus"><text>−</text></view>
-            <text class="checkout-qty-val">{{quantity}}</text>
-            <view class="checkout-qty-btn" catchtap="onQtyPlus"><text>+</text></view>
           </view>
         </view>
 
@@ -97,8 +215,6 @@
           <text class="checkout-label">收货地址</text>
           <input class="checkout-input" placeholder="请输入详细地址" value="{{recipientAddress}}" data-field="recipientAddress" bindinput="onRecipientInput"/>
         </view>
-
-        <!-- 备注 -->
         <view class="checkout-row">
           <text class="checkout-label">备注</text>
           <input class="checkout-input" placeholder="选填" value="{{note}}" bindinput="onNoteInput"/>
@@ -127,7 +243,10 @@
             <text class="checkout-summary-val">{{totalPrice}}</text>
           </view>
         </view>
-      </view>
+
+        <!-- 底部安全区占位 -->
+        <view style="height: calc(24rpx + env(safe-area-inset-bottom));"></view>
+      </scroll-view>
 
       <!-- 提交按钮 -->
       <view class="checkout-submit-bar">
@@ -137,4 +256,9 @@
       </view>
     </view>
   </view>
+</view>
+
+<!-- 加载态 -->
+<view class="sd-loading" wx:elif="{{loading}}">
+  <text>加载中…</text>
 </view>
