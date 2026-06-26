@@ -131,6 +131,8 @@ router.get('/settings/store', ctrl.getStoreSettings);
 router.put('/settings/store', ctrl.updateStoreSettings);
 router.get('/settings/business', ctrl.getBusinessSettings);
 router.put('/settings/business', ctrl.updateBusinessSettings);
+router.get('/settings/logistics', ctrl.getLogisticsSettings);
+router.put('/settings/logistics', ctrl.updateLogisticsSettings);
 
 // Payment records (transaction history)
 router.get('/payment-records', ctrl.listPaymentRecords);

@@ -1,0 +1,96 @@
+<!-- pages/shop-logistics/shop-logistics.wxml — 物流追踪（黏土风） -->
+<view class="log-page" style="padding-top: {{topBarTotalHeight}}px">
+  <!-- 顶部返回栏 -->
+  <view class="log-top-bar" style="padding-top: {{statusBarHeight}}px">
+    <view class="log-back-btn" bindtap="onBack">
+      <text class="log-back-icon">‹</text>
+    </view>
+    <text class="log-top-title">我的物流</text>
+    <view class="log-back-btn log-back-placeholder"></view>
+  </view>
+
+  <!-- 列表 -->
+  <view class="log-list" wx:if="{{orders.length > 0}}">
+    <view class="log-card" wx:for="{{orders}}" wx:key="id">
+      <!-- 订单头 -->
+      <view class="log-card-hd" bindtap="onTapOrder" data-id="{{item.id}}">
+        <text class="log-card-id">订单 {{item.id}}</text>
+        <text class="log-card-status status-{{item.status}}">{{item.statusLabel}}</text>
+      </view>
+
+      <!-- 商品行 -->
+      <view class="log-card-body" wx:for="{{item.items}}" wx:for-item="it" wx:key="id">
+        <image class="log-item-img" src="{{it.productImage}}" mode="aspectFill"></image>
+        <view class="log-item-info">
+          <text class="log-item-name">{{it.productName}}</text>
+          <view class="log-item-bottom">
+            <text class="log-item-price">¥{{it.price}}</text>
+            <text class="log-item-qty">×{{it.quantity}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 物流信息行 -->
+      <view class="log-shipping-row">
+        <view class="log-shipping-left">
+          <text class="log-shipping-company">{{item.shippingCompany}}</text>
+          <text class="log-shipping-no">{{item.trackingNo}}</text>
+        </view>
+        <!-- 追踪状态徽章 -->
+        <view class="log-tracking-status transit" wx:if="{{item.tracking.stateLabel && !item.tracking.isDelivered && !item.tracking.error && !item.tracking.unsupported && !item.tracking.pending}}">
+          <text>{{item.tracking.stateLabel}}</text>
+        </view>
+        <view class="log-tracking-status delivered" wx:elif="{{item.tracking.isDelivered}}">
+          <text>{{item.tracking.stateLabel}}</text>
+        </view>
+        <view class="log-tracking-status pending" wx:elif="{{item.tracking.pending}}">
+          <text>待接入</text>
+        </view>
+        <view class="log-tracking-status unsupported" wx:elif="{{item.tracking.unsupported}}">
+          <text>暂不支持</text>
+        </view>
+        <view class="log-tracking-status error" wx:elif="{{item.tracking.error}}">
+          <text>查询失败</text>
+        </view>
+      </view>
+
+      <!-- 最新事件预览 -->
+      <view class="log-latest" wx:if="{{item.tracking.latestEvent}}">
+        <text class="log-latest-time">{{item.tracking.latestEvent.time}}</text>
+        <text class="log-latest-context">{{item.tracking.latestEvent.context}}</text>
+      </view>
+
+      <!-- 展开/收起按钮 -->
+      <view class="log-expand-btn" catchtap="onToggleTracking" data-id="{{item.id}}">
+        <text>{{item.expanded ? '收起物流详情 ▲' : '查看物流详情 ▼'}}</text>
+      </view>
+
+      <!-- 展开的物流时间线 -->
+      <view class="log-timeline" wx:if="{{item.expanded}}">
+        <block wx:if="{{loadingDetail && expandedId === item.id}}">
+          <view class="log-timeline-loading"><text>加载中…</text></view>
+        </block>
+        <block wx:elif="{{item.trackingEvents && item.trackingEvents.length > 0}}">
+          <view class="log-event {{evIndex === 0 ? 'latest' : ''}}" wx:for="{{item.trackingEvents}}" wx:for-item="ev" wx:for-index="evIndex" wx:key="time">
+            <view class="log-event-dot {{evIndex === 0 ? 'active' : ''}}"></view>
+            <view class="log-event-content">
+              <text class="log-event-context">{{ev.context}}</text>
+              <text class="log-event-time">{{ev.time}}</text>
+            </view>
+          </view>
+        </block>
+        <block wx:else>
+          <view class="log-timeline-empty"><text>暂无物流轨迹</text></view>
+        </block>
+      </view>
+    </view>
+    <view style="height: calc(60rpx + env(safe-area-inset-bottom))"></view>
+  </view>
+
+  <!-- 空态 -->
+  <view class="log-empty" wx:elif="{{!loading}}">
+    <image class="log-empty-img" src="/images/empty-shop.png" mode="aspectFit"></image>
+    <text class="log-empty-text">暂无物流信息</text>
+    <text class="log-empty-sub">已发货的订单会显示在这里</text>
+  </view>
+</view>

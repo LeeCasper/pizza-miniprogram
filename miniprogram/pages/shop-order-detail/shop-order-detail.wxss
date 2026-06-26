@@ -46,6 +46,15 @@
 /* 物流 */
 .sod-shipping { display: flex; flex-direction: column; gap: 6rpx; font-size: 26rpx; color: var(--color-on-surface); }
 .sod-tracking { font-size: 24rpx; color: var(--color-on-surface-variant); }
+.sod-shipping-action {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 16rpx; padding-top: 16rpx;
+  border-top: var(--clay-border-subtle);
+  font-size: 26rpx; color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+}
+.sod-shipping-action:active { opacity: 0.7; }
+.sod-shipping-arrow { font-size: 36rpx; line-height: 1; }
 
 /* 商品 */
 .sod-item { display: flex; gap: 16rpx; }

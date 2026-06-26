@@ -133,4 +133,8 @@ Page({
       },
     });
   },
+
+  onViewLogistics() {
+    wx.navigateTo({ url: '/pages/shop-logistics/shop-logistics' });
+  },
 });

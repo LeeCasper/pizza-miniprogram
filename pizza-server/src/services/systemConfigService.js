@@ -375,6 +375,77 @@ const systemConfigService = {
     });
   },
 
+  // ── Logistics Config ───────────────────────────────
+
+  /**
+   * Get logistics (快递100) config from DB.
+   * @returns {Promise<{ customer, key, enabled }>}
+   */
+  async getLogisticsConfig() {
+    try {
+      const [rows] = await pool.query(
+        "SELECT config_key, config_value FROM system_config WHERE config_key LIKE 'logistics_%'"
+      );
+      const map = {};
+      rows.forEach(r => { map[r.config_key] = r.config_value || ''; });
+      return {
+        customer: map.logistics_customer || '',
+        key: map.logistics_key || '',
+        enabled: map.logistics_enabled || '',
+      };
+    } catch (_) {
+      return { customer: '', key: '', enabled: '' };
+    }
+  },
+
+  /**
+   * Update logistics config in DB (UPSERT per key).
+   * @param {object} entries — { customer, key, enabled }
+   */
+  async updateLogisticsConfig(entries) {
+    const fieldMap = {
+      customer: 'logistics_customer',
+      key: 'logistics_key',
+      enabled: 'logistics_enabled',
+    };
+
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+      for (const [camelKey, dbKey] of Object.entries(fieldMap)) {
+        if (entries[camelKey] !== undefined) {
+          const value = entries[camelKey] != null ? String(entries[camelKey]) : '';
+          await conn.query(
+            'INSERT INTO system_config (config_key, config_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE config_value = ?',
+            [dbKey, value, value]
+          );
+        }
+      }
+      await conn.commit();
+    } catch (err) {
+      await conn.rollback();
+      throw err;
+    } finally {
+      conn.release();
+    }
+
+    // Sync to in-memory config
+    this.syncLogisticsConfigToMemory();
+  },
+
+  /**
+   * Sync logistics DB config to in-memory config object.
+   */
+  syncLogisticsConfigToMemory() {
+    this.getLogisticsConfig().then(dbConfig => {
+      if (dbConfig.customer) config.logistics.customer = dbConfig.customer;
+      if (dbConfig.key) config.logistics.key = dbConfig.key;
+      if (dbConfig.enabled !== '') config.logistics.enabled = dbConfig.enabled !== 'false';
+    }).catch(err => {
+      log.error({ err }, 'failed to sync logistics config from DB');
+    });
+  },
+
 };
 
 module.exports = systemConfigService;

@@ -67,6 +67,12 @@ const config = {
     unpaidTimeoutMinutes: 30,
     storeName: '爱家店',
   },
+
+  logistics: {
+    customer: process.env.LOGISTICS_CUSTOMER || '',
+    key: process.env.LOGISTICS_KEY || '',
+    enabled: process.env.LOGISTICS_ENABLED !== 'false',
+  },
 };
 
 // ── Production env validation ─────────────────────────

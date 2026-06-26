@@ -210,4 +210,36 @@ export function fetchUpdateBusinessSettings(data: BusinessSettingsForm) {
   });
 }
 
+// ── Logistics Settings ────────────────────────────────
+
+export interface LogisticsSettings {
+  customer: string;
+  key: string;
+  enabled: boolean;
+  _hasKey: boolean;
+}
+
+export interface LogisticsSettingsForm {
+  customer?: string;
+  key?: string;
+  enabled?: boolean;
+}
+
+/** Get logistics (快递100) settings */
+export function fetchLogisticsSettings() {
+  return request<LogisticsSettings>({
+    url: '/settings/logistics',
+    method: 'GET',
+  });
+}
+
+/** Update logistics settings */
+export function fetchUpdateLogisticsSettings(data: LogisticsSettingsForm) {
+  return request<null>({
+    url: '/settings/logistics',
+    method: 'PUT',
+    data,
+  });
+}
+
 // ── Theme Settings removed ──

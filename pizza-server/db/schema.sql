@@ -414,6 +414,11 @@ INSERT INTO system_config (config_key, config_value, description) VALUES
 ('wx_pay_platform_cert', '', '微信支付平台证书(PEM格式)'),
 ('wx_pay_notify_url', 'https://artaides.com/api/v1/pay/notify', '支付回调通知URL');
 
+-- 物流查询(快递100) — 通过管理后台配置，UPSERT 写入
+-- logistics_customer: 快递100 customer ID
+-- logistics_key: 快递100 API key
+-- logistics_enabled: 是否启用 (true/false)
+
 -- =============================================
 -- 20. 幸运转盘 (Lucky Wheel)
 -- =============================================

@@ -41,6 +41,10 @@
         <text>{{order.shippingCompany}}</text>
         <text class="sod-tracking">运单号: {{order.trackingNo}}</text>
       </view>
+      <view class="sod-shipping-action" catchtap="onViewLogistics">
+        <text>查看物流</text>
+        <text class="sod-shipping-arrow">›</text>
+      </view>
     </view>
 
     <!-- 商品列表 -->

@@ -169,6 +169,7 @@ app.use('/api/v1/config', require('./routes/config'));
 
 const luckyWheelRoutes = require('./routes/luckyWheel');
 app.use('/api/v1/lucky-wheel', luckyWheelRoutes);
+app.use('/api/v1/logistics', require('./routes/logistics'));
 
 // ── Admin API routes (JSON, JWT) ─────────────────────
 app.use('/api/v1/admin', adminApiRoutes);
@@ -283,6 +284,7 @@ const server = app.listen(PORT, async () => {
     systemConfigService.syncPrinterConfigToMemory();
     systemConfigService.syncMapConfigToMemory();
     systemConfigService.syncBusinessConfigToMemory();
+    systemConfigService.syncLogisticsConfigToMemory();
   } catch (err) {
     serverLog.warn({ err }, 'Could not sync config from DB');
   }

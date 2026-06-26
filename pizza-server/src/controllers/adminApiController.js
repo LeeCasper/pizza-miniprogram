@@ -1462,6 +1462,60 @@ const adminApiController = {
     }
   },
 
+  // ── Logistics Settings ───────────────────────────────
+
+  /**
+   * GET /api/v1/admin/settings/logistics
+   */
+  async getLogisticsSettings(req, res, next) {
+    try {
+      const cfg = await systemConfigService.getLogisticsConfig();
+      res.json({
+        code: 0,
+        data: {
+          customer: cfg.customer || '',
+          key: cfg.key ? '****' : '',
+          enabled: cfg.enabled === '' ? false : cfg.enabled !== 'false',
+          _hasKey: !!cfg.key,
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * PUT /api/v1/admin/settings/logistics
+   */
+  async updateLogisticsSettings(req, res, next) {
+    try {
+      const body = req.body || {};
+      const entries = {};
+
+      if (body.customer !== undefined) {
+        entries.customer = String(body.customer).trim();
+      }
+      if (body.key !== undefined) {
+        const v = String(body.key).trim();
+        // Only update if user provided a non-masked value
+        if (v && v !== '****') {
+          entries.key = v;
+        }
+      }
+      if (body.enabled !== undefined) {
+        entries.enabled = body.enabled ? 'true' : 'false';
+      }
+
+      if (Object.keys(entries).length > 0) {
+        await systemConfigService.updateLogisticsConfig(entries);
+      }
+
+      res.json({ code: 0, message: '物流配置已保存' });
+    } catch (err) {
+      next(err);
+    }
+  },
+
   // ── Audit Logs ──────────────────────────────────────
 
   /**

@@ -63,7 +63,7 @@ Page({
       address: '/pages/address/address',
       favorites: '/pages/favorites/favorites',
       shopOrders: '/pages/shop-orders/shop-orders',
-      logistics: '__toast__',
+      logistics: '/pages/shop-logistics/shop-logistics',
       settings: '/pages/settings/settings',
       about: '/pages/settings/settings',
       recharge: '/pages/recharge/recharge',
@@ -76,7 +76,6 @@ Page({
       if (actions[action] === '__toast__') {
         const messages = {
           service: '客服热线: 400-888-8888',
-          logistics: '物流功能开发中，敬请期待'
         };
         wx.showToast({ title: messages[action] || '功能开发中', icon: 'none', duration: 2000 });
         return;

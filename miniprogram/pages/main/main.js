@@ -725,12 +725,12 @@ Page({
       recharge: '/pages/recharge/recharge',
       claimcenter: '/pages/claim-center/claim-center',
       lucky: '/pages/lucky-wheel/lucky-wheel', service: '__toast__',
-      shopOrders: '/pages/shop-orders/shop-orders', logistics: '__toast__'
+      shopOrders: '/pages/shop-orders/shop-orders', logistics: '/pages/shop-logistics/shop-logistics'
     };
     const target = routes[action];
     if (!target) { wx.showToast({ title: '功能开发中', icon: 'none' }); return; }
     if (target === '__toast__') {
-      const msgs = { service: '客服热线: 400-888-8888', logistics: '物流功能开发中，敬请期待' };
+      const msgs = { service: '客服热线: 400-888-8888' };
       wx.showToast({ title: msgs[action] || '功能开发中', icon: 'none', duration: 2000 }); return;
     }
     target.tab !== undefined ? this.setData({ currentTab: target.tab }) : wx.navigateTo({ url: target });
