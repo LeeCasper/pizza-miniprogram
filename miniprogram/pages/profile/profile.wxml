@@ -165,7 +165,12 @@
               </view>
               <text class="grid-label">余额充值</text>
             </view>
-            <view class="grid-item grid-item-placeholder"></view>
+            <view class="grid-item" bindtap="onMenuItem" data-action="claimcenter">
+              <view class="grid-icon-wrap grid-icon-red">
+                <image class="grid-icon" src="/images/grid-claim.png" mode="aspectFit"></image>
+              </view>
+              <text class="grid-label">领券中心</text>
+            </view>
           </view>
         </swiper-item>
         <swiper-item>
