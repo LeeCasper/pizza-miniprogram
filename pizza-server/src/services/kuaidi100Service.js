@@ -140,44 +140,85 @@ function clearCache() {
 /**
  * Auto-detect carrier company from a tracking number.
  *
- * Uses kuaidi100's public auto-detection endpoint (no auth required).
- * Enriches results with Chinese carrier names via carrierMap.
+ * Uses kuaidi100's query endpoint with com="autonumber" when credentials are available
+ * (same MD5-signing as queryTracking). Falls back to public endpoint if no credentials.
  *
  * @param {string} trackingNo
+ * @param {string} [customer] - kuaidi100 customer ID
+ * @param {string} [key] - kuaidi100 API key
  * @returns {Promise<object>} { com, auto, state } with each item having .name
  */
-async function autoDetectCarrier(trackingNo) {
-  log.info({ trackingNo }, 'kuaidi100 auto-detect carrier');
+async function autoDetectCarrier(trackingNo, customer, key) {
+  log.info({ trackingNo, hasAuth: !!(customer && key) }, 'kuaidi100 auto-detect carrier');
 
   try {
-    const body = new URLSearchParams({ text: trackingNo }).toString();
+    let result;
 
-    const response = await fetch('https://www.kuaidi100.com/autonumber/autoComNum', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body,
-      signal: AbortSignal.timeout(5000),
-    });
+    if (customer && key) {
+      // Authenticated endpoint — same MD5-signing as queryTracking
+      const paramJson = JSON.stringify({ com: 'autonumber', num: trackingNo });
+      const sign = generateSign(paramJson, key, customer);
+      const body = buildFormBody(customer, sign, paramJson);
 
-    if (!response.ok) {
-      throw new Error(`快递100 HTTP ${response.status}`);
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body,
+        signal: AbortSignal.timeout(5000),
+      });
+
+      if (response.ok) {
+        const raw = await response.json();
+        log.info({ trackingNo, returnCode: raw.returnCode }, 'kuaidi100 auto-detect (auth) response');
+
+        if (raw.returnCode === '200' && raw.data) {
+          // Auth API returns data[] with { comCode, name? } per item
+          result = {
+            com: (raw.data || []).map(item => ({
+              comCode: item.comCode,
+              name: item.name || item.comCode,
+              lengthPre: item.lengthPre,
+            })),
+            auto: [],
+            state: 'ok',
+          };
+        }
+      }
     }
 
-    const result = await response.json();
+    // Fallback to public endpoint if auth not configured or failed
+    if (!result) {
+      const body = new URLSearchParams({ text: trackingNo }).toString();
 
-    // Enrich with Chinese carrier names
-    const { getCarrierName } = require('./carrierMap');
-    if (Array.isArray(result.com)) {
-      result.com = result.com.map(item => ({
-        ...item,
-        name: getCarrierName(item.comCode) || item.comCode,
-      }));
-    }
-    if (Array.isArray(result.auto)) {
-      result.auto = result.auto.map(item => ({
-        ...item,
-        name: getCarrierName(item.comCode) || item.comCode,
-      }));
+      const response = await fetch('https://www.kuaidi100.com/autonumber/autoComNum', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body,
+        signal: AbortSignal.timeout(5000),
+      });
+
+      if (!response.ok) {
+        throw new Error(`快递100 HTTP ${response.status}`);
+      }
+
+      const raw = await response.json();
+
+      // Enrich public API results
+      const { getCarrierName } = require('./carrierMap');
+      if (Array.isArray(raw.com)) {
+        raw.com = raw.com.map(item => ({
+          ...item,
+          name: getCarrierName(item.comCode) || item.comCode,
+        }));
+      }
+      if (Array.isArray(raw.auto)) {
+        raw.auto = raw.auto.map(item => ({
+          ...item,
+          name: getCarrierName(item.comCode) || item.comCode,
+        }));
+      }
+
+      result = raw;
     }
 
     return result;
