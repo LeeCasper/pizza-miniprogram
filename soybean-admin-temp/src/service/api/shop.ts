@@ -126,3 +126,20 @@ export function fetchUpdateShopOrderStatus(id: string, status: string, reason?: 
 export function fetchUpdateShopOrderShipping(id: string, data: { shippingCompany: string; trackingNo: string }) {
   return request<AdminShopOrder>({ url: `/shop/orders/${id}/shipping`, method: 'put', data });
 }
+
+// ───── Carrier Auto-Detect ─────
+export interface CarrierOption {
+  comCode: string;
+  name: string;
+  lengthPre?: number[];
+}
+
+export interface AutoDetectResult {
+  com: CarrierOption[];
+  auto: CarrierOption[];
+  state: string;
+}
+
+export function fetchAutoDetectCarrier(trackingNo: string) {
+  return request<AutoDetectResult>({ url: '/shop/auto-detect-carrier', method: 'post', data: { trackingNo } });
+}

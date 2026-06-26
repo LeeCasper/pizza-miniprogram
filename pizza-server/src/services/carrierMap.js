@@ -129,4 +129,53 @@ function getCarrierCode(shippingCompany) {
   return null;
 }
 
-module.exports = { getCarrierCode, CARRIER_MAP };
+/**
+ * Reverse lookup: kuaidi100 comCode → primary Chinese carrier name.
+ * Used to enrich auto-detection results for admin display.
+ */
+const CODE_TO_NAME = {
+  'shunfeng': '顺丰速运',
+  'zhongtong': '中通快递',
+  'yuantong': '圆通速递',
+  'shentong': '申通快递',
+  'yunda': '韵达快递',
+  'huitongkuaidi': '百世快递',
+  'jtexpress': '极兔速递',
+  'youzhengguonei': '邮政快递包裹',
+  'ems': 'EMS',
+  'jd': '京东物流',
+  'debangwuliu': '德邦快递',
+  'yousukuaidi': '优速快递',
+  'tiantian': '天天快递',
+  'zhaijisong': '宅急送',
+  'cainiao': '菜鸟裹裹',
+  'danniao': '丹鸟',
+  'fedex': 'FedEx',
+  'dhl': 'DHL',
+  'ups': 'UPS',
+  'tnt': 'TNT',
+  'annengwuliu': '安能物流',
+  'yimidida': '壹米滴答',
+  'kuayue': '跨越速运',
+  'lianhaowuliu': '联昊通',
+  'suer': '速尔快递',
+  'guotongkuaidi': '国通快递',
+  'quanfengkuaidi': '全峰快递',
+  'kuaijiesudi': '快捷快递',
+  'rufengda': '如风达',
+  'longbanwuliu': '龙邦物流',
+};
+
+/**
+ * Look up Chinese carrier name from kuaidi100 comCode.
+ * Falls back to returning the raw code if no mapping exists.
+ *
+ * @param {string|null} code - kuaidi100 company code (e.g. "shunfeng")
+ * @returns {string|null}
+ */
+function getCarrierName(code) {
+  if (!code || typeof code !== 'string') return null;
+  return CODE_TO_NAME[code.trim().toLowerCase()] || code;
+}
+
+module.exports = { getCarrierCode, getCarrierName, CARRIER_MAP };

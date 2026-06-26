@@ -56,6 +56,7 @@ router.get('/shop/orders/:id', shopCtrl.getOrder);
 router.put('/shop/orders/:id/status', shopCtrl.updateOrderStatus);
 router.put('/shop/orders/:id/shipping', shopCtrl.updateShipping);
 router.post('/shop/orders/:id/refund', shopCtrl.refundOrder);
+router.post('/shop/auto-detect-carrier', shopCtrl.autoDetectCarrier);
 
 // Orders
 router.get('/orders', ctrl.listOrders);

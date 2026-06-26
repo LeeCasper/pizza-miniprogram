@@ -137,4 +137,57 @@ function clearCache() {
   log.info('kuaidi100 cache cleared');
 }
 
-module.exports = { queryTracking, clearCache };
+/**
+ * Auto-detect carrier company from a tracking number.
+ *
+ * Uses kuaidi100's public auto-detection endpoint (no auth required).
+ * Enriches results with Chinese carrier names via carrierMap.
+ *
+ * @param {string} trackingNo
+ * @returns {Promise<object>} { com, auto, state } with each item having .name
+ */
+async function autoDetectCarrier(trackingNo) {
+  log.info({ trackingNo }, 'kuaidi100 auto-detect carrier');
+
+  try {
+    const body = new URLSearchParams({ text: trackingNo }).toString();
+
+    const response = await fetch('https://www.kuaidi100.com/autonumber/autoComNum', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body,
+      signal: AbortSignal.timeout(5000),
+    });
+
+    if (!response.ok) {
+      throw new Error(`快递100 HTTP ${response.status}`);
+    }
+
+    const result = await response.json();
+
+    // Enrich with Chinese carrier names
+    const { getCarrierName } = require('./carrierMap');
+    if (Array.isArray(result.com)) {
+      result.com = result.com.map(item => ({
+        ...item,
+        name: getCarrierName(item.comCode) || item.comCode,
+      }));
+    }
+    if (Array.isArray(result.auto)) {
+      result.auto = result.auto.map(item => ({
+        ...item,
+        name: getCarrierName(item.comCode) || item.comCode,
+      }));
+    }
+
+    return result;
+  } catch (err) {
+    log.error({ err, trackingNo }, 'kuaidi100 auto-detect carrier failed');
+    throw Object.assign(
+      new Error('识别物流公司失败，请手动输入'),
+      { statusCode: 502 }
+    );
+  }
+}
+
+module.exports = { queryTracking, clearCache, autoDetectCarrier };

@@ -2,6 +2,7 @@
 const shopProductService = require('../services/shopProductService');
 const shopCategoryService = require('../services/shopCategoryService');
 const shopOrderService = require('../services/shopOrderService');
+const { autoDetectCarrier } = require('../services/kuaidi100Service');
 const { createLogger } = require('../utils/logger');
 const log = createLogger('AdminShop');
 
@@ -269,6 +270,23 @@ const adminShopController = {
       if (err.statusCode) return res.status(err.statusCode).json({ code: err.statusCode, message: err.message });
       log.error({ err }, 'admin update shop order shipping failed');
       res.status(500).json({ code: 500, message: '更新物流信息失败' });
+    }
+  },
+
+  async autoDetectCarrier(req, res) {
+    try {
+      const { trackingNo } = req.body;
+      if (!trackingNo || !trackingNo.trim()) {
+        return res.status(400).json({ code: 400, message: '请提供运单号' });
+      }
+      const data = await autoDetectCarrier(trackingNo.trim());
+      res.json({ code: 0, data });
+    } catch (err) {
+      if (err.statusCode) {
+        return res.status(err.statusCode).json({ code: err.statusCode, message: err.message });
+      }
+      log.error({ err }, 'admin auto-detect carrier failed');
+      res.status(500).json({ code: 500, message: '识别物流公司失败' });
     }
   },
 };

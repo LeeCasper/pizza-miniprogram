@@ -2,7 +2,7 @@
 import { ref, onMounted, h } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { NCard, NDescriptions, NDescriptionsItem, NTag, NSelect, NButton, NSpace, NDataTable, NDivider, NInput, useDialog } from 'naive-ui';
-import { fetchShopOrder, fetchUpdateShopOrderStatus, fetchUpdateShopOrderShipping } from '@/service/api/shop';
+import { fetchShopOrder, fetchUpdateShopOrderStatus, fetchUpdateShopOrderShipping, fetchAutoDetectCarrier } from '@/service/api/shop';
 import { formatPrice } from '@/utils/format';
 
 defineOptions({ name: 'ShopOrdersDetail' });
@@ -15,6 +15,9 @@ const loading = ref(false);
 const shippingCompany = ref('');
 const trackingNo = ref('');
 const shippingLoading = ref(false);
+const detectedCarriersDetail = ref<{ label: string; value: string }[]>([]);
+const detectLoadingDetail = ref(false);
+const detectMessageDetail = ref('');
 const refundReason = ref('');
 
 const statusOptionsMap: Record<string, { label: string; value: string; type: 'warning' | 'info' | 'success' | 'error' | 'default' }[]> = {
@@ -105,6 +108,37 @@ async function handleStatusChange(status: string) {
   }
 }
 
+async function handleAutoDetectDetail() {
+  if (!trackingNo.value.trim()) {
+    window.$message?.warning('请先输入运单号');
+    return;
+  }
+  detectLoadingDetail.value = true;
+  detectMessageDetail.value = '';
+  detectedCarriersDetail.value = [];
+  const { data, error } = await fetchAutoDetectCarrier(trackingNo.value.trim());
+  detectLoadingDetail.value = false;
+  if (error || !data) {
+    detectMessageDetail.value = '识别失败，请手动选择物流公司';
+    return;
+  }
+  const carriers = (data.auto?.length ? data.auto : data.com) || [];
+  if (carriers.length === 0) {
+    detectMessageDetail.value = '未识别到物流公司，请手动输入';
+    return;
+  }
+  detectedCarriersDetail.value = carriers.map((c: any) => ({
+    label: c.name || c.comCode,
+    value: c.name || c.comCode,
+  }));
+  if (carriers.length === 1) {
+    shippingCompany.value = carriers[0].name || carriers[0].comCode;
+    detectMessageDetail.value = `已识别：${carriers[0].name || carriers[0].comCode}`;
+  } else {
+    detectMessageDetail.value = `识别到 ${carriers.length} 家物流公司，请选择`;
+  }
+}
+
 async function handleSaveShipping() {
   if (!shippingCompany.value.trim() || !trackingNo.value.trim()) {
     window.$message?.warning('请填写物流公司和运单号');
@@ -187,8 +221,24 @@ onMounted(() => { loadOrder(); });
       <template v-if="order.status === 'paid' || order.status === 'shipped'">
         <h4 style="margin-bottom:12px">物流信息</h4>
         <NSpace vertical style="max-width: 400px">
-          <NInput v-model:value="shippingCompany" placeholder="物流公司" />
-          <NInput v-model:value="trackingNo" placeholder="运单号" />
+          <NInput v-model:value="trackingNo" placeholder="运单号" @blur="handleAutoDetectDetail" />
+          <NSpace align="center">
+            <NButton size="small" :loading="detectLoadingDetail" @click="handleAutoDetectDetail">
+              识别物流公司
+            </NButton>
+            <span v-if="detectMessageDetail" style="font-size:13px; color: var(--n-text-color-3)">
+              {{ detectMessageDetail }}
+            </span>
+          </NSpace>
+          <NSelect
+            v-if="detectedCarriersDetail.length > 1"
+            v-model:value="shippingCompany"
+            :options="detectedCarriersDetail"
+            placeholder="选择物流公司"
+            filterable
+            tag
+          />
+          <NInput v-else v-model:value="shippingCompany" placeholder="物流公司" />
           <NButton type="primary" :loading="shippingLoading" @click="handleSaveShipping">保存物流信息</NButton>
         </NSpace>
         <NDivider />

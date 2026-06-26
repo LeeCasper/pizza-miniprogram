@@ -393,6 +393,15 @@ export const generatedRoutes: GeneratedRoute[] = [
         }
       },
       {
+        name: 'settings_logistics',
+        path: '/settings/logistics',
+        component: 'view.settings_logistics',
+        meta: {
+          title: 'settings_logistics',
+          i18nKey: 'route.settings_logistics'
+        }
+      },
+      {
         name: 'settings_map',
         path: '/settings/map',
         component: 'view.settings_map',
