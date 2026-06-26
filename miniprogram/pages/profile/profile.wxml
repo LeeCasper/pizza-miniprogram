@@ -177,13 +177,13 @@
           <view class="grid-actions">
             <view class="grid-item" bindtap="onMenuItem" data-action="shopOrders">
               <view class="grid-icon-wrap grid-icon-red">
-                <text class="grid-icon-emoji">📋</text>
+                <image class="grid-icon" src="/images/grid-shop-orders.png" mode="aspectFit"></image>
               </view>
               <text class="grid-label">会员订单</text>
             </view>
             <view class="grid-item" bindtap="onMenuItem" data-action="logistics">
               <view class="grid-icon-wrap grid-icon-blue">
-                <text class="grid-icon-emoji">🚚</text>
+                <image class="grid-icon" src="/images/grid-logistics.png" mode="aspectFit"></image>
               </view>
               <text class="grid-label">我的物流</text>
             </view>
