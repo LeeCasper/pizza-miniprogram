@@ -47,6 +47,11 @@ const userService = {
     return this.findById(id);
   },
 
+  async updateName(id, name) {
+    await pool.query('UPDATE users SET name = ? WHERE id = ?', [name, id]);
+    return this.findById(id);
+  },
+
   async updatePoints(id, points, memberLevel) {
     await pool.query(
       'UPDATE users SET points = ?, member_level = ? WHERE id = ?',

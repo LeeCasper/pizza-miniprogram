@@ -62,6 +62,7 @@ import {
   useDialog,
 } from 'naive-ui';
 import { fetchDefaultAvatars, fetchAddDefaultAvatar, fetchDeleteDefaultAvatar } from '@/service/api';
+import { getToken } from '@/store/modules/auth/shared';
 
 defineOptions({ name: 'SettingsAvatars' });
 
@@ -123,7 +124,7 @@ async function handleFileChange(e: Event) {
 
   loading.value = true;
   try {
-    const token = localStorage.getItem('token') || '';
+    const token = getToken();
     const resp = await fetch('/api/v1/admin/default-avatars', {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },

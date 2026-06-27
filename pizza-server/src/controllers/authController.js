@@ -1,5 +1,6 @@
 const userService = require('../services/userService');
 const defaultAvatarService = require('../services/defaultAvatarService');
+const cuteNames = require('../utils/cuteNames');
 const { code2session, getPhoneNumber } = require('../utils/wechat');
 const { signToken } = require('../utils/jwt');
 const { computeTier } = require('../utils/memberTier');
@@ -87,9 +88,10 @@ const authController = {
 
       await userService.updatePhone(req.user.id, phone);
 
-      // If user has no avatar, assign a random default one
+      // If user has no avatar/nickname, assign random defaults
       const user = await userService.findById(req.user.id);
       let avatar = user.avatar || '';
+      let name = user.name || '';
       if (!avatar) {
         const randomAvatar = await defaultAvatarService.getRandom();
         if (randomAvatar) {
@@ -97,10 +99,15 @@ const authController = {
           avatar = randomAvatar;
         }
       }
+      if (!name) {
+        const randomName = cuteNames.getRandom();
+        await userService.updateName(req.user.id, randomName);
+        name = randomName;
+      }
 
       res.json({
         code: 0,
-        data: { phone, avatar },
+        data: { phone, avatar, name },
         message: '手机号绑定成功',
       });
     } catch (err) {

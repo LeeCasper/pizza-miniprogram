@@ -60,11 +60,14 @@ Component({
       api.post('/auth/phone', { code }).then(res => {
         wx.hideLoading();
         if (res.code === 0) {
-          const { phone, avatar } = res.data;
+          const { phone, avatar, name } = res.data;
           app.globalData.userInfo.phone = phone;
-          // 服务端可能分配了随机默认头像
+          // 服务端可能分配了随机默认头像和可爱昵称
           if (avatar) {
             app.globalData.userInfo.avatar = avatar;
+          }
+          if (name) {
+            app.globalData.userInfo.name = name;
           }
           wx.setStorageSync('userInfo', app.globalData.userInfo);
           wx.showToast({ title: '登录成功', icon: 'success' });
