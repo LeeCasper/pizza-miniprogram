@@ -28,6 +28,11 @@ function request(path, options = {}) {
         if (res.statusCode >= 200 && res.statusCode < 300) {
           resolve(res.data);
         } else if (res.statusCode === 401 && needAuth) {
+          // 已主动退出，不再自动重登
+          if (wx.getStorageSync('_loggedOut')) {
+            reject(res.data || { code: 401, message: '未登录' });
+            return;
+          }
           // Token expired — re-login and retry once
           doLogin().then(() => {
             request(path, options).then(resolve).catch(reject);
@@ -69,6 +74,8 @@ function doLogin() {
             pendingLoginPromise = null;
             if (result.statusCode === 200 && result.data.code === 0) {
               const { token, user } = result.data.data;
+              // 登录成功，清除退出标记
+              wx.removeStorageSync('_loggedOut');
               wx.setStorageSync('token', token);
               wx.setStorageSync('userInfo', user);
               resolve(user);

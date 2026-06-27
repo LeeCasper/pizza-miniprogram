@@ -14,10 +14,13 @@ function logout() {
         if (res.confirm) {
           wx.removeStorageSync('token');
           wx.removeStorageSync('userInfo');
+          // 设置退出标记，阻止 api.js 的 401 自动重登
+          wx.setStorageSync('_loggedOut', '1');
           const app = getApp();
           if (app && app.globalData) {
             app.globalData.userInfo = {};
             app.globalData.token = '';
+            app.globalData._loggedOut = true;
           }
           wx.showToast({ title: '已退出', icon: 'success' });
         }

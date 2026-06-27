@@ -1,5 +1,5 @@
 // components/quick-login/quick-login.js — 微信快捷登录
-const { api, fixImageUrl, BASE_URL } = require('../../utils/api');
+const { api, doLogin, fixImageUrl, BASE_URL } = require('../../utils/api');
 const app = getApp();
 
 Component({
@@ -107,6 +107,10 @@ Component({
       }
       wx.showLoading({ title: '登录中...' });
 
+      // 用户主动登录，清除退出标记
+      wx.removeStorageSync('_loggedOut');
+      if (app.globalData) app.globalData._loggedOut = false;
+
       const { avatarUrl, nickname } = this.data;
 
       // 构建请求体：有则有，无则后端随机默认
@@ -123,7 +127,12 @@ Component({
         ? this._uploadAvatar(avatarUrl).catch(() => null)
         : Promise.resolve(null);
 
-      avatarPromise.then((permanentAvatarUrl) => {
+      // 确保有 token（退出登录后快捷登录需要先静默登录获取 token）
+      const ensureToken = wx.getStorageSync('token')
+        ? Promise.resolve()
+        : doLogin().then(() => {});
+
+      Promise.all([avatarPromise, ensureToken]).then(([permanentAvatarUrl]) => {
         const payload = buildPayload(permanentAvatarUrl);
         return api.post('/auth/phone', payload);
       }).then(res => {

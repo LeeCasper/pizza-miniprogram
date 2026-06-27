@@ -74,7 +74,11 @@ Page({
   },
 
   onLogout() {
-    logout();
+    logout().then(confirmed => {
+      if (confirmed) {
+        setTimeout(() => wx.navigateBack(), 800);
+      }
+    });
   },
 
   onDeleteAccount() {
