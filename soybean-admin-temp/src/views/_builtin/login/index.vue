@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { NCard, NForm, NFormItem, NInput, NButton, NSpace } from 'naive-ui';
 import { useAuthStore } from '@/store/modules/auth';
 import { useAppStore } from '@/store/modules/app';
@@ -17,6 +17,17 @@ const themeStore = useThemeStore();
 const username = ref('');
 const password = ref('');
 const loading = ref(false);
+const icpBeian = ref('');
+const gonganBeian = ref('');
+
+const gonganRecordUrl = computed(() => {
+  const text = gonganBeian.value;
+  if (!text) return '';
+  // Extract the numeric record code from the beian text
+  const digits = text.replace(/\D/g, '');
+  if (!digits) return '';
+  return `http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=${digits}`;
+});
 
 const bgThemeColor = computed(() =>
   themeStore.darkMode ? getPaletteColorByNumber(themeStore.themeColor, 600) : themeStore.themeColor
@@ -37,6 +48,21 @@ async function handleLogin() {
   await authStore.login(username.value, password.value);
   loading.value = false;
 }
+
+onMounted(async () => {
+  try {
+    const resp = await fetch('/api/v1/config/beian');
+    if (resp.ok) {
+      const { data } = await resp.json();
+      if (data) {
+        icpBeian.value = data.icpBeian || '';
+        gonganBeian.value = data.gonganBeian || '';
+      }
+    }
+  } catch {
+    // Non-critical — silently ignore if API is unreachable
+  }
+});
 </script>
 
 <template>
@@ -72,6 +98,44 @@ async function handleLogin() {
         </NForm>
       </div>
     </NCard>
+
+    <!-- ICP & 公安备案 -->
+    <div
+      v-if="icpBeian || gonganBeian"
+      class="absolute bottom-16px left-0 right-0 flex-center flex-col gap-4px text-12px"
+      style="color: var(--n-text-color-3)"
+    >
+      <div v-if="icpBeian" class="flex-center gap-4px">
+        <a
+          href="https://beian.miit.gov.cn/"
+          target="_blank"
+          rel="noopener noreferrer"
+          style="color: inherit; text-decoration: none"
+          class="hover:text-primary transition-colors"
+        >
+          {{ icpBeian }}
+        </a>
+      </div>
+      <div v-if="gonganBeian" class="flex-center gap-4px">
+        <span class="inline-block w-14px h-14px flex-shrink-0">
+          <svg viewBox="0 0 128 128" width="100%" height="100%" fill="currentColor" opacity="0.5">
+            <path d="M64 8L16 32v32c0 44.2 20.5 85.4 48 96 27.5-10.6 48-51.8 48-96V32L64 8z" fill="#1367C8"/>
+            <path d="M64 20.5L23.5 41v25c0 39.6 18.7 76.6 40.5 85.4 21.8-8.8 40.5-45.8 40.5-85.4V41L64 20.5z" fill="#FFF"/>
+            <text x="64" y="82" text-anchor="middle" font-size="36" font-weight="bold" fill="#1367C8">公</text>
+            <text x="64" y="112" text-anchor="middle" font-size="14" font-weight="bold" fill="#1367C8">安</text>
+          </svg>
+        </span>
+        <a
+          :href="gonganRecordUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          style="color: inherit; text-decoration: none"
+          class="hover:text-primary transition-colors"
+        >
+          {{ gonganBeian }}
+        </a>
+      </div>
+    </div>
   </div>
 </template>
 

@@ -185,12 +185,16 @@ export interface BusinessSettings {
   orderCancelMinutes: number;
   unpaidTimeoutMinutes: number;
   storeName: string;
+  icpBeian: string;
+  gonganBeian: string;
 }
 
 export interface BusinessSettingsForm {
   orderCancelMinutes?: number;
   unpaidTimeoutMinutes?: number;
   storeName?: string;
+  icpBeian?: string;
+  gonganBeian?: string;
 }
 
 /** Get business settings */

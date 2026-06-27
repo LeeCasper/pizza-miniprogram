@@ -321,21 +321,25 @@ const systemConfigService = {
         orderCancelMinutes: map.biz_order_cancel_minutes || '',
         unpaidTimeoutMinutes: map.biz_order_unpaid_timeout_minutes || '',
         storeName: map.biz_order_store_name || '',
+        icpBeian: map.biz_icp_beian || '',
+        gonganBeian: map.biz_gongan_beian || '',
       };
     } catch (_) {
-      return { orderCancelMinutes: '', unpaidTimeoutMinutes: '', storeName: '' };
+      return { orderCancelMinutes: '', unpaidTimeoutMinutes: '', storeName: '', icpBeian: '', gonganBeian: '' };
     }
   },
 
   /**
    * Update business config in DB (UPSERT per key).
-   * @param {object} entries — { orderCancelMinutes, unpaidTimeoutMinutes, storeName }
+   * @param {object} entries — { orderCancelMinutes, unpaidTimeoutMinutes, storeName, icpBeian, gonganBeian }
    */
   async updateBusinessConfig(entries) {
     const fieldMap = {
       orderCancelMinutes: 'biz_order_cancel_minutes',
       unpaidTimeoutMinutes: 'biz_order_unpaid_timeout_minutes',
       storeName: 'biz_order_store_name',
+      icpBeian: 'biz_icp_beian',
+      gonganBeian: 'biz_gongan_beian',
     };
 
     const conn = await pool.getConnection();
@@ -370,6 +374,8 @@ const systemConfigService = {
       if (dbConfig.orderCancelMinutes !== '') config.business.orderCancelMinutes = parseInt(dbConfig.orderCancelMinutes, 10) || 1;
       if (dbConfig.unpaidTimeoutMinutes !== '') config.business.unpaidTimeoutMinutes = parseInt(dbConfig.unpaidTimeoutMinutes, 10) || 30;
       if (dbConfig.storeName) config.business.storeName = dbConfig.storeName;
+      if (dbConfig.icpBeian !== '') config.business.icpBeian = dbConfig.icpBeian;
+      if (dbConfig.gonganBeian !== '') config.business.gonganBeian = dbConfig.gonganBeian;
     }).catch(err => {
       log.error({ err }, 'failed to sync business config from DB');
     });

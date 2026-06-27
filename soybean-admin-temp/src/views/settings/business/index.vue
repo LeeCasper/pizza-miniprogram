@@ -21,6 +21,8 @@ const form = ref({
   orderCancelMinutes: 1,
   unpaidTimeoutMinutes: 30,
   storeName: '',
+  icpBeian: '',
+  gonganBeian: '',
 });
 
 onMounted(async () => {
@@ -30,6 +32,8 @@ onMounted(async () => {
     form.value.orderCancelMinutes = data.orderCancelMinutes ?? 1;
     form.value.unpaidTimeoutMinutes = data.unpaidTimeoutMinutes ?? 30;
     form.value.storeName = data.storeName || '';
+    form.value.icpBeian = data.icpBeian || '';
+    form.value.gonganBeian = data.gonganBeian || '';
   }
   loading.value = false;
 });
@@ -41,6 +45,8 @@ async function handleSave() {
     orderCancelMinutes: form.value.orderCancelMinutes,
     unpaidTimeoutMinutes: form.value.unpaidTimeoutMinutes,
     storeName: form.value.storeName,
+    icpBeian: form.value.icpBeian,
+    gonganBeian: form.value.gonganBeian,
   };
 
   const { error } = await fetchUpdateBusinessSettings(payload);
@@ -88,6 +94,14 @@ async function handleSave() {
         <NInput v-model:value="form.storeName" placeholder="订单中显示的门店名" />
       </NFormItem>
 
+      <NFormItem label="ICP 备案号">
+        <NInput v-model:value="form.icpBeian" placeholder="例如：沪ICP备2024XXXXXX号-1" />
+      </NFormItem>
+
+      <NFormItem label="公安备案号">
+        <NInput v-model:value="form.gonganBeian" placeholder="例如：沪公网安备 310XXXXXXXXXXX号" />
+      </NFormItem>
+
       <NFormItem label="">
         <div style="color: #999; font-size: 12px; line-height: 1.8">
           <span>· 取消时限：用户下单后可取消的时间窗口。设为 0 表示不允许用户取消。管理员取消不受此限制。</span>
@@ -95,6 +109,8 @@ async function handleSave() {
           <span>· 未支付超时：超过此时间的未支付订单将自动取消并释放库存和优惠券。</span>
           <br />
           <span>· 门店名称：用于订单小票、通知等场景中显示的门店名称。</span>
+          <br />
+          <span>· ICP 备案号和公安备案号：填写后将在管理后台登录页底部展示。留空则不展示对应行。</span>
         </div>
       </NFormItem>
     </NForm>

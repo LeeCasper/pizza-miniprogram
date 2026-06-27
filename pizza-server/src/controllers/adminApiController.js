@@ -1419,6 +1419,8 @@ const adminApiController = {
           orderCancelMinutes: parseInt(cfg.orderCancelMinutes, 10) || config.business.orderCancelMinutes,
           unpaidTimeoutMinutes: parseInt(cfg.unpaidTimeoutMinutes, 10) || config.business.unpaidTimeoutMinutes,
           storeName: cfg.storeName || config.business.storeName,
+          icpBeian: cfg.icpBeian || '',
+          gonganBeian: cfg.gonganBeian || '',
         },
       });
     } catch (err) {
@@ -1450,6 +1452,12 @@ const adminApiController = {
       }
       if (body.storeName !== undefined) {
         entries.storeName = String(body.storeName).trim();
+      }
+      if (body.icpBeian !== undefined) {
+        entries.icpBeian = String(body.icpBeian).trim();
+      }
+      if (body.gonganBeian !== undefined) {
+        entries.gonganBeian = String(body.gonganBeian).trim();
       }
 
       if (Object.keys(entries).length > 0) {
