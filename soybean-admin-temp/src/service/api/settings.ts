@@ -24,6 +24,7 @@ export interface PaySettings {
   privateKey: string;
   platformCert: string;
   notifyUrl: string;
+  refundNotifyUrl: string;
   _hasPrivateKey?: boolean;
   _hasPlatformCert?: boolean;
 }
@@ -35,6 +36,7 @@ export interface PaySettingsForm {
   privateKey?: string;
   platformCert?: string;
   notifyUrl?: string;
+  refundNotifyUrl?: string;
 }
 
 // ── Printer Settings ──────────────────────────────────

@@ -39,10 +39,11 @@ const systemConfigService = {
         privateKey: map.wx_pay_private_key || '',
         platformCert: map.wx_pay_platform_cert || '',
         notifyUrl: map.wx_pay_notify_url || '',
+        refundNotifyUrl: map.wx_pay_refund_notify_url || '',
       };
     } catch (_) {
       // Table might not exist yet — return empty
-      return { mchId: '', apiV3Key: '', certSerialNo: '', privateKey: '', platformCert: '', notifyUrl: '' };
+      return { mchId: '', apiV3Key: '', certSerialNo: '', privateKey: '', platformCert: '', notifyUrl: '', refundNotifyUrl: '' };
     }
   },
 
@@ -50,7 +51,7 @@ const systemConfigService = {
    * Update payment config in DB (UPSERT per key).
    * Also syncs cert PEM content to disk files.
    *
-   * @param {object} entries - { mchId, apiV3Key, certSerialNo, privateKey, platformCert, notifyUrl }
+   * @param {object} entries - { mchId, apiV3Key, certSerialNo, privateKey, platformCert, notifyUrl, refundNotifyUrl }
    */
   async updatePayConfig(entries) {
     const fieldMap = {
@@ -60,6 +61,7 @@ const systemConfigService = {
       privateKey: 'wx_pay_private_key',
       platformCert: 'wx_pay_platform_cert',
       notifyUrl: 'wx_pay_notify_url',
+      refundNotifyUrl: 'wx_pay_refund_notify_url',
     };
 
     const conn = await pool.getConnection();
@@ -123,6 +125,7 @@ const systemConfigService = {
       if (dbConfig.apiV3Key) config.wxPay.apiV3Key = dbConfig.apiV3Key;
       if (dbConfig.certSerialNo) config.wxPay.certSerialNo = dbConfig.certSerialNo;
       if (dbConfig.notifyUrl) config.wxPay.notifyUrl = dbConfig.notifyUrl;
+      if (dbConfig.refundNotifyUrl) config.wxPay.refundNotifyUrl = dbConfig.refundNotifyUrl;
 
       // Store PEM content directly on config for wechatPay.js to use
       if (dbConfig.privateKey) config.wxPay._privateKeyContent = dbConfig.privateKey;

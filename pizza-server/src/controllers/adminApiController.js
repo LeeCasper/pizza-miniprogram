@@ -1136,6 +1136,7 @@ const adminApiController = {
         privateKey: cfg.privateKey ? '已配置' : '未配置',
         platformCert: cfg.platformCert ? '已配置' : '未配置',
         notifyUrl: cfg.notifyUrl,
+        refundNotifyUrl: cfg.refundNotifyUrl,
       };
 
       masked._hasPrivateKey = !!cfg.privateKey;
@@ -1149,7 +1150,7 @@ const adminApiController = {
 
   /**
    * PUT /api/v1/admin/settings/pay
-   * Body: { mchId, apiV3Key, certSerialNo, privateKey, platformCert, notifyUrl }
+   * Body: { mchId, apiV3Key, certSerialNo, privateKey, platformCert, notifyUrl, refundNotifyUrl }
    *
    * If apiV3Key === '****' (masked placeholder), keep existing value.
    * If privateKey/platformCert is empty, keep existing value.
@@ -1163,6 +1164,7 @@ const adminApiController = {
         mchId: body.mchId !== undefined ? body.mchId : undefined,
         certSerialNo: body.certSerialNo !== undefined ? body.certSerialNo : undefined,
         notifyUrl: body.notifyUrl !== undefined ? body.notifyUrl : undefined,
+        refundNotifyUrl: body.refundNotifyUrl !== undefined ? body.refundNotifyUrl : undefined,
       };
 
       if (body.apiV3Key !== undefined && body.apiV3Key !== '****' && !body.apiV3Key.includes('****')) {

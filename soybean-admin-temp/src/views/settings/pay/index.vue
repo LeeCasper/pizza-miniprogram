@@ -25,6 +25,7 @@ const form = ref({
   privateKey: '',
   platformCert: '',
   notifyUrl: '',
+  refundNotifyUrl: '',
 });
 
 // Track whether cert PEM content was modified
@@ -42,6 +43,7 @@ onMounted(async () => {
     form.value.privateKey = data.privateKey || '';
     form.value.platformCert = data.platformCert || '';
     form.value.notifyUrl = data.notifyUrl || 'https://artaides.com/api/v1/pay/notify';
+    form.value.refundNotifyUrl = data.refundNotifyUrl || '';
   }
   loading.value = false;
 });
@@ -64,6 +66,7 @@ async function handleSave() {
     mchId: form.value.mchId,
     certSerialNo: form.value.certSerialNo,
     notifyUrl: form.value.notifyUrl,
+    refundNotifyUrl: form.value.refundNotifyUrl,
   };
 
   // Only send key if modified (not the masked placeholder)
@@ -157,6 +160,10 @@ async function handleSave() {
 
         <NFormItem label="回调 URL" path="notifyUrl">
           <NInput v-model:value="form.notifyUrl" placeholder="支付结果通知地址" />
+        </NFormItem>
+
+        <NFormItem label="退款回调 URL" path="refundNotifyUrl">
+          <NInput v-model:value="form.refundNotifyUrl" placeholder="退款结果通知地址" />
         </NFormItem>
       </NForm>
     </NCard>
