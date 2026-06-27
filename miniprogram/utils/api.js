@@ -4,7 +4,7 @@
  */
 
 // Production domain; change to localhost for local dev
-const BASE_URL = 'https://artaides.com/api/v1';
+const BASE_URL = 'https://pizza.artaides.com/api/v1';
 
 let pendingLoginPromise = null;
 
@@ -111,8 +111,8 @@ function fixImageUrl(url) {
   if (!url) return url;
   if (url.startsWith('https://')) return url;
   if (url.startsWith('http://')) return url.replace('http://', 'https://');
-  if (url.startsWith('/uploads/')) return 'https://artaides.com' + url;
-  if (url.startsWith('uploads/')) return 'https://artaides.com/' + url;
+  if (url.startsWith('/uploads/')) return 'https://pizza.artaides.com' + url;
+  if (url.startsWith('uploads/')) return 'https://pizza.artaides.com/' + url;
   return url;
 }
 
