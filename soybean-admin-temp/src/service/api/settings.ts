@@ -246,4 +246,40 @@ export function fetchUpdateLogisticsSettings(data: LogisticsSettingsForm) {
   });
 }
 
+// ── Storage Settings ─────────────────────────────────
+
+export interface StorageSettings {
+  storageType: string;
+  cosSecretId: string;
+  cosSecretKey: string;
+  cosBucket: string;
+  cosRegion: string;
+  cosBaseUrl: string;
+  _hasSecretKey: boolean;
+}
+
+export interface StorageSettingsForm {
+  storageType?: string;
+  cosSecretId?: string;
+  cosSecretKey?: string;
+  cosBucket?: string;
+  cosRegion?: string;
+  cosBaseUrl?: string;
+}
+
+export function fetchStorageSettings() {
+  return request<StorageSettings>({
+    url: '/settings/storage',
+    method: 'GET',
+  });
+}
+
+export function fetchUpdateStorageSettings(data: StorageSettingsForm) {
+  return request<null>({
+    url: '/settings/storage',
+    method: 'PUT',
+    data,
+  });
+}
+
 // ── Theme Settings removed ──

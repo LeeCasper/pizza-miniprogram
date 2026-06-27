@@ -140,6 +140,15 @@ const customRoutes: CustomRoute[] = [
           i18nKey: 'route.settings_logistics',
         },
       },
+      {
+        name: 'settings_storage',
+        path: '/settings/storage',
+        component: 'view.settings_storage',
+        meta: {
+          title: '存储配置',
+          i18nKey: 'route.settings_storage',
+        },
+      },
     ],
   },
   // Multi-level routes — parent has layout.base, children have view.xxx

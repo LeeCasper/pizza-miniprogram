@@ -75,6 +75,15 @@ const config = {
     key: process.env.LOGISTICS_KEY || '',
     enabled: process.env.LOGISTICS_ENABLED !== 'false',
   },
+
+  storage: {
+    storageType: process.env.STORAGE_TYPE || 'local',
+    cosSecretId: process.env.COS_SECRET_ID || '',
+    cosSecretKey: process.env.COS_SECRET_KEY || '',
+    cosBucket: process.env.COS_BUCKET || '',
+    cosRegion: process.env.COS_REGION || 'ap-guangzhou',
+    cosBaseUrl: process.env.COS_BASE_URL || '',
+  },
 };
 
 // ── Production env validation ─────────────────────────

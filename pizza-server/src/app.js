@@ -290,6 +290,7 @@ const server = app.listen(PORT, async () => {
     systemConfigService.syncMapConfigToMemory();
     systemConfigService.syncBusinessConfigToMemory();
     systemConfigService.syncLogisticsConfigToMemory();
+    systemConfigService.syncStorageConfigToMemory();
   } catch (err) {
     serverLog.warn({ err }, 'Could not sync config from DB');
   }

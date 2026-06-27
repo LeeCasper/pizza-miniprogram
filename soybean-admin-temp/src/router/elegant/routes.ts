@@ -429,6 +429,15 @@ export const generatedRoutes: GeneratedRoute[] = [
         }
       },
       {
+        name: 'settings_storage',
+        path: '/settings/storage',
+        component: 'view.settings_storage',
+        meta: {
+          title: 'settings_storage',
+          i18nKey: 'route.settings_storage'
+        }
+      },
+      {
         name: 'settings_store',
         path: '/settings/store',
         component: 'view.settings_store',

@@ -452,6 +452,74 @@ const systemConfigService = {
     });
   },
 
+  // ── Storage Config ─────────────────────────────────
+
+  async getStorageConfig() {
+    try {
+      const [rows] = await pool.query(
+        "SELECT config_key, config_value FROM system_config WHERE config_key LIKE 'storage_%'"
+      );
+      const map = {};
+      rows.forEach(r => { map[r.config_key] = r.config_value || ''; });
+      return {
+        storageType: map.storage_type || '',
+        cosSecretId: map.storage_cos_secret_id || '',
+        cosSecretKey: map.storage_cos_secret_key || '',
+        cosBucket: map.storage_cos_bucket || '',
+        cosRegion: map.storage_cos_region || '',
+        cosBaseUrl: map.storage_cos_base_url || '',
+      };
+    } catch (_) {
+      return { storageType: '', cosSecretId: '', cosSecretKey: '', cosBucket: '', cosRegion: '', cosBaseUrl: '' };
+    }
+  },
+
+  async updateStorageConfig(entries) {
+    const fieldMap = {
+      storageType: 'storage_type',
+      cosSecretId: 'storage_cos_secret_id',
+      cosSecretKey: 'storage_cos_secret_key',
+      cosBucket: 'storage_cos_bucket',
+      cosRegion: 'storage_cos_region',
+      cosBaseUrl: 'storage_cos_base_url',
+    };
+
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+      for (const [camelKey, dbKey] of Object.entries(fieldMap)) {
+        if (entries[camelKey] !== undefined) {
+          const value = entries[camelKey] != null ? String(entries[camelKey]) : '';
+          await conn.query(
+            'INSERT INTO system_config (config_key, config_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE config_value = ?',
+            [dbKey, value, value]
+          );
+        }
+      }
+      await conn.commit();
+    } catch (err) {
+      await conn.rollback();
+      throw err;
+    } finally {
+      conn.release();
+    }
+
+    this.syncStorageConfigToMemory();
+  },
+
+  syncStorageConfigToMemory() {
+    this.getStorageConfig().then(dbConfig => {
+      if (dbConfig.storageType !== '') config.storage.storageType = dbConfig.storageType;
+      if (dbConfig.cosSecretId) config.storage.cosSecretId = dbConfig.cosSecretId;
+      if (dbConfig.cosSecretKey) config.storage.cosSecretKey = dbConfig.cosSecretKey;
+      if (dbConfig.cosBucket) config.storage.cosBucket = dbConfig.cosBucket;
+      if (dbConfig.cosRegion) config.storage.cosRegion = dbConfig.cosRegion;
+      if (dbConfig.cosBaseUrl !== '') config.storage.cosBaseUrl = dbConfig.cosBaseUrl;
+    }).catch(err => {
+      log.error({ err }, 'failed to sync storage config from DB');
+    });
+  },
+
 };
 
 module.exports = systemConfigService;

@@ -1524,6 +1524,71 @@ const adminApiController = {
     }
   },
 
+  // ── Storage Settings ────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/settings/storage
+   */
+  async getStorageSettings(req, res, next) {
+    try {
+      const cfg = await systemConfigService.getStorageConfig();
+      res.json({
+        code: 0,
+        data: {
+          storageType: cfg.storageType || 'local',
+          cosSecretId: cfg.cosSecretId || '',
+          cosSecretKey: cfg.cosSecretKey ? '****' : '',
+          cosBucket: cfg.cosBucket || '',
+          cosRegion: cfg.cosRegion || 'ap-guangzhou',
+          cosBaseUrl: cfg.cosBaseUrl || '',
+          _hasSecretKey: !!cfg.cosSecretKey,
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * PUT /api/v1/admin/settings/storage
+   */
+  async updateStorageSettings(req, res, next) {
+    try {
+      const body = req.body || {};
+      const entries = {};
+
+      if (body.storageType !== undefined) {
+        entries.storageType = String(body.storageType);
+      }
+      if (body.cosSecretId !== undefined) {
+        entries.cosSecretId = String(body.cosSecretId).trim();
+      }
+      if (body.cosSecretKey !== undefined) {
+        const v = String(body.cosSecretKey).trim();
+        if (v && v !== '****') {
+          entries.cosSecretKey = v;
+        }
+      }
+      if (body.cosBucket !== undefined) {
+        entries.cosBucket = String(body.cosBucket).trim();
+      }
+      if (body.cosRegion !== undefined) {
+        entries.cosRegion = String(body.cosRegion).trim();
+      }
+      if (body.cosBaseUrl !== undefined) {
+        entries.cosBaseUrl = String(body.cosBaseUrl).trim();
+      }
+
+      if (Object.keys(entries).length > 0) {
+        await systemConfigService.updateStorageConfig(entries);
+      }
+
+      res.json({ code: 0, message: '存储配置已保存' });
+    } catch (err) {
+      next(err);
+    }
+  },
+
   // ── Audit Logs ──────────────────────────────────────
 
   /**

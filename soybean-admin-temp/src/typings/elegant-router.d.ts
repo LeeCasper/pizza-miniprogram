@@ -60,6 +60,7 @@ declare module "@elegant-router/types" {
     "settings_map": "/settings/map";
     "settings_pay": "/settings/pay";
     "settings_printer": "/settings/printer";
+    "settings_storage": "/settings/storage";
     "settings_store": "/settings/store";
     "shop": "/shop";
     "shop_categories": "/shop/categories";
@@ -166,6 +167,7 @@ declare module "@elegant-router/types" {
     | "settings_map"
     | "settings_pay"
     | "settings_printer"
+    | "settings_storage"
     | "settings_store"
     | "shop_categories"
     | "shop_orders_detail"

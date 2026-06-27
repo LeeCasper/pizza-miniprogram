@@ -11,11 +11,25 @@ const uploadController = {
         return res.status(400).json({ code: 400, message: '请选择图片' });
       }
 
-      const relativePath = '/uploads/' + req.file.filename;
-      // Store relative path — frontend prepends domain via fixImageUrl
-      await userService.updateAvatar(req.user.id, relativePath);
+      let url = '/uploads/' + req.file.filename;
 
-      res.json({ code: 0, data: { url: relativePath }, message: '头像更新成功' });
+      // If COS is enabled, push to COS
+      if (config.storage.storageType === 'cos') {
+        const cosService = require('../services/cosService');
+        if (cosService.isConfigured()) {
+          try {
+            const localPath = path.join(config.upload.dir, req.file.filename);
+            url = await cosService.uploadFile(localPath, req.file.filename);
+            try { fs.unlinkSync(localPath); } catch (_) { /* ignore */ }
+          } catch (err) {
+            console.error('[uploadAvatar] COS upload failed, keeping local file:', err.message);
+          }
+        }
+      }
+
+      await userService.updateAvatar(req.user.id, url);
+
+      res.json({ code: 0, data: { url }, message: '头像更新成功' });
     } catch (err) {
       next(err);
     }
@@ -28,8 +42,24 @@ const uploadController = {
         return res.status(400).json({ code: 400, message: '请选择图片' });
       }
 
-      const relativePath = '/uploads/' + req.file.filename;
-      const url = relativePath; // relative path — frontend prepends base URL as needed
+      let url = '/uploads/' + req.file.filename;
+
+      // If COS is enabled and configured, push to COS and delete local temp
+      if (config.storage.storageType === 'cos') {
+        const cosService = require('../services/cosService');
+        if (cosService.isConfigured()) {
+          try {
+            const localPath = path.join(config.upload.dir, req.file.filename);
+            url = await cosService.uploadFile(localPath, req.file.filename);
+            try { fs.unlinkSync(localPath); } catch (_) { /* ignore cleanup errors */ }
+          } catch (err) {
+            // COS failed — keep local file as fallback
+            console.error('[uploadImage] COS upload failed, keeping local file:', err.message);
+          }
+        } else {
+          console.warn('[uploadImage] COS enabled but not configured — keeping local file');
+        }
+      }
 
       res.json({
         code: 0,
@@ -108,6 +138,17 @@ const uploadController = {
         return res.status(400).json({ code: 400, message: '无效的文件名' });
       }
 
+      // Check for optional COS URL in request body (full URL stored in DB)
+      const fileUrl = req.body && req.body.url;
+
+      if (fileUrl && fileUrl.startsWith('https://')) {
+        // Delete from COS
+        const cosService = require('../services/cosService');
+        await cosService.deleteFile(fileUrl);
+        return res.json({ code: 0, message: '删除成功' });
+      }
+
+      // Local file delete
       const filePath = path.join(config.upload.dir, filename);
 
       if (!fs.existsSync(filePath)) {

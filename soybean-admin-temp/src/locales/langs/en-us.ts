@@ -285,6 +285,7 @@ const local: App.I18n.Schema = {
     settings_store: 'Store Settings',
     settings_business: 'Business',
     settings_logistics: 'Logistics',
+    settings_storage: 'Storage',
     shop: 'Shop',
     shop_products_list: 'Shop Products',
     shop_products_form: 'Product Form',
