@@ -54,6 +54,11 @@ const userService = {
     );
   },
 
+  async updatePhone(id, phone) {
+    await pool.query('UPDATE users SET phone = ? WHERE id = ?', [phone, id]);
+    return this.findById(id);
+  },
+
   async updateSettings(id, { notificationEnabled, phone }) {
     const sets = [];
     const values = [];

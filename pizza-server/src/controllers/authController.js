@@ -1,5 +1,5 @@
 const userService = require('../services/userService');
-const { code2session } = require('../utils/wechat');
+const { code2session, getPhoneNumber } = require('../utils/wechat');
 const { signToken } = require('../utils/jwt');
 const { computeTier } = require('../utils/memberTier');
 
@@ -53,9 +53,43 @@ const authController = {
             cardCount: 0,
             balance: parseFloat(user.balance),
             bio: user.bio,
+            phone: user.phone || '',
+            birthday: user.birthday,
             tier,
           },
         },
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async bindPhone(req, res, next) {
+    try {
+      const { code } = req.body;
+      if (!code) {
+        return res.status(400).json({ code: 400, message: '缺少手机号凭证' });
+      }
+
+      let phone;
+      try {
+        const result = await getPhoneNumber(code);
+        phone = result.purePhoneNumber || result.phoneNumber;
+      } catch (err) {
+        // 开发环境用 code 模拟手机号，方便调试
+        if (process.env.NODE_ENV === 'development') {
+          phone = code.replace(/\D/g, '').slice(0, 11) || '13800138000';
+        } else {
+          throw err;
+        }
+      }
+
+      await userService.updatePhone(req.user.id, phone);
+
+      res.json({
+        code: 0,
+        data: { phone },
+        message: '手机号绑定成功',
       });
     } catch (err) {
       next(err);
