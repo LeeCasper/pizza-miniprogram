@@ -177,6 +177,11 @@ app.use('/api/v1/admin', adminApiRoutes);
 // ── Admin routes (EJS) ─────────────────────────────────
 app.use('/admin', adminRoutes);
 
+// ── Root ───────────────────────────────────────────────
+app.get('/', (req, res) => {
+  res.json({ status: 'ok', message: 'Pizza Server API' });
+});
+
 // ── Health check ───────────────────────────────────────
 app.get('/health', async (req, res) => {
   const health = {
