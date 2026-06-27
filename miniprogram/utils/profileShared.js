@@ -203,6 +203,45 @@ const profileMethods = {
 
   onLogout() { logout(); },
 
+  // ── 微信快捷登录 ──────────────────────────────
+
+  onOpenQuickLogin() {
+    this.setData({ showQuickLogin: true });
+  },
+
+  onQuickLoginDone() {
+    // 立即同步登录后的用户数据到页面, 避免 loadProfileCore API 回调覆盖
+    var app = getApp();
+    var ui = app.globalData.userInfo;
+    this.setData({
+      showQuickLogin: false,
+      userInfo: { ...ui, balanceText: '¥' + ((ui.balance || 0)).toFixed(2), cardCount: ui.cardCount || 0, bio: ui.bio || '享受美味每一天' },
+    });
+    this._reloadProfile();
+  },
+
+  onQuickLoginSkip() {
+    this.setData({ showQuickLogin: false });
+  },
+
+  // 头像点击：未登录→快捷登录，已登录→换头像
+  onAvatarTap() {
+    if (this.data.userInfo.phone) {
+      this.onChooseAvatar();
+    } else {
+      this.onOpenQuickLogin();
+    }
+  },
+
+  // 个人信息区点击：未登录→快捷登录，已登录→编辑资料
+  onProfileInfoTap() {
+    if (this.data.userInfo.phone) {
+      this.onOpenEditProfile();
+    } else {
+      this.onOpenQuickLogin();
+    }
+  },
+
   noop() {},
 };
 
@@ -241,6 +280,10 @@ function loadProfileCore(page, hooks) {
     if (freshUi) {
       // hook: 页面可在合并前修改 freshUi（例如 optimistic totalSpent 保护）
       if (_hooks.beforeMerge) _hooks.beforeMerge(freshUi, cachedUi);
+      // 保护快捷登录刚写入的字段：若 API 返回空值，保留缓存中的最新值
+      if (!freshUi.phone && cachedUi.phone) freshUi.phone = cachedUi.phone;
+      if (!freshUi.name && cachedUi.name) freshUi.name = cachedUi.name;
+      if (!freshUi.avatar && cachedUi.avatar) freshUi.avatar = cachedUi.avatar;
       // Fix avatar URL for real device (relative path → full https URL)
       if (freshUi.avatar) freshUi.avatar = fixImageUrl(freshUi.avatar);
       app.globalData.userInfo = freshUi;

@@ -1,5 +1,7 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "quick-login": "/components/quick-login/quick-login"
+  },
   "navigationBarTitleText": "个人中心",
   "navigationStyle": "custom"
 }

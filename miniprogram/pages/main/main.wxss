@@ -707,6 +707,9 @@
 .avatar-edit-mask { position: absolute; inset: 0; border-radius: var(--radius-full); background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
 .avatar-wrap:active .avatar-edit-mask { opacity: 1; }
 .avatar-edit-icon { font-size: 28rpx; color: #FFFFFF; }
+.avatar-login-mask { position: absolute; inset: 0; border-radius: var(--radius-full); background: rgba(26,173,25,0.18); display: flex; align-items: center; justify-content: center; }
+.avatar-login-icon { font-size: 40rpx; opacity: 0.8; }
+.profile-name-login { color: #1aad19 !important; }
 .profile-name-row { display: flex; align-items: center; gap: 10rpx; }
 .profile-edit-hint { width: 28rpx; height: 28rpx; opacity: 0.6; }
 /* 生日行 */

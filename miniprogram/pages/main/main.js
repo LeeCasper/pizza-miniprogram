@@ -59,6 +59,7 @@ Page({
     // 加载态
     productsLoaded: false, ordersLoaded: false,
     gridPage: 0, gridSwiperHeight: 380,
+    showQuickLogin: false,
   },
 
   // ── 共享 profile 方法（头像、编辑、公告、等级轮播、退出等）──

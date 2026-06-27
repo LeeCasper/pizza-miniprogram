@@ -16,20 +16,22 @@
     <view class="profile-card">
       <!-- 顶部：头像 + 信息 + 统计 -->
       <view class="profile-card-top">
-        <view class="avatar-wrap" bindtap="onChooseAvatar">
+        <view class="avatar-wrap" bindtap="onAvatarTap">
           <image class="avatar" src="{{userInfo.avatar}}" mode="aspectFill" wx:if="{{userInfo.avatar}}"></image>
           <view class="avatar avatar-placeholder" wx:else></view>
           <view class="avatar-edit-mask">
             <text class="avatar-edit-icon">📷</text>
           </view>
         </view>
-        <view class="profile-info" bindtap="onOpenEditProfile">
+        <view class="profile-info" bindtap="onProfileInfoTap">
           <view class="profile-name-row">
-            <text class="profile-name">{{userInfo.name}}</text>
+            <text class="profile-name" wx:if="{{userInfo.phone}}">{{userInfo.name}}</text>
+            <text class="profile-name profile-name-login" wx:else>点击登录</text>
             <image class="profile-edit-hint" src="/images/edit.png" mode="aspectFit"></image>
           </view>
-          <text class="profile-bio">{{userInfo.bio}}</text>
-          <text class="profile-member-id">会员编号 #{{userInfo.memberId}}</text>
+          <text class="profile-bio" wx:if="{{userInfo.phone}}">{{userInfo.bio}}</text>
+          <text class="profile-bio" wx:else>微信一键登录</text>
+          <text class="profile-member-id" wx:if="{{userInfo.phone}}">会员编号 #{{userInfo.memberId}}</text>
         </view>
         <view class="profile-stats">
           <view class="profile-stat" bindtap="onMenuItem" data-action="recharge">
@@ -256,3 +258,10 @@
     <view style="height: calc(120rpx + env(safe-area-inset-bottom))"></view>
   </scroll-view>
 </view>
+
+<!-- 微信快捷登录组件 -->
+<quick-login
+  visible="{{showQuickLogin}}"
+  bind:done="onQuickLoginDone"
+  bind:skip="onQuickLoginSkip"
+/>

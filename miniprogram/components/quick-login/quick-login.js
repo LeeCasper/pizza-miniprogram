@@ -61,14 +61,10 @@ Component({
         wx.hideLoading();
         if (res.code === 0) {
           const { phone, avatar, name } = res.data;
-          app.globalData.userInfo.phone = phone;
-          // 服务端可能分配了随机默认头像和可爱昵称
-          if (avatar) {
-            app.globalData.userInfo.avatar = avatar;
-          }
-          if (name) {
-            app.globalData.userInfo.name = name;
-          }
+          // 必须设置 phone（核心登录标识），avatar 和 name 可选
+          if (phone) app.globalData.userInfo.phone = phone;
+          if (avatar) app.globalData.userInfo.avatar = avatar;
+          if (name) app.globalData.userInfo.name = name;
           wx.setStorageSync('userInfo', app.globalData.userInfo);
           wx.showToast({ title: '登录成功', icon: 'success' });
           // 直接完成登录，不再需要完善信息步骤

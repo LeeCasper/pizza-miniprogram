@@ -130,6 +130,25 @@
   color: #FFFFFF;
 }
 
+.avatar-login-mask {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-full);
+  background: rgba(26, 173, 25, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-login-icon {
+  font-size: 40rpx;
+  opacity: 0.8;
+}
+
+.profile-name-login {
+  color: #1aad19 !important;
+}
+
 /* 昵称行 */
 .profile-name-row {
   display: flex;

@@ -1,5 +1,7 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "quick-login": "/components/quick-login/quick-login"
+  },
   "navigationStyle": "custom",
   "disableScroll": true
 }
