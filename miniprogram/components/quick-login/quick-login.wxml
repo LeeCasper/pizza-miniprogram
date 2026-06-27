@@ -21,6 +21,25 @@
         <text class="ql-heading">欢迎使用</text>
         <text class="ql-subtitle">微信一键登录，更快更安全</text>
 
+        <!-- 微信头像选择 -->
+        <view class="ql-avatar-section">
+          <view class="ql-avatar-label">设置头像</view>
+          <button class="ql-avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+            <image wx:if="{{avatarUrl}}" class="ql-avatar-preview" src="{{avatarUrl}}" mode="aspectFill"></image>
+            <view wx:else class="ql-avatar-placeholder">
+              <text class="ql-avatar-placeholder-icon">📷</text>
+              <text class="ql-avatar-placeholder-text">点击选择微信头像</text>
+            </view>
+          </button>
+        </view>
+
+        <!-- 微信昵称输入 -->
+        <view class="ql-nickname-section">
+          <view class="ql-nickname-label">设置昵称</view>
+          <input class="ql-nickname-input" type="nickname" placeholder="微信昵称（可修改）" value="{{nickname}}" bindinput="onNicknameInput" bindblur="onNicknameBlur" maxlength="30"></input>
+          <text class="ql-nickname-hint">自动获取微信昵称，可点击修改</text>
+        </view>
+
         <!-- 登录按钮组 -->
         <view class="ql-actions">
           <!-- 微信一键登录按钮（原生 getPhoneNumber） -->

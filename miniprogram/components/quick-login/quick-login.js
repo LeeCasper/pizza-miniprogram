@@ -13,6 +13,8 @@ Component({
   observers: {
     'visible'(val) {
       if (val) {
+        // 每次打开重置头像/昵称状态
+        this.setData({ avatarUrl: '', nickname: '' });
         // 延迟一帧触发动画
         setTimeout(() => this.setData({ animating: true }), 50);
       } else {
@@ -32,6 +34,8 @@ Component({
     animating: false,
     statusBarHeight: 44,
     agreed: true,         // 协议默认勾选
+    avatarUrl: '',        // chooseAvatar 临时路径
+    nickname: '',         // 用户输入的昵称
   },
 
   methods: {
@@ -39,6 +43,51 @@ Component({
 
     onToggleAgree() {
       this.setData({ agreed: !this.data.agreed });
+    },
+
+    // ── 选择微信头像 ──────────────────────────
+
+    onChooseAvatar(e) {
+      const { avatarUrl } = e.detail;
+      if (!avatarUrl) return;
+      this.setData({ avatarUrl });
+    },
+
+    // ── 昵称输入 ─────────────────────────────
+
+    onNicknameInput(e) {
+      this.setData({ nickname: e.detail.value });
+    },
+
+    onNicknameBlur(e) {
+      this.setData({ nickname: (e.detail.value || '').trim() });
+    },
+
+    // ── 上传头像到服务器（返回永久 URL） ─────
+
+    _uploadAvatar(filePath) {
+      return new Promise((resolve, reject) => {
+        const token = wx.getStorageSync('token') || '';
+        wx.uploadFile({
+          url: BASE_URL + '/upload/avatar',
+          filePath,
+          name: 'file',
+          header: { 'Authorization': 'Bearer ' + token },
+          success(result) {
+            if (result.statusCode === 200) {
+              try {
+                const data = JSON.parse(result.data);
+                if (data.code === 0) {
+                  resolve(fixImageUrl(data.data.url));
+                  return;
+                }
+              } catch (_) {}
+            }
+            reject(new Error('上传失败'));
+          },
+          fail: reject,
+        });
+      });
     },
 
     // ── 微信一键登录（获取手机号） ──────────
@@ -57,7 +106,27 @@ Component({
         return;
       }
       wx.showLoading({ title: '登录中...' });
-      api.post('/auth/phone', { code }).then(res => {
+
+      const { avatarUrl, nickname } = this.data;
+
+      // 构建请求体：有则有，无则后端随机默认
+      const buildPayload = (permanentAvatarUrl) => {
+        const payload = { code };
+        if (permanentAvatarUrl) payload.avatar = permanentAvatarUrl;
+        const name = (nickname || '').trim();
+        if (name) payload.name = name;
+        return payload;
+      };
+
+      // 选了头像就先上传到服务器，再绑定手机号；否则直接绑手机号
+      const avatarPromise = avatarUrl
+        ? this._uploadAvatar(avatarUrl).catch(() => null)
+        : Promise.resolve(null);
+
+      avatarPromise.then((permanentAvatarUrl) => {
+        const payload = buildPayload(permanentAvatarUrl);
+        return api.post('/auth/phone', payload);
+      }).then(res => {
         wx.hideLoading();
         if (res.code === 0) {
           const { phone, avatar, name } = res.data;
@@ -67,8 +136,8 @@ Component({
           if (name) app.globalData.userInfo.name = name;
           wx.setStorageSync('userInfo', app.globalData.userInfo);
           wx.showToast({ title: '登录成功', icon: 'success' });
-          // 直接完成登录，不再需要完善信息步骤
-          this.setData({ animating: false });
+          // 重置组件状态，下次打开时干净
+          this.setData({ animating: false, avatarUrl: '', nickname: '' });
           setTimeout(() => this.triggerEvent('done'), 500);
         } else {
           wx.showToast({ title: res.message || '登录失败', icon: 'none' });

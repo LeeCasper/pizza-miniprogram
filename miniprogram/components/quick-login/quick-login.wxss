@@ -58,6 +58,7 @@
   justify-content: center;
   align-items: center;
   padding: 0 40rpx;
+  overflow-y: auto;
 }
 
 .ql-main {
@@ -70,7 +71,7 @@
 /* ── Logo ── */
 
 .ql-logo-wrap {
-  margin-bottom: 194rpx;
+  margin-bottom: 80rpx;
 }
 
 .ql-logo-img {
@@ -84,7 +85,7 @@
 
 .ql-heading {
   position: relative;
-  bottom: 150rpx;
+  bottom: 60rpx;
   font-size: 60rpx;
   font-weight: 600;
   color: #111827;
@@ -94,10 +95,123 @@
 
 .ql-subtitle {
   position: relative;
-  bottom: 150rpx;
+  bottom: 60rpx;
   font-size: 30rpx;
   color: #6b7280;
-  margin-bottom: 100rpx;
+  margin-bottom: 40rpx;
+}
+
+/* ── 头像选择 ── */
+
+.ql-avatar-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 40rpx;
+}
+
+.ql-avatar-label {
+  font-size: 26rpx;
+  color: #6b7280;
+  margin-bottom: 20rpx;
+  font-weight: 500;
+  align-self: flex-start;
+  padding-left: 8rpx;
+}
+
+.ql-avatar-btn {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--clay-bg-elevated);
+  border: var(--clay-border);
+  box-shadow: var(--clay-shadow-card);
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+.ql-avatar-btn::after {
+  border: none;
+  display: none;
+}
+
+.ql-avatar-btn:active {
+  background: var(--clay-bg-light);
+  transform: scale(0.97);
+}
+
+.ql-avatar-preview {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.ql-avatar-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  gap: 8rpx;
+}
+
+.ql-avatar-placeholder-icon {
+  font-size: 48rpx;
+  line-height: 1;
+}
+
+.ql-avatar-placeholder-text {
+  font-size: 20rpx;
+  color: #9ca3af;
+  text-align: center;
+  padding: 0 8rpx;
+}
+
+/* ── 昵称输入 ── */
+
+.ql-nickname-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 60rpx;
+}
+
+.ql-nickname-label {
+  font-size: 26rpx;
+  color: #6b7280;
+  margin-bottom: 20rpx;
+  font-weight: 500;
+  align-self: flex-start;
+  padding-left: 8rpx;
+}
+
+.ql-nickname-input {
+  width: 100%;
+  height: 88rpx;
+  padding: 0 32rpx;
+  font-size: 28rpx;
+  color: var(--color-on-surface);
+  background: var(--clay-bg-card);
+  border-radius: 24rpx;
+  border: var(--clay-border);
+  box-shadow: var(--clay-shadow-card);
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.ql-nickname-hint {
+  font-size: 22rpx;
+  color: #9ca3af;
+  margin-top: 12rpx;
+  text-align: center;
 }
 
 /* ── 按钮区 ── */

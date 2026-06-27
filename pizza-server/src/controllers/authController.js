@@ -68,7 +68,7 @@ const authController = {
 
   async bindPhone(req, res, next) {
     try {
-      const { code } = req.body;
+      const { code, avatar: clientAvatar, name: clientName } = req.body;
       if (!code) {
         return res.status(400).json({ code: 400, message: '缺少手机号凭证' });
       }
@@ -88,18 +88,24 @@ const authController = {
 
       await userService.updatePhone(req.user.id, phone);
 
-      // If user has no avatar/nickname, assign random defaults
+      // 头像/昵称：客户端传了就用，否则随机默认
       const user = await userService.findById(req.user.id);
       let avatar = user.avatar || '';
       let name = user.name || '';
-      if (!avatar) {
+      if (clientAvatar) {
+        await userService.updateAvatar(req.user.id, clientAvatar);
+        avatar = clientAvatar;
+      } else if (!avatar) {
         const randomAvatar = await defaultAvatarService.getRandom();
         if (randomAvatar) {
           await userService.updateAvatar(req.user.id, randomAvatar);
           avatar = randomAvatar;
         }
       }
-      if (!name) {
+      if (clientName) {
+        await userService.updateName(req.user.id, clientName);
+        name = clientName;
+      } else if (!name) {
         const randomName = cuteNames.getRandom();
         await userService.updateName(req.user.id, randomName);
         name = randomName;
