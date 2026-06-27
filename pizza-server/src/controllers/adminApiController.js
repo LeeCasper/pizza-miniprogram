@@ -21,6 +21,7 @@ const storeService = require('../services/storeService');
 const auditService = require('../services/auditService');
 const reconciliationService = require('../services/reconciliationService');
 const luckyWheelService = require('../services/luckyWheelService');
+const defaultAvatarService = require('../services/defaultAvatarService');
 
 const adminApiController = {
   // ── Auth ────────────────────────────────────────────
@@ -1586,6 +1587,53 @@ const adminApiController = {
       }
 
       res.json({ code: 0, message: '存储配置已保存' });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  // ── Default Avatars ────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/default-avatars
+   */
+  async listDefaultAvatars(req, res, next) {
+    try {
+      const list = await defaultAvatarService.list();
+      res.json({ code: 0, data: list });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * POST /api/v1/admin/default-avatars
+   * Body: { url }
+   */
+  async createDefaultAvatar(req, res, next) {
+    try {
+      const { url } = req.body || {};
+      if (!url || !url.trim()) {
+        return res.status(400).json({ code: 400, message: '请提供头像URL' });
+      }
+      const count = await defaultAvatarService.count();
+      if (count >= 10) {
+        return res.status(400).json({ code: 400, message: '默认头像最多10个，请先删除旧的再添加' });
+      }
+      const result = await defaultAvatarService.create(url.trim());
+      res.json({ code: 0, data: result, message: '已添加' });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * DELETE /api/v1/admin/default-avatars/:id
+   */
+  async deleteDefaultAvatar(req, res, next) {
+    try {
+      await defaultAvatarService.delete(req.params.id);
+      res.json({ code: 0, message: '已删除' });
     } catch (err) {
       next(err);
     }

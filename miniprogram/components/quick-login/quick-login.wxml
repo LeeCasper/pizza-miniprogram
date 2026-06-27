@@ -1,0 +1,49 @@
+<!-- components/quick-login/quick-login.wxml — 微信快捷登录 -->
+<view class="ql-root" wx:if="{{visible}}" catchtouchmove="noop">
+  <view class="ql-page {{animating ? 'ql-show' : ''}}">
+
+    <!-- 关闭按钮 -->
+    <view class="ql-close" style="padding-top: {{statusBarHeight + 1}}px">
+      <view class="ql-close-btn" bindtap="onSkip">
+        <text class="ql-close-icon">✕</text>
+      </view>
+    </view>
+
+    <!-- 微信一键登录 -->
+    <view class="ql-body">
+      <view class="ql-main">
+        <!-- 微信 Logo -->
+        <view class="ql-logo-wrap">
+          <image class="ql-logo-img" src="/images/wechat-logo.jpg" mode="aspectFit"></image>
+        </view>
+
+        <!-- 欢迎文字 -->
+        <text class="ql-heading">欢迎使用</text>
+        <text class="ql-subtitle">微信一键登录，更快更安全</text>
+
+        <!-- 登录按钮组 -->
+        <view class="ql-actions">
+          <!-- 微信一键登录按钮（原生 getPhoneNumber） -->
+          <button class="ql-btn-primary" open-type="getPhoneNumber" bindgetphonenumber="onGetPhoneNumber" style="margin:0;padding:0;width:100%;display:flex;align-items:center;justify-content:center;">
+            <image class="ql-btn-icon-img" src="/images/wechat-icon.png" mode="aspectFit"></image>
+            <text class="ql-btn-text">微信一键登录</text>
+          </button>
+
+          <!-- 协议勾选 -->
+          <view class="ql-agreement">
+            <view class="ql-agree-check" bindtap="onToggleAgree">
+              <view class="ql-checkbox {{agreed ? 'ql-checked' : ''}}">
+                <text class="ql-checkmark" wx:if="{{agreed}}">✓</text>
+              </view>
+            </view>
+            <text class="ql-agree-text">已阅读并同意</text>
+            <text class="ql-agree-link" catchtap="onShowTerms">《用户协议》</text>
+            <text class="ql-agree-text">和</text>
+            <text class="ql-agree-link" catchtap="onShowPrivacy">《隐私政策》</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+  </view>
+</view>

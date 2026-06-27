@@ -285,3 +285,33 @@ export function fetchUpdateStorageSettings(data: StorageSettingsForm) {
 }
 
 // ── Theme Settings removed ──
+
+// ── Default Avatars ─────────────────────────────────
+
+export interface DefaultAvatar {
+  id: number;
+  url: string;
+  sort_order: number;
+}
+
+export function fetchDefaultAvatars() {
+  return request<DefaultAvatar[]>({
+    url: '/default-avatars',
+    method: 'GET',
+  });
+}
+
+export function fetchAddDefaultAvatar(url: string) {
+  return request<DefaultAvatar>({
+    url: '/default-avatars',
+    method: 'POST',
+    data: { url },
+  });
+}
+
+export function fetchDeleteDefaultAvatar(id: number) {
+  return request<null>({
+    url: `/default-avatars/${id}`,
+    method: 'DELETE',
+  });
+}

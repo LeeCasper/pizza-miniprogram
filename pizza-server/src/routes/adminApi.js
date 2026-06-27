@@ -137,6 +137,11 @@ router.put('/settings/logistics', ctrl.updateLogisticsSettings);
 router.get('/settings/storage', ctrl.getStorageSettings);
 router.put('/settings/storage', ctrl.updateStorageSettings);
 
+// Default avatars
+router.get('/default-avatars', ctrl.listDefaultAvatars);
+router.post('/default-avatars', adminUpload.single('file'), uploadCtrl.uploadDefaultAvatar);
+router.delete('/default-avatars/:id', ctrl.deleteDefaultAvatar);
+
 // Payment records (transaction history)
 router.get('/payment-records', ctrl.listPaymentRecords);
 router.get('/payment-records/:id', ctrl.getPaymentRecord);

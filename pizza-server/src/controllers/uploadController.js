@@ -1,6 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const userService = require('../services/userService');
+const defaultAvatarService = require('../services/defaultAvatarService');
 const config = require('../config');
 
 const uploadController = {
@@ -123,6 +124,44 @@ const uploadController = {
           totalPages: Math.ceil(total / limitNum),
         },
       });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  // ── Admin: upload default avatar ───────────────────────
+  async uploadDefaultAvatar(req, res, next) {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ code: 400, message: '请选择图片' });
+      }
+
+      const count = await defaultAvatarService.count();
+      if (count >= 10) {
+        // Clean up the uploaded file
+        try { fs.unlinkSync(path.join(config.upload.dir, req.file.filename)); } catch (_) {}
+        return res.status(400).json({ code: 400, message: '默认头像最多10个，请先删除旧的再添加' });
+      }
+
+      let url = '/uploads/' + req.file.filename;
+
+      // If COS is enabled, push to COS
+      if (config.storage.storageType === 'cos') {
+        const cosService = require('../services/cosService');
+        if (cosService.isConfigured()) {
+          try {
+            const localPath = path.join(config.upload.dir, req.file.filename);
+            url = await cosService.uploadFile(localPath, req.file.filename);
+            try { fs.unlinkSync(localPath); } catch (_) { /* ignore */ }
+          } catch (err) {
+            console.error('[uploadDefaultAvatar] COS upload failed, keeping local file:', err.message);
+          }
+        }
+      }
+
+      const result = await defaultAvatarService.create(url);
+
+      res.json({ code: 0, data: result, message: '已添加' });
     } catch (err) {
       next(err);
     }
