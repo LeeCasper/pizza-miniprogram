@@ -213,16 +213,17 @@ const profileMethods = {
     // 立即同步登录后的用户数据到页面, 避免 loadProfileCore API 回调覆盖
     var app = getApp();
     var detail = (e && e.detail) || {};
-    var ui = app.globalData.userInfo;
-    var qlAvatar = detail.avatar || (ui && ui.avatar) || '';
-    var qlName = detail.name || (ui && ui.name) || '';
-    var qlPhone = detail.phone || (ui && ui.phone) || '';
+    var ui = normalizeUserInfo(app.globalData.userInfo);
+    var qlAvatar = detail.avatar || ui.avatar || '';
+    var qlName = detail.name || ui.name || '';
+    var qlPhone = detail.phone || ui.phone || '';
     console.log('[ql-done] avatar:', JSON.stringify(qlAvatar), 'name:', JSON.stringify(qlName), 'phone:', JSON.stringify(qlPhone));
-    // 标记快捷登录刚完成，loadProfileCore 不应覆盖 avatar/name/phone
     app.globalData._qlProtected = { avatar: qlAvatar, name: qlName, phone: qlPhone, ts: Date.now() };
+    app.globalData.userInfo = { ...ui, avatar: qlAvatar || ui.avatar, name: qlName || ui.name, phone: qlPhone || ui.phone };
+    wx.setStorageSync('userInfo', app.globalData.userInfo);
     this.setData({
       showQuickLogin: false,
-      userInfo: { ...ui, balanceText: '¥' + ((ui.balance || 0)).toFixed(2), cardCount: ui.cardCount || 0, bio: ui.bio || '享受美味每一天' },
+      userInfo: { ...app.globalData.userInfo, balanceText: '¥' + ((app.globalData.userInfo.balance || 0)).toFixed(2), cardCount: app.globalData.userInfo.cardCount || 0, bio: app.globalData.userInfo.bio || '享受美味每一天' },
     });
     this._reloadProfile();
   },
@@ -252,6 +253,20 @@ const profileMethods = {
   noop() {},
 };
 
+function normalizeUserInfo(ui) {
+  var user = ui || {};
+  var avatar = user.avatar ? fixImageUrl(user.avatar) : '';
+  return {
+    ...user,
+    avatar: avatar,
+    name: user.name || '',
+    phone: user.phone || '',
+    bio: user.bio || '享受美味每一天',
+    balanceText: '¥' + ((user.balance || 0)).toFixed(2),
+    cardCount: user.cardCount || 0,
+  };
+}
+
 // ── Core profile data loader ─────────────────────────────
 
 /**
@@ -265,12 +280,11 @@ const profileMethods = {
 function loadProfileCore(page, hooks) {
   var _hooks = hooks || {};
   const app = getApp();
-  const cachedUi = app.globalData.userInfo;
-  console.log('[profile] loadProfileCore START — cachedUi.avatar:', JSON.stringify(cachedUi.avatar), 'phone:', JSON.stringify(cachedUi.phone), 'name:', JSON.stringify(cachedUi.name));
-  // 立即显示缓存的用户基本信息
-  var cachedBd = computeBirthdayInfo(cachedUi.birthday || null);
+  const cachedUi = normalizeUserInfo(app.globalData.userInfo);
+  app.globalData.userInfo = cachedUi;
+  const cachedBd = computeBirthdayInfo(cachedUi.birthday || null);
   page.setData({
-    userInfo: { ...cachedUi, balanceText: '¥' + ((cachedUi.balance || 0)).toFixed(2), cardCount: cachedUi.cardCount || 0, bio: cachedUi.bio || '享受美味每一天' },
+    userInfo: cachedUi,
     birthdayDisplay: cachedBd.birthdayDisplay,
     birthdayCountdown: cachedBd.birthdayCountdown,
     isBirthdayToday: cachedBd.isBirthdayToday,
@@ -309,9 +323,9 @@ function loadProfileCore(page, hooks) {
       // Fix avatar URL for real device (relative path → full https URL)
       if (freshUi.avatar) freshUi.avatar = fixImageUrl(freshUi.avatar);
       console.log('[profile] Before setData 2 — ui.avatar:', JSON.stringify(freshUi.avatar), 'ui.phone:', JSON.stringify(freshUi.phone));
-      app.globalData.userInfo = freshUi;
-      wx.setStorageSync('userInfo', freshUi);
-      ui = freshUi;
+      var ui = normalizeUserInfo(freshUi);
+      app.globalData.userInfo = ui;
+      wx.setStorageSync('userInfo', ui);
     }
     // 等级判定使用 余额+消费金额 作为资格金额（与后端逻辑一致）
     var qualifyingAmount = (ui.totalSpent || 0) + (ui.balance || 0);
