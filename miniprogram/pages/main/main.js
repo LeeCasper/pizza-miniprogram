@@ -93,9 +93,9 @@ Page({
 
   fetchProducts() {
     Promise.all([
-      api.get('/products'),
-      api.get('/products/categories'),
-      api.get('/banners'),
+      api.publicGet('/products'),
+      api.publicGet('/products/categories'),
+      api.publicGet('/banners'),
     ]).then(([prodRes, catRes, bannerRes]) => {
       if (prodRes.code === 0) {
         const cart = app.globalData.cart;
@@ -134,6 +134,7 @@ Page({
           });
         }
         const banners = apiBanners.length ? apiBanners : fallbackBanners;
+        const catList = catRes && catRes.code === 0 ? (catRes.data || []) : [];
 
         this.setData({
           products,
@@ -141,7 +142,7 @@ Page({
           banners,
           categories: [
             { key: 'all', name: '全部商品', icon: CATEGORY_ICON_MAP.all },
-            ...(catRes.code === 0 ? (catRes.data || []) : []).map(c => ({
+            ...catList.map(c => ({
               ...c,
               icon: CATEGORY_ICON_MAP[c.key] || c.icon,
             })),
@@ -149,7 +150,9 @@ Page({
           productsLoaded: true,
         });
       }
-    }).catch(() => {});
+    }).catch((err) => {
+      console.warn('[main] fetchProducts failed:', err);
+    });
   },
 
   fetchShopData() {

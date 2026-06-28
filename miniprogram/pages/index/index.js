@@ -47,8 +47,8 @@ Page({
     this.setData({ loading: true, error: null });
 
     Promise.all([
-      api.get('/products'),
-      api.get('/products/categories'),
+      api.publicGet('/products'),
+      api.publicGet('/products/categories'),
     ]).then(([prodRes, catRes]) => {
       if (prodRes.code === 0 && catRes.code === 0) {
         const products = (prodRes.data || []).map(p => ({

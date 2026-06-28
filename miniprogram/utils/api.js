@@ -150,6 +150,7 @@ function doLogin() {
  */
 const api = {
   get(path, data)  { return request(path, { method: 'GET', data }); },
+  publicGet(path, data) { return request(path, { method: 'GET', data, needAuth: false }); },
   post(path, data) { return request(path, { method: 'POST', data }); },
   put(path, data)  { return request(path, { method: 'PUT', data }); },
   del(path)        { return request(path, { method: 'DELETE' }); },
