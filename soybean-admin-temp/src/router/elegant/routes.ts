@@ -384,6 +384,15 @@ export const generatedRoutes: GeneratedRoute[] = [
     },
     children: [
       {
+        name: 'settings_avatars',
+        path: '/settings/avatars',
+        component: 'view.settings_avatars',
+        meta: {
+          title: 'settings_avatars',
+          i18nKey: 'route.settings_avatars'
+        }
+      },
+      {
         name: 'settings_business',
         path: '/settings/business',
         component: 'view.settings_business',

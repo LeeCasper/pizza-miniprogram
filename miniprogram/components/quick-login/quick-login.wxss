@@ -117,7 +117,8 @@
   width: 100%;
   background: #ffffff;
   border-radius: 24rpx;
-  padding: 40rpx;
+  padding: 20rpx;
+  margin-top: 0rpx;
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.02);
   box-sizing: border-box;
 }
@@ -128,7 +129,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 36rpx;
+  margin-bottom: 10rpx;
+  margin-top: -15rpx;
 }
 
 /* ── 左侧：icon + 文字 ── */
@@ -137,7 +139,6 @@
   display: flex;
   align-items: center;
   gap: 28rpx;
-  overflow: hidden;
   flex: 1;
   min-width: 0;
 }
@@ -153,9 +154,9 @@
   flex-shrink: 0;
 }
 
-.ql-card-icon-emoji {
-  font-size: 36rpx;
-  line-height: 1;
+.ql-card-icon-img {
+  width: 40rpx;
+  height: 40rpx;
 }
 
 .ql-card-text {
@@ -169,14 +170,12 @@
   font-size: 34rpx;
   font-weight: 600;
   color: #111827;
-  white-space: nowrap;
   line-height: 1.3;
 }
 
 .ql-card-desc {
   font-size: 26rpx;
   color: #9ca3af;
-  white-space: nowrap;
   line-height: 1.4;
 }
 
@@ -207,16 +206,22 @@
 .ql-avatar-pick {
   width: 128rpx;
   height: 128rpx;
+  min-width: 128rpx;
+  min-height: 128rpx;
+  max-width: 128rpx;
+  max-height: 128rpx;
   border-radius: 50%;
   overflow: visible;
   border: 2rpx solid #f3f4f6;
   background: #ffffff;
   padding: 0;
   margin: 0;
+  box-sizing: border-box;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  line-height: 1;
 }
 
 .ql-avatar-pick::after {
@@ -231,8 +236,8 @@
 }
 
 .ql-avatar-empty-circle {
-  width: 100%;
-  height: 100%;
+  width: 100rpx;
+  height: 100rpx;
   border-radius: 50%;
   background: #f9fafb;
   display: flex;
@@ -249,10 +254,10 @@
 
 .ql-avatar-camera-badge {
   position: absolute;
-  bottom: -4rpx;
-  right: -4rpx;
-  width: 48rpx;
-  height: 48rpx;
+  bottom: -3rpx;
+  right: -3rpx;
+  width: 38rpx;
+  height: 38rpx;
   border-radius: 50%;
   background: #f5a623;
   border: 4rpx solid #ffffff;
@@ -263,8 +268,8 @@
 }
 
 .ql-avatar-camera-badge-icon {
-  font-size: 24rpx;
-  line-height: 1;
+  width: 24rpx;
+  height: 24rpx;
 }
 
 /* ── 卡片底部按钮（更换头像） ── */
@@ -294,9 +299,9 @@
   background: #f3f4f6;
 }
 
-.ql-card-btn-icon {
-  font-size: 32rpx;
-  line-height: 1;
+.ql-card-btn-icon-img {
+  width: 32rpx;
+  height: 32rpx;
 }
 
 .ql-card-btn-text {

@@ -19,13 +19,15 @@ let pendingLoginPromise = null;
  * and will 401, which the caller or the 401 handler can deal with.
  */
 function ensureToken() {
-  if (wx.getStorageSync('token')) return Promise.resolve();
+  if (wx.getStorageSync('token')) { console.log('[api] ensureToken: token exists'); return Promise.resolve(); }
   // 已主动退出：拒绝而不是 resolve，避免无 token 请求打出 401
-  if (wx.getStorageSync('_loggedOut')) return Promise.reject(new Error('LOGGED_OUT'));
+  if (wx.getStorageSync('_loggedOut')) { console.log('[api] ensureToken: loggedOut → reject'); return Promise.reject(new Error('LOGGED_OUT')); }
   if (pendingLoginPromise) {
-    return pendingLoginPromise.then(function () {}).catch(function () {});
+    console.log('[api] ensureToken: waiting for pendingLoginPromise');
+    return pendingLoginPromise.then(function () { console.log('[api] ensureToken: pendingLoginPromise resolved'); }).catch(function (e) { console.log('[api] ensureToken: pendingLoginPromise rejected', e); });
   }
-  return doLogin().then(function () {}).catch(function () {});
+  console.log('[api] ensureToken: starting new doLogin');
+  return doLogin().then(function () { console.log('[api] ensureToken: new doLogin resolved'); }).catch(function (e) { console.log('[api] ensureToken: new doLogin rejected', e); });
 }
 
 /**
@@ -110,12 +112,14 @@ function doLogin() {
             pendingLoginPromise = null;
             if (result.statusCode === 200 && result.data.code === 0) {
               const { token, user } = result.data.data;
+              console.log('[api] doLogin SUCCESS — user.avatar:', JSON.stringify(user.avatar), 'user.phone:', JSON.stringify(user.phone));
               // 登录成功，清除退出标记
               wx.removeStorageSync('_loggedOut');
               wx.setStorageSync('token', token);
               wx.setStorageSync('userInfo', user);
               resolve(user);
             } else {
+              console.log('[api] doLogin FAIL — status:', result.statusCode, 'code:', result.data && result.data.code);
               reject(new Error('登录失败'));
             }
           },

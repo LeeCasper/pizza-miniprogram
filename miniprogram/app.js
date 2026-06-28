@@ -37,12 +37,13 @@ App({
 
   doAppLogin() {
     doLogin().then(user => {
+      console.log('[app] doAppLogin SUCCESS — user.avatar:', JSON.stringify(user.avatar), 'user.phone:', JSON.stringify(user.phone), 'user.name:', JSON.stringify(user.name));
       if (user.avatar) user.avatar = fixImageUrl(user.avatar);
       this.globalData.userInfo = user;
       wx.setStorageSync('userInfo', user);
-    }).catch(() => {
+    }).catch((e) => {
       // 登录失败静默处理，使用离线模式
-      console.warn('[App] 登录失败，使用离线模式');
+      console.warn('[App] 登录失败，使用离线模式', e);
     });
   },
 

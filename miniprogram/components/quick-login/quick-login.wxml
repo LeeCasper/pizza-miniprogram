@@ -29,7 +29,7 @@
             <view class="ql-card-row">
               <view class="ql-card-info">
                 <view class="ql-card-icon-wrap">
-                  <text class="ql-card-icon-emoji">👤</text>
+                  <image class="ql-card-icon-img" src="/images/icon-avatar.png" mode="aspectFit"></image>
                 </view>
                 <view class="ql-card-text">
                   <text class="ql-card-title">头像</text>
@@ -43,7 +43,7 @@
                     <text class="ql-avatar-empty-emoji">👤</text>
                   </view>
                   <view class="ql-avatar-camera-badge">
-                    <text class="ql-avatar-camera-badge-icon">📷</text>
+                    <image class="ql-avatar-camera-badge-icon" src="/images/camera-badge.png" mode="aspectFit"></image>
                   </view>
                 </button>
                 <text class="ql-card-chevron">›</text>
@@ -51,7 +51,7 @@
             </view>
             <!-- 更换头像按钮 -->
             <button class="ql-card-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
-              <text class="ql-card-btn-icon">📷</text>
+              <image class="ql-card-btn-icon-img" src="/images/icon-camera.png" mode="aspectFit"></image>
               <text class="ql-card-btn-text">更换头像</text>
             </button>
           </view>
@@ -61,7 +61,7 @@
             <view class="ql-card-row">
               <view class="ql-card-info">
                 <view class="ql-card-icon-wrap">
-                  <text class="ql-card-icon-emoji">✏️</text>
+                  <image class="ql-card-icon-img" src="/images/icon-nickname.png" mode="aspectFit"></image>
                 </view>
                 <view class="ql-card-text">
                   <text class="ql-card-title">昵称</text>

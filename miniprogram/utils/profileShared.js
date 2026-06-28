@@ -261,6 +261,7 @@ function loadProfileCore(page, hooks) {
   var _hooks = hooks || {};
   const app = getApp();
   const cachedUi = app.globalData.userInfo;
+  console.log('[profile] loadProfileCore START — cachedUi.avatar:', JSON.stringify(cachedUi.avatar), 'phone:', JSON.stringify(cachedUi.phone), 'name:', JSON.stringify(cachedUi.name));
   // 立即显示缓存的用户基本信息
   var cachedBd = computeBirthdayInfo(cachedUi.birthday || null);
   page.setData({
@@ -273,14 +274,18 @@ function loadProfileCore(page, hooks) {
 
   // 并行获取最新用户数据 & 等级配置，只构建一次卡片（避免 swiper 连续两次 setData 导致抖动）
   return Promise.all([
-    api.get('/user/profile').then(function (res) { return res.code === 0 ? res.data : null; }).catch(function () { return null; }),
+    api.get('/user/profile').then(function (res) { return res.code === 0 ? res.data : null; }).catch(function (e) { console.log('[profile] /user/profile API error:', e); return null; }),
     loadTiers(),
   ]).then(function (results) {
     var freshUi = results[0];
     var apiTiers = results[1];
     // 重新读取 globalData（此时 doLogin 可能已完成，有最新的 avatar）
     var latestGlobal = app.globalData.userInfo || {};
+    console.log('[profile] After API — freshUi.avatar:', JSON.stringify(freshUi && freshUi.avatar), 'latestGlobal.avatar:', JSON.stringify(latestGlobal.avatar), 'cachedUi.avatar:', JSON.stringify(cachedUi.avatar), '_quickLoginJustDone:', app.globalData._quickLoginJustDone);
     var ui = cachedUi;
+    if (!freshUi) {
+      console.log('[profile] ERROR: freshUi is null/undefined — API returned no data, using cachedUi as fallback');
+    }
     if (freshUi) {
       // hook: 页面可在合并前修改 freshUi（例如 optimistic totalSpent 保护）
       if (_hooks.beforeMerge) _hooks.beforeMerge(freshUi, cachedUi);
@@ -297,6 +302,7 @@ function loadProfileCore(page, hooks) {
       if (!freshUi.avatar && (cachedUi.avatar || latestGlobal.avatar)) freshUi.avatar = cachedUi.avatar || latestGlobal.avatar;
       // Fix avatar URL for real device (relative path → full https URL)
       if (freshUi.avatar) freshUi.avatar = fixImageUrl(freshUi.avatar);
+      console.log('[profile] Before setData 2 — ui.avatar:', JSON.stringify(freshUi.avatar), 'ui.phone:', JSON.stringify(freshUi.phone));
       app.globalData.userInfo = freshUi;
       wx.setStorageSync('userInfo', freshUi);
       ui = freshUi;

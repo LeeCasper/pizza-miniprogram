@@ -1,0 +1,142 @@
+<!DOCTYPE html><html lang="zh-CN" style=""><head>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>微信登录</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#07c160",
+                        "background": "#FDF8F2",
+                        "on-background": "#1c1b1b",
+                        "surface": "#ffffff",
+                        "secondary": "#605e5a",
+                        "outline-variant": "#e5e2e1",
+                    },
+                    borderRadius: {
+                        "DEFAULT": "12px",
+                        "lg": "16px",
+                        "xl": "24px",
+                        "full": "9999px"
+                    }
+                },
+            },
+        }
+    </script>
+<style data-purpose="custom-styles">
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #FDF8F2;
+        }
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        .wechat-green {
+            background-color: #07C160;
+        }
+    </style>
+</head>
+<body class="min-h-screen w-full flex flex-col items-center bg-background overflow-x-hidden">
+<!-- Top Status Bar (Logic from COMPONENTS_7) -->
+<header class="w-full sticky top-0 z-50 flex items-center justify-between px-5 h-14 bg-transparent" data-purpose="top-app-bar">
+<button class="active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-on-background">close</span>
+</button>
+<div class="flex items-center gap-2 bg-black/5 px-3 py-1 rounded-full border border-black/5">
+<span class="material-symbols-outlined text-[18px]">more_horiz</span>
+<div class="w-px h-3 bg-black/10 mx-1"></div>
+<span class="material-symbols-outlined text-[18px]">radio_button_checked</span>
+</div>
+</header>
+<main class="flex-1 w-full max-w-md px-6 flex flex-col items-center pt-4 pb-12">
+<!-- Brand Logo & Header -->
+<div class="flex flex-col items-center mb-10 text-center">
+<div class="relative mb-6">
+<div class="w-32 h-32 rounded-full border-4 border-white shadow-sm overflow-hidden bg-white">
+<img alt="Logo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZVBzYq_ybJXP4FWxfrwzOE9gd0vor7nQi_6_6zBpbxyFfTRXaqb7faXeMhpUiE5pgeU8ruK5FdQLGFRDuSuF2kKTimqgNMR966wfPiWVlT7YgpXq5XMzlBXbKtdVZIHwSHVX4A-GDbGy_pS_opBW5yMR1LqbRt9JuzmC5mr0rUdqXeeQZWvvSqhlsTvEokLFuoboHBjUvjXKMBN2gspZSCkde1Q_hPQU98DdvXSHZ9_o5X4PuDyeDP6553R4pcRVh7AIx0rnJ_YI">
+</div>
+
+</div>
+<h1 class="text-[28px] font-bold text-gray-900 mb-2">欢迎使用</h1>
+<p class="text-[15px] text-gray-400">微信一键登录，更快更安全</p>
+</div>
+<!-- Info Cards Area -->
+<div class="w-full flex flex-col gap-4 mb-10">
+<!-- Avatar Card -->
+<div class="bg-white rounded-lg p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+<div class="flex items-center justify-between mb-5">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-[#FFF5EB] flex items-center justify-center"><span class="material-symbols-outlined text-[#f5a623]">person</span></div>
+<div class="flex flex-col whitespace-nowrap">
+<span class="text-[17px] font-semibold text-gray-900">头像</span>
+<span class="text-[13px] text-gray-400">设置头像，让朋友更容易认识你</span>
+</div>
+</div>
+<div class="relative">
+<div class="w-16 h-16 rounded-full overflow-hidden border border-gray-100">
+<img alt="Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZVBzYq_ybJXP4FWxfrwzOE9gd0vor7nQi_6_6zBpbxyFfTRXaqb7faXeMhpUiE5pgeU8ruK5FdQLGFRDuSuF2kKTimqgNMR966wfPiWVlT7YgpXq5XMzlBXbKtdVZIHwSHVX4A-GDbGy_pS_opBW5yMR1LqbRt9JuzmC5mr0rUdqXeeQZWvvSqhlsTvEokLFuoboHBjUvjXKMBN2gspZSCkde1Q_hPQU98DdvXSHZ9_o5X4PuDyeDP6553R4pcRVh7AIx0rnJ_YI">
+</div><div class="absolute bottom-0 right-0 w-6 h-6 bg-[#f5a623] rounded-full border-2 border-white flex items-center justify-center z-10"><span class="material-symbols-outlined text-white text-[14px]">photo_camera</span></div>
+<span class="material-symbols-outlined absolute -right-1 top-1/2 -translate-y-1/2 translate-x-6 text-gray-300 text-[20px]">chevron_right</span>
+</div>
+</div>
+<button class="w-full py-2.5 bg-gray-50 rounded-full flex items-center justify-center gap-2 text-[14px] text-gray-600 active:bg-gray-100 transition-colors">
+<span class="material-symbols-outlined text-[18px]">photo_camera</span>
+<span class="">更换头像</span>
+</button>
+</div>
+<!-- Nickname Card -->
+<div class="bg-surface-container-low rounded-lg p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+  <div class="flex items-center justify-between gap-4">
+    <div class="flex items-center gap-4 overflow-hidden">
+      <div class="w-10 h-10 rounded-full bg-[#FFF5EB] flex-shrink-0 flex items-center justify-center">
+        <span class="material-symbols-outlined text-[#f5a623]">edit</span>
+      </div>
+      <div class="flex flex-col overflow-hidden">
+        <span class="text-[17px] font-semibold text-gray-900 whitespace-nowrap">昵称</span>
+        <span class="text-[13px] text-gray-500 whitespace-nowrap">设置昵称，展示个性自我</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-1 bg-black/5 px-3 py-2.5 rounded-lg cursor-pointer flex-shrink-0 active:bg-black/10 transition-colors">
+      <span class="text-[14px] text-gray-600 font-medium whitespace-nowrap">微信昵称</span>
+      <span class="material-symbols-outlined text-gray-400 text-[18px]">chevron_right</span>
+    </div>
+  </div>
+  <div class="mt-2 text-right">
+    <p class="text-[11px] text-gray-500 whitespace-nowrap">自动获取微信昵称，可点击修改</p>
+  </div>
+</div>
+</div>
+<!-- Action Area -->
+<div class="w-full flex flex-col items-center gap-6">
+<button class="w-full wechat-green hover:opacity-90 text-white rounded-lg py-4 flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-sm shadow-green-200">
+<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+<path d="M21.5,10.66c0-4-3.58-7.33-8-7.33s-8,3.33-8,7.33a6.83,6.83 0 0 0 2.8,5.43l-.7,2.58l3.14-1.6a9.14,9.14 0 0 0 2.76.43C17.92,18,21.5,14.66,21.5,10.66m-10.74-2c0-.44.36-.8.81-.8s.8.36.8.8v2.4c0 .44-.36.8-.8.8s-.81-.36-.81-.8V8.66m4.8,0c0-.44.36-.8.8-.8s.8.36.8.8v2.4c0 .44-.36.8-.8.8s-.8-.36-.8-.8V8.66Z"></path>
+</svg>
+<span class="text-[18px] font-medium">微信一键登录</span>
+</button>
+<!-- Agreement -->
+<div class="flex items-center gap-2 text-[13px] text-gray-400">
+<label class="flex items-center cursor-pointer">
+<div class="relative">
+<input checked="" class="peer sr-only" type="checkbox">
+<div class="w-5 h-5 rounded-full border border-gray-300 bg-white peer-checked:bg-primary peer-checked:border-primary flex items-center justify-center transition-all">
+<span class="material-symbols-outlined text-white text-[14px] font-bold">check</span>
+</div>
+</div>
+<span class="ml-2">已阅读并同意</span>
+</label>
+<a class="text-[#576b95]" href="#">《用户协议》</a>
+<span class="">和</span>
+<a class="text-[#576b95]" href="#">《隐私政策》</a>
+</div>
+</div>
+</main>
+<!-- Bottom Nav Logic (from COMPONENTS_7) -->
+
+
+
+</body></html>

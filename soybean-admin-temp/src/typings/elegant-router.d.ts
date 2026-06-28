@@ -55,12 +55,12 @@ declare module "@elegant-router/types" {
     "products_form": "/products/form";
     "products_list": "/products/list";
     "settings": "/settings";
+    "settings_avatars": "/settings/avatars";
     "settings_business": "/settings/business";
     "settings_logistics": "/settings/logistics";
     "settings_map": "/settings/map";
     "settings_pay": "/settings/pay";
     "settings_printer": "/settings/printer";
-    "settings_avatars": "/settings/avatars";
     "settings_storage": "/settings/storage";
     "settings_store": "/settings/store";
     "shop": "/shop";
@@ -163,12 +163,12 @@ declare module "@elegant-router/types" {
     | "products_categories"
     | "products_form"
     | "products_list"
+    | "settings_avatars"
     | "settings_business"
     | "settings_logistics"
     | "settings_map"
     | "settings_pay"
     | "settings_printer"
-    | "settings_avatars"
     | "settings_storage"
     | "settings_store"
     | "shop_categories"

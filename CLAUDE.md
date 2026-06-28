@@ -15,7 +15,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **AppID**: `wx06b8f02feceac089`
 - **Node version**: pnpm + Soybean Admin require Node >= v22.13. Local system PATH defaults to v18 — override before building.
 - **Memory**: See `C:\Users\61778\.claude\projects\D--Code-Pizza\memory\MEMORY.md` for previously learned lessons.
-- **Production**: `https://www.artaides.com` (Nginx → Express `/api` + static `/uploads`; Admin at `/admin/` served from Soybean Admin dist)
+- **Production**: `https://pizza.artaides.com` (Nginx → Express `/api` + static `/uploads`; Admin at `/admin/` served from Soybean Admin dist) — server `103.236.67.179`
+- **Domain history**: Previously `www.artaides.com` on old server `39.107.77.26` — now deprecated. Always use `pizza.artaides.com`.
+- **Deploy env vars**: `deploy.py` reads `PIZZA_HOST`, `PIZZA_PASS` (and optionally `PIZZA_USER`, `PIZZA_PORT`). Set `$env:PIZZA_HOST = "103.236.67.179"` before deploying.
 
 ## Key Reference — Node.js Version
 
@@ -59,8 +61,16 @@ src/
 │   ├── errorHandler.js     — global error handler
 │   └── requestId.js        — X-Request-Id per request (crypto.randomBytes)
 ├── controllers/            — Request handlers
-├── services/               — Business logic + SQL queries
-│   ├── systemConfigService.js — 4-group admin-configurable settings (pay/printer/map/business)
+├── services/               — Business logic + SQL queries (33 files)
+│   ├── systemConfigService.js — 5-group admin-configurable settings (pay/printer/map/business/storage)
+│   ├── cosService.js       — Tencent COS object storage (upload, delete, isConfigured)
+│   ├── defaultAvatarService.js — Default avatar CRUD + getRandom() for new users
+│   ├── kuaidi100Service.js  — kuaidi100 logistics API (tracking query, auto-detect carrier, MD5 signing)
+│   ├── logisticsService.js  — Logistics tracking orchestration for shop orders
+│   ├── shopRefundService.js — Shop order refunds (balance credit-back + WeChat Pay)
+│   ├── shopFavoriteService.js — Shop product favorites
+│   ├── luckyWheelService.js + luckyWheel.logic.js — Lucky wheel game backend + logic
+│   ├── carrierMap.js       — Carrier name-to-code mapping + tracking-number prefix detection (20+ carriers)
 │   ├── orderCleanupService.js — Auto-cancel unpaid orders (cron-driven)
 │   ├── auditService.js     — Fire-and-forget audit logging (NEVER throws)
 │   ├── reconciliationService.js — Payment vs order cross-check
@@ -68,10 +78,13 @@ src/
 │   ├── paymentService.js   — Order + recharge payment processing
 │   └── printerService.js   — Cloud receipt printing
 ├── routes/                 — Express Routers (mounted at /api/v1/*)
-│   └── adminApi.js         — Admin JSON API (/api/v1/admin/*), JWT + adminOnly
+│   ├── adminApi.js         — Admin JSON API (/api/v1/admin/*), JWT + adminOnly
+│   ├── logistics.js        — Logistics tracking endpoints
+│   ├── luckyWheel.js       — Lucky wheel game endpoints
+│   └── shop.js             — Shop (会员商城) endpoints
 └── utils/
     ├── jwt.js              — JWT sign/verify
-    ├── wechat.js           — WeChat login (code → openid)
+    ├── wechat.js           — WeChat login (code→openid) + getAccessToken (cached 2h) + getPhoneNumber(code)
     ├── wechatPay.js        — WeChat Pay v3 crypto (sign, verify, decrypt, payRequest)
     ├── memberTier.js       — Tier calculation from totalSpent
     ├── pickupCode.js       — 4-digit pickup code generator
@@ -86,12 +99,13 @@ src/
 
 ### Route Conventions
 
-- Public API routes: `/api/v1/auth`, `/api/v1/products`, `/api/v1/banners`, `/api/v1/config`
+- Public API routes: `/api/v1/auth` (login, logout, **phone** binding), `/api/v1/products`, `/api/v1/banners`, `/api/v1/config` (map, beian, **default-avatars**)
 - User API routes: `/api/v1/user/*` — profile, settings, member-tiers, **balance** (history + recharge)
 - Payment routes: `/api/v1/pay/*` — order payment, recharge, WeChat Pay notify callbacks
 - Admin API routes: `/api/v1/admin/*` — all behind `auth` + `adminOnly` middleware
   - CRUD: products, orders, coupons, coupon-templates, member-tiers, users, points, banners
-  - Settings: `/admin/settings/{pay,printer,map,store,business}` (GET/PUT)
+  - Settings: `/admin/settings/{pay,printer,map,store,business,storage}` (GET/PUT)
+  - **Default avatars**: `/admin/default-avatars` (GET/POST/DELETE)
   - Ops: `/admin/audit-logs`, `/admin/reconciliation`, `/admin/payment-records`
 - Admin EJS routes: `/admin` — session-based, renders EJS views
 - Upload static files: `/uploads` → `config.upload.dir` (default `uploads/`)
@@ -115,17 +129,18 @@ Both stopped during graceful shutdown. Both only log when count > 0.
 
 ### System Config (Admin-Configurable)
 
-`system_config` table stores key-value pairs. `systemConfigService` manages 4 groups, each with a **get/update/sync triplet**:
+`system_config` table stores key-value pairs. `systemConfigService` manages 5 groups, each with a **get/update/sync triplet**:
 
 | Group | DB Prefix | Notable Fields |
 |-------|-----------|---------------|
-| **pay** | `wx_pay_*` | mchId, apiV3Key, certs, notifyUrl |
+| **pay** | `wx_pay_*` | mchId, apiV3Key, certs, notifyUrl, refundNotifyUrl |
 | **printer** | `printer_*` | enabled, sn, copies, storeName |
 | **map** | `map_*` | tencentKey |
 | **business** | `biz_*` | orderCancelMinutes (1), unpaidTimeoutMinutes (30), storeName ('爱家店') |
+| **storage** | `cos_*` | Tencent COS config (SecretId, SecretKey, Bucket, Region) |
 
 - Writes use `INSERT ... ON DUPLICATE KEY UPDATE` (UPSERT) — keys auto-created on first save.
-- **Startup sync**: All 4 groups synced from DB to in-memory `config` in the `listen()` callback.
+- **Startup sync**: All 5 groups synced from DB to in-memory `config` in the `listen()` callback.
 - **Write-time sync**: After each `updateXConfig()`, the corresponding `syncXConfigToMemory()` runs immediately.
 - Priority chain: `.env` defaults → loaded into `config/index.js` → overridden by DB values at startup and on admin save.
 
@@ -190,7 +205,10 @@ src/
 │   │   ├── printer/index.vue    — Printer config + test + live preview
 │   │   ├── map/index.vue        — Tencent Map key
 │   │   ├── store/index.vue      — Store info (name, address, coords)
-│   │   └── business/index.vue   — Business config (cancel window, timeout, store name)
+│   │   ├── business/index.vue   — Business config (cancel window, timeout, store name)
+│   │   ├── storage/index.vue    — COS object storage config
+│   │   ├── logistics/index.vue  — Logistics (kuaidi100) config
+│   │   └── avatars/index.vue    — Default avatar management (grid, upload, delete, max 10)
 │   ├── files/list/index.vue     — File manager (NGrid, upload, delete, preview)
 │   ├── products/form/index.vue  — ImageUpload component replaces URL input
 │   └── points/form/index.vue    — Same ImageUpload integration
@@ -466,7 +484,7 @@ Uses `visibility: hidden` + `transform: translateY(100%)` for slide-up. Always a
 ```
 miniprogram/
 ├── app.js              — App lifecycle, globalData, cart methods, auto-login
-├── app.json            — Page registration (9 pages), window config
+├── app.json            — Page registration (14 pages), window config
 ├── app.wxss            — Design tokens, utility classes, global reset
 ├── utils/
 │   ├── api.js          — HTTP client (wx.request wrapper), doLogin()
@@ -475,11 +493,16 @@ miniprogram/
 │   ├── orders.js       — ORDER_STATUS_MAP, formatOrder (adds canCancel, isPaid, statusText, etc.)
 │   ├── layout.js       — Shared top bar height calculations (getSimpleTopBar, getBackBtnTopBar, getSwiperLayout)
 │   ├── pay.js          — WeChat Pay flow: payOrder, rechargeBalance (with retry polling)
-│   ├── shopPay.js      — 商城订单支付: payShopOrder (WeChat Pay + 余额) 
+│   ├── shopPay.js      — 商城订单支付: payShopOrder (WeChat Pay + 余额)
 │   ├── mapConfig.js    — Tencent Maps API wrapper (walking distance, reverse geocode)
 │   ├── auth.js         — Shared logout logic with confirmation modal
 │   └── profileShared.js — Profile mixin: profileMethods (avatar/edit/tier/announce/birthday) + loadProfileCore(page, hooks) + computeBirthdayInfo()
-├── custom-tab-bar/     — Tab bar Component (for standalone pages; only reusable component)
+├── components/         — Reusable UI components
+│   ├── quick-login/    — WeChat phone quick login (phone auth → auto-assign default avatar → done)
+│   ├── cart-bar/       — Cart bottom bar
+│   ├── product-card/   — Product display card
+│   └── tab-bar/        — Custom tab bar
+├── custom-tab-bar/     — Legacy tab bar Component (for standalone pages)
 ├── pages/
 │   ├── main/           — Swiper 4-tab entry (main.js + main.wxml + tpl-index/orders/shop/profile.wxml)
 │   ├── index/          — ⚠ Standalone 点单 (NOT in app.json; duplicate of main tab 0 logic)
@@ -494,6 +517,10 @@ miniprogram/
 │   ├── shop-detail/    — 商品详情 + 结账抽屉（黏土风 🌸）
 │   ├── shop-orders/    — 商城订单列表（黏土风 🌸）
 │   ├── shop-order-detail/ — 商城订单详情 + 退款（黏土风 🌸）
+│   ├── shop-logistics/ — 物流跟踪（黏土风 🌸, expandable cards）
+│   ├── favorites/      — 商城收藏（黏土风 🌸）
+│   ├── claim-center/   — 优惠券领取中心
+│   ├── lucky-wheel/    — 幸运转盘抽奖
 │   ├── settings/       — 设置页
 │   ├── tiers/          — 会员权益页 (hero card + horizontal compare + 2-col benefits grid + rules)
 │   └── recharge/       — 余额充值 (preset amounts + custom input + confirm modal)
@@ -502,7 +529,9 @@ miniprogram/
 
 ⚠ Pages marked "NOT in app.json" exist on disk but are not registered as routes. They are either consumed as inline templates by `main.wxml` (`<include src="tpl-*.wxml"/>`) or are legacy/orphaned code. The `member/` page's UI is duplicated as a modal overlay inside `main.wxml`.
 
-**No `components/` directory exists.** All UI is built directly inside page files. The only reusable component is `custom-tab-bar/`.
+### Quick Login Component
+
+`components/quick-login/` — Single-step WeChat phone auth. User clicks "微信一键登录", authorizes phone number via `getPhoneNumber`, and is logged in directly (no profile-completion step). On success, the server (`POST /api/v1/auth/phone`) binds the phone and randomly assigns a default avatar if the user has none.
 
 ### Common Pitfalls
 
