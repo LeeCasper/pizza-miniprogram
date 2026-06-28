@@ -9,46 +9,77 @@ const BASE_URL = 'https://pizza.artaides.com/api/v1';
 let pendingLoginPromise = null;
 
 /**
+ * Ensure we have a valid token before making authenticated requests.
+ * - Token exists → resolve immediately
+ * - User deliberately logged out → resolve (let request 401 naturally)
+ * - Login already in-flight → wait for it
+ * - No token and not logged out → start a new login
+ *
+ * Silently catches login failures — the request proceeds without auth
+ * and will 401, which the caller or the 401 handler can deal with.
+ */
+function ensureToken() {
+  if (wx.getStorageSync('token')) return Promise.resolve();
+  if (wx.getStorageSync('_loggedOut')) return Promise.resolve();
+  if (pendingLoginPromise) {
+    return pendingLoginPromise.then(function () {}).catch(function () {});
+  }
+  return doLogin().then(function () {}).catch(function () {});
+}
+
+/**
  * Core request function
  */
-function request(path, options = {}) {
-  const { method = 'GET', data, needAuth = true } = options;
-  const token = wx.getStorageSync('token');
+function request(path, options) {
+  if (!options) options = {};
+  var method = options.method || 'GET';
+  var data = options.data;
+  var needAuth = options.needAuth !== false;
 
-  return new Promise((resolve, reject) => {
-    wx.request({
-      url: BASE_URL + path,
-      method,
-      data,
-      header: {
-        'Content-Type': 'application/json',
-        ...(needAuth && token ? { 'Authorization': 'Bearer ' + token } : {}),
-      },
-      success(res) {
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          resolve(res.data);
-        } else if (res.statusCode === 401 && needAuth) {
-          // 已主动退出，不再自动重登
-          if (wx.getStorageSync('_loggedOut')) {
-            reject(res.data || { code: 401, message: '未登录' });
-            return;
+  function sendRequest() {
+    var token = wx.getStorageSync('token');
+
+    return new Promise(function (resolve, reject) {
+      wx.request({
+        url: BASE_URL + path,
+        method: method,
+        data: data,
+        header: {
+          'Content-Type': 'application/json',
+          ...(needAuth && token ? { 'Authorization': 'Bearer ' + token } : {}),
+        },
+        success: function (res) {
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            resolve(res.data);
+          } else if (res.statusCode === 401 && needAuth) {
+            // 已主动退出，不再自动重登
+            if (wx.getStorageSync('_loggedOut')) {
+              reject(res.data || { code: 401, message: '未登录' });
+              return;
+            }
+            // Token expired — re-login and retry once
+            doLogin().then(function () {
+              request(path, options).then(resolve).catch(reject);
+            }).catch(reject);
+          } else {
+            var message = (res.data && res.data.message) || '请求失败';
+            wx.showToast({ title: message, icon: 'none' });
+            reject(res.data || { code: res.statusCode, message });
           }
-          // Token expired — re-login and retry once
-          doLogin().then(() => {
-            request(path, options).then(resolve).catch(reject);
-          }).catch(reject);
-        } else {
-          const message = (res.data && res.data.message) || '请求失败';
-          wx.showToast({ title: message, icon: 'none' });
-          reject(res.data || { code: res.statusCode, message });
-        }
-      },
-      fail(err) {
-        wx.showToast({ title: '网络异常，请检查网络', icon: 'none' });
-        reject(err);
-      },
+        },
+        fail: function (err) {
+          wx.showToast({ title: '网络异常，请检查网络', icon: 'none' });
+          reject(err);
+        },
+      });
     });
-  });
+  }
+
+  // Before making authenticated request, ensure we have a token
+  if (needAuth) {
+    return ensureToken().then(sendRequest);
+  }
+  return sendRequest();
 }
 
 /**
