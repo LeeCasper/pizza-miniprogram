@@ -110,6 +110,20 @@ Component({
         }
         return;
       }
+
+      const { avatarUrl, nickname } = this.data;
+      const name = (nickname || '').trim();
+      console.log('[ql] onGetPhoneNumber — avatarUrl:', JSON.stringify(avatarUrl), 'nickname:', JSON.stringify(nickname), 'hasToken:', !!wx.getStorageSync('token'));
+
+      if (!avatarUrl) {
+        wx.showToast({ title: '请先选择微信头像', icon: 'none' });
+        return;
+      }
+      if (!name) {
+        wx.showToast({ title: '请先填写微信昵称', icon: 'none' });
+        return;
+      }
+
       wx.showLoading({ title: '登录中...' });
 
       // 用户主动登录，清除退出标记
@@ -117,16 +131,9 @@ Component({
       wx.removeStorageSync('_manualLogout');
       if (app.globalData) { app.globalData._loggedOut = false; app.globalData._manualLogout = false; }
 
-      const { avatarUrl, nickname } = this.data;
-      console.log('[ql] onGetPhoneNumber — avatarUrl:', JSON.stringify(avatarUrl), 'nickname:', JSON.stringify(nickname), 'hasToken:', !!wx.getStorageSync('token'));
-
-      // 构建请求体：有则有，无则后端随机默认
+      // 构建请求体：快捷登录必须携带本次选择的头像和昵称，避免后端保留旧值
       const buildPayload = (permanentAvatarUrl) => {
-        const payload = { code };
-        if (permanentAvatarUrl) payload.avatar = permanentAvatarUrl;
-        const name = (nickname || '').trim();
-        if (name) payload.name = name;
-        return payload;
+        return { code, avatar: permanentAvatarUrl, name };
       };
 
       // 确保有 token（必须先拿到 token，否则 _uploadAvatar 读不到）
@@ -136,9 +143,15 @@ Component({
 
       // token 就绪后再上传头像 → 绑定手机号（串行，不能和 ensureToken 并行）
       ensureToken.then(() => {
-        return avatarUrl
-          ? this._uploadAvatar(avatarUrl).then(function(url) { console.log('[ql] upload SUCCESS — url:', JSON.stringify(url)); return url; }).catch(function(err) { console.warn('[ql] upload FAILED —', err); return null; })
-          : Promise.resolve(null);
+        return this._uploadAvatar(avatarUrl).then(function(url) {
+          console.log('[ql] upload SUCCESS — url:', JSON.stringify(url));
+          return url;
+        }).catch(function(err) {
+          console.warn('[ql] upload FAILED —', err);
+          wx.hideLoading();
+          wx.showToast({ title: '头像上传失败，请重试', icon: 'none' });
+          throw err;
+        });
       }).then((permanentAvatarUrl) => {
         console.log('[ql] permanentAvatarUrl:', JSON.stringify(permanentAvatarUrl));
         const payload = buildPayload(permanentAvatarUrl);
