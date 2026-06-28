@@ -43,6 +43,19 @@ const authController = {
         user.name = randomName;
       } else {
         await userService.updateSession(user.id, sessionKey);
+        // 已有用户缺少头像/昵称 → 补分配默认值
+        if (!user.avatar) {
+          const randomAvatar = await defaultAvatarService.getRandom();
+          if (randomAvatar) {
+            await userService.updateAvatar(user.id, randomAvatar);
+            user.avatar = randomAvatar;
+          }
+        }
+        if (!user.name) {
+          const randomName = cuteNames.getRandom();
+          await userService.updateName(user.id, randomName);
+          user.name = randomName;
+        }
       }
 
       const token = signToken({ sub: user.id, role: user.role });

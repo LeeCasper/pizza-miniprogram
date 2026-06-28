@@ -20,7 +20,8 @@ let pendingLoginPromise = null;
  */
 function ensureToken() {
   if (wx.getStorageSync('token')) return Promise.resolve();
-  if (wx.getStorageSync('_loggedOut')) return Promise.resolve();
+  // 已主动退出：拒绝而不是 resolve，避免无 token 请求打出 401
+  if (wx.getStorageSync('_loggedOut')) return Promise.reject(new Error('LOGGED_OUT'));
   if (pendingLoginPromise) {
     return pendingLoginPromise.then(function () {}).catch(function () {});
   }
@@ -77,7 +78,11 @@ function request(path, options) {
 
   // Before making authenticated request, ensure we have a token
   if (needAuth) {
-    return ensureToken().then(sendRequest);
+    return ensureToken().then(sendRequest).catch(function (err) {
+      // 主动退出 → 静默返回 null，不打出 401 请求
+      if (err && err.message === 'LOGGED_OUT') return null;
+      throw err;
+    });
   }
   return sendRequest();
 }
