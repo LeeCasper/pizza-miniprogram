@@ -32,6 +32,15 @@ const authController = {
       let user = await userService.findByOpenid(openid);
       if (!user) {
         user = await userService.create({ openid, unionid, sessionKey });
+        // 新用户：分配随机默认头像和昵称
+        const randomAvatar = await defaultAvatarService.getRandom();
+        if (randomAvatar) {
+          await userService.updateAvatar(user.id, randomAvatar);
+          user.avatar = randomAvatar;
+        }
+        const randomName = cuteNames.getRandom();
+        await userService.updateName(user.id, randomName);
+        user.name = randomName;
       } else {
         await userService.updateSession(user.id, sessionKey);
       }
