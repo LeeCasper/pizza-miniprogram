@@ -9,7 +9,7 @@
         <view class="avatar-wrap" bindtap="onOpenQuickLogin">
           <image wx:if="{{userInfo.avatar}}" class="avatar" src="{{userInfo.avatar}}" mode="aspectFill"></image>
           <view wx:else class="avatar avatar-placeholder"></view>
-          <view class="avatar-login-mask">
+          <view class="avatar-login-mask" wx:if="{{!userInfo.avatar}}">
             <text class="avatar-login-icon">👤</text>
           </view>
         </view>

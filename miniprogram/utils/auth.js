@@ -1,5 +1,6 @@
 // utils/auth.js — 认证相关共享模块
 // 统一 logout 逻辑，修复 profile.js 漏清 token 的 bug
+const { BASE_URL } = require('./api');
 
 /**
  * 退出登录（带确认弹窗）
@@ -25,6 +26,21 @@ function logout() {
             app.globalData._manualLogout = true;
             app.globalData._qlProtected = null;
             app.globalData._defaultAvatarFromServer = false;
+            wx.request({
+              url: BASE_URL + '/config/default-avatars',
+              method: 'GET',
+              success: function (r) {
+                if (r.statusCode === 200 && r.data.code === 0 && r.data.data && r.data.data.length > 0 && !app.globalData.userInfo.phone) {
+                  var list = r.data.data;
+                  app.globalData.userInfo.avatar = list[Math.floor(Math.random() * list.length)];
+                  app.globalData._defaultAvatarFromServer = true;
+                  var activePages = getCurrentPages();
+                  activePages.forEach(page => {
+                    if (page.updateUserInfo) page.updateUserInfo(app.globalData.userInfo);
+                  });
+                }
+              }
+            });
           }
           wx.showToast({ title: '已退出', icon: 'success' });
           const pages = getCurrentPages();
