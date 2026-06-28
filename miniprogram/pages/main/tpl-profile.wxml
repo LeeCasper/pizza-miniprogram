@@ -7,9 +7,8 @@
       <!-- 未登录状态：点击唤起快捷登录 -->
       <block wx:if="{{!userInfo.phone}}">
         <view class="avatar-wrap" bindtap="onOpenQuickLogin">
-          <image class="avatar" src="{{userInfo.avatar}}" mode="aspectFill" wx:if="{{userInfo.avatar}}"></image>
-          <view class="avatar avatar-placeholder" wx:else></view>
-          <view class="avatar-login-mask" wx:if="{{!userInfo.avatar}}">
+          <image class="avatar" src="{{userInfo.avatar || '/images/icon-avatar.png'}}" mode="aspectFill"></image>
+          <view class="avatar-login-mask">
             <text class="avatar-login-icon">👤</text>
           </view>
         </view>
