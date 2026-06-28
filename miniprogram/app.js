@@ -10,34 +10,40 @@ App({
 
     // 预获取默认头像（未登录时展示 CDN 默认头像，替代本地 icon）
     var app = this;
-    wx.request({
-      url: BASE_URL + '/config/default-avatars',
-      method: 'GET',
-      success: function (res) {
-        if (res.statusCode === 200 && res.data.code === 0 && res.data.data && res.data.data.length > 0) {
-          var list = res.data.data;
-          var randomAvatar = list[Math.floor(Math.random() * list.length)];
-          if (!app.globalData.userInfo.avatar) {
-            app.globalData.userInfo.avatar = randomAvatar;
-            app.globalData._defaultAvatarFromServer = true;
-            console.log('[app] default avatar loaded:', JSON.stringify(randomAvatar));
-            var pages = getCurrentPages();
-            pages.forEach(function (p) {
-              if (p.updateUserInfo) p.updateUserInfo(app.globalData.userInfo);
-            });
-          }
-        }
-      }
-    });
-
-    // 尝试自动登录
-    const token = wx.getStorageSync('token');
-    const cachedUser = wx.getStorageSync('userInfo');
+    var cachedUser = wx.getStorageSync('userInfo');
     if (cachedUser) {
       if (cachedUser.avatar) cachedUser.avatar = fixImageUrl(cachedUser.avatar);
-      this.globalData.userInfo = cachedUser;
+      this.globalData.userInfo = { ...this.globalData.userInfo, ...cachedUser };
+    }
+    if (!wx.getStorageSync('_manualLogout')) {
+      wx.request({
+        url: BASE_URL + '/config/default-avatars',
+        method: 'GET',
+        success: function (res) {
+          if (res.statusCode === 200 && res.data.code === 0 && res.data.data && res.data.data.length > 0) {
+            var list = res.data.data;
+            var randomAvatar = list[Math.floor(Math.random() * list.length)];
+            if (!app.globalData.userInfo.avatar && !cachedUser.phone) {
+              app.globalData.userInfo.avatar = randomAvatar;
+              app.globalData._defaultAvatarFromServer = true;
+              console.log('[app] default avatar loaded:', JSON.stringify(randomAvatar));
+              var pages = getCurrentPages();
+              pages.forEach(function (p) {
+                if (p.updateUserInfo) p.updateUserInfo(app.globalData.userInfo);
+              });
+            }
+          }
+        }
+      });
     }
 
+    if (wx.getStorageSync('_manualLogout')) {
+      console.log('[app] manualLogout active — skip auto login');
+      return;
+    }
+
+    const token = wx.getStorageSync('token');
+    // 尝试自动登录（手动退出后禁止自动恢复，直到用户主动重新登录）
     if (token) {
       // 有 token，验证并刷新用户信息
       api.get('/user/profile').then(res => {

@@ -19,13 +19,14 @@ let pendingLoginPromise = null;
  * and will 401, which the caller or the 401 handler can deal with.
  */
 function ensureToken() {
+  if (wx.getStorageSync('_manualLogout')) { console.log('[api] ensureToken: manualLogout → reject'); return Promise.reject(new Error('LOGGED_OUT')); }
   if (wx.getStorageSync('token')) {
     // 自愈：token 存在但 _loggedOut 也设置 → 矛盾状态，以 token 为准
     if (wx.getStorageSync('_loggedOut')) { wx.removeStorageSync('_loggedOut'); console.log('[api] ensureToken: cleared stale _loggedOut (token exists)'); }
     console.log('[api] ensureToken: token exists'); return Promise.resolve();
   }
   // 已主动退出：拒绝而不是 resolve，避免无 token 请求打出 401
-  if (wx.getStorageSync('_loggedOut')) { console.log('[api] ensureToken: loggedOut → reject'); return Promise.reject(new Error('LOGGED_OUT')); }
+  if (wx.getStorageSync('_loggedOut') || wx.getStorageSync('_manualLogout')) { console.log('[api] ensureToken: loggedOut/manualLogout → reject'); return Promise.reject(new Error('LOGGED_OUT')); }
   if (pendingLoginPromise) {
     console.log('[api] ensureToken: waiting for pendingLoginPromise');
     return pendingLoginPromise.then(function () { console.log('[api] ensureToken: pendingLoginPromise resolved'); }).catch(function (e) { console.log('[api] ensureToken: pendingLoginPromise rejected', e); });
@@ -60,7 +61,7 @@ function request(path, options) {
             resolve(res.data);
           } else if (res.statusCode === 401 && needAuth) {
             // 已主动退出，不再自动重登
-            if (wx.getStorageSync('_loggedOut')) {
+            if (wx.getStorageSync('_loggedOut') || wx.getStorageSync('_manualLogout')) {
               reject(res.data || { code: 401, message: '未登录' });
               return;
             }

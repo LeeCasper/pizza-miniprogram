@@ -14,13 +14,17 @@ function logout() {
         if (res.confirm) {
           wx.removeStorageSync('token');
           wx.removeStorageSync('userInfo');
-          // 设置退出标记，阻止 api.js 的 401 自动重登
+          // 退出态必须同时清掉会话内/持久化自动登录信号，避免刷新后被恢复
           wx.setStorageSync('_loggedOut', '1');
+          wx.setStorageSync('_manualLogout', '1');
           const app = getApp();
           if (app && app.globalData) {
-            app.globalData.userInfo = {};
+            app.globalData.userInfo = { name: '披萨爱好者', avatar: '', totalSpent: 0, memberLevel: 'silver', memberId: '', points: 0, coupons: 0, cardCount: 0, balance: 0, bio: '享受美味每一天', birthday: null };
             app.globalData.token = '';
             app.globalData._loggedOut = true;
+            app.globalData._manualLogout = true;
+            app.globalData._qlProtected = null;
+            app.globalData._defaultAvatarFromServer = false;
           }
           wx.showToast({ title: '已退出', icon: 'success' });
         }
