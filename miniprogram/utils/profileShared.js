@@ -213,6 +213,8 @@ const profileMethods = {
     // 立即同步登录后的用户数据到页面, 避免 loadProfileCore API 回调覆盖
     var app = getApp();
     var ui = app.globalData.userInfo;
+    // 标记快捷登录刚完成，loadProfileCore 不应覆盖 avatar/name/phone
+    app.globalData._quickLoginJustDone = true;
     this.setData({
       showQuickLogin: false,
       userInfo: { ...ui, balanceText: '¥' + ((ui.balance || 0)).toFixed(2), cardCount: ui.cardCount || 0, bio: ui.bio || '享受美味每一天' },
@@ -280,6 +282,13 @@ function loadProfileCore(page, hooks) {
     if (freshUi) {
       // hook: 页面可在合并前修改 freshUi（例如 optimistic totalSpent 保护）
       if (_hooks.beforeMerge) _hooks.beforeMerge(freshUi, cachedUi);
+      // 快捷登录刚完成：avatar/name/phone 以缓存（刚写入的新值）为准，不被 API 覆盖
+      if (app.globalData._quickLoginJustDone) {
+        if (cachedUi.phone) freshUi.phone = cachedUi.phone;
+        if (cachedUi.name) freshUi.name = cachedUi.name;
+        if (cachedUi.avatar) freshUi.avatar = cachedUi.avatar;
+        app.globalData._quickLoginJustDone = false;
+      }
       // 保护快捷登录刚写入的字段：若 API 返回空值，保留缓存中的最新值
       if (!freshUi.phone && cachedUi.phone) freshUi.phone = cachedUi.phone;
       if (!freshUi.name && cachedUi.name) freshUi.name = cachedUi.name;

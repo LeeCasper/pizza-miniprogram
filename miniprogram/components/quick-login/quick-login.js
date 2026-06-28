@@ -127,24 +127,27 @@ Component({
         return payload;
       };
 
-      // 选了头像就先上传到服务器，再绑定手机号；否则直接绑手机号
-      const avatarPromise = avatarUrl
-        ? this._uploadAvatar(avatarUrl).catch(() => null)
-        : Promise.resolve(null);
-
-      // 确保有 token（退出登录后快捷登录需要先静默登录获取 token）
+      // 确保有 token（必须先拿到 token，否则 _uploadAvatar 读不到）
       const ensureToken = wx.getStorageSync('token')
         ? Promise.resolve()
         : doLogin().then(() => {});
 
-      Promise.all([avatarPromise, ensureToken]).then(([permanentAvatarUrl]) => {
+      // token 就绪后再上传头像 → 绑定手机号（串行，不能和 ensureToken 并行）
+      ensureToken.then(() => {
+        return avatarUrl
+          ? this._uploadAvatar(avatarUrl).catch(() => null)
+          : Promise.resolve(null);
+      }).then((permanentAvatarUrl) => {
         const payload = buildPayload(permanentAvatarUrl);
         return api.post('/auth/phone', payload);
       }).then(res => {
         wx.hideLoading();
         if (res.code === 0) {
           const { phone, avatar, name } = res.data;
-          // 必须设置 phone（核心登录标识），avatar 和 name 可选
+          // 从 storage 合并 doLogin() 写入的完整用户对象，再覆盖新头像/昵称
+          // 防止 logout 后 app.globalData.userInfo 是空 {} 导致残缺写入
+          const stored = wx.getStorageSync('userInfo') || {};
+          app.globalData.userInfo = { ...stored };
           if (phone) app.globalData.userInfo.phone = phone;
           if (avatar) app.globalData.userInfo.avatar = avatar;
           if (name) app.globalData.userInfo.name = name;
