@@ -94,10 +94,6 @@ function doLogin() {
   // Avoid concurrent login calls
   if (pendingLoginPromise) return pendingLoginPromise;
 
-  // 记录调用时的退出状态：静默登录（之前已退出）不存 token，
-  // 仅获取用户数据用于展示（头像/昵称），API 调用仍被 ensureToken 拦截
-  var wasLoggedOut = !!wx.getStorageSync('_loggedOut');
-
   pendingLoginPromise = new Promise((resolve, reject) => {
     wx.login({
       success(res) {
@@ -116,10 +112,7 @@ function doLogin() {
               const { token, user } = result.data.data;
               // 登录成功，清除退出标记
               wx.removeStorageSync('_loggedOut');
-              // 静默登录：只存用户数据，不存 token（API 调用需显式登录）
-              if (!wasLoggedOut) {
-                wx.setStorageSync('token', token);
-              }
+              wx.setStorageSync('token', token);
               wx.setStorageSync('userInfo', user);
               resolve(user);
             } else {
