@@ -33,6 +33,10 @@ Page({
     });
 
     // Load settings from API
+    if (wx.getStorageSync('_manualLogout')) {
+      this.setData({ phoneNumber: '未设置' });
+      return;
+    }
     api.get('/user/settings').then(res => {
       if (res.code === 0) {
         this.setData({

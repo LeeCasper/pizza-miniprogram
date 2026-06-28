@@ -44,6 +44,10 @@ Page({
   },
 
   fetchOrders() {
+    if (wx.getStorageSync('_manualLogout')) {
+      this.setData({ orders: [], loading: false });
+      return;
+    }
     this.setData({ loading: true });
     const status = this.data.currentTab;
     api.get('/shop/orders', { status }).then(res => {

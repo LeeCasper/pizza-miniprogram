@@ -98,6 +98,10 @@ Page({
   },
 
   onPointsHistory() {
+    if (wx.getStorageSync('_manualLogout')) {
+      wx.showToast({ title: '请先登录', icon: 'none' });
+      return;
+    }
     wx.showLoading({ title: '加载中...' });
     api.get('/points/history').then(res => {
       wx.hideLoading();

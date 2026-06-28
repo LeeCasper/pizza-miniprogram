@@ -40,7 +40,7 @@
                 <button class="ql-avatar-pick" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
                   <image wx:if="{{avatarUrl}}" class="ql-avatar-preview-img" src="{{avatarUrl}}" mode="aspectFill"></image>
                   <view wx:else class="ql-avatar-empty-circle">
-                    <text class="ql-avatar-empty-emoji">👤</text>
+                    <text class="ql-avatar-empty-text">选择</text>
                   </view>
                   <view class="ql-avatar-camera-badge">
                     <image class="ql-avatar-camera-badge-icon" src="/images/camera-badge.png" mode="aspectFit"></image>
@@ -69,16 +69,10 @@
                 </view>
               </view>
               <view class="ql-card-right">
-                <!-- 昵称输入（编辑态） -->
-                <view class="ql-nickname-chip" wx:if="{{!nicknameEditing}}" bindtap="onNicknameTap">
-                  <text class="ql-nickname-chip-text">{{nickname || '微信昵称'}}</text>
-                  <text class="ql-card-chevron ql-card-chevron-sm">›</text>
-                </view>
-                <!-- 昵称输入框（编辑态） -->
-                <input wx:else class="ql-nickname-input-inline" type="nickname"
-                       placeholder="微信昵称" value="{{nickname}}"
+                <input class="ql-nickname-input-inline" type="nickname"
+                       placeholder="点击填写微信昵称" value="{{nickname}}"
                        bindinput="onNicknameInput" bindblur="onNicknameBlur"
-                       maxlength="30" focus="{{nicknameEditing}}"></input>
+                       maxlength="30"></input>
               </view>
             </view>
             <view class="ql-card-hint">

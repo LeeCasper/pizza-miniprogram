@@ -22,6 +22,10 @@ Page({
   },
 
   fetchAddresses() {
+    if (wx.getStorageSync('_manualLogout')) {
+      this.setData({ addresses: [], loading: false, mode: 'list', editId: null });
+      return;
+    }
     this.setData({ loading: true });
     api.get('/addresses').then(res => {
       if (res.code === 0) {
@@ -34,7 +38,7 @@ Page({
         this.setData({ loading: false });
       }
     }).catch(() => {
-      this.setData({ loading: false });
+      this.setData({ addresses: [], loading: false, mode: 'list', editId: null });
       wx.showToast({ title: '加载失败', icon: 'none' });
     });
   },

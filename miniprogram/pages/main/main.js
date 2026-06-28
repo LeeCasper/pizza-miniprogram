@@ -197,6 +197,10 @@ Page({
   },
 
   fetchOrders() {
+    if (wx.getStorageSync('_manualLogout')) {
+      this.setData({ orders: [], filteredOrders: [], ordersLoaded: true });
+      return;
+    }
     api.get('/orders').then(res => {
       if (res.code === 0) {
         const ordersWithDigits = (res.data || []).map(o => {
@@ -211,7 +215,9 @@ Page({
         this.setData({ orders: ordersWithDigits, filteredOrders: filtered, ordersLoaded: true });
         this._scheduleCancelDeadlineRefresh(ordersWithDigits);
       }
-    }).catch(() => {});
+    }).catch(() => {
+      this.setData({ orders: [], filteredOrders: [], ordersLoaded: true });
+    });
   },
 
   /** Auto-refresh when the nearest cancelDeadline expires so button disappears */

@@ -58,6 +58,12 @@ function request(path, options) {
         },
         success: function (res) {
           if (res.statusCode >= 200 && res.statusCode < 300) {
+            // If the user logged out while this authenticated request was in-flight,
+            // discard the stale private response instead of repopulating page data.
+            if (needAuth && wx.getStorageSync('_manualLogout')) {
+              reject(new Error('LOGGED_OUT'));
+              return;
+            }
             resolve(res.data);
           } else if (res.statusCode === 401 && needAuth) {
             // 已主动退出，不再自动重登

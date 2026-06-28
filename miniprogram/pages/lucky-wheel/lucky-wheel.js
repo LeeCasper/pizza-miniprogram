@@ -53,6 +53,9 @@ Page({
   noop() {},
 
   loadConfig() {
+    if (wx.getStorageSync('_manualLogout')) {
+      this.setData({ userPoints: 0, freeRemaining: 0, drawsRemaining: 0, records: [], showRecords: false });
+    }
     api.get('/lucky-wheel/config').then(res => {
       if (!res || res.code !== 0 || !res.data) return;
       const d = res.data;
@@ -197,6 +200,11 @@ Page({
 
   // ── Records drawer ──
   onOpenRecords() {
+    if (wx.getStorageSync('_manualLogout')) {
+      this.setData({ showRecords: true, records: [] });
+      wx.showToast({ title: '请先登录', icon: 'none' });
+      return;
+    }
     this.setData({ showRecords: true });
     api.get('/lucky-wheel/records').then(res => {
       if (!res || res.code !== 0 || !res.data) return;

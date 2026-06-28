@@ -20,6 +20,10 @@ Page({
   },
 
   fetchFavorites() {
+    if (wx.getStorageSync('_manualLogout')) {
+      this.setData({ favorites: [], loading: false });
+      return;
+    }
     api.get('/shop/favorites').then(res => {
       if (res.code === 0) {
         const favorites = (res.data || []).map(p => ({

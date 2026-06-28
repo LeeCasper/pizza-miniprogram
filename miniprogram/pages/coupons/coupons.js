@@ -29,6 +29,10 @@ Page({
   },
 
   fetchCoupons() {
+    if (wx.getStorageSync('_manualLogout')) {
+      this.setData({ allCoupons: [], redeemCoupons: [], redeemFiltered: [], redeemAvailableCount: 0, discountCoupons: [], discountFiltered: [], discountAvailableCount: 0, detailProduct: null, detailOpen: false, loading: false });
+      return;
+    }
     this.setData({ loading: true });
     api.get('/coupons').then(res => {
       if (res.code === 0) {
@@ -56,7 +60,7 @@ Page({
         this.setData({ loading: false });
       }
     }).catch(() => {
-      this.setData({ loading: false });
+      this.setData({ allCoupons: [], redeemCoupons: [], redeemFiltered: [], redeemAvailableCount: 0, discountCoupons: [], discountFiltered: [], discountAvailableCount: 0, detailProduct: null, detailOpen: false, loading: false });
       wx.showToast({ title: '加载失败', icon: 'none' });
     });
   },

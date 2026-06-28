@@ -59,6 +59,10 @@ Page({
   },
 
   fetchDetail() {
+    if (wx.getStorageSync('_manualLogout')) {
+      this.setData({ product: null, images: [], loading: false });
+      return;
+    }
     api.get('/shop/products/' + this.data.productId).then(res => {
       if (res.code === 0 && res.data) {
         const p = res.data;

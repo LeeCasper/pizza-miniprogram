@@ -38,6 +38,10 @@ Page({
   },
 
   fetchOrders() {
+    if (wx.getStorageSync('_manualLogout')) {
+      this.setData({ orders: [], filteredOrders: [], loading: false });
+      return;
+    }
     this.setData({ loading: true });
     api.get('/orders').then(res => {
       if (res.code === 0) {
@@ -49,7 +53,7 @@ Page({
         this.setData({ loading: false });
       }
     }).catch(() => {
-      this.setData({ loading: false });
+      this.setData({ orders: [], filteredOrders: [], loading: false });
       wx.showToast({ title: '加载失败', icon: 'none' });
     });
   },

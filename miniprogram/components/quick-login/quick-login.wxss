@@ -245,9 +245,10 @@
   justify-content: center;
 }
 
-.ql-avatar-empty-emoji {
-  font-size: 52rpx;
-  opacity: 0.35;
+.ql-avatar-empty-text {
+  font-size: 24rpx;
+  color: #9ca3af;
+  font-weight: 500;
 }
 
 /* ── 头像相机角标 ── */

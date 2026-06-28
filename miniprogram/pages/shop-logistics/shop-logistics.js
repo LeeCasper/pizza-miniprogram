@@ -21,6 +21,10 @@ Page({
   },
 
   fetchOrders() {
+    if (wx.getStorageSync('_manualLogout')) {
+      this.setData({ orders: [], loading: false, expandedId: null, loadingDetail: false });
+      return;
+    }
     this.setData({ loading: true });
     api.get('/logistics/orders').then(res => {
       if (res.code === 0 && res.data) {

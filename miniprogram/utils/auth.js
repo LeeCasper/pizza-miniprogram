@@ -2,6 +2,34 @@
 // 统一 logout 逻辑，修复 profile.js 漏清 token 的 bug
 const { BASE_URL } = require('./api');
 
+function resetPrivatePageData(page) {
+  if (!page || !page.setData || !page.data) return;
+  var data = page.data;
+  var update = {};
+  if ('orders' in data) update.orders = [];
+  if ('filteredOrders' in data) update.filteredOrders = [];
+  if ('addresses' in data) update.addresses = [];
+  if ('favorites' in data) update.favorites = [];
+  if ('allCoupons' in data) update.allCoupons = [];
+  if ('redeemCoupons' in data) update.redeemCoupons = [];
+  if ('redeemFiltered' in data) update.redeemFiltered = [];
+  if ('discountCoupons' in data) update.discountCoupons = [];
+  if ('discountFiltered' in data) update.discountFiltered = [];
+  if ('availableCoupons' in data) update.availableCoupons = [];
+  if ('selectedCoupon' in data) update.selectedCoupon = null;
+  if ('couponPickerOpen' in data) update.couponPickerOpen = false;
+  if ('cartOpen' in data) update.cartOpen = false;
+  if ('cartItems' in data) update.cartItems = [];
+  if ('cartCount' in data) update.cartCount = 0;
+  if ('cartTotal' in data) update.cartTotal = 0;
+  if ('records' in data) update.records = [];
+  if ('showRecords' in data) update.showRecords = false;
+  if ('userPoints' in data) update.userPoints = 0;
+  if ('phoneNumber' in data) update.phoneNumber = '未设置';
+  if ('loading' in data) update.loading = false;
+  if (Object.keys(update).length) page.setData(update);
+}
+
 /**
  * 退出登录（带确认弹窗）
  * @returns {Promise<boolean>} 用户是否确认退出
@@ -36,6 +64,7 @@ function logout() {
                   app.globalData._defaultAvatarFromServer = true;
                   var activePages = getCurrentPages();
                   activePages.forEach(page => {
+                    resetPrivatePageData(page);
                     if (page.updateUserInfo) page.updateUserInfo(app.globalData.userInfo);
                   });
                 }
@@ -45,6 +74,7 @@ function logout() {
           wx.showToast({ title: '已退出', icon: 'success' });
           const pages = getCurrentPages();
           pages.forEach(page => {
+            resetPrivatePageData(page);
             if (page.updateUserInfo && app && app.globalData) page.updateUserInfo(app.globalData.userInfo);
             if (page.setData) page.setData({ showQuickLogin: false });
           });

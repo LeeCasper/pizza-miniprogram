@@ -24,6 +24,10 @@ Page({
   },
 
   loadClaimable() {
+    if (wx.getStorageSync('_manualLogout')) {
+      this.setData({ coupons: [], loading: false, claiming: 0 });
+      return;
+    }
     this.setData({ loading: true });
     api.get('/coupons/claimable').then(res => {
       if (res.code === 0) {
