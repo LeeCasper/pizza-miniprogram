@@ -5,6 +5,9 @@ App({
     const windowInfo = wx.getWindowInfo();
     this.globalData.statusBarHeight = windowInfo.statusBarHeight;
 
+    // 每次冷启动清除退出标记 — _loggedOut 只对当前会话有效，新会话应重试登录
+    wx.removeStorageSync('_loggedOut');
+
     // 尝试自动登录
     const token = wx.getStorageSync('token');
     const cachedUser = wx.getStorageSync('userInfo');
@@ -17,20 +20,16 @@ App({
       // 有 token，验证并刷新用户信息
       api.get('/user/profile').then(res => {
         if (res.code === 0) {
-          wx.removeStorageSync('_loggedOut');
           if (res.data.avatar) res.data.avatar = fixImageUrl(res.data.avatar);
           this.globalData.userInfo = res.data;
           wx.setStorageSync('userInfo', res.data);
         }
       }).catch(() => {
-        // Token 无效，重新登录（除非已主动退出）
-        if (!wx.getStorageSync('_loggedOut')) {
-          this.doAppLogin();
-        }
+        // Token 无效，重新登录
+        this.doAppLogin();
       });
     } else {
       // 无 token，静默登录获取用户数据（头像/昵称等展示用）
-      // 即使之前主动退出，也执行静默登录——doLogin 会跳过 token 存储
       this.doAppLogin();
     }
   },
