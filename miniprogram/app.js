@@ -29,10 +29,9 @@ App({
         }
       });
     } else {
-      // 无 token，除非已主动退出，否则静默登录
-      if (!wx.getStorageSync('_loggedOut')) {
-        this.doAppLogin();
-      }
+      // 无 token，静默登录获取用户数据（头像/昵称等展示用）
+      // 即使之前主动退出，也执行静默登录——doLogin 会跳过 token 存储
+      this.doAppLogin();
     }
   },
 
