@@ -117,6 +117,7 @@ Component({
       if (app.globalData) app.globalData._loggedOut = false;
 
       const { avatarUrl, nickname } = this.data;
+      console.log('[ql] onGetPhoneNumber — avatarUrl:', JSON.stringify(avatarUrl), 'nickname:', JSON.stringify(nickname), 'hasToken:', !!wx.getStorageSync('token'));
 
       // 构建请求体：有则有，无则后端随机默认
       const buildPayload = (permanentAvatarUrl) => {
@@ -135,12 +136,15 @@ Component({
       // token 就绪后再上传头像 → 绑定手机号（串行，不能和 ensureToken 并行）
       ensureToken.then(() => {
         return avatarUrl
-          ? this._uploadAvatar(avatarUrl).catch(() => null)
+          ? this._uploadAvatar(avatarUrl).then(function(url) { console.log('[ql] upload SUCCESS — url:', JSON.stringify(url)); return url; }).catch(function(err) { console.warn('[ql] upload FAILED —', err); return null; })
           : Promise.resolve(null);
       }).then((permanentAvatarUrl) => {
+        console.log('[ql] permanentAvatarUrl:', JSON.stringify(permanentAvatarUrl));
         const payload = buildPayload(permanentAvatarUrl);
+        console.log('[ql] POST /auth/phone payload keys:', Object.keys(payload));
         return api.post('/auth/phone', payload);
       }).then(res => {
+        console.log('[ql] /auth/phone response — code:', res && res.code, 'data:', JSON.stringify(res && res.data));
         wx.hideLoading();
         if (res.code === 0) {
           const { phone, avatar, name } = res.data;
@@ -152,10 +156,12 @@ Component({
           if (avatar) app.globalData.userInfo.avatar = avatar;
           if (name) app.globalData.userInfo.name = name;
           wx.setStorageSync('userInfo', app.globalData.userInfo);
+          console.log('[ql] globalData.userInfo final — avatar:', JSON.stringify(app.globalData.userInfo.avatar), 'name:', JSON.stringify(app.globalData.userInfo.name), 'phone:', JSON.stringify(app.globalData.userInfo.phone));
           wx.showToast({ title: '登录成功', icon: 'success' });
           // 重置组件状态，下次打开时干净
           this.setData({ animating: false, avatarUrl: '', nickname: '', nicknameEditing: false });
-          setTimeout(() => this.triggerEvent('done'), 500);
+          // 传递组件刚写入的值给 onQuickLoginDone，防止 globalData 中途被覆盖
+          setTimeout(() => this.triggerEvent('done', { avatar: app.globalData.userInfo.avatar, name: app.globalData.userInfo.name, phone: app.globalData.userInfo.phone }), 500);
         } else {
           wx.showToast({ title: res.message || '登录失败', icon: 'none' });
         }

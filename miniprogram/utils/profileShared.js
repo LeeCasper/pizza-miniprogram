@@ -209,12 +209,17 @@ const profileMethods = {
     this.setData({ showQuickLogin: true });
   },
 
-  onQuickLoginDone() {
+  onQuickLoginDone(e) {
     // 立即同步登录后的用户数据到页面, 避免 loadProfileCore API 回调覆盖
     var app = getApp();
+    var detail = (e && e.detail) || {};
     var ui = app.globalData.userInfo;
+    var qlAvatar = detail.avatar || (ui && ui.avatar) || '';
+    var qlName = detail.name || (ui && ui.name) || '';
+    var qlPhone = detail.phone || (ui && ui.phone) || '';
+    console.log('[ql-done] avatar:', JSON.stringify(qlAvatar), 'name:', JSON.stringify(qlName), 'phone:', JSON.stringify(qlPhone));
     // 标记快捷登录刚完成，loadProfileCore 不应覆盖 avatar/name/phone
-    app.globalData._quickLoginJustDone = true;
+    app.globalData._qlProtected = { avatar: qlAvatar, name: qlName, phone: qlPhone, ts: Date.now() };
     this.setData({
       showQuickLogin: false,
       userInfo: { ...ui, balanceText: '¥' + ((ui.balance || 0)).toFixed(2), cardCount: ui.cardCount || 0, bio: ui.bio || '享受美味每一天' },
@@ -289,12 +294,13 @@ function loadProfileCore(page, hooks) {
     if (freshUi) {
       // hook: 页面可在合并前修改 freshUi（例如 optimistic totalSpent 保护）
       if (_hooks.beforeMerge) _hooks.beforeMerge(freshUi, cachedUi);
-      // 快捷登录刚完成：avatar/name/phone 以缓存（刚写入的新值）为准，不被 API 覆盖
-      if (app.globalData._quickLoginJustDone) {
-        if (latestGlobal.phone) freshUi.phone = latestGlobal.phone;
-        if (latestGlobal.name) freshUi.name = latestGlobal.name;
-        if (latestGlobal.avatar) freshUi.avatar = latestGlobal.avatar;
-        app.globalData._quickLoginJustDone = false;
+      // 快捷登录刚完成：avatar/name/phone 以组件写入值为准（10s 时间窗，支持并发 loadProfileCore）
+      var qlp = app.globalData._qlProtected;
+      if (qlp && (Date.now() - qlp.ts < 10000)) {
+        console.log('[profile] _qlProtected active — ts:', qlp.ts, 'age:', Date.now() - qlp.ts, 'ms');
+        if (qlp.avatar) freshUi.avatar = qlp.avatar;
+        if (qlp.name) freshUi.name = qlp.name;
+        if (qlp.phone) freshUi.phone = qlp.phone;
       }
       // 保护已登录写入的字段：若 API 返回空值，保留缓存/globalData 中的最新值
       if (!freshUi.phone && (cachedUi.phone || latestGlobal.phone)) freshUi.phone = cachedUi.phone || latestGlobal.phone;

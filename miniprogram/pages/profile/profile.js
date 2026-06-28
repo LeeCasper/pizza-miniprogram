@@ -28,6 +28,15 @@ Page({
   /** 约定接口：头像上传/保存后的数据刷新指向 */
   _reloadProfile() { this.loadUserData(); },
 
+  /** Called by app.doAppLogin() / default avatar broadcast */
+  updateUserInfo(user) {
+    console.log('[profile] updateUserInfo — user.avatar:', JSON.stringify(user.avatar));
+    var ui = this.data.userInfo || {};
+    this.setData({
+      userInfo: { ...ui, avatar: user.avatar || ui.avatar, name: user.name || ui.name, phone: user.phone || ui.phone },
+    });
+  },
+
   onLoad() {
     this.setData(getSimpleTopBar(app.globalData.statusBarHeight));
     this.loadUserData();

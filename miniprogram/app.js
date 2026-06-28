@@ -1,4 +1,4 @@
-const { doLogin, api, fixImageUrl } = require('./utils/api');
+const { doLogin, api, fixImageUrl, BASE_URL } = require('./utils/api');
 
 App({
   onLaunch() {
@@ -7,6 +7,27 @@ App({
 
     // 每次冷启动清除退出标记 — _loggedOut 只对当前会话有效，新会话应重试登录
     wx.removeStorageSync('_loggedOut');
+
+    // 预获取默认头像（未登录时展示 CDN 默认头像，替代本地 icon）
+    var app = this;
+    wx.request({
+      url: BASE_URL + '/config/default-avatars',
+      method: 'GET',
+      success: function (res) {
+        if (res.statusCode === 200 && res.data.code === 0 && res.data.data && res.data.data.length > 0) {
+          var list = res.data.data;
+          var randomAvatar = list[Math.floor(Math.random() * list.length)];
+          if (!app.globalData.userInfo.avatar) {
+            app.globalData.userInfo.avatar = randomAvatar;
+            // 通知所有活跃页面（头像立即生效）
+            var pages = getCurrentPages();
+            pages.forEach(function (p) {
+              if (p.updateUserInfo) p.updateUserInfo(app.globalData.userInfo);
+            });
+          }
+        }
+      }
+    });
 
     // 尝试自动登录
     const token = wx.getStorageSync('token');
