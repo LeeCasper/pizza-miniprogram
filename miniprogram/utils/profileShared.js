@@ -325,6 +325,8 @@ function loadProfileCore(page, hooks) {
     });
     // hook: 加载完成后执行自定义逻辑（例如缓存 tiers、重算价格）
     if (_hooks.afterLoad) _hooks.afterLoad.call(page, apiTiers, ui);
+  }).catch(function (err) {
+    console.error('[profile] loadProfileCore Promise chain threw:', err);
   });
 }
 

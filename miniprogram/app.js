@@ -41,6 +41,11 @@ App({
       if (user.avatar) user.avatar = fixImageUrl(user.avatar);
       this.globalData.userInfo = user;
       wx.setStorageSync('userInfo', user);
+      // 通知所有活跃页面：用户信息已更新（头像、昵称等立即生效）
+      const pages = getCurrentPages();
+      pages.forEach(p => {
+        if (p.updateUserInfo) p.updateUserInfo(user);
+      });
     }).catch((e) => {
       // 登录失败静默处理，使用离线模式
       console.warn('[App] 登录失败，使用离线模式', e);

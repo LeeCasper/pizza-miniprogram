@@ -255,6 +255,15 @@ Page({
   },
   updateCart() { this.syncCart(); },
 
+  /** Called by app.doAppLogin() when doLogin completes — immediately syncs avatar/name to page */
+  updateUserInfo(user) {
+    console.log('[main] updateUserInfo — user.avatar:', JSON.stringify(user.avatar));
+    const ui = this.data.userInfo || {};
+    this.setData({
+      userInfo: { ...ui, avatar: user.avatar || ui.avatar, name: user.name || ui.name, phone: user.phone || ui.phone },
+    });
+  },
+
   // ── 点单：分类 & 商品 ──────────────────────
 
   onCategoryChange(e) {
