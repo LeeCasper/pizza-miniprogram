@@ -114,7 +114,8 @@ Component({
 
       // 用户主动登录，清除退出标记
       wx.removeStorageSync('_loggedOut');
-      if (app.globalData) app.globalData._loggedOut = false;
+      wx.removeStorageSync('_manualLogout');
+      if (app.globalData) { app.globalData._loggedOut = false; app.globalData._manualLogout = false; }
 
       const { avatarUrl, nickname } = this.data;
       console.log('[ql] onGetPhoneNumber — avatarUrl:', JSON.stringify(avatarUrl), 'nickname:', JSON.stringify(nickname), 'hasToken:', !!wx.getStorageSync('token'));

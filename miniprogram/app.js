@@ -15,27 +15,25 @@ App({
       if (cachedUser.avatar) cachedUser.avatar = fixImageUrl(cachedUser.avatar);
       this.globalData.userInfo = { ...this.globalData.userInfo, ...cachedUser };
     }
-    if (!wx.getStorageSync('_manualLogout')) {
-      wx.request({
-        url: BASE_URL + '/config/default-avatars',
-        method: 'GET',
-        success: function (res) {
-          if (res.statusCode === 200 && res.data.code === 0 && res.data.data && res.data.data.length > 0) {
-            var list = res.data.data;
-            var randomAvatar = list[Math.floor(Math.random() * list.length)];
-            if (!app.globalData.userInfo.avatar && !cachedUser.phone) {
-              app.globalData.userInfo.avatar = randomAvatar;
-              app.globalData._defaultAvatarFromServer = true;
-              console.log('[app] default avatar loaded:', JSON.stringify(randomAvatar));
-              var pages = getCurrentPages();
-              pages.forEach(function (p) {
-                if (p.updateUserInfo) p.updateUserInfo(app.globalData.userInfo);
-              });
-            }
+    wx.request({
+      url: BASE_URL + '/config/default-avatars',
+      method: 'GET',
+      success: function (res) {
+        if (res.statusCode === 200 && res.data.code === 0 && res.data.data && res.data.data.length > 0) {
+          var list = res.data.data;
+          var randomAvatar = list[Math.floor(Math.random() * list.length)];
+          if (!app.globalData.userInfo.phone && (!app.globalData.userInfo.avatar || app.globalData._defaultAvatarFromServer)) {
+            app.globalData.userInfo.avatar = randomAvatar;
+            app.globalData._defaultAvatarFromServer = true;
+            console.log('[app] default avatar loaded:', JSON.stringify(randomAvatar));
+            var pages = getCurrentPages();
+            pages.forEach(function (p) {
+              if (p.updateUserInfo) p.updateUserInfo(app.globalData.userInfo);
+            });
           }
         }
-      });
-    }
+      }
+    });
 
     if (wx.getStorageSync('_manualLogout')) {
       console.log('[app] manualLogout active — skip auto login');
@@ -63,6 +61,10 @@ App({
   },
 
   doAppLogin() {
+    if (wx.getStorageSync('_manualLogout')) {
+      console.log('[app] doAppLogin skipped — manualLogout active');
+      return;
+    }
     doLogin().then(user => {
       console.log('[app] doAppLogin SUCCESS — user.avatar:', JSON.stringify(user.avatar), 'user.phone:', JSON.stringify(user.phone), 'user.name:', JSON.stringify(user.name));
       if (user.avatar) user.avatar = fixImageUrl(user.avatar);

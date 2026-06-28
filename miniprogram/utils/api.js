@@ -120,6 +120,7 @@ function doLogin() {
               console.log('[api] doLogin SUCCESS — user.avatar:', JSON.stringify(user.avatar), 'user.phone:', JSON.stringify(user.phone));
               // 登录成功，清除退出标记
               wx.removeStorageSync('_loggedOut');
+              wx.removeStorageSync('_manualLogout');
               wx.setStorageSync('token', token);
               wx.setStorageSync('userInfo', user);
               resolve(user);

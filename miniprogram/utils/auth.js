@@ -27,6 +27,11 @@ function logout() {
             app.globalData._defaultAvatarFromServer = false;
           }
           wx.showToast({ title: '已退出', icon: 'success' });
+          const pages = getCurrentPages();
+          pages.forEach(page => {
+            if (page.updateUserInfo && app && app.globalData) page.updateUserInfo(app.globalData.userInfo);
+            if (page.setData) page.setData({ showQuickLogin: false });
+          });
         }
         resolve(!!res.confirm);
       }
