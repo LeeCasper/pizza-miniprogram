@@ -278,21 +278,23 @@ function loadProfileCore(page, hooks) {
   ]).then(function (results) {
     var freshUi = results[0];
     var apiTiers = results[1];
+    // 重新读取 globalData（此时 doLogin 可能已完成，有最新的 avatar）
+    var latestGlobal = app.globalData.userInfo || {};
     var ui = cachedUi;
     if (freshUi) {
       // hook: 页面可在合并前修改 freshUi（例如 optimistic totalSpent 保护）
       if (_hooks.beforeMerge) _hooks.beforeMerge(freshUi, cachedUi);
       // 快捷登录刚完成：avatar/name/phone 以缓存（刚写入的新值）为准，不被 API 覆盖
       if (app.globalData._quickLoginJustDone) {
-        if (cachedUi.phone) freshUi.phone = cachedUi.phone;
-        if (cachedUi.name) freshUi.name = cachedUi.name;
-        if (cachedUi.avatar) freshUi.avatar = cachedUi.avatar;
+        if (latestGlobal.phone) freshUi.phone = latestGlobal.phone;
+        if (latestGlobal.name) freshUi.name = latestGlobal.name;
+        if (latestGlobal.avatar) freshUi.avatar = latestGlobal.avatar;
         app.globalData._quickLoginJustDone = false;
       }
-      // 保护快捷登录刚写入的字段：若 API 返回空值，保留缓存中的最新值
-      if (!freshUi.phone && cachedUi.phone) freshUi.phone = cachedUi.phone;
-      if (!freshUi.name && cachedUi.name) freshUi.name = cachedUi.name;
-      if (!freshUi.avatar && cachedUi.avatar) freshUi.avatar = cachedUi.avatar;
+      // 保护已登录写入的字段：若 API 返回空值，保留缓存/globalData 中的最新值
+      if (!freshUi.phone && (cachedUi.phone || latestGlobal.phone)) freshUi.phone = cachedUi.phone || latestGlobal.phone;
+      if (!freshUi.name && (cachedUi.name || latestGlobal.name)) freshUi.name = cachedUi.name || latestGlobal.name;
+      if (!freshUi.avatar && (cachedUi.avatar || latestGlobal.avatar)) freshUi.avatar = cachedUi.avatar || latestGlobal.avatar;
       // Fix avatar URL for real device (relative path → full https URL)
       if (freshUi.avatar) freshUi.avatar = fixImageUrl(freshUi.avatar);
       app.globalData.userInfo = freshUi;
