@@ -17,8 +17,8 @@
       <!-- 顶部：头像 + 信息 + 统计 -->
       <view class="profile-card-top">
         <view class="avatar-wrap" bindtap="onAvatarTap">
-          <image class="avatar" src="{{userInfo.avatar}}" mode="aspectFill" wx:if="{{userInfo.avatar}}"></image>
-          <view class="avatar avatar-placeholder" wx:else></view>
+          <image wx:if="{{userInfo.avatar}}" class="avatar" src="{{userInfo.avatar}}" mode="aspectFill"></image>
+          <view wx:else class="avatar avatar-placeholder"></view>
           <view class="avatar-edit-mask">
             <text class="avatar-edit-icon">📷</text>
           </view>

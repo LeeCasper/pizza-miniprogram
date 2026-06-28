@@ -19,7 +19,8 @@ App({
           var randomAvatar = list[Math.floor(Math.random() * list.length)];
           if (!app.globalData.userInfo.avatar) {
             app.globalData.userInfo.avatar = randomAvatar;
-            // 通知所有活跃页面（头像立即生效）
+            app.globalData._defaultAvatarFromServer = true;
+            console.log('[app] default avatar loaded:', JSON.stringify(randomAvatar));
             var pages = getCurrentPages();
             pages.forEach(function (p) {
               if (p.updateUserInfo) p.updateUserInfo(app.globalData.userInfo);

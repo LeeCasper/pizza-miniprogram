@@ -258,9 +258,10 @@ Page({
   /** Called by app.doAppLogin() when doLogin completes — immediately syncs avatar/name to page */
   updateUserInfo(user) {
     console.log('[main] updateUserInfo — user.avatar:', JSON.stringify(user.avatar));
-    const ui = this.data.userInfo || {};
+    var ui = this.data.userInfo || {};
+    var avatar = user.avatar || ui.avatar || '';
     this.setData({
-      userInfo: { ...ui, avatar: user.avatar || ui.avatar, name: user.name || ui.name, phone: user.phone || ui.phone },
+      userInfo: { ...ui, avatar: avatar, name: user.name || ui.name, phone: user.phone || ui.phone },
     });
   },
 
