@@ -6,7 +6,7 @@
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background-color: #F6F1E9;
+  background-color: #FDF8F2;
 }
 
 .ql-page {
@@ -14,7 +14,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  background-color: #F6F1E9;
+  background-color: #FDF8F2;
   opacity: 0;
   transform: scale(0.95);
   transition: opacity 0.3s, transform 0.3s;
@@ -57,7 +57,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 0 40rpx;
+  padding: 0 48rpx;
   overflow-y: auto;
 }
 
@@ -71,147 +71,287 @@
 /* ── Logo ── */
 
 .ql-logo-wrap {
-  margin-bottom: 80rpx;
+  margin-bottom: 48rpx;
 }
 
 .ql-logo-img {
-  width: 200rpx;
-  height: 200rpx;
+  width: 256rpx;
+  height: 256rpx;
   border-radius: 50%;
-  box-shadow: 0 4rpx 16rpx rgba(28, 186, 84, 0.25);
+  border: 8rpx solid #ffffff;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+  background: #ffffff;
 }
 
 /* ── 欢迎文字 ── */
 
 .ql-heading {
-  position: relative;
-  bottom: 60rpx;
-  font-size: 60rpx;
-  font-weight: 600;
+  font-size: 56rpx;
+  font-weight: 700;
   color: #111827;
-  margin-bottom: 16rpx;
+  margin-bottom: 12rpx;
   letter-spacing: 4rpx;
 }
 
 .ql-subtitle {
-  position: relative;
-  bottom: 60rpx;
   font-size: 30rpx;
-  color: #6b7280;
-  margin-bottom: 40rpx;
+  color: #9ca3af;
+  margin-bottom: 56rpx;
 }
 
-/* ── 头像选择 ── */
+/* ══════════════════════════════════════════
+   信息卡片区（Stitch 设计稿 1:1 还原）
+   ══════════════════════════════════════════ */
 
-.ql-avatar-section {
+.ql-cards {
   width: 100%;
   display: flex;
   flex-direction: column;
+  gap: 32rpx;
+  margin-bottom: 64rpx;
+}
+
+/* ── 卡片容器 ── */
+
+.ql-card {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 24rpx;
+  padding: 40rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.02);
+  box-sizing: border-box;
+}
+
+/* ── 卡片行（标题行：左侧 icon+文字，右侧操作区） ── */
+
+.ql-card-row {
+  display: flex;
   align-items: center;
-  margin-bottom: 40rpx;
+  justify-content: space-between;
+  margin-bottom: 36rpx;
 }
 
-.ql-avatar-label {
-  font-size: 26rpx;
-  color: #6b7280;
-  margin-bottom: 20rpx;
-  font-weight: 500;
-  align-self: flex-start;
-  padding-left: 8rpx;
+/* ── 左侧：icon + 文字 ── */
+
+.ql-card-info {
+  display: flex;
+  align-items: center;
+  gap: 28rpx;
+  overflow: hidden;
+  flex: 1;
+  min-width: 0;
 }
 
-.ql-avatar-btn {
-  width: 160rpx;
-  height: 160rpx;
+.ql-card-icon-wrap {
+  width: 80rpx;
+  height: 80rpx;
   border-radius: 50%;
+  background: #FFF5EB;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--clay-bg-elevated);
-  border: var(--clay-border);
-  box-shadow: var(--clay-shadow-card);
-  padding: 0;
-  margin: 0;
-  overflow: hidden;
+  flex-shrink: 0;
 }
 
-.ql-avatar-btn::after {
+.ql-card-icon-emoji {
+  font-size: 36rpx;
+  line-height: 1;
+}
+
+.ql-card-text {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.ql-card-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+
+.ql-card-desc {
+  font-size: 26rpx;
+  color: #9ca3af;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+/* ── 右侧：操作区 ── */
+
+.ql-card-right {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.ql-card-chevron {
+  font-size: 48rpx;
+  color: #d1d5db;
+  line-height: 1;
+  font-weight: 300;
+}
+
+.ql-card-chevron-sm {
+  font-size: 36rpx;
+  color: #9ca3af;
+}
+
+/* ── 头像预览圆圈 ── */
+
+.ql-avatar-pick {
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 50%;
+  overflow: visible;
+  border: 2rpx solid #f3f4f6;
+  background: #ffffff;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ql-avatar-pick::after {
   border: none;
   display: none;
 }
 
-.ql-avatar-btn:active {
-  background: var(--clay-bg-light);
-  transform: scale(0.97);
-}
-
-.ql-avatar-preview {
+.ql-avatar-preview-img {
   width: 100%;
   height: 100%;
   border-radius: 50%;
 }
 
-.ql-avatar-placeholder {
+.ql-avatar-empty-circle {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #f9fafb;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  gap: 8rpx;
 }
 
-.ql-avatar-placeholder-icon {
-  font-size: 48rpx;
+.ql-avatar-empty-emoji {
+  font-size: 52rpx;
+  opacity: 0.35;
+}
+
+/* ── 头像相机角标 ── */
+
+.ql-avatar-camera-badge {
+  position: absolute;
+  bottom: -4rpx;
+  right: -4rpx;
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background: #f5a623;
+  border: 4rpx solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.ql-avatar-camera-badge-icon {
+  font-size: 24rpx;
   line-height: 1;
 }
 
-.ql-avatar-placeholder-text {
-  font-size: 20rpx;
-  color: #9ca3af;
-  text-align: center;
-  padding: 0 8rpx;
-}
+/* ── 卡片底部按钮（更换头像） ── */
 
-/* ── 昵称输入 ── */
-
-.ql-nickname-section {
+.ql-card-btn {
   width: 100%;
+  height: 72rpx;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  margin-bottom: 60rpx;
-}
-
-.ql-nickname-label {
-  font-size: 26rpx;
-  color: #6b7280;
-  margin-bottom: 20rpx;
-  font-weight: 500;
-  align-self: flex-start;
-  padding-left: 8rpx;
-}
-
-.ql-nickname-input {
-  width: 100%;
-  height: 88rpx;
-  padding: 0 32rpx;
+  justify-content: center;
+  gap: 12rpx;
+  background: #f9fafb;
+  border-radius: 72rpx;
+  border: none;
+  padding: 0;
+  margin: 0;
   font-size: 28rpx;
-  color: var(--color-on-surface);
-  background: var(--clay-bg-card);
-  border-radius: 24rpx;
-  border: var(--clay-border);
-  box-shadow: var(--clay-shadow-card);
-  box-sizing: border-box;
+  color: #4b5563;
+}
+
+.ql-card-btn::after {
+  border: none;
+  display: none;
+}
+
+.ql-card-btn:active {
+  background: #f3f4f6;
+}
+
+.ql-card-btn-icon {
+  font-size: 32rpx;
+  line-height: 1;
+}
+
+.ql-card-btn-text {
+  font-size: 28rpx;
+  color: #4b5563;
+}
+
+/* ── 昵称 chip 按钮 ── */
+
+.ql-nickname-chip {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 16rpx 24rpx;
+  border-radius: 16rpx;
+}
+
+.ql-nickname-chip:active {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.ql-nickname-chip-text {
+  font-size: 28rpx;
+  color: #4b5563;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* ── 昵称输入框（编辑态，内联显示） ── */
+
+.ql-nickname-input-inline {
+  width: 220rpx;
+  height: 64rpx;
+  padding: 0 24rpx;
+  font-size: 26rpx;
+  color: #4b5563;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 16rpx;
+  border: 2rpx solid #e5e7eb;
   text-align: center;
 }
 
-.ql-nickname-hint {
+/* ── 卡片底部提示文字 ── */
+
+.ql-card-hint {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16rpx;
+}
+
+.ql-card-hint-text {
   font-size: 22rpx;
   color: #9ca3af;
-  margin-top: 12rpx;
-  text-align: center;
+  white-space: nowrap;
 }
 
 /* ── 按钮区 ── */
@@ -225,24 +365,19 @@
 
 /* ── 主按钮（微信一键登录） ── */
 
-.ql-btn-wrap {
-  width: 100%;
-}
-
 .ql-btn-primary {
-  position: relative;
-  bottom: 40rpx;
   width: 100%;
-  height: 112rpx;
+  height: 108rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #1aad19;
-  border-radius: 112rpx;
+  background: #07C160;
+  border-radius: 24rpx;
   border: none;
   padding: 0;
   margin: 0;
   gap: 12rpx;
+  box-shadow: 0 4rpx 12rpx rgba(7, 193, 96, 0.18);
 }
 
 .ql-btn-primary::after {
@@ -251,17 +386,17 @@
 }
 
 .ql-btn-primary:active {
-  background: #189b17;
+  background: #06ad56;
   transform: scale(0.98);
 }
 
 .ql-btn-icon-img {
-  width: 48rpx;
-  height: 48rpx;
+  width: 44rpx;
+  height: 44rpx;
 }
 
 .ql-btn-text {
-  font-size: 38rpx;
+  font-size: 36rpx;
   font-weight: 500;
   color: #ffffff;
   letter-spacing: 2rpx;
@@ -274,8 +409,6 @@
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  position: relative;
-  bottom: 40rpx;
   margin-top: 32rpx;
   line-height: 40rpx;
 }
@@ -285,8 +418,8 @@
 }
 
 .ql-checkbox {
-  width: 32rpx;
-  height: 32rpx;
+  width: 36rpx;
+  height: 36rpx;
   border-radius: 50%;
   border: 2rpx solid #d1d5db;
   background: #ffffff;
@@ -297,81 +430,22 @@
 }
 
 .ql-checkbox.ql-checked {
-  background: #1aad19;
-  border-color: #1aad19;
+  background: #07C160;
+  border-color: #07C160;
 }
 
 .ql-checkmark {
-  font-size: 18rpx;
+  font-size: 20rpx;
   font-weight: 700;
   color: #ffffff;
 }
 
 .ql-agree-text {
-  font-size: 24rpx;
+  font-size: 26rpx;
   color: #9ca3af;
 }
 
 .ql-agree-link {
-  font-size: 24rpx;
-  color: #576b95;
-}
-
-/* ── 底部：其他方式登录 ── */
-
-.ql-footer {
-  position: relative;
-  bottom: 100rpx;
-  padding-bottom: 60rpx;
-  padding-left: 64rpx;
-  padding-right: 64rpx;
-}
-
-.ql-divider {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 34rpx;
-}
-
-.ql-divider-line {
-  width: 128rpx;
-  height: 2rpx;
-  background: #e5e7eb;
-}
-
-.ql-divider-text {
-  padding: 0 32rpx;
   font-size: 26rpx;
-  color: #9ca3af;
-  letter-spacing: 2rpx;
-  white-space: nowrap;
-}
-
-.ql-other-login {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16rpx;
-}
-
-.ql-other-icon-wrap {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 50%;
-  border: 2rpx solid #e5e7eb;
-  background: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
-}
-
-.ql-other-icon-emoji {
-  font-size: 36rpx;
-}
-
-.ql-other-label {
-  font-size: 24rpx;
-  color: #9ca3af;
+  color: #576b95;
 }

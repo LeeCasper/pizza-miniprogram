@@ -14,7 +14,7 @@ Component({
     'visible'(val) {
       if (val) {
         // 每次打开重置头像/昵称状态
-        this.setData({ avatarUrl: '', nickname: '' });
+        this.setData({ avatarUrl: '', nickname: '', nicknameEditing: false });
         // 延迟一帧触发动画
         setTimeout(() => this.setData({ animating: true }), 50);
       } else {
@@ -36,6 +36,7 @@ Component({
     agreed: true,         // 协议默认勾选
     avatarUrl: '',        // chooseAvatar 临时路径
     nickname: '',         // 用户输入的昵称
+    nicknameEditing: false, // 昵称编辑态（chip → input 切换）
   },
 
   methods: {
@@ -55,12 +56,16 @@ Component({
 
     // ── 昵称输入 ─────────────────────────────
 
+    onNicknameTap() {
+      this.setData({ nicknameEditing: true });
+    },
+
     onNicknameInput(e) {
       this.setData({ nickname: e.detail.value });
     },
 
     onNicknameBlur(e) {
-      this.setData({ nickname: (e.detail.value || '').trim() });
+      this.setData({ nickname: (e.detail.value || '').trim(), nicknameEditing: false });
     },
 
     // ── 上传头像到服务器（返回永久 URL） ─────
@@ -146,7 +151,7 @@ Component({
           wx.setStorageSync('userInfo', app.globalData.userInfo);
           wx.showToast({ title: '登录成功', icon: 'success' });
           // 重置组件状态，下次打开时干净
-          this.setData({ animating: false, avatarUrl: '', nickname: '' });
+          this.setData({ animating: false, avatarUrl: '', nickname: '', nicknameEditing: false });
           setTimeout(() => this.triggerEvent('done'), 500);
         } else {
           wx.showToast({ title: res.message || '登录失败', icon: 'none' });

@@ -1,4 +1,4 @@
-<!-- components/quick-login/quick-login.wxml — 微信快捷登录 -->
+<!-- components/quick-login/quick-login.wxml — 微信快捷登录（Stitch 设计稿 1:1 还原） -->
 <view class="ql-root" wx:if="{{visible}}" catchtouchmove="noop">
   <view class="ql-page {{animating ? 'ql-show' : ''}}">
 
@@ -21,23 +21,71 @@
         <text class="ql-heading">欢迎使用</text>
         <text class="ql-subtitle">微信一键登录，更快更安全</text>
 
-        <!-- 微信头像选择 -->
-        <view class="ql-avatar-section">
-          <view class="ql-avatar-label">设置头像</view>
-          <button class="ql-avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
-            <image wx:if="{{avatarUrl}}" class="ql-avatar-preview" src="{{avatarUrl}}" mode="aspectFill"></image>
-            <view wx:else class="ql-avatar-placeholder">
-              <text class="ql-avatar-placeholder-icon">📷</text>
-              <text class="ql-avatar-placeholder-text">点击选择微信头像</text>
-            </view>
-          </button>
-        </view>
+        <!-- 信息卡片区（头像 + 昵称）—— Stitch 设计稿 1:1 还原 -->
+        <view class="ql-cards">
 
-        <!-- 微信昵称输入 -->
-        <view class="ql-nickname-section">
-          <view class="ql-nickname-label">设置昵称</view>
-          <input class="ql-nickname-input" type="nickname" placeholder="微信昵称（可修改）" value="{{nickname}}" bindinput="onNicknameInput" bindblur="onNicknameBlur" maxlength="30"></input>
-          <text class="ql-nickname-hint">自动获取微信昵称，可点击修改</text>
+          <!-- 头像卡片 -->
+          <view class="ql-card">
+            <view class="ql-card-row">
+              <view class="ql-card-info">
+                <view class="ql-card-icon-wrap">
+                  <text class="ql-card-icon-emoji">👤</text>
+                </view>
+                <view class="ql-card-text">
+                  <text class="ql-card-title">头像</text>
+                  <text class="ql-card-desc">设置头像，让朋友更容易认识你</text>
+                </view>
+              </view>
+              <view class="ql-card-right">
+                <button class="ql-avatar-pick" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+                  <image wx:if="{{avatarUrl}}" class="ql-avatar-preview-img" src="{{avatarUrl}}" mode="aspectFill"></image>
+                  <view wx:else class="ql-avatar-empty-circle">
+                    <text class="ql-avatar-empty-emoji">👤</text>
+                  </view>
+                  <view class="ql-avatar-camera-badge">
+                    <text class="ql-avatar-camera-badge-icon">📷</text>
+                  </view>
+                </button>
+                <text class="ql-card-chevron">›</text>
+              </view>
+            </view>
+            <!-- 更换头像按钮 -->
+            <button class="ql-card-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+              <text class="ql-card-btn-icon">📷</text>
+              <text class="ql-card-btn-text">更换头像</text>
+            </button>
+          </view>
+
+          <!-- 昵称卡片 -->
+          <view class="ql-card">
+            <view class="ql-card-row">
+              <view class="ql-card-info">
+                <view class="ql-card-icon-wrap">
+                  <text class="ql-card-icon-emoji">✏️</text>
+                </view>
+                <view class="ql-card-text">
+                  <text class="ql-card-title">昵称</text>
+                  <text class="ql-card-desc">设置昵称，展示个性自我</text>
+                </view>
+              </view>
+              <view class="ql-card-right">
+                <!-- 昵称输入（编辑态） -->
+                <view class="ql-nickname-chip" wx:if="{{!nicknameEditing}}" bindtap="onNicknameTap">
+                  <text class="ql-nickname-chip-text">{{nickname || '微信昵称'}}</text>
+                  <text class="ql-card-chevron ql-card-chevron-sm">›</text>
+                </view>
+                <!-- 昵称输入框（编辑态） -->
+                <input wx:else class="ql-nickname-input-inline" type="nickname"
+                       placeholder="微信昵称" value="{{nickname}}"
+                       bindinput="onNicknameInput" bindblur="onNicknameBlur"
+                       maxlength="30" focus="{{nicknameEditing}}"></input>
+              </view>
+            </view>
+            <view class="ql-card-hint">
+              <text class="ql-card-hint-text">自动获取微信昵称，可点击修改</text>
+            </view>
+          </view>
+
         </view>
 
         <!-- 登录按钮组 -->
