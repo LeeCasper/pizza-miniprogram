@@ -20,6 +20,8 @@ const form = ref<Partial<Banner>>({
   tag: '',
   linkType: 'none',
   linkProductId: null,
+  linkUrl: null,
+  scope: 'pos',
   sortOrder: 0,
 });
 
@@ -28,6 +30,16 @@ const productOptions = ref<{ label: string; value: number }[]>([]);
 const linkTypeOptions = [
   { label: '无链接', value: 'none' },
   { label: '商品链接', value: 'product' },
+  { label: '优惠券中心', value: 'coupon' },
+  { label: '积分商城', value: 'points' },
+  { label: '幸运转盘', value: 'lucky-wheel' },
+  { label: '自定义外链', value: 'url' },
+];
+
+const scopeOptions = [
+  { label: '点单页', value: 'pos' },
+  { label: '商城页', value: 'shop' },
+  { label: '两处都显示', value: 'both' },
 ];
 
 async function loadProductOptions() {
@@ -52,6 +64,8 @@ onMounted(async () => {
         tag: data.tag,
         linkType: data.linkType,
         linkProductId: data.linkProductId,
+        linkUrl: data.linkUrl,
+        scope: data.scope || 'pos',
         sortOrder: data.sortOrder,
       };
     }
@@ -63,7 +77,12 @@ async function handleSave() {
   saving.value = true;
   const id = route.params.id as string;
   const payload = { ...form.value };
-  if (payload.linkType === 'none') payload.linkProductId = null;
+  if (payload.linkType === 'none') {
+    payload.linkProductId = null;
+    payload.linkUrl = null;
+  }
+  if (payload.linkType !== 'product') payload.linkProductId = null;
+  if (payload.linkType !== 'url') payload.linkUrl = null;
 
   let error: any;
   if (isEdit.value) {
@@ -116,6 +135,12 @@ async function handleSave() {
             filterable
             style="width: 300px"
           />
+        </NFormItem>
+        <NFormItem label="展示范围">
+          <NSelect v-model:value="form.scope" :options="scopeOptions" style="width: 200px" />
+        </NFormItem>
+        <NFormItem label="外链URL" v-if="form.linkType === 'url'">
+          <NInput v-model:value="form.linkUrl" placeholder="https://..." />
         </NFormItem>
         <NFormItem label="排序">
           <NInputNumber v-model:value="form.sortOrder" :min="0" style="width: 120px" />
