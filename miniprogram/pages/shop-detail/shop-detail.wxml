@@ -8,32 +8,32 @@
     <view class="sd-back-btn sd-back-placeholder"></view>
   </view>
 
+  <!-- ═══ Hero 大图轮播（在 scroll-view 外，避免被原生裁剪） ═══ -->
+  <view class="sd-hero" style="padding-top: {{topBarTotalHeight}}px;">
+    <swiper
+      class="sd-hero-swiper"
+      circular="{{images.length > 1}}"
+      indicator-dots="{{false}}"
+      bindchange="onHeroSwiperChange"
+    >
+      <swiper-item wx:for="{{images}}" wx:key="*this">
+        <image class="sd-hero-img" src="{{item}}" mode="aspectFit"></image>
+      </swiper-item>
+    </swiper>
+    <!-- 页标 -->
+    <view class="sd-hero-counter" wx:if="{{images.length > 1}}">
+      <text>{{currentImageIndex + 1}}/{{images.length}}</text>
+    </view>
+    <!-- 底部渐变过渡 -->
+    <view class="sd-hero-fade"></view>
+  </view>
+
   <!-- ═══ 内容滚动区 ═══ -->
   <scroll-view
     class="sd-scroll"
     scroll-y enhanced show-scrollbar="{{false}}"
-    style="height: {{scrollViewHeight}}px; padding-top: {{topBarTotalHeight}}px;"
+    style="height: {{scrollViewHeight}}px;"
   >
-
-    <!-- ── Hero 大图轮播 ── -->
-    <view class="sd-hero">
-      <swiper
-        class="sd-hero-swiper"
-        circular="{{images.length > 1}}"
-        indicator-dots="{{false}}"
-        bindchange="onHeroSwiperChange"
-      >
-        <swiper-item wx:for="{{images}}" wx:key="*this">
-          <image class="sd-hero-img" src="{{item}}" mode="widthFix"></image>
-        </swiper-item>
-      </swiper>
-      <!-- 页标 -->
-      <view class="sd-hero-counter" wx:if="{{images.length > 1}}">
-        <text>{{currentImageIndex + 1}}/{{images.length}}</text>
-      </view>
-      <!-- 底部渐变过渡 -->
-      <view class="sd-hero-fade"></view>
-    </view>
 
     <!-- ── 商品信息卡（叠加 Hero，负 margin 上移） ── -->
     <view class="sd-info-card">
