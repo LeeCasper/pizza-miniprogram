@@ -159,18 +159,22 @@ Page({
     Promise.all([
       api.get('/shop/products'),
       api.get('/shop/categories'),
-    ]).then(([prodRes, catRes]) => {
+      api.publicGet('/banners?scope=shop'),
+    ]).then(([prodRes, catRes, bannerRes]) => {
       if (prodRes.code === 0) {
         const products = (prodRes.data || []).map(p => ({
           ...p,
           main_image: fixImageUrl(p.main_image),
         }));
-        const withImg = products.filter(p => p.main_image);
-        const banners = withImg.slice(0, 3).map((p, i) => ({
-          id: i,
-          image: p.main_image,
-          title: p.name,
-          subtitle: p.subtitle || '精选好物，新鲜上架',
+        const banners = (bannerRes && bannerRes.code === 0 ? (bannerRes.data || []) : []).map(b => ({
+          id: b.id,
+          image: fixImageUrl(b.imageUrl),
+          title: b.title || '',
+          subtitle: b.subtitle || '',
+          tag: b.tag || '',
+          linkType: b.linkType || 'none',
+          linkProductId: b.linkProductId || null,
+          linkUrl: b.linkUrl || null,
         }));
         const cats = [
           { key: 'all', name: '全部', icon: '/images/cat-all.png', emoji: CAT_EMOJI_MAP.all, productCount: products.length },
@@ -692,7 +696,32 @@ Page({
     const filtered = key === 'all' ? products : products.filter(p => p.shop_category_key === key);
     this.setData({ shopActiveCat: key, shopFilteredProducts: filtered });
   },
-  onShopBannerTap() { wx.showToast({ title: '促销活动即将上线', icon: 'none' }); },
+  onShopBannerTap(e) {
+    const { linkType, productId, linkUrl } = e.currentTarget.dataset;
+    switch (linkType) {
+      case 'product':
+        if (productId) wx.navigateTo({ url: '/pages/shop-detail/shop-detail?id=' + productId });
+        break;
+      case 'coupon':
+        wx.navigateTo({ url: '/pages/claim-center/claim-center' });
+        break;
+      case 'points':
+        wx.navigateTo({ url: '/pages/points/points' });
+        break;
+      case 'lucky-wheel':
+        wx.navigateTo({ url: '/pages/lucky-wheel/lucky-wheel' });
+        break;
+      case 'url':
+        if (linkUrl) {
+          wx.setClipboardData({ data: linkUrl, success: () => {
+            wx.showToast({ title: '链接已复制，请在浏览器中打开', icon: 'none' });
+          }});
+        }
+        break;
+      default:
+        break;
+    }
+  },
   onShopProductTap(e) {
     const { id } = e.currentTarget.dataset;
     wx.navigateTo({ url: '/pages/shop-detail/shop-detail?id=' + id });
