@@ -9,7 +9,13 @@
       <view class="shop-hero" wx:if="{{shopBanners.length > 0}}">
         <swiper class="shop-hero-swiper" autoplay interval="4000" circular indicator-dots indicator-color="rgba(255,255,255,0.35)" indicator-active-color="#C0563A">
           <swiper-item wx:for="{{shopBanners}}" wx:key="id">
-            <view class="shop-hero-slide" bindtap="onShopBannerTap" data-id="{{item.id}}">
+            <view
+              class="shop-hero-slide"
+              bindtap="onShopBannerTap"
+              data-link-type="{{item.linkType}}"
+              data-product-id="{{item.linkProductId}}"
+              data-link-url="{{item.linkUrl}}"
+            >
               <image class="shop-hero-img" src="{{item.image}}" mode="aspectFill"></image>
               <view class="shop-hero-overlay">
                 <text class="shop-hero-title">{{item.title}}</text>
