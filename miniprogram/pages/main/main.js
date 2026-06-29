@@ -174,6 +174,7 @@ Page({
           tag: b.tag || '',
           linkType: b.linkType || 'none',
           linkProductId: b.linkProductId || null,
+          linkShopProductId: b.linkShopProductId || null,
           linkUrl: b.linkUrl || null,
         }));
         const cats = [
