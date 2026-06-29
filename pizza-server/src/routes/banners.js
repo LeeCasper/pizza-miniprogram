@@ -8,10 +8,12 @@ const router = Router();
 /**
  * GET /api/v1/banners
  * Public: returns active banners (for mini program carousel)
+ * Query: ?scope=pos|shop — filter by display scope
  */
 router.get('/', async (req, res) => {
   try {
-    const banners = await bannerService.getActive();
+    const scope = req.query.scope || null;
+    const banners = await bannerService.getActive(scope);
     return res.json({ code: 0, data: banners });
   } catch (err) {
     log.error({ err }, 'List error');
