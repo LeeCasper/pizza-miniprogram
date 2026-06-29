@@ -15,9 +15,6 @@ const loading = ref(false);
 
 const form = ref<Partial<Banner>>({
   imageUrl: '',
-  title: '',
-  subtitle: '',
-  tag: '',
   linkType: 'none',
   linkProductId: null,
   linkUrl: null,
@@ -59,9 +56,6 @@ onMounted(async () => {
     if (!error && data) {
       form.value = {
         imageUrl: data.imageUrl,
-        title: data.title,
-        subtitle: data.subtitle,
-        tag: data.tag,
         linkType: data.linkType,
         linkProductId: data.linkProductId,
         linkUrl: data.linkUrl,
@@ -114,15 +108,6 @@ async function handleSave() {
       <NForm label-placement="left" label-width="100" style="max-width: 640px;">
         <NFormItem label="轮播图片" required>
           <ImageUpload v-model="form.imageUrl" />
-        </NFormItem>
-        <NFormItem label="标题">
-          <NInput v-model:value="form.title" placeholder="轮播图标题" />
-        </NFormItem>
-        <NFormItem label="副标题">
-          <NInput v-model:value="form.subtitle" placeholder="轮播图副标题" />
-        </NFormItem>
-        <NFormItem label="标签">
-          <NInput v-model:value="form.tag" placeholder="如：🔥 新品" />
         </NFormItem>
         <NFormItem label="链接类型">
           <NSelect v-model:value="form.linkType" :options="linkTypeOptions" style="width: 200px" />

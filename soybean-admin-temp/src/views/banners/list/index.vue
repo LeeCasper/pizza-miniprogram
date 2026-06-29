@@ -34,12 +34,6 @@ const columns: DataTableColumns<Banner> = [
       return h(NImage, { src: row.imageUrl, width: 56, height: 56, style: { borderRadius: '6px', objectFit: 'cover' } });
     }
   },
-  { title: '标题', key: 'title', width: 160 },
-  { title: '副标题', key: 'subtitle', width: 160, ellipsis: { tooltip: true } },
-  {
-    title: '标签', key: 'tag', width: 80,
-    render(row) { return row.tag ? h(NTag, { type: 'error', size: 'small', bordered: false }, () => row.tag) : '—'; }
-  },
   {
     title: '链接类型', key: 'linkType', width: 80,
     render(row) { return linkTypeMap[row.linkType] || row.linkType; }
@@ -65,7 +59,7 @@ const columns: DataTableColumns<Banner> = [
       return h(NSpace, null, {
         default: () => [
           h(NButton, { size: 'small', quaternary: true, onClick: () => router.push(`/banners/${row.id}/edit`) }, { icon: () => h(NIcon, null, () => h(EditOutlined)) }),
-          h(NButton, { size: 'small', quaternary: true, type: 'error', onClick: () => handleDelete(row.id!, row.title) }, { icon: () => h(NIcon, null, () => h(DeleteOutlined)) }),
+          h(NButton, { size: 'small', quaternary: true, type: 'error', onClick: () => handleDelete(row.id!) }, { icon: () => h(NIcon, null, () => h(DeleteOutlined)) }),
         ]
       });
     }
@@ -91,16 +85,14 @@ async function handleToggle(row: Banner, val: boolean) {
     window.$message?.error('切换状态失败');
     return;
   }
-  // 用后端返回的真实状态回写本地行，驱动受控 NSwitch 更新；
-  // 原来只弹 toast 不改 row.isActive → 开关 re-render 读旧值，弹回旧态（看着像“关不掉”）。
   row.isActive = data?.isActive ?? val;
   window.$message?.success(val ? '已启用' : '已禁用');
 }
 
-async function handleDelete(id: number, title: string) {
+async function handleDelete(id: number) {
   dialog.warning({
     title: '确认删除',
-    content: `确定删除轮播图「${title}」？`,
+    content: '确定删除该轮播图？',
     positiveText: '确认删除',
     negativeText: '取消',
     onPositiveClick: async () => {

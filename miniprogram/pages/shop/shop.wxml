@@ -17,10 +17,6 @@
               data-link-url="{{item.linkUrl}}"
             >
               <image class="shop-hero-img" src="{{item.image}}" mode="aspectFill"></image>
-              <view class="shop-hero-overlay">
-                <text class="shop-hero-title">{{item.title}}</text>
-                <text class="shop-hero-sub">{{item.subtitle}}</text>
-              </view>
             </view>
           </swiper-item>
         </swiper>
