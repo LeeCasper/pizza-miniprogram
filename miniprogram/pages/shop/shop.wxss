@@ -106,7 +106,7 @@
 }
 .shop-grid-card:active { transform: scale(0.97); }
 .shop-grid-imgwrap {
-  position: relative; width: 100%; height: 800rpx;
+  position: relative; width: 100%; height: 260rpx;
   background: var(--color-surface-container-low);
 }
 .shop-grid-img { width: 100%; height: 100%; }

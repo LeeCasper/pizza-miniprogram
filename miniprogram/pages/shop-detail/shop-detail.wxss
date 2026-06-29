@@ -48,8 +48,8 @@
 
 /* ═══ Hero 大图 ═══ */
 .sd-hero { position: relative; width: 100%; }
-.sd-hero-swiper { width: 100%; height: 800rpx; }
-.sd-hero-img { width: 100%; height: 100%; }
+.sd-hero-swiper { width: 100%; }
+.sd-hero-img { width: 100%; display: block; }
 
 /* 页标浮层 */
 .sd-hero-counter {

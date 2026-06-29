@@ -231,8 +231,8 @@
 }
 
 .product-image {
-  width: 800rpx;
-  height: 800rpx;
+  width: 160rpx;
+  height: 160rpx;
   border-radius: 16rpx;
   flex-shrink: 0;
   background: var(--color-surface-container-low);

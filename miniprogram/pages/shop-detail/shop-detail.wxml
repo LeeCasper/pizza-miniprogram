@@ -24,7 +24,7 @@
         bindchange="onHeroSwiperChange"
       >
         <swiper-item wx:for="{{images}}" wx:key="*this">
-          <image class="sd-hero-img" src="{{item}}" mode="aspectFill"></image>
+          <image class="sd-hero-img" src="{{item}}" mode="widthFix"></image>
         </swiper-item>
       </swiper>
       <!-- 页标 -->
