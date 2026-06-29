@@ -44,9 +44,8 @@ Page({
     const win = wx.getWindowInfo();
     const rpx = win.windowWidth / 750;
     const bottomBarPx = 140 * rpx;
-    // Hero 在 scroll-view 外：减去 Hero 高度 (topBar + 800rpx - 48rpx 重叠)
-    const heroPx = layout.topBarTotalHeight + 800 * rpx - 48 * rpx;
-    const scrollViewHeight = win.windowHeight - heroPx - bottomBarPx;
+    // padding-top 已处理顶栏偏移，高度只需减底栏
+    const scrollViewHeight = win.windowHeight - bottomBarPx;
 
     const id = options.id;
     if (!id) {

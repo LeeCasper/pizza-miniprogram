@@ -46,9 +46,9 @@
 /* ── 滚动区 ── */
 .sd-scroll { background: var(--sd-bg); }
 
-/* ═══ Hero 大图 ═══ */
-.sd-hero { position: relative; width: 100%; overflow: visible; }
-.sd-hero-swiper { width: 800rpx; height: 800rpx; }
+/* ═══ Hero 大图 — swiper 800rpx 高，aspectFit 不裁剪 ═══ */
+.sd-hero { position: relative; width: 100%; }
+.sd-hero-swiper { width: 100%; height: 800rpx; }
 .sd-hero-img { width: 100%; height: 100%; }
 
 /* 页标浮层 */
