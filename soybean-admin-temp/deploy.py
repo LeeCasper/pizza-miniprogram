@@ -67,6 +67,7 @@ def deploy_backend():
         'pizza-server/db/migrate_shop_refund.sql',
         'pizza-server/db/migrate_default_avatars.sql',
         'pizza-server/db/migrate_shop_banners.sql',
+        'pizza-server/db/migrate_banner_shop_product.sql',
     ]
     for m in migrations:
         stdin, stdout, stderr = ssh.exec_command(

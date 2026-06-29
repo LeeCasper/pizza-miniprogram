@@ -4,6 +4,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { NButton, NSpace, NCard, NForm, NFormItem, NInput, NInputNumber, NSelect, NSpin } from 'naive-ui';
 import ImageUpload from '@/components/common/ImageUpload.vue';
 import { fetchBanner, fetchCreateBanner, fetchUpdateBanner, fetchProducts, type Banner } from '@/service/api';
+import { fetchShopProducts } from '@/service/api/shop';
 
 defineOptions({ name: 'BannersForm' });
 
@@ -17,12 +18,14 @@ const form = ref<Partial<Banner>>({
   imageUrl: '',
   linkType: 'none',
   linkProductId: null,
+  linkShopProductId: null,
   linkUrl: null,
   scope: 'pos',
   sortOrder: 0,
 });
 
 const productOptions = ref<{ label: string; value: number }[]>([]);
+const shopProductOptions = ref<{ label: string; value: number }[]>([]);
 
 const linkTypeOptions = [
   { label: '无链接', value: 'none' },
@@ -46,8 +49,16 @@ async function loadProductOptions() {
   }
 }
 
+async function loadShopProductOptions() {
+  const { data, error } = await fetchShopProducts();
+  if (!error && data) {
+    shopProductOptions.value = data.map((p: any) => ({ label: p.name, value: p.id }));
+  }
+}
+
 onMounted(async () => {
   loadProductOptions();
+  loadShopProductOptions();
   const id = route.params.id as string;
   if (id && id !== 'create') {
     isEdit.value = true;
@@ -58,6 +69,7 @@ onMounted(async () => {
         imageUrl: data.imageUrl,
         linkType: data.linkType,
         linkProductId: data.linkProductId,
+        linkShopProductId: data.linkShopProductId,
         linkUrl: data.linkUrl,
         scope: data.scope || 'pos',
         sortOrder: data.sortOrder,
@@ -75,7 +87,7 @@ async function handleSave() {
     payload.linkProductId = null;
     payload.linkUrl = null;
   }
-  if (payload.linkType !== 'product') payload.linkProductId = null;
+  if (payload.linkType !== 'product') { payload.linkProductId = null; payload.linkShopProductId = null; }
   if (payload.linkType !== 'url') payload.linkUrl = null;
 
   let error: any;
@@ -112,12 +124,23 @@ async function handleSave() {
         <NFormItem label="链接类型">
           <NSelect v-model:value="form.linkType" :options="linkTypeOptions" style="width: 200px" />
         </NFormItem>
-        <NFormItem label="关联商品" v-if="form.linkType === 'product'">
+        <NFormItem label="关联商品" v-if="form.linkType === 'product' && (form.scope === 'pos' || form.scope === 'both')">
           <NSelect
             v-model:value="form.linkProductId"
             :options="productOptions"
-            placeholder="选择关联商品"
+            placeholder="选择POS商品"
             filterable
+            clearable
+            style="width: 300px"
+          />
+        </NFormItem>
+        <NFormItem label="关联商城商品" v-if="form.linkType === 'product' && (form.scope === 'shop' || form.scope === 'both')">
+          <NSelect
+            v-model:value="form.linkShopProductId"
+            :options="shopProductOptions"
+            placeholder="选择商城商品"
+            filterable
+            clearable
             style="width: 300px"
           />
         </NFormItem>

@@ -26,19 +26,19 @@ const bannerService = {
   },
 
   async create(data) {
-    const { image_url, title, subtitle, tag, link_type, link_product_id, link_url, scope, sort_order } = data;
+    const { image_url, title, subtitle, tag, link_type, link_product_id, link_shop_product_id, link_url, scope, sort_order } = data;
     const [result] = await pool.query(
-      `INSERT INTO banners (image_url, title, subtitle, tag, link_type, link_product_id, link_url, scope, sort_order)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO banners (image_url, title, subtitle, tag, link_type, link_product_id, link_shop_product_id, link_url, scope, sort_order)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [image_url, title || '', subtitle || '', tag || '',
-       link_type || 'none', link_product_id || null, link_url || null,
+       link_type || 'none', link_product_id || null, link_shop_product_id || null, link_url || null,
        scope || 'pos', sort_order || 0]
     );
     return this.findById(result.insertId);
   },
 
   async update(id, data) {
-    const fields = ['image_url', 'title', 'subtitle', 'tag', 'link_type', 'link_product_id', 'link_url', 'scope', 'sort_order', 'is_active'];
+    const fields = ['image_url', 'title', 'subtitle', 'tag', 'link_type', 'link_product_id', 'link_shop_product_id', 'link_url', 'scope', 'sort_order', 'is_active'];
     const sets = [];
     const values = [];
     for (const f of fields) {
@@ -75,6 +75,7 @@ function formatBanner(row) {
     tag: row.tag,
     linkType: row.link_type,
     linkProductId: row.link_product_id,
+    linkShopProductId: row.link_shop_product_id,
     linkUrl: row.link_url,
     scope: row.scope,
     sortOrder: row.sort_order,

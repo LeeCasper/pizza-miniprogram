@@ -8,6 +8,7 @@ export interface Banner {
   tag: string;
   linkType: 'product' | 'none' | 'coupon' | 'points' | 'lucky-wheel' | 'url';
   linkProductId: number | null;
+  linkShopProductId: number | null;
   linkUrl: string | null;
   scope: 'pos' | 'shop' | 'both';
   sortOrder: number;

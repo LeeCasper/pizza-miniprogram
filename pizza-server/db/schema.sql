@@ -264,6 +264,7 @@ CREATE TABLE IF NOT EXISTS banners (
     tag VARCHAR(30) DEFAULT '',
     link_type ENUM('product','none') DEFAULT 'none',
     link_product_id INT UNSIGNED NULL,
+    link_shop_product_id INT UNSIGNED NULL,
     sort_order INT DEFAULT 0,
     is_active TINYINT(1) DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

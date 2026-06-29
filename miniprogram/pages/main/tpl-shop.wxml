@@ -9,7 +9,7 @@
             class="shop-hero-slide"
             bindtap="onShopBannerTap"
             data-link-type="{{item.linkType}}"
-            data-product-id="{{item.linkProductId}}"
+            data-product-id="{{item.linkShopProductId || item.linkProductId}}"
             data-link-url="{{item.linkUrl}}"
           >
             <image class="shop-hero-img" src="{{item.image}}" mode="aspectFill"></image>
