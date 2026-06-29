@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, h } from 'vue';
 import { useRouter } from 'vue-router';
-import { NCard, NDataTable, NButton, NTag, NSpace, NImage, NIcon, NSwitch, useDialog } from 'naive-ui';
+import { NCard, NDataTable, NButton, NTag, NSpace, NImage, NIcon, NSwitch, NSelect, useDialog } from 'naive-ui';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@vicons/antd';
 import type { DataTableColumns } from 'naive-ui';
 import { fetchBanners, fetchDeleteBanner, fetchToggleBanner, type Banner } from '@/service/api';
@@ -13,7 +13,18 @@ const dialog = useDialog();
 const banners = ref<Banner[]>([]);
 const loading = ref(false);
 
-const linkTypeMap: Record<string, string> = { product: '商品', none: '无' };
+const scopeFilter = ref<string | null>(null);
+const scopeFilterOptions = [
+  { label: '全部', value: null },
+  { label: '点单页', value: 'pos' },
+  { label: '商城页', value: 'shop' },
+  { label: '两处', value: 'both' },
+];
+const scopeMap: Record<string, string> = { pos: '点单', shop: '商城', both: '两处' };
+const linkTypeMap: Record<string, string> = {
+  product: '商品', none: '无', coupon: '优惠券', points: '积分',
+  'lucky-wheel': '幸运转盘', url: '外链',
+};
 
 const columns: DataTableColumns<Banner> = [
   { title: '排序', key: 'sortOrder', width: 60, align: 'center' },
@@ -32,6 +43,12 @@ const columns: DataTableColumns<Banner> = [
   {
     title: '链接类型', key: 'linkType', width: 80,
     render(row) { return linkTypeMap[row.linkType] || row.linkType; }
+  },
+  {
+    title: '展示范围', key: 'scope', width: 80,
+    render(row) {
+      return h(NTag, { type: row.scope === 'both' ? 'info' : row.scope === 'shop' ? 'success' : 'default', size: 'small', bordered: false }, () => scopeMap[row.scope] || row.scope || '点单');
+    }
   },
   {
     title: '状态', key: 'isActive', width: 80,
@@ -58,7 +75,13 @@ const columns: DataTableColumns<Banner> = [
 async function loadBanners() {
   loading.value = true;
   const { data, error } = await fetchBanners();
-  if (!error && data) banners.value = data;
+  if (!error && data) {
+    let filtered = data;
+    if (scopeFilter.value) {
+      filtered = data.filter(b => b.scope === scopeFilter.value || b.scope === 'both');
+    }
+    banners.value = filtered;
+  }
   loading.value = false;
 }
 
@@ -96,10 +119,20 @@ onMounted(() => { loadBanners(); });
 <template>
   <NCard title="轮播图管理" :bordered="false" class="card-wrapper">
     <template #header-extra>
-      <NButton type="primary" @click="router.push('/banners/create')">
+      <NSpace>
+        <NSelect
+          v-model:value="scopeFilter"
+          :options="scopeFilterOptions"
+          placeholder="展示范围"
+          clearable
+          style="width: 140px"
+          @update:value="loadBanners"
+        />
+        <NButton type="primary" @click="router.push('/banners/create')">
         <template #icon><NIcon><PlusOutlined /></NIcon></template>
         新建轮播图
-      </NButton>
+        </NButton>
+      </NSpace>
     </template>
     <NDataTable :columns="columns" :data="banners" :loading="loading" :row-key="(r: Banner) => r.id ?? 0" />
   </NCard>
