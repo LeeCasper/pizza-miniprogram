@@ -1133,9 +1133,9 @@
   min-height: 0;
 }
 
-/* 产品大图 — 完整显示不裁剪 */
+/* 产品大图 — 800×800 完整显示不裁剪 */
 .detail-image {
-  width: 100%;
+  width: 800rpx;
   display: block;
   background: var(--color-surface-container-low);
 }

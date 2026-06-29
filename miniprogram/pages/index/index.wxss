@@ -650,7 +650,7 @@
   min-height: 0;
 }
 .detail-image {
-  width: 100%;
+  width: 800rpx;
   display: block;
   background: var(--color-surface-container-low);
 }
