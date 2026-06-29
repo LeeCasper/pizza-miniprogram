@@ -25,7 +25,7 @@
 
 /* ── 顶部 Hero（促销 Banner，黏土卡） ── */
 .shop-hero {
-  margin: 24rpx -32rpx 28rpx;
+  margin: 24rpx 0 28rpx;
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--clay-shadow-elevated);
