@@ -49,7 +49,7 @@
 /* ═══ Hero 大图 ═══ */
 .sd-hero { position: relative; width: 100%; }
 .sd-hero-swiper { width: 100%; }
-.sd-hero-img { width: 100%; display: block; }
+.sd-hero-img { width: 800rpx; display: block; margin: 0 auto; }
 
 /* 页标浮层 */
 .sd-hero-counter {

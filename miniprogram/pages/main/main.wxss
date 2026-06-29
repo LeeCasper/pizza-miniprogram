@@ -1122,7 +1122,8 @@
   transform: translateY(100%);
   transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
   box-shadow: 0 -10rpx 30rpx rgba(120,108,94,0.18), inset 3rpx 3rpx 5rpx rgba(255,255,255,0.9);
-  overflow: hidden;
+  overflow-x: visible;
+  overflow-y: hidden;
 }
 .detail-drawer.show { transform: translateY(0); }
 
@@ -1133,10 +1134,11 @@
   min-height: 0;
 }
 
-/* 产品大图 — 800×800 完整显示不裁剪 */
+/* 产品大图 — 800rpx 完整显示不裁剪 */
 .detail-image {
   width: 800rpx;
   display: block;
+  margin: 0 auto;
   background: var(--color-surface-container-low);
 }
 
