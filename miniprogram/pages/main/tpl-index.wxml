@@ -25,15 +25,6 @@
     <swiper-item wx:for="{{banners}}" wx:key="id">
       <view class="hero-slide" bindtap="onBannerTap" data-product-id="{{item.productId}}">
         <image class="hero-image" src="{{item.image}}" mode="aspectFill"></image>
-        <view class="hero-overlay">
-          <view class="hero-tag">
-            <text>{{item.tag}}</text>
-          </view>
-          <view class="hero-text">
-            <text class="hero-title">{{item.title}}</text>
-            <text class="hero-subtitle">{{item.subtitle}}</text>
-          </view>
-        </view>
       </view>
     </swiper-item>
   </swiper>
