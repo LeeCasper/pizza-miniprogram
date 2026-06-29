@@ -523,7 +523,7 @@
 .shop-scroll-inner { padding: 0 32rpx; }
 
 /* ── 顶部 Hero（促销 Banner，黏土卡） ── */
-.shop-hero { margin: 24rpx 0 28rpx; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--clay-shadow-elevated); border: var(--clay-border-subtle); }
+.shop-hero { margin: 24rpx -32rpx 28rpx; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--clay-shadow-elevated); border: var(--clay-border-subtle); }
 .shop-hero-swiper { height: 300rpx; }
 .shop-hero-slide { width: 100%; height: 100%; position: relative; }
 .shop-hero-img { width: 100%; height: 100%; }
