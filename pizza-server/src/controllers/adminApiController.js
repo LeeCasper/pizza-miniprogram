@@ -699,7 +699,7 @@ const adminApiController = {
    */
   async createBanner(req, res) {
     try {
-      const { imageUrl, title, subtitle, tag, linkType, linkProductId, sortOrder } = req.body;
+      const { imageUrl, title, subtitle, tag, linkType, linkProductId, linkUrl, scope, sortOrder } = req.body;
       const banner = await bannerService.create({
         image_url: imageUrl,
         title,
@@ -707,6 +707,8 @@ const adminApiController = {
         tag,
         link_type: linkType,
         link_product_id: linkProductId,
+        link_url: linkUrl,
+        scope,
         sort_order: sortOrder,
       });
       return res.status(201).json({ code: 0, message: '轮播图已创建', data: banner });
@@ -721,7 +723,7 @@ const adminApiController = {
    */
   async updateBanner(req, res) {
     try {
-      const { imageUrl, title, subtitle, tag, linkType, linkProductId, sortOrder, isActive } = req.body;
+      const { imageUrl, title, subtitle, tag, linkType, linkProductId, linkUrl, scope, sortOrder, isActive } = req.body;
       const updateData = {};
       if (imageUrl !== undefined) updateData.image_url = imageUrl;
       if (title !== undefined) updateData.title = title;
@@ -729,6 +731,8 @@ const adminApiController = {
       if (tag !== undefined) updateData.tag = tag;
       if (linkType !== undefined) updateData.link_type = linkType;
       if (linkProductId !== undefined) updateData.link_product_id = linkProductId;
+      if (linkUrl !== undefined) updateData.link_url = linkUrl;
+      if (scope !== undefined) updateData.scope = scope;
       if (sortOrder !== undefined) updateData.sort_order = sortOrder;
       if (isActive !== undefined) updateData.is_active = isActive ? 1 : 0;
 
