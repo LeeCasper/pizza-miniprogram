@@ -6,8 +6,10 @@ export interface Banner {
   title: string;
   subtitle: string;
   tag: string;
-  linkType: 'product' | 'none';
+  linkType: 'product' | 'none' | 'coupon' | 'points' | 'lucky-wheel' | 'url';
   linkProductId: number | null;
+  linkUrl: string | null;
+  scope: 'pos' | 'shop' | 'both';
   sortOrder: number;
   isActive?: boolean;
   createdAt?: string;
