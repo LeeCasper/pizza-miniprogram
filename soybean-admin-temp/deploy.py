@@ -10,8 +10,7 @@ PORT = int(os.environ.get('PIZZA_PORT', '22'))
 
 SERVER_REPO = '/opt/pizza-server'  # Git repo root
 ADMIN_BASES = [
-    '/opt/pizza-admin',                            # artaides.com Nginx alias
-    '/www/wwwroot/pizza.artaides.com/admin',        # pizza.artaides.com Nginx root (aaPanel default)
+    '/opt/pizza-admin',                            # pizza.artaides.com Nginx admin alias
 ]
 LOCAL_ADMIN_DIST = r'D:\Code\Pizza\soybean-admin-temp\dist'
 

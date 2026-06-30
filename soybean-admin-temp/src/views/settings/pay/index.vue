@@ -42,7 +42,7 @@ onMounted(async () => {
     form.value.certSerialNo = data.certSerialNo || '';
     form.value.privateKey = data.privateKey || '';
     form.value.platformCert = data.platformCert || '';
-    form.value.notifyUrl = data.notifyUrl || 'https://artaides.com/api/v1/pay/notify';
+    form.value.notifyUrl = data.notifyUrl || 'https://pizza.artaides.com/api/v1/pay/notify';
     form.value.refundNotifyUrl = data.refundNotifyUrl || '';
   }
   loading.value = false;

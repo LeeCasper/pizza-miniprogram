@@ -32,7 +32,7 @@
             <NInput v-model:value="form.cosRegion" placeholder="ap-guangzhou" />
           </NFormItem>
           <NFormItem label="CDN 域名">
-            <NInput v-model:value="form.cosBaseUrl" placeholder="https://img.artaides.com（可选）" />
+            <NInput v-model:value="form.cosBaseUrl" placeholder="https://img.pizza.artaides.com（可选）" />
           </NFormItem>
         </template>
       </NForm>

@@ -44,8 +44,8 @@ app.use(helmet({
 
 // CORS whitelist
 const allowedOrigins = [
-  'https://www.artaides.com',
-  'https://artaides.com',
+  'https://pizza.artaides.com',
+  'https://www.pizza.artaides.com',
 ];
 if (config.nodeEnv !== 'production') {
   allowedOrigins.push('http://localhost:9527', 'http://localhost:5173', 'http://127.0.0.1:9527');
