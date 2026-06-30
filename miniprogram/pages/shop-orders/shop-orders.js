@@ -34,7 +34,6 @@ Page({
   onLoad() {
     const layout = getSimpleTopBar(app.globalData.statusBarHeight);
     const rpx = wx.getWindowInfo().windowWidth / 750;
-    // 修正顶栏高度：按钮 64rpx + 底边距 20rpx = 84rpx，补齐 layout 中固定 36px 的差额
     const delta = Math.max(0, 84 * rpx - 36);
     this.setData({ ...layout, topBarTotalHeight: layout.topBarTotalHeight + delta });
   },
@@ -43,27 +42,50 @@ Page({
     this.fetchOrders();
   },
 
+  onHide() {
+    this._clearCancelTimers();
+  },
+
+  onUnload() {
+    this._clearCancelTimers();
+  },
+
+  _clearCancelTimers() {
+    if (this._cancelTimers) {
+      Object.values(this._cancelTimers).forEach(t => clearInterval(t));
+      this._cancelTimers = {};
+    }
+  },
+
   fetchOrders() {
     if (wx.getStorageSync('_manualLogout')) {
       this.setData({ orders: [], loading: false });
       return;
     }
+    this._clearCancelTimers();
     this.setData({ loading: true });
     const status = this.data.currentTab;
     api.get('/shop/orders', { status }).then(res => {
       if (res.code === 0 && res.data) {
         const now = Date.now();
+        const timers = {};
         const orders = (res.data.list || []).map(o => {
-          const deadline = new Date(o.createdAt).getTime() + 60000; // 1 minute
+          // 安全解析 MySQL DATETIME 格式（兼容 iOS 微信）
+          const deadline = new Date((o.createdAt || '').replace(' ', 'T')).getTime() + 60000;
+          const canCancel = now < deadline;
+          if (canCancel) {
+            timers[o.id] = this._createCancelTimer(o.id, deadline);
+          }
           return {
             ...o,
-            canCancel: now < deadline,
+            canCancel,
             items: (o.items || []).map(it => ({
               ...it,
               productImage: fixImageUrl(it.productImage),
             })),
           };
         });
+        this._cancelTimers = timers;
         this.setData({ orders, loading: false });
       } else {
         this.setData({ orders: [], loading: false });
@@ -71,6 +93,23 @@ Page({
     }).catch(() => {
       this.setData({ orders: [], loading: false });
     });
+  },
+
+  /** 为单个订单启动取消窗口倒计时，到期自动切换为禁用态 */
+  _createCancelTimer(orderId, deadline) {
+    return setInterval(() => {
+      if (Date.now() >= deadline) {
+        const orders = this.data.orders.map(o => {
+          if (o.id === orderId) return { ...o, canCancel: false };
+          return o;
+        });
+        this.setData({ orders });
+        if (this._cancelTimers && this._cancelTimers[orderId]) {
+          clearInterval(this._cancelTimers[orderId]);
+          delete this._cancelTimers[orderId];
+        }
+      }
+    }, 200);
   },
 
   onBack() { wx.navigateBack(); },

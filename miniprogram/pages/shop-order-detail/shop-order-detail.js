@@ -26,6 +26,10 @@ Page({
     this.fetchOrder();
   },
 
+  onUnload() {
+    if (this._cancelTimer) { clearInterval(this._cancelTimer); this._cancelTimer = null; }
+  },
+
   fetchOrder() {
     this.setData({ loading: true });
     api.get('/shop/orders/' + this.data.orderId).then(res => {
@@ -37,10 +41,14 @@ Page({
             productImage: fixImageUrl(it.productImage),
           }));
         }
-        // Calculate 1-minute cancel window
-        const deadline = new Date(order.createdAt).getTime() + 60000;
+        // 1 分钟取消倒计时（实时更新按钮状态）
+        const deadline = new Date(order.createdAt.replace(' ', 'T')).getTime() + 60000;
         order.canCancel = Date.now() < deadline;
         this.setData({ order, loading: false });
+        // 启动倒计时，过期后自动切换为禁用态
+        if (order.canCancel) {
+          this._startCancelTimer(deadline);
+        }
       } else {
         this.setData({ loading: false });
         wx.showToast({ title: '订单不存在', icon: 'none' });
@@ -48,6 +56,20 @@ Page({
     }).catch(() => {
       this.setData({ loading: false });
     });
+  },
+
+  /** 取消窗口倒计时：到期后自动将按钮切换为禁用态 */
+  _startCancelTimer(deadline) {
+    if (this._cancelTimer) clearInterval(this._cancelTimer);
+    this._cancelTimer = setInterval(() => {
+      if (Date.now() >= deadline) {
+        clearInterval(this._cancelTimer);
+        this._cancelTimer = null;
+        if (this.data.order) {
+          this.setData({ 'order.canCancel': false });
+        }
+      }
+    }, 200);
   },
 
   onBack() { wx.navigateBack(); },
