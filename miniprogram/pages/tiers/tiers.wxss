@@ -77,12 +77,7 @@
   margin-left: -8rpx;
 }
 
-/* ── 对比卡片纯渐变背景（不用图片）── */
-.compare-bg-1 { background: linear-gradient(135deg, #3c3c41, #19191e); }
-.compare-bg-2 { background: linear-gradient(135deg, #2d2a21, #110e07); }
-.compare-bg-3 { background: linear-gradient(135deg, #322323, #140f0f); }
-.compare-bg-4 { background: linear-gradient(135deg, #232832, #0f1119); }
-.compare-bg-5 { background: linear-gradient(135deg, #142332, #0a0f19); }
+/* ── 对比卡片背景由 tier 数据的 bgStartColor / bgEndColor 内联渲染 ── */
 
 /* ==============================
    HERO 卡片
@@ -253,7 +248,7 @@
   border-radius: 24rpx;
   position: relative;
   white-space: normal;
-  box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.2);
+  overflow: hidden;
   border: 4rpx solid transparent;
   transition: all 0.25s ease;
 }
@@ -270,7 +265,6 @@
 /* 选中态：红色边框 + 发光 + 微提亮 */
 .tier-compare-card.compare-card-selected {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 6rpx rgba(120, 108, 94, 0.22), 0 8rpx 32rpx rgba(0, 0, 0, 0.35);
   transform: translateY(-4rpx);
 }
 

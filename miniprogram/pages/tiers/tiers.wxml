@@ -45,7 +45,8 @@
 
       <scroll-view scroll-x class="tier-compare-scroll" enhanced show-scrollbar="{{false}}">
         <view class="tier-compare-list">
-          <view class="tier-compare-card compare-bg-{{item.levelIndex}} {{item.status === 'current' ? 'compare-card-active' : ''}} {{item.status === 'upcoming' ? 'compare-card-dimmed' : ''}} {{item.levelKey === selectedTierKey ? 'compare-card-selected' : ''}}"
+          <view class="tier-compare-card {{item.status === 'current' ? 'compare-card-active' : ''}} {{item.status === 'upcoming' ? 'compare-card-dimmed' : ''}} {{item.levelKey === selectedTierKey ? 'compare-card-selected' : ''}}"
+              style="background: linear-gradient(135deg, {{item.bgStartColor}}, {{item.bgEndColor}});"
               wx:for="{{tiers}}" wx:key="levelKey" id="tier-{{item.levelKey}}"
               bindtap="onSelectTier" data-level-key="{{item.levelKey}}">
             <text class="compare-card-name" style="color: #ffffff">{{item.name}}</text>
