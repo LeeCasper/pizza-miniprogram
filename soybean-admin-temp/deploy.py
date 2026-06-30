@@ -1,48 +1,54 @@
-#!/usr/bin/env python3
-"""Deploy to production server."""
-import paramiko
 import os
 import sys
+import paramiko
 
-HOST = os.environ.get('PIZZA_HOST', '')
+# ── Config ─────────────────────────────────────
+HOST = os.environ.get('PIZZA_HOST', '103.236.67.179')
 USER = os.environ.get('PIZZA_USER', 'root')
 PASS = os.environ.get('PIZZA_PASS', '')
 PORT = int(os.environ.get('PIZZA_PORT', '22'))
 
 SERVER_REPO = '/opt/pizza-server'  # Git repo root
-ADMIN_BASE = '/www/wwwroot/pizza.artaides.com/admin'  # Nginx root for pizza.artaides.com/admin/
+ADMIN_BASES = [
+    '/opt/pizza-admin',                            # artaides.com Nginx alias
+    '/www/wwwroot/pizza.artaides.com/admin',        # pizza.artaides.com Nginx root (aaPanel default)
+]
 LOCAL_ADMIN_DIST = r'D:\Code\Pizza\soybean-admin-temp\dist'
 
 ssh = None
 
+
+# ── Helpers ────────────────────────────────────
+def ssh_exec(cmd):
+    """Execute command on remote server, return stdout string."""
+    stdin, stdout, stderr = ssh.exec_command(cmd, get_pty=False)
+    return stdout.read().decode('utf-8', errors='replace').strip()
+
+
+# ── Backend Deploy ─────────────────────────────
 def deploy_backend():
-    """Full backend deploy: git pull -> npm install -> run migrations -> pm2 restart"""
     print("=" * 60)
     print("Deploying BACKEND (git pull + migrate + restart)...")
     print("=" * 60)
 
     global ssh
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(HOST, username=USER, password=PASS, port=PORT, timeout=15)
-
-    def run_cmd(cmd, desc=''):
-        if desc:
-            print(f"  {desc}...")
-        stdin, stdout, stderr = ssh.exec_command(f'{cmd} 2>&1', get_pty=False)
-        output = stdout.read().decode('utf-8', errors='replace')
-        for line in output.strip().split('\n'):
-            print(f"    {line}")
-        exit_code = stdout.channel.recv_exit_status()
-        if exit_code != 0:
-            print(f"  WARN: Exit code: {exit_code}")
-        return output
+    if ssh is None:
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(HOST, username=USER, password=PASS, port=PORT, timeout=15)
 
     # 1. Git pull
-    run_cmd(f'cd {SERVER_REPO} && git pull origin master', '[1/6] Git pull')
+    print("  [1/6] Git pull...")
+    out = ssh_exec(f'cd {SERVER_REPO} && git pull 2>&1')
+    for line in out.split('\n'):
+        print(f"    {line}")
 
-    # 2. Install dependencies
-    run_cmd(f'cd {SERVER_REPO}/pizza-server && npm install --production', '[2/6] npm install')
+    # 2. npm install
+    print("  [2/6] npm install...")
+    out = ssh_exec(f'cd {SERVER_REPO} && npm install --production 2>&1')
+    for line in out.split('\n')[-3:]:
+        if line.strip():
+            print(f"    {line.strip()}")
 
     # 3. Run migrations
     print("  [3/6] Running DB migrations...")
@@ -78,24 +84,27 @@ def deploy_backend():
             f'mysql -u "$DB_USER" -p"$DB_PASSWORD" "$DB_NAME" < {m} 2>&1',
             get_pty=False
         )
-        output = stdout.read().decode('utf-8', errors='replace')
-        if output.strip():
-            print("    " + output.strip())
-        exit_code = stdout.channel.recv_exit_status()
-        if exit_code == 0:
-            print(f"    {m}: OK")
+        err = stderr.read().decode('utf-8', errors='replace').strip()
+        out = stdout.read().decode('utf-8', errors='replace').strip()
+        if err and 'Warning' not in err:
+            print(f"  WARN: {m} exit: {err[:80]} (may already be applied)")
         else:
-            print(f"  WARN: {m} exit: {exit_code} (may already be applied)")
+            print(f"    {m}: OK")
 
-    # 4. Verify .env exists
-    run_cmd(f'test -f {SERVER_REPO}/pizza-server/.env && echo "OK" || echo "MISSING"', '[4/6] .env check')
+    # 4. .env check
+    print("  [4/6] .env check...")
+    out = ssh_exec(f'ls {SERVER_REPO}/.env 2>&1')
+    print(f"    {'OK' if '.env' in out else 'MISSING!'}")
 
-    # 5. Restart PM2
-    run_cmd('pm2 restart pizza-server', '[6/6] PM2 restart')
+    # 5. PM2 restart
+    print("  [6/6] PM2 restart...")
+    out = ssh_exec(f'cd {SERVER_REPO} && pm2 restart pizza-server 2>&1')
+    print(f"    {out[:200]}")
 
     print("\n  Backend deploy complete")
 
 
+# ── Frontend Deploy ────────────────────────────
 def deploy_frontend():
     print("=" * 60)
     print("Deploying FRONTEND dist...")
@@ -114,47 +123,43 @@ def deploy_frontend():
 
     sftp = ssh.open_sftp()
 
-    # Clean old dist
-    print("  Cleaning old dist...")
-    stdin, stdout, stderr = ssh.exec_command(
-        f'rm -rf {ADMIN_BASE}/* 2>&1',
-        get_pty=False
-    )
-    stdout.read()
+    for ADMIN_BASE in ADMIN_BASES:
+        print(f"\n  --- Deploying to {ADMIN_BASE} ---")
 
-    # Upload all files recursively
-    file_count = 0
-    for root, dirs, files in os.walk(LOCAL_ADMIN_DIST):
-        for filename in files:
-            local_path = os.path.join(root, filename)
-            rel_path = os.path.relpath(local_path, LOCAL_ADMIN_DIST).replace('\\', '/')
-            remote_path = f"{ADMIN_BASE}/{rel_path}"
+        # Clean old dist
+        print("  Cleaning old dist...")
+        ssh_exec(f'rm -rf {ADMIN_BASE}/* 2>&1')
 
-            # Ensure remote directory exists
-            remote_dir = os.path.dirname(remote_path).replace('\\', '/')
-            try:
-                sftp.lstat(remote_dir)
-            except FileNotFoundError:
-                stdin, stdout, stderr = ssh.exec_command(
-                    f'mkdir -p {remote_dir} 2>&1', get_pty=False
-                )
-                stdout.read()
+        # Upload all files recursively
+        file_count = 0
+        for root, dirs, files in os.walk(LOCAL_ADMIN_DIST):
+            for filename in files:
+                local_path = os.path.join(root, filename)
+                rel_path = os.path.relpath(local_path, LOCAL_ADMIN_DIST).replace('\\', '/')
+                remote_path = f"{ADMIN_BASE}/{rel_path}"
 
-            sftp.put(local_path, remote_path)
-            file_count += 1
-            if file_count % 10 == 0:
-                print(f"  Uploaded {file_count} files...")
+                # Ensure remote directory exists
+                remote_dir = os.path.dirname(remote_path).replace('\\', '/')
+                try:
+                    sftp.lstat(remote_dir)
+                except FileNotFoundError:
+                    ssh_exec(f'mkdir -p {remote_dir} 2>&1')
 
-    print(f"  Total: {file_count} files uploaded")
+                sftp.put(local_path, remote_path)
+                file_count += 1
+                if file_count % 10 == 0:
+                    print(f"  Uploaded {file_count} files...")
+
+        print(f"  Total: {file_count} files uploaded")
+
+        # Verify
+        output = ssh_exec(f'ls {ADMIN_BASE}/index.html 2>&1')
+        print(f"  Verify index.html: {'OK' if 'index.html' in output else 'MISSING'}")
+
     sftp.close()
-
-    # Verify
-    stdin, stdout, stderr = ssh.exec_command(
-        f'ls {ADMIN_BASE}/index.html 2>&1',
-        get_pty=False
-    )
-    output = stdout.read().decode('utf-8', errors='replace')
-    print(f"  Verify index.html: {'OK' if 'index.html' in output else 'MISSING'}")
+    print("=" * 60)
+    print("Deploy complete!")
+    print("=" * 60)
 
 
 if __name__ == '__main__':
@@ -173,7 +178,7 @@ if __name__ == '__main__':
         print("Deploy complete!")
         print("=" * 60)
     except Exception as e:
-        print(f"\nERROR: {e}")
+        print(f"\n  ERROR: {e}")
         if ssh:
             ssh.close()
         sys.exit(1)
