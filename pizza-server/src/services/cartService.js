@@ -55,6 +55,12 @@ const cartService = {
   },
 
   async getCartWithProducts(userId) {
+    // 先清理超过 72 小时未更新的购物车项（防止跨会话僵尸数据累积）
+    // 用户每次下单成功后购物车已在事务中清空，此处仅清理"放弃购买"的过期项
+    await pool.query(
+      'DELETE FROM cart_items WHERE user_id = ? AND updated_at < DATE_SUB(NOW(), INTERVAL 72 HOUR)',
+      [userId]
+    );
     const [rows] = await pool.query(
       `SELECT ci.id, ci.quantity, ci.restrictions,
               p.id AS product_id, p.name, p.price, p.image, p.category_key, p.tag, p.size_desc
