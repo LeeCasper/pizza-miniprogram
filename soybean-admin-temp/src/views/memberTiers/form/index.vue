@@ -22,8 +22,6 @@ const form = ref<Partial<MemberTier>>({
   birthdayGift: '',
   couponValue: 0,
   accentColor: '#c0c0c0',
-  bgStartColor: 'rgba(60,60,65,0.88)',
-  bgEndColor: 'rgba(25,25,30,0.95)',
 });
 
 onMounted(async () => {
@@ -43,8 +41,6 @@ onMounted(async () => {
         birthdayGift: data.birthdayGift,
         couponValue: data.couponValue,
         accentColor: data.accentColor,
-        bgStartColor: data.bgStartColor,
-        bgEndColor: data.bgEndColor,
       };
     }
     loading.value = false;
@@ -112,12 +108,6 @@ async function handleSave() {
         </NFormItem>
         <NFormItem label="主题色">
           <NColorPicker v-model:value="form.accentColor" :modes="['hex']" />
-        </NFormItem>
-        <NFormItem label="卡片渐变起始色">
-          <NInput v-model:value="form.bgStartColor" placeholder="rgba(60,60,65,0.88)" />
-        </NFormItem>
-        <NFormItem label="卡片渐变结束色">
-          <NInput v-model:value="form.bgEndColor" placeholder="rgba(25,25,30,0.95)" />
         </NFormItem>
       </NForm>
     </NSpin>

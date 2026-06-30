@@ -946,7 +946,7 @@ const adminApiController = {
     try {
       const { levelKey, name, levelIndex, minSpent, discountRate,
               pointsRewardRate, birthdayGift, couponValue,
-              accentColor, bgStartColor, bgEndColor } = req.body;
+              accentColor } = req.body;
 
       if (!levelKey || !name || levelIndex === undefined) {
         return res.status(400).json({ code: 400, message: '等级标识、名称、序号为必填项' });
@@ -968,8 +968,6 @@ const adminApiController = {
         birthday_gift: birthdayGift,
         coupon_value: couponValue,
         accent_color: accentColor,
-        bg_start_color: bgStartColor,
-        bg_end_color: bgEndColor,
       });
       invalidateCache();
       return res.status(201).json({ code: 0, message: '会员等级已创建', data: tier });
@@ -986,7 +984,7 @@ const adminApiController = {
     try {
       const { levelKey, name, levelIndex, minSpent, discountRate,
               pointsRewardRate, birthdayGift, couponValue,
-              accentColor, bgStartColor, bgEndColor, isActive } = req.body;
+              accentColor, isActive } = req.body;
       const updateData = {};
       if (levelKey !== undefined) updateData.level_key = levelKey;
       if (name !== undefined) updateData.name = name;
@@ -1007,8 +1005,6 @@ const adminApiController = {
       if (birthdayGift !== undefined) updateData.birthday_gift = birthdayGift;
       if (couponValue !== undefined) updateData.coupon_value = couponValue;
       if (accentColor !== undefined) updateData.accent_color = accentColor;
-      if (bgStartColor !== undefined) updateData.bg_start_color = bgStartColor;
-      if (bgEndColor !== undefined) updateData.bg_end_color = bgEndColor;
       if (isActive !== undefined) updateData.is_active = isActive ? 1 : 0;
 
       const tier = await memberTierService.update(req.params.id, updateData);

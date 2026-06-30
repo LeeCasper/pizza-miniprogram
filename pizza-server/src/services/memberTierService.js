@@ -27,18 +27,18 @@ const memberTierService = {
     const {
       level_key, name, level_index, min_spent, discount_rate,
       points_reward_rate, birthday_gift, coupon_value,
-      accent_color, bg_start_color, bg_end_color
+      accent_color
     } = data;
     const [result] = await pool.query(
       `INSERT INTO member_tiers (level_key, name, level_index, min_spent, discount_rate,
        points_reward_rate, birthday_gift, coupon_value,
-       accent_color, bg_start_color, bg_end_color)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       accent_color)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         level_key, name, level_index,
         min_spent || 0, discount_rate || 1.00,
         points_reward_rate || 1.00, birthday_gift || '', coupon_value || 0,
-        accent_color || '#c0c0c0', bg_start_color || 'rgba(60,60,65,0.88)', bg_end_color || 'rgba(25,25,30,0.95)'
+        accent_color || '#c0c0c0'
       ]
     );
     return this.getById(result.insertId);
@@ -48,7 +48,7 @@ const memberTierService = {
     const fields = [
       'level_key', 'name', 'level_index', 'min_spent', 'discount_rate',
       'points_reward_rate', 'birthday_gift', 'coupon_value',
-      'accent_color', 'bg_start_color', 'bg_end_color', 'is_active'
+      'accent_color', 'is_active'
     ];
     const sets = [];
     const values = [];
@@ -87,8 +87,6 @@ function formatTier(row) {
     birthdayGift: row.birthday_gift,
     couponValue: parseFloat(row.coupon_value || 0),
     accentColor: row.accent_color,
-    bgStartColor: row.bg_start_color,
-    bgEndColor: row.bg_end_color,
     isActive: !!row.is_active,
     createdAt: row.created_at,
     updatedAt: row.updated_at,

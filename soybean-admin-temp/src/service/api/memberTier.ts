@@ -11,8 +11,6 @@ export interface MemberTier {
   birthdayGift: string;
   couponValue: number;
   accentColor: string;
-  bgStartColor: string;
-  bgEndColor: string;
   isActive?: boolean;
   createdAt?: string;
   updatedAt?: string;
