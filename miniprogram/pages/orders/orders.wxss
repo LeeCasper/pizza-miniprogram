@@ -314,6 +314,10 @@
 }
 .order-action-btn.pay-btn { background: linear-gradient(160deg, #7A6F61 0%, #5C5249 100%); color: #FFFFFF; box-shadow: 0 6rpx 16rpx rgba(60, 50, 40, 0.28), inset 2rpx 2rpx 4rpx rgba(255, 255, 255, 0.2), inset -3rpx -4rpx 8rpx rgba(30, 24, 18, 0.28); }
 .order-action-btn.pay-btn:active { transform: scale(0.96); opacity: 0.9; }
+.order-action-btn.disabled { color: #bbb; background: #F0EBE3; box-shadow: none; opacity: 0.7; }
+.order-action-btn.disabled:active { transform: none; }
+.cancel-disabled-wrap { display: flex; flex-direction: column; align-items: flex-end; gap: 4rpx; }
+.cancel-disabled-hint { font-size: 20rpx; color: #bbb; white-space: nowrap; }
 
 /* 空状态 */
 .empty-state {

@@ -175,7 +175,11 @@ Page({
     });
   },
 
-  /** Auto-refresh when the nearest cancelDeadline expires so button disappears */
+  onCancelDisabled() {
+    wx.showToast({ title: '下单超过1分钟，无法取消', icon: 'none' });
+  },
+
+  /** Auto-refresh when the nearest cancelDeadline expires — inline update canCancel, keep button visible */
   _scheduleCancelDeadlineRefresh(orders) {
     if (this._cancelTimer) { clearTimeout(this._cancelTimer); this._cancelTimer = null; }
     const now = Date.now();
@@ -187,7 +191,18 @@ Page({
       }
     }
     if (nearest < Infinity) {
-      this._cancelTimer = setTimeout(() => { this.fetchOrders(); }, nearest - now + 500);
+      this._cancelTimer = setTimeout(() => {
+        const orders = this.data.orders.map(o => {
+          if (o.canCancel && o.cancelDeadline) {
+            const dl = new Date(o.cancelDeadline).getTime();
+            if (Date.now() >= dl) return { ...o, canCancel: false };
+          }
+          return o;
+        });
+        const { activeTab } = this.data;
+        const filtered = activeTab === 'all' ? orders : orders.filter(o => o.status === activeTab);
+        this.setData({ orders, filteredOrders: filtered });
+      }, nearest - now + 500);
     }
   },
 });
