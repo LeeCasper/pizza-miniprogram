@@ -18,7 +18,7 @@
       scale="{{mapScale}}"
       markers="{{markers}}"
       include-points="{{includePoints}}"
-      show-location="{{true}}"
+      show-location="{{showUserLocation}}"
       enable-scroll="{{true}}"
       enable-zoom="{{true}}"
     ></map>

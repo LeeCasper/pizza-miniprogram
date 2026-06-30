@@ -34,11 +34,14 @@ Page({
     userLatitude: null,
     userLongitude: null,
     distance: '',
+    showUserLocation: false,
     locationWatching: false,
   },
 
   // 距离计算节流时间戳
   _lastDistCalc: 0,
+  _locating: false,
+  _locationRequested: false,
 
   onLoad() {
     this.setData(getSimpleTopBar());
@@ -104,28 +107,48 @@ Page({
   // ===== 定位 =====
 
   /**
-   * 首次高精度定位，然后开启实时追踪
+   * 首次定位，然后开启实时追踪。
+   * 地图组件的 show-location 也会触发定位授权，因此先保持关闭；
+   * 只在 wx.getLocation 成功后打开，避免进入页面时重复授权。
    */
   requestLocation() {
-    wx.getSetting({
-      success: (res) => {
-        if (res.authSetting['scope.userLocation'] === false) {
-          // 用户之前拒绝 → 降级
-          return;
+    if (this._locating || this._locationRequested) return;
+    this._locating = true;
+    this._locationRequested = true;
+
+    wx.getLocation({
+      type: 'gcj02',
+      isHighAccuracy: true,
+      highAccuracyExpireTime: 3000,
+      success: (loc) => {
+        this._locating = false;
+        this.setData({ showUserLocation: true });
+        this.onLocationUpdate(loc.latitude, loc.longitude);
+        this.startLocationWatch();
+      },
+      fail: (err) => {
+        this._locating = false;
+        const msg = (err && err.errMsg) || '';
+        if (msg.indexOf('deny') > -1 || msg.indexOf('auth') > -1) {
+          wx.showModal({
+            title: '需要位置权限',
+            content: '授权位置信息后，可查看到店距离和导航路线',
+            confirmText: '去设置',
+            cancelText: '暂不授权',
+            success: (res) => {
+              if (res.confirm) {
+                wx.openSetting({
+                  success: (settingRes) => {
+                    if (settingRes.authSetting && settingRes.authSetting['scope.userLocation']) {
+                      this._locationRequested = false;
+                      this.requestLocation();
+                    }
+                  },
+                });
+              }
+            },
+          });
         }
-        wx.getLocation({
-          type: 'gcj02',
-          isHighAccuracy: true,
-          highAccuracyExpireTime: 3000,
-          success: (loc) => {
-            this.onLocationUpdate(loc.latitude, loc.longitude);
-            // 首次定位成功后开启实时追踪
-            this.startLocationWatch();
-          },
-          fail: () => {
-            // 定位失败，仅显示门店
-          },
-        });
       },
     });
   },
@@ -261,23 +284,20 @@ Page({
     const s = this.data.store;
     if (!s) return;
 
+    if (!this.data.userLatitude) {
+      this._locationRequested = false;
+      this.requestLocation();
+      return;
+    }
+
     const storeLat = s.latitude || DEFAULT_LAT;
     const storeLng = s.longitude || DEFAULT_LNG;
 
-    if (this.data.userLatitude) {
-      // 有用户位置 → 中心取两点中点
-      this.setData({
-        mapLatitude: (storeLat + this.data.userLatitude) / 2,
-        mapLongitude: (storeLng + this.data.userLongitude) / 2,
-      });
-      this.updateMarkers(); // 触发 includePoints 重新缩放
-    } else {
-      this.setData({
-        mapLatitude: storeLat,
-        mapLongitude: storeLng,
-        mapScale: 15,
-      });
-    }
+    this.setData({
+      mapLatitude: (storeLat + this.data.userLatitude) / 2,
+      mapLongitude: (storeLng + this.data.userLongitude) / 2,
+    });
+    this.updateMarkers();
   },
 
   onViewMap() {
