@@ -50,6 +50,7 @@ App({
           this.globalData.userInfo = res.data;
           wx.setStorageSync('userInfo', res.data);
         }
+        this.loadCartFromServer();
       }).catch(() => {
         // Token 无效，重新登录
         this.doAppLogin();
@@ -75,9 +76,46 @@ App({
       pages.forEach(p => {
         if (p.updateUserInfo) p.updateUserInfo(user);
       });
+      // 登录成功后从服务端恢复购物车
+      this.loadCartFromServer();
     }).catch((e) => {
       // 登录失败静默处理，使用离线模式
       console.warn('[App] 登录失败，使用离线模式', e);
+    });
+  },
+
+  /** 从服务端加载购物车，防止跨会话本地/服务端不同步 */
+  loadCartFromServer() {
+    api.get('/cart').then(res => {
+      if (res && res.code === 0 && res.data && res.data.items) {
+        const cart = {};
+        res.data.items.forEach(item => {
+          cart[item.productId] = {
+            id: item.productId,
+            name: item.productName,
+            price: item.productPrice,
+            image: item.productImage,
+            categoryKey: item.categoryKey,
+            tag: item.tag,
+            sizeDesc: item.sizeDesc,
+            quantity: item.quantity,
+            restrictions: item.restrictions || [],
+          };
+        });
+        this.globalData.cart = cart;
+        // 同步派生数据
+        const count = res.data.items.reduce((s, i) => s + i.quantity, 0);
+        const total = res.data.items.reduce((s, i) => s + i.productPrice * i.quantity, 0);
+        this.globalData.cartCount = count;
+        this.globalData.cartTotal = total;
+        // 通知所有活跃页面：购物车已更新
+        const pages = getCurrentPages();
+        pages.forEach(p => {
+          if (p.updateCart) p.updateCart();
+        });
+      }
+    }).catch(() => {
+      // 加载失败静默处理
     });
   },
 

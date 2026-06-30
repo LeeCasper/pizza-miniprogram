@@ -41,6 +41,23 @@ function logout() {
       content: '确定要退出登录吗？',
       success: (res) => {
         if (res.confirm) {
+          // 退出前清空服务端购物车（必须在 token 移除前调用）
+          const appPre = getApp();
+          if (appPre && appPre.globalData) {
+            appPre.globalData.cart = {};
+            appPre.globalData.cartCount = 0;
+            appPre.globalData.cartTotal = 0;
+          }
+          // 尝试清空服务端购物车（fire-and-forget，忽略失败）
+          const tokenPre = wx.getStorageSync('token');
+          if (tokenPre) {
+            wx.request({
+              url: BASE_URL + '/cart', method: 'DELETE',
+              header: { 'Authorization': 'Bearer ' + tokenPre },
+              success: () => {},
+              fail: () => {},
+            });
+          }
           wx.removeStorageSync('token');
           wx.removeStorageSync('userInfo');
           // 退出态必须同时清掉会话内/持久化自动登录信号，避免刷新后被恢复
