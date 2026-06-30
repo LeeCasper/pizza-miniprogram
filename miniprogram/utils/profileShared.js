@@ -327,8 +327,8 @@ function loadProfileCore(page, hooks) {
       app.globalData.userInfo = ui;
       wx.setStorageSync('userInfo', ui);
     }
-    // 等级判定使用 余额+消费金额 作为资格金额（与后端逻辑一致）
-    var qualifyingAmount = (ui.totalSpent || 0) + (ui.balance || 0);
+    // 等级判定仅使用累计消费金额（与后端 computeTier 逻辑一致）
+    var qualifyingAmount = (ui.totalSpent || 0);
     var tierInfo = computeTier(qualifyingAmount, apiTiers, ui.memberLevel);
     tierInfo._totalSpent = qualifyingAmount;
     var tierCards = buildTierCards(apiTiers, tierInfo);

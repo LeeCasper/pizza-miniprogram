@@ -484,7 +484,7 @@ Page({
 
     // 会员折扣（叠加在优惠券之后）
     const ui = app.globalData.userInfo || {};
-    const qualifyingAmount = parseFloat(ui.totalSpent || 0) + parseFloat(ui.balance || 0);
+    const qualifyingAmount = parseFloat(ui.totalSpent || 0);
     const tiers = this._cachedTiers || [];
     let tierDiscount = 0;
     let tierName = '';

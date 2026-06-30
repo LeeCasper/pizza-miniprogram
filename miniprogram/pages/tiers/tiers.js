@@ -30,8 +30,8 @@ Page({
 
   loadData(scrollToKey) {
     const ui = app.globalData.userInfo || {};
-    // 等级判定使用 余额+消费金额 作为资格金额（与后端逻辑一致）
-    const qualifyingAmount = parseFloat(ui.totalSpent || 0) + parseFloat(ui.balance || 0);
+    // 等级判定仅使用累计消费金额（与后端 computeTier 逻辑一致）
+    const qualifyingAmount = parseFloat(ui.totalSpent || 0);
 
     loadTiers().then(apiTiers => {
       const tierInfo = computeTier(qualifyingAmount, apiTiers, ui.memberLevel);
