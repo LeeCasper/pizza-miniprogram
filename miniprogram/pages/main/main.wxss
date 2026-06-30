@@ -358,7 +358,8 @@
   display: flex; justify-content: space-between; align-items: center;
   padding: 6rpx 0; font-size: 26rpx; color: #8A7B66;
 }
-.price-row.discount { color: var(--color-tertiary); }
+.price-row.discount { color: #5E5142; }
+.price-row.discount text:last-child { color: var(--color-price); }
 .price-row.total { padding-top: 12rpx; font-size: 28rpx; color: #5E5142; font-weight: var(--font-weight-semibold); }
 .final-price { color: var(--color-price); font-size: 32rpx; font-weight: var(--font-weight-bold); }
 
