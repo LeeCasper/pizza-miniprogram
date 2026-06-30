@@ -261,7 +261,7 @@ cd soybean-admin-temp && pnpm build
 cd .. && python soybean-admin-temp/deploy.py frontend
 ```
 
-`deploy.py` uses paramiko (SSH) to upload `dist/` to `/opt/pizza-admin/` and clean old files.
+`deploy.py` uses paramiko (SSH) to upload `dist/` to `/www/wwwroot/pizza.artaides.com/admin/` and clean old files.
 
 ---
 
