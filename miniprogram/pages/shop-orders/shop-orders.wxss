@@ -60,7 +60,9 @@
 }
 .so-action-btn.outline { border: 1rpx solid var(--color-primary); color: var(--color-primary); background: transparent; }
 .so-action-btn.primary { background: var(--clay-bg-primary); color: #FFFFFF; }
+.so-action-btn.disabled { border: 1rpx solid rgba(180,160,140,0.28); color: var(--color-on-surface-variant); background: var(--clay-bg-light); opacity: 0.6; }
 .so-action-btn:active { transform: scale(0.95); }
+.so-action-btn.disabled:active { transform: none; }
 
 /* 空态 */
 .so-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 200rpx; gap: 12rpx; }

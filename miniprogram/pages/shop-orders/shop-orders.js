@@ -52,13 +52,18 @@ Page({
     const status = this.data.currentTab;
     api.get('/shop/orders', { status }).then(res => {
       if (res.code === 0 && res.data) {
-        const orders = (res.data.list || []).map(o => ({
-          ...o,
-          items: (o.items || []).map(it => ({
-            ...it,
-            productImage: fixImageUrl(it.productImage),
-          })),
-        }));
+        const now = Date.now();
+        const orders = (res.data.list || []).map(o => {
+          const deadline = new Date(o.createdAt).getTime() + 60000; // 1 minute
+          return {
+            ...o,
+            canCancel: now < deadline,
+            items: (o.items || []).map(it => ({
+              ...it,
+              productImage: fixImageUrl(it.productImage),
+            })),
+          };
+        });
         this.setData({ orders, loading: false });
       } else {
         this.setData({ orders: [], loading: false });
@@ -121,6 +126,10 @@ Page({
         }
       },
     });
+  },
+
+  onCancelDisabled() {
+    wx.showToast({ title: '下单超过1分钟，无法取消', icon: 'none' });
   },
 
   onCancelOrder(e) {

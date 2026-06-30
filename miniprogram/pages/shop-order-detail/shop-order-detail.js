@@ -37,6 +37,9 @@ Page({
             productImage: fixImageUrl(it.productImage),
           }));
         }
+        // Calculate 1-minute cancel window
+        const deadline = new Date(order.createdAt).getTime() + 60000;
+        order.canCancel = Date.now() < deadline;
         this.setData({ order, loading: false });
       } else {
         this.setData({ loading: false });
@@ -66,6 +69,10 @@ Page({
     }).then(() => {
       this.setData({ paying: false });
     });
+  },
+
+  onCancelDisabled() {
+    wx.showToast({ title: '下单超过1分钟，无法取消', icon: 'none' });
   },
 
   onCancel() {

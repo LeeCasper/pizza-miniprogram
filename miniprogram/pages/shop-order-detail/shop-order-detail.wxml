@@ -97,7 +97,8 @@
 
     <!-- 底部操作栏 -->
     <view class="sod-actions" wx:if="{{order.status === 'pending'}}">
-      <view class="sod-action-btn outline" bindtap="onCancel"><text>取消订单</text></view>
+      <view class="sod-action-btn outline" bindtap="onCancel" wx:if="{{order.canCancel}}"><text>取消订单</text></view>
+      <view class="sod-action-btn disabled" bindtap="onCancelDisabled" wx:else><text>取消订单</text></view>
       <view class="sod-action-btn primary" bindtap="onPay"><text>{{paying ? '支付中…' : '去支付'}}</text></view>
     </view>
     <view class="sod-actions" wx:elif="{{order.status === 'paid' && !order.refundStatus}}">

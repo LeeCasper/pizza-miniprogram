@@ -80,7 +80,9 @@
 .sod-action-btn { flex: 1; height: 80rpx; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-size: 28rpx; font-weight: var(--font-weight-semibold); }
 .sod-action-btn.primary { background: var(--clay-bg-primary); color: #FFFFFF; box-shadow: var(--clay-shadow-button); }
 .sod-action-btn.outline { border: 1rpx solid var(--color-primary); color: var(--color-primary); background: transparent; }
+.sod-action-btn.disabled { border: 1rpx solid rgba(180,160,140,0.28); color: var(--color-on-surface-variant); background: var(--clay-bg-light); opacity: 0.6; }
 .sod-action-btn:active { transform: scale(0.97); }
+.sod-action-btn.disabled:active { transform: none; }
 
 /* 退款状态颜色 */
 .sod-refund-success { color: #52A854; font-weight: var(--font-weight-semibold); }
