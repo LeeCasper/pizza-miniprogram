@@ -10,7 +10,7 @@ PASS = os.environ.get('PIZZA_PASS', '')
 PORT = int(os.environ.get('PIZZA_PORT', '22'))
 
 SERVER_REPO = '/opt/pizza-server'  # Git repo root
-ADMIN_BASE = '/opt/pizza-admin'  # Nginx alias /admin/ → this directory
+ADMIN_BASE = '/www/wwwroot/pizza.artaides.com/admin'  # Nginx root for pizza.artaides.com/admin/
 LOCAL_ADMIN_DIST = r'D:\Code\Pizza\soybean-admin-temp\dist'
 
 ssh = None
