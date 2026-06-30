@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { NButton, NSpace, NCard, NForm, NFormItem, NInput, NInputNumber, NColorPicker, NSpin } from 'naive-ui';
+import { NButton, NSpace, NCard, NForm, NFormItem, NInput, NInputNumber, NSpin } from 'naive-ui';
 import { fetchMemberTier, fetchCreateMemberTier, fetchUpdateMemberTier, type MemberTier } from '@/service/api';
 
 defineOptions({ name: 'MemberTiersForm' });
@@ -21,7 +21,6 @@ const form = ref<Partial<MemberTier>>({
   pointsRewardRate: 1.00,
   birthdayGift: '',
   couponValue: 0,
-  accentColor: '#c0c0c0',
 });
 
 onMounted(async () => {
@@ -40,7 +39,6 @@ onMounted(async () => {
         pointsRewardRate: data.pointsRewardRate,
         birthdayGift: data.birthdayGift,
         couponValue: data.couponValue,
-        accentColor: data.accentColor,
       };
     }
     loading.value = false;
@@ -105,9 +103,6 @@ async function handleSave() {
         </NFormItem>
         <NFormItem label="升级奖券(元)">
           <NInputNumber v-model:value="form.couponValue" :min="0" :step="0.01" :style="{ width: '100%' }" />
-        </NFormItem>
-        <NFormItem label="主题色">
-          <NColorPicker v-model:value="form.accentColor" :modes="['hex']" />
         </NFormItem>
       </NForm>
     </NSpin>
