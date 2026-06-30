@@ -17,7 +17,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Memory**: See `C:\Users\61778\.claude\projects\D--Code-Pizza\memory\MEMORY.md` for previously learned lessons.
 - **Production**: `https://pizza.artaides.com` (Nginx → Express `/api` + static `/uploads`; Admin at `/admin/` served from Soybean Admin dist) — server `103.236.67.179`
 - **Domain**: `pizza.artaides.com` — server `103.236.67.179`
-- **Deploy env vars**: `deploy.py` reads `PIZZA_HOST`, `PIZZA_PASS` (and optionally `PIZZA_USER`, `PIZZA_PORT`). Set `$env:PIZZA_HOST = "103.236.67.179"` before deploying.
+- **Deploy env vars**: `deploy.py` reads `PIZZA_HOST` (default `103.236.67.179`), `PIZZA_PASS`, and optionally `PIZZA_USER`, `PIZZA_PORT`.
 
 ## Key Reference — Node.js Version
 
@@ -105,7 +105,8 @@ src/
 - Admin API routes: `/api/v1/admin/*` — all behind `auth` + `adminOnly` middleware
   - CRUD: products, orders, coupons, coupon-templates, member-tiers, users, points, banners
   - Settings: `/admin/settings/{pay,printer,map,store,business,storage}` (GET/PUT)
-  - **Default avatars**: `/admin/default-avatars` (GET/POST/DELETE)
+  - **Member tier colors**: frontend-only (`utils/tiers.js`); DB columns dropped, API no longer returns them
+	  - **Default avatars**: `/admin/default-avatars` (GET/POST/DELETE)
   - Ops: `/admin/audit-logs`, `/admin/reconciliation`, `/admin/payment-records`
 - Admin EJS routes: `/admin` — session-based, renders EJS views
 - Upload static files: `/uploads` → `config.upload.dir` (default `uploads/`)
@@ -254,14 +255,25 @@ Merge logic (`routes/index.ts`): `[...generatedRoutes, ...customRoutes]` — lat
 
 ### Deploy
 
-```bash
-# Build & deploy admin to production server
+```powershell
+# One-time env setup (skip if already system env vars)
+$env:PIZZA_HOST = "103.236.67.179"
+$env:PIZZA_PASS = "your_password"
 $env:PATH = "C:\Program Files\nodejs;" + $env:PATH
-cd soybean-admin-temp && pnpm build
-cd .. && python soybean-admin-temp/deploy.py frontend
+
+# Build admin
+cd soybean-admin-temp
+pnpm build
+
+# Deploy backend (git pull → npm install → migrations → pm2 restart)
+cd D:\Code\Pizza
+python soybean-admin-temp/deploy.py backend
+
+# Deploy admin frontend
+python soybean-admin-temp/deploy.py frontend
 ```
 
-`deploy.py` uses paramiko (SSH) to upload `dist/` to `/www/wwwroot/pizza.artaides.com/admin/` and clean old files.
+`deploy.py` uses paramiko (SSH) to upload `dist/` to `/www/wwwroot/pizza.artaides.com/admin/` and clean old files. Migrations listed in `deploy.py` run in order; harmless errors printed for already-applied migrations. **Exit code may be non-zero due to GBK encoding of `✓` — check output for success lines instead.**
 
 ---
 
@@ -355,14 +367,14 @@ Tier logic is centralized in `utils/tiers.js` (single source of truth). Three pa
 | `pages/tiers/` | `buildBenefitTiers()` | Hero card + comparison cards |
 
 **Key exports from `utils/tiers.js`**:
-- `FALLBACK_TIERS` — 5 tiers (silver → diamond) with `levelKey, name, levelIndex, minSpent, discountRate, pointsRewardRate, bgImage, accentColor`
+- `FALLBACK_TIERS` — 5 tiers (silver → diamond) with `levelKey, name, levelIndex, minSpent, discountRate, pointsRewardRate, bgImage, accentColor, bgStartColor, bgEndColor`. **Tier colors are frontend-only** — no DB storage or API fields involved.
 - `computeTier(totalSpent, tiers, memberLevel)` — determines current/next tier. Prioritizes server-set `memberLevel` (admin override), falls back to `totalSpent` calculation.
 - `buildTierCards(apiTiers, userTier)` — for profile/main swiper (adds `isActive`, `progressText`, `progressPercent`)
 - `buildBenefitTiers(apiTiers, userTier, totalSpent)` — for tiers page (adds `benefitItems[]`, `rangeText`)
 - `loadTiers()` — module-level cached API fetch with FALLBACK_TIERS merge. Replaces per-page `_ensureTiersLoaded()`.
 - `clearTierCache()` — invalidates cache (call after tier admin changes)
 
-**Backend-configurable**: Tier data flows from API (`/user/member-tiers`) → `FALLBACK_TIERS` as fallback. `loadTiers()` merges `{ ...fallback, ...apiTier }` so local `bgImage` survives when API doesn't provide it.
+**Tier color source of truth**: `FALLBACK_TIERS` in `utils/tiers.js` is the ONLY place tier card colors are defined. API no longer returns color fields. To change tier card colors, edit only this file.
 
 ### WXSS Known Quirks
 
