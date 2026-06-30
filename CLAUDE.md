@@ -15,9 +15,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **AppID**: `wx06b8f02feceac089`
 - **Node version**: pnpm + Soybean Admin require Node >= v22.13. Local system PATH defaults to v18 — override before building.
 - **Memory**: See `C:\Users\61778\.claude\projects\D--Code-Pizza\memory\MEMORY.md` for previously learned lessons.
-- **Production**: `https://pizza.artaides.com` (Nginx → Express `/api` + static `/uploads`; Admin at `/admin/` served from Soybean Admin dist) — server `103.263.67.179`
+- **Production**: `https://pizza.artaides.com` (Nginx → Express `/api` + static `/uploads`; Admin at `/admin/` served from Soybean Admin dist) — server `103.236.67.179`
 - **Domain**: Only `pizza.artaides.com` is in use. `artaides.com` and `www.artaides.com` are deprecated; old server `39.107.77.26` is decommissioned.
-- **Deploy env vars**: `deploy.py` reads `PIZZA_HOST`, `PIZZA_PASS` (and optionally `PIZZA_USER`, `PIZZA_PORT`). Set `$env:PIZZA_HOST = "103.263.67.179"` before deploying.
+- **Deploy env vars**: `deploy.py` reads `PIZZA_HOST`, `PIZZA_PASS` (and optionally `PIZZA_USER`, `PIZZA_PORT`). Set `$env:PIZZA_HOST = "103.236.67.179"` before deploying.
 
 ## Key Reference — Node.js Version
 
