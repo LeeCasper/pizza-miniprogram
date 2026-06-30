@@ -3,7 +3,7 @@ import sys
 import paramiko
 
 # ── Config ─────────────────────────────────────
-HOST = os.environ.get('PIZZA_HOST', '103.236.67.179')
+HOST = os.environ.get('PIZZA_HOST', '103.263.67.179')
 USER = os.environ.get('PIZZA_USER', 'root')
 PASS = os.environ.get('PIZZA_PASS', '')
 PORT = int(os.environ.get('PIZZA_PORT', '22'))
