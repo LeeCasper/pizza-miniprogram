@@ -41,6 +41,7 @@ const adminShopController = {
           ? parseFloat(b.original_price) : null,
         main_image: b.main_image || null,
         images: Array.isArray(b.images) ? b.images : [],
+        detail_images: Array.isArray(b.detail_images) ? b.detail_images : [],
         detail_desc: b.detail_desc || null,
         stock: b.stock !== undefined ? parseInt(b.stock) : 0,
         tag: b.tag || null,
@@ -67,6 +68,7 @@ const adminShopController = {
       }
       if (b.main_image !== undefined) updateData.main_image = b.main_image || null;
       if (b.images !== undefined) updateData.images = Array.isArray(b.images) ? b.images : [];
+      if (b.detail_images !== undefined) updateData.detail_images = Array.isArray(b.detail_images) ? b.detail_images : [];
       if (b.detail_desc !== undefined) updateData.detail_desc = b.detail_desc || null;
       if (b.stock !== undefined) updateData.stock = parseInt(b.stock);
       if (b.tag !== undefined) updateData.tag = b.tag || null;

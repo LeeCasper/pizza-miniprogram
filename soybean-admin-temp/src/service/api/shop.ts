@@ -9,6 +9,7 @@ export interface AdminShopProduct {
   original_price: string | null;
   main_image: string;
   images: string[];
+  detail_images: string[];
   detail_desc: string;
   stock: number;
   sales: number;

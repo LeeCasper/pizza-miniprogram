@@ -129,27 +129,24 @@
 
       <!-- Tab 内容：详情 -->
       <view class="sd-tab-content" hidden="{{activeTab !== 'detail'}}">
-        <!-- 特色图文卡 -->
-        <view class="sd-feature-card">
-          <view class="sd-feature-text">
-            <text class="sd-feature-title">精选食材\n美味看得见</text>
-            <text class="sd-feature-desc">新鲜食材 现做现烤\n每一口都充满幸福感</text>
-          </view>
-          <view class="sd-feature-img-wrap">
-            <image class="sd-feature-img" src="{{images[0] || product.main_image}}" mode="aspectFill"></image>
-          </view>
-        </view>
-
         <!-- 详情描述 -->
         <text class="sd-desc-text" wx:if="{{product.detail_desc}}">{{product.detail_desc}}</text>
 
-        <!-- 底部工艺图（使用第二张图或占位） -->
-        <image
-          class="sd-detail-img"
-          src="{{images[1] || images[0] || product.main_image}}"
-          mode="aspectFill"
-          wx:if="{{images.length > 0}}"
-        ></image>
+        <!-- 商品详情图（独立于轮播图） -->
+        <view class="sd-detail-gallery" wx:if="{{detailImages.length > 0}}">
+          <image
+            wx:for="{{detailImages}}"
+            wx:key="*this"
+            class="sd-detail-img"
+            src="{{item}}"
+            mode="widthFix"
+          ></image>
+        </view>
+
+        <!-- 无详情图且无描述 -->
+        <view class="sd-tab-placeholder" wx:if="{{!product.detail_desc && detailImages.length === 0}}">
+          <text class="sd-placeholder-text">暂无详情信息</text>
+        </view>
       </view>
 
       <!-- Tab 内容：配料 -->

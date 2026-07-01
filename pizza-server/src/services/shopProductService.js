@@ -57,15 +57,17 @@ const shopProductService = {
     const {
       shop_category_key = null, name, subtitle = null, price,
       original_price = null, main_image = null, images = [],
-      detail_desc = null, stock = 0, tag = null,
+      detail_images = [], detail_desc = null, stock = 0, tag = null,
       is_available = 1, sort_order = 0,
     } = data;
     const [result] = await pool.query(
       `INSERT INTO shop_products
-       (shop_category_key, name, subtitle, price, original_price, main_image, images, detail_desc, stock, tag, is_available, sort_order)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       (shop_category_key, name, subtitle, price, original_price, main_image, images, detail_images, detail_desc, stock, tag, is_available, sort_order)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [shop_category_key, name, subtitle, price, original_price, main_image,
-       JSON.stringify(Array.isArray(images) ? images : []), detail_desc, stock, tag,
+       JSON.stringify(Array.isArray(images) ? images : []),
+       JSON.stringify(Array.isArray(detail_images) ? detail_images : []),
+       detail_desc, stock, tag,
        is_available ? 1 : 0, sort_order]
     );
     return this.adminFindById(result.insertId);
@@ -100,6 +102,10 @@ const shopProductService = {
       sets.push('images = ?');
       params.push(JSON.stringify(Array.isArray(data.images) ? data.images : []));
     }
+    if (data.detail_images !== undefined) {
+      sets.push('detail_images = ?');
+      params.push(JSON.stringify(Array.isArray(data.detail_images) ? data.detail_images : []));
+    }
     if (sets.length === 0) return this.adminFindById(id);
     sets.push('updated_at = NOW()');
     params.push(id);
@@ -123,6 +129,7 @@ function formatShopProduct(row) {
   return {
     ...rest,
     images: safeJson(row.images, []),
+    detailImages: safeJson(row.detail_images, []),
     isFavorited: !!is_favorited,
   };
 }

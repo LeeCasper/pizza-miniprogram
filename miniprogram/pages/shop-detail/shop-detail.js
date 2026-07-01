@@ -10,6 +10,7 @@ Page({
     productId: null,
     product: null,
     images: [],
+    detailImages: [],
     loading: true,
     favLoading: false,
 
@@ -69,9 +70,14 @@ Page({
           ? p.images
           : (p.main_image ? [p.main_image] : [])
         ).map(u => fixImageUrl(u));
+        const detailImgs = (Array.isArray(p.detailImages) && p.detailImages.length
+          ? p.detailImages
+          : []
+        ).map(u => fixImageUrl(u));
         this.setData({
           product: { ...p, main_image: fixImageUrl(p.main_image) },
           images: imgs,
+          detailImages: detailImgs,
           loading: false,
         });
         this.updateTotalPrice();

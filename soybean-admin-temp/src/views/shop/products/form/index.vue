@@ -23,6 +23,7 @@ const form = ref({
   original_price: null as number | null,
   main_image: '',
   images: [] as string[],
+  detail_images: [] as string[],
   detail_desc: '',
   stock: 0,
   tag: '',
@@ -47,6 +48,7 @@ onMounted(async () => {
         original_price: data.original_price != null ? parseFloat(data.original_price) : null,
         main_image: data.main_image || '',
         images: Array.isArray(data.images) ? data.images : [],
+        detail_images: Array.isArray(data.detail_images) ? data.detail_images : [],
         detail_desc: data.detail_desc || '',
         stock: data.stock ?? 0,
         tag: data.tag || '',
@@ -119,8 +121,12 @@ async function handleSubmit() {
           </NCollapseItem>
         </NCollapse>
       </NFormItem>
-      <NFormItem label="详情轮播图">
+      <NFormItem label="商品主图">
         <MultiImageUpload v-model="form.images" :width="120" :height="120" :max="6" />
+      </NFormItem>
+      <NFormItem label="商品详情图">
+        <MultiImageUpload v-model="form.detail_images" :width="120" :height="120" :max="10" />
+        <span class="text-xs opacity-30" style="display:block;margin-top:4px;">用于详情页描述区，不上轮播图</span>
       </NFormItem>
       <NFormItem label="角标文案">
         <NInput v-model:value="form.tag" placeholder="例：新品 / 热卖" style="width:200px" />
