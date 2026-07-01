@@ -22,11 +22,11 @@
 /* tabs */
 .so-tabs { white-space: nowrap; padding: 15rpx 40rpx; }
 .so-tab {
-  display: inline-block; padding: 10rpx 28rpx; margin-right: 16rpx;
+  display: inline-block; padding: 10rpx 28rpx; margin-right: 10rpx;
   border-radius: var(--radius-full); font-size: 26rpx; color: var(--color-on-surface-variant);
   background: var(--clay-bg-card); border: var(--clay-border-subtle);
 }
-.so-tab.active { background: var(--clay-bg-primary); color: #FFFFFF; border-color: transparent; }
+.so-tab.active { background: #cd3030; color: #ffffff; }
 
 /* 列表 */
 .so-list { padding: 0rpx 24rpx 0; display: flex; flex-direction: column; gap: 20rpx; }
