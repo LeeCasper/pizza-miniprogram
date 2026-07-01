@@ -744,7 +744,7 @@
    居中在 DevTools(Chromium) 与真机渲染一致；旧方案「父级 align-items:stretch + 本列 justify-content:space-between
    靠拉伸高度把余额钉顶、积分钉底」在真机不可靠——真机不 honor 嵌套列的拉伸高度，列塌成内容高度→两栏不再水平。 */
 .wallet-row {
-  margin-left: auto; flex-shrink: 0; width: 232rpx;
+  margin-left: auto; flex-shrink: 0; width: 265rpx;
   display: flex; flex-direction: column; justify-content: center; gap: 14rpx;
 }
 .wallet-card {
