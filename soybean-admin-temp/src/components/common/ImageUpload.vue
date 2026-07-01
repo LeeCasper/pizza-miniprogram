@@ -50,6 +50,11 @@ async function handleFileChange(e: Event) {
     input.value = '';
     return;
   }
+  if (file.size > 5 * 1024 * 1024) {
+    window.$message?.warning(`图片过大（${(file.size / 1024 / 1024).toFixed(1)}MB），最大 5MB`);
+    input.value = '';
+    return;
+  }
 
   uploading.value = true;
   const { data, error } = await fetchUploadImage(file);
@@ -84,6 +89,7 @@ function handleDelete() {
         <div class="flex flex-col items-center gap-1">
           <span class="text-3xl opacity-30 i-mdi:cloud-upload-outline"></span>
           <span class="text-xs opacity-50">{{ uploading ? '上传中…' : '点击上传图片' }}</span>
+          <span class="text-xs opacity-30">JPG/PNG/GIF/WebP · 单边≤4096px · ≤5MB</span>
         </div>
       </NSpin>
     </div>
