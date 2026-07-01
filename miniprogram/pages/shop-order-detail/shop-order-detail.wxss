@@ -27,7 +27,7 @@
   position: relative; overflow: hidden;
 }
 .sod-status-bg {
-  position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
+  position: absolute; top: 0; right: 0; width: 60%; height: 100%; z-index: 0;
 }
 .sod-status-card.status-pending { border-color: #F0A030; }
 .sod-status-card.status-paid { border-color: #4A90D9; }
