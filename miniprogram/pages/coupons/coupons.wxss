@@ -75,10 +75,10 @@
   padding: 4rpx 14rpx;
   border-radius: var(--radius-full);
 }
-.category-tab.active .cat-label { color: #7A3220; }
+.category-tab.active .cat-label { color: #FFFFFF; }
 .category-tab.active .cat-count {
   background: rgba(255,255,255,0.3);
-  color: #7A3220;
+  color: #FFFFFF;
 }
 
 /* ======= 状态筛选 ======= */
@@ -98,7 +98,7 @@
 }
 .status-chip.active {
   background: var(--glass-bg-primary-container);
-  color: #7A3220;
+  color: #FFFFFF;
   font-weight: var(--font-weight-semibold);
   border: var(--glass-border-colored);
 }
