@@ -58,7 +58,7 @@
   min-height: 120rpx;
 }
 .category-tab.active {
-  background: linear-gradient(160deg, #E8C9B0 0%, #D4A88C 100%);
+  background: linear-gradient(160deg, #D4846B 0%, #C0563A 100%);
   border: var(--glass-border-colored);
   box-shadow: var(--glass-shadow-button);
 }
