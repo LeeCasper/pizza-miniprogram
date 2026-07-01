@@ -62,7 +62,7 @@
 }
 .log-shipping-left { display: flex; flex-direction: column; gap: 4rpx; }
 .log-shipping-company { font-size: 26rpx; color: var(--color-on-surface); font-weight: var(--font-weight-semibold); }
-.log-shipping-no { font-size: 22rpx; color: var(--color-on-surface-variant); }
+.log-shipping-no { font-size: 22rpx; color: #2979FF; }
 
 /* ── 追踪状态徽章 ── */
 .log-tracking-status {
@@ -70,7 +70,7 @@
   font-size: 22rpx; font-weight: var(--font-weight-semibold);
   flex-shrink: 0;
 }
-.log-tracking-status.transit { background: #FFF3E0; color: #E65100; }
+.log-tracking-status.transit { background: #E8F5E9; color: #2E7D32; }
 .log-tracking-status.delivered { background: #E8F5E9; color: #2E7D32; }
 .log-tracking-status.pending { background: var(--clay-bg-light); color: var(--color-on-surface-variant); }
 .log-tracking-status.unsupported { background: #FFF3E0; color: #E65100; }
@@ -108,15 +108,15 @@
   border-left: 3rpx solid rgba(180, 160, 140, 0.24);
 }
 .log-event:first-child { padding-top: 24rpx; }
-.log-event.latest { border-left-color: var(--color-primary); }
+.log-event.latest { border-left-color: #4CAF50; }
 .log-event-dot {
   position: absolute; left: -9rpx; top: 28rpx;
   width: 16rpx; height: 16rpx; border-radius: var(--radius-full);
   background: rgba(180, 160, 140, 0.30);
 }
 .log-event-dot.active {
-  background: var(--color-primary);
-  box-shadow: 0 0 0 6rpx var(--clay-bg-primary-light);
+  background: #4CAF50;
+  box-shadow: 0 0 0 6rpx rgba(76, 175, 80, 0.25);
 }
 .log-event:first-child .log-event-dot { top: 32rpx; }
 .log-event-content { display: flex; flex-direction: column; gap: 6rpx; }
