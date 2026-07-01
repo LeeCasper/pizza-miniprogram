@@ -31,7 +31,7 @@
 }
 .sod-status-card.status-pending { border-color: #F0A030; }
 .sod-status-card.status-paid { border-color: #4A90D9; }
-.sod-status-card.status-shipped { border-color: #7B5BB8; }
+.sod-status-card.status-shipped { border-color: #7B5BB8; align-items: flex-start; padding: 24rpx 28rpx; }
 .sod-status-card.status-completed { border-color: #52A854; }
 .sod-status-card.status-cancelled { border-color: #C0C0C0; }
 .sod-status-icon { font-size: 72rpx; line-height: 1.2; position: relative; z-index: 1; }

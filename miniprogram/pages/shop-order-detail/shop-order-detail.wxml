@@ -14,7 +14,6 @@
       <text class="sod-status-icon">
         <block wx:if="{{order.status === 'pending'}}">🕐</block>
         <block wx:elif="{{order.status === 'paid'}}">✅</block>
-        <block wx:elif="{{order.status === 'shipped'}}">🚚</block>
         <block wx:elif="{{order.status === 'completed'}}">🎉</block>
         <block wx:elif="{{order.status === 'cancelled'}}">❌</block>
       </text>
