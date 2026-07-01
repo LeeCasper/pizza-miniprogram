@@ -58,7 +58,7 @@
   min-height: 120rpx;
 }
 .category-tab.active {
-  background: #C0563A;
+  background: #cd3030;
   border: var(--glass-border-colored);
   box-shadow: var(--glass-shadow-button);
 }
@@ -97,7 +97,7 @@
   border: var(--glass-border-subtle);
 }
 .status-chip.active {
-  background: var(--glass-bg-primary-container);
+  background: #E74C3C;
   color: #FFFFFF;
   font-weight: var(--font-weight-semibold);
   border: var(--glass-border-colored);
