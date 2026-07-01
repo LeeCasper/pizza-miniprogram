@@ -113,7 +113,7 @@
   gap: 20rpx;
   padding: 20rpx;
   border-radius: var(--radius-card);
-  background: var(--glass-bg-card);
+  background: linear-gradient(160deg, #EDE4D3 0%, #DDD2BD 100%);
   box-shadow: var(--glass-shadow-card);
   border: var(--glass-border-subtle);
 }
@@ -155,7 +155,7 @@
   display: flex;
   border-radius: var(--radius-card);
   overflow: hidden;
-  background: var(--glass-bg-card);
+  background: linear-gradient(160deg, #EDE4D3 0%, #DDD2BD 100%);
   box-shadow: var(--glass-shadow-card);
   border: var(--glass-border-subtle);
 }
