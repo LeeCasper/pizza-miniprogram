@@ -115,7 +115,16 @@ router.delete('/banners/:id', ctrl.deleteBanner);
 router.put('/banners/:id/toggle', ctrl.toggleBanner);
 
 // File upload & management
-router.post('/upload', adminUpload.single('file'), uploadCtrl.uploadImage);
+const uploadLogger = require('../utils/logger').createLogger('Upload');
+router.post('/upload', (req, res, next) => {
+  adminUpload.single('file')(req, res, (err) => {
+    if (err) {
+      uploadLogger.error({ err }, 'Multer upload failed');
+      return res.status(err.status || 500).json({ code: err.status || 500, message: err.message || '上传失败' });
+    }
+    next();
+  });
+}, uploadCtrl.uploadImage);
 router.get('/files', uploadCtrl.listFiles);
 router.delete('/files/:filename', uploadCtrl.deleteFile);
 
