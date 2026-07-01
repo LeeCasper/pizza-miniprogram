@@ -18,7 +18,7 @@
           bindtap="onCategoryChange"
           data-key="redeem"
         >
-          <text class="cat-icon">🎫</text>
+          <image class="cat-icon" src="/images/grid-redeem.png" mode="aspectFit"></image>
           <text class="cat-label">兑换券</text>
           <text class="cat-count">{{redeemAvailableCount}}</text>
         </view>
@@ -27,7 +27,7 @@
           bindtap="onCategoryChange"
           data-key="discount"
         >
-          <text class="cat-icon">🏷️</text>
+          <image class="cat-icon" src="/images/grid-discount.png" mode="aspectFit"></image>
           <text class="cat-label">优惠券</text>
           <text class="cat-count">{{discountAvailableCount}}</text>
         </view>

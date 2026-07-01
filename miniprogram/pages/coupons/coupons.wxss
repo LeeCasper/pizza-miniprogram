@@ -62,7 +62,7 @@
   border: var(--glass-border-colored);
   box-shadow: var(--glass-shadow-button);
 }
-.cat-icon { font-size: 40rpx; }
+.cat-icon { width: 44rpx; height: 44rpx; }
 .cat-label {
   font-size: 28rpx;
   font-weight: var(--font-weight-semibold);
