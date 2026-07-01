@@ -24,15 +24,19 @@
   margin: 24rpx 32rpx; padding: 36rpx 28rpx; border-radius: var(--radius-card);
   display: flex; flex-direction: column; align-items: center; gap: 8rpx;
   background: var(--clay-bg-card); border: var(--clay-border-subtle); box-shadow: var(--clay-shadow-card);
+  position: relative; overflow: hidden;
+}
+.sod-status-bg {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
 }
 .sod-status-card.status-pending { border-color: #F0A030; }
 .sod-status-card.status-paid { border-color: #4A90D9; }
 .sod-status-card.status-shipped { border-color: #7B5BB8; }
 .sod-status-card.status-completed { border-color: #52A854; }
 .sod-status-card.status-cancelled { border-color: #C0C0C0; }
-.sod-status-icon { font-size: 72rpx; line-height: 1.2; }
-.sod-status-label { font-size: 34rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); }
-.sod-status-desc { font-size: 24rpx; color: var(--color-on-surface-variant); }
+.sod-status-icon { font-size: 72rpx; line-height: 1.2; position: relative; z-index: 1; }
+.sod-status-label { font-size: 34rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); position: relative; z-index: 1; }
+.sod-status-desc { font-size: 24rpx; color: var(--color-on-surface-variant); position: relative; z-index: 1; }
 
 /* section */
 .sod-section { margin: 0 32rpx 20rpx; padding: 24rpx 28rpx; display: flex; flex-direction: column; gap: 16rpx; background: var(--clay-bg-card); box-shadow: var(--clay-shadow-card); border: var(--clay-border-subtle); }

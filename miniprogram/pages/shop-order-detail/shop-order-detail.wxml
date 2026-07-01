@@ -10,6 +10,7 @@
   <view wx:if="{{order}}">
     <!-- 状态头部 -->
     <view class="sod-status-card status-{{order.status}}">
+      <image wx:if="{{order.status === 'shipped'}}" class="sod-status-bg" src="/images/status-shipped-bg.gif" mode="aspectFill"></image>
       <text class="sod-status-icon">
         <block wx:if="{{order.status === 'pending'}}">🕐</block>
         <block wx:elif="{{order.status === 'paid'}}">✅</block>
