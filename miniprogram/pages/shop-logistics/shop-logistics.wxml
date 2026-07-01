@@ -74,7 +74,9 @@
           <view class="log-event {{evIndex === 0 ? 'latest' : ''}}" wx:for="{{item.trackingEvents}}" wx:for-item="ev" wx:for-index="evIndex" wx:key="time">
             <view class="log-event-dot {{evIndex === 0 ? 'active' : ''}}"></view>
             <view class="log-event-content">
-              <text class="log-event-context">{{ev.context}}</text>
+              <view class="log-event-context">
+            <text wx:for="{{ev.contextSegments}}" wx:key="index" class="log-evt-{{item.type}}">{{item.text}}</text>
+          </view>
               <text class="log-event-time">{{ev.time}}</text>
             </view>
           </view>
