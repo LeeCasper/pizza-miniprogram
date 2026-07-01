@@ -57,7 +57,12 @@
       <!-- 最新事件预览 -->
       <view class="log-latest" wx:if="{{item.tracking.latestEvent}}">
         <text class="log-latest-time">{{item.tracking.latestEvent.time}}</text>
-        <text class="log-latest-context">{{item.tracking.latestEvent.context}}</text>
+        <view class="log-latest-context">
+          <block wx:if="{{item.tracking.latestEvent.contextSegments}}">
+            <text wx:for="{{item.tracking.latestEvent.contextSegments}}" wx:key="index" class="log-evt-{{item.type}}">{{item.text}}</text>
+          </block>
+          <text wx:else>{{item.tracking.latestEvent.context}}</text>
+        </view>
       </view>
 
       <!-- 展开/收起按钮 -->

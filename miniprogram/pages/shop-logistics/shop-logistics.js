@@ -28,15 +28,21 @@ Page({
     this.setData({ loading: true });
     api.get('/logistics/orders').then(res => {
       if (res.code === 0 && res.data) {
-        const orders = (res.data.list || []).map(o => ({
-          ...o,
-          items: (o.items || []).map(it => ({
-            ...it,
-            productImage: fixImageUrl(it.productImage),
-          })),
-          expanded: false,
-          trackingEvents: null,
-        }));
+        const orders = (res.data.list || []).map(o => {
+          // Process latestEvent context for phone highlighting
+          if (o.tracking && o.tracking.latestEvent && o.tracking.latestEvent.context) {
+            o.tracking.latestEvent.contextSegments = this.highlightTrackingText(o.tracking.latestEvent.context);
+          }
+          return {
+            ...o,
+            items: (o.items || []).map(it => ({
+              ...it,
+              productImage: fixImageUrl(it.productImage),
+            })),
+            expanded: false,
+            trackingEvents: null,
+          };
+        });
         this.setData({ orders, loading: false });
       } else {
         this.setData({ orders: [], loading: false });
