@@ -97,7 +97,7 @@
   border: var(--glass-border-subtle);
 }
 .status-chip.active {
-  background: #E74C3C;
+  background: #cd3030;
   color: #FFFFFF;
   font-weight: var(--font-weight-semibold);
   border: var(--glass-border-colored);
