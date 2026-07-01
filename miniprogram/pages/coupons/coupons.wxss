@@ -58,7 +58,7 @@
   min-height: 120rpx;
 }
 .category-tab.active {
-  background: #C0392B;
+  background: #C0563A;
   border: var(--glass-border-colored);
   box-shadow: var(--glass-shadow-button);
 }
