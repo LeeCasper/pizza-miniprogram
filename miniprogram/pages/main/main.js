@@ -58,7 +58,6 @@ Page({
     finalPrice: '0.00',
     // 加载态
     productsLoaded: false, ordersLoaded: false,
-    gridPage: 0, gridSwiperHeight: 380,
     showQuickLogin: false,
   },
 
@@ -800,8 +799,6 @@ Page({
     }
     target.tab !== undefined ? this.setData({ currentTab: target.tab }) : wx.navigateTo({ url: target });
   },
-
-  onGridSwiperChange(e) { this.setData({ gridPage: e.detail.current }); },
 
   onClaimCenter() {
     wx.navigateTo({ url: '/pages/claim-center/claim-center' });

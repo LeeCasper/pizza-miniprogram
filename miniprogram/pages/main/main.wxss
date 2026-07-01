@@ -1001,7 +1001,7 @@
 /* 金刚区：粘土面板 */
 .grid-actions { display: flex; flex-wrap: wrap; row-gap: 28rpx; justify-content: space-around; margin: 0 32rpx 24rpx; padding: 32rpx 16rpx; border-radius: 32rpx; background: linear-gradient(160deg, #FFFFFF 0%, #F4F0E9 100%);
   box-shadow: 0 12rpx 28rpx rgba(120,108,94,0.12), inset 3rpx 3rpx 5rpx rgba(255,255,255,0.95), inset -4rpx -6rpx 14rpx rgba(120,108,94,0.08); }
-.grid-item { display: flex; flex-direction: column; align-items: center; gap: 12rpx; width: 33.33%; }
+.grid-item { display: flex; flex-direction: column; align-items: center; gap: 12rpx; width: 25%; }
 /* 金刚区图标：粘土圆球（实底 + 内顶高光 + 内底暗影 + 外柔影） */
 .grid-icon-wrap { width: 96rpx; height: 96rpx; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; transition: transform 0.15s ease, box-shadow 0.15s ease; }
 .grid-icon-wrap:active { transform: translateY(2rpx) scale(0.94); }
@@ -1014,13 +1014,6 @@
 .grid-icon-emoji { font-size: 40rpx; line-height: 1; }
 .grid-label { font-size: 22rpx; color: var(--color-on-surface); }
 
-/* ── 金刚区滑动容器 + 指示点 ── */
-.grid-swiper-wrap { margin-bottom: 24rpx; }
-.grid-swiper { border-radius: 32rpx; overflow: hidden; }
-.grid-dots { display: flex; justify-content: center; align-items: center; gap: 12rpx; margin: 16rpx 32rpx 0; }
-.grid-dot { width: 12rpx; height: 12rpx; border-radius: var(--radius-full); background: rgba(120,108,94,0.20); transition: all 0.25s; }
-.grid-dot.active { width: 28rpx; border-radius: 6rpx; background: #C0563A; }
-.grid-item-placeholder { visibility: hidden; }
 
 /* 功能菜单 */
 .menu-section { padding: 0 32rpx 72rpx; }

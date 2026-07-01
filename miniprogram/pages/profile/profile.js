@@ -18,7 +18,6 @@ Page({
     birthdayCountdown: '',
     isBirthdayToday: false,
     hasBirthday: false,
-    gridPage: 0, gridSwiperHeight: 380,
     showQuickLogin: false,
   },
 
@@ -100,7 +99,5 @@ Page({
       wx.showToast({ title: '功能开发中', icon: 'none' });
     }
   },
-
-  onGridSwiperChange(e) { this.setData({ gridPage: e.detail.current }); },
 
 });
