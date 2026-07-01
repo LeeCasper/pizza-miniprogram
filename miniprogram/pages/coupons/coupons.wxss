@@ -58,7 +58,7 @@
   min-height: 120rpx;
 }
 .category-tab.active {
-  background: linear-gradient(160deg, #D4846B 0%, #C0563A 100%);
+  background: #C0392B;
   border: var(--glass-border-colored);
   box-shadow: var(--glass-shadow-button);
 }
@@ -75,10 +75,10 @@
   padding: 4rpx 14rpx;
   border-radius: var(--radius-full);
 }
-.category-tab.active .cat-label { color: var(--color-on-primary-container); }
+.category-tab.active .cat-label { color: #FFFFFF; }
 .category-tab.active .cat-count {
-  background: rgba(255,255,255,0.3);
-  color: var(--color-on-primary-container);
+  background: rgba(255,255,255,0.25);
+  color: #FFFFFF;
 }
 
 /* ======= 状态筛选 ======= */
