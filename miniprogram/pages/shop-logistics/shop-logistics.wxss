@@ -122,7 +122,6 @@
 .log-event-content { display: flex; flex-direction: column; gap: 6rpx; }
 .log-event-context { font-size: 26rpx; color: var(--color-on-surface); line-height: 1.5; }
 .log-evt-phone { color: #2979FF; }
-.log-evt-name { color: #2979FF; }
 .log-event.latest .log-event-context { color: #4CAF50; }
 .log-event-time { font-size: 22rpx; color: var(--color-on-surface-variant); }
 
