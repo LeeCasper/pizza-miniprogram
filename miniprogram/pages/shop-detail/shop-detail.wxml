@@ -217,21 +217,65 @@
           <view class="co-addr-header">
             <text class="co-addr-icon">📍</text>
             <text class="co-addr-label">收货地址</text>
+            <text class="co-addr-arrow">›</text>
           </view>
-          <block wx:if="{{recipientName && recipientPhone && recipientAddress}}">
+          <!-- 有地址：显示选中地址 -->
+          <block wx:if="{{selectedAddress}}">
             <view class="co-addr-contact">
-              <text class="co-addr-name">{{recipientName}}</text>
-              <text class="co-addr-phone">{{recipientPhone}}</text>
+              <text class="co-addr-name">{{selectedAddress.name}}</text>
+              <text class="co-addr-phone">{{selectedAddress.phone}}</text>
+              <view class="co-addr-tag" wx:if="{{selectedAddress.tag}}">
+                <text>{{selectedAddress.tag}}</text>
+              </view>
             </view>
-            <text class="co-addr-detail">{{recipientAddress}}</text>
+            <text class="co-addr-detail">{{selectedAddress.region[0]}} {{selectedAddress.region[1]}} {{selectedAddress.region[2]}} {{selectedAddress.detail}}</text>
           </block>
+          <!-- 无地址：提示添加 -->
           <view class="co-addr-empty" wx:else>
-            <text class="co-addr-empty-text">请填写收货信息</text>
+            <text class="co-addr-empty-text">请添加收货地址</text>
           </view>
-          <view class="co-addr-form" wx:if="{{showAddressForm}}">
-            <input class="co-input" placeholder="收货人姓名" value="{{recipientName}}" data-field="recipientName" bindinput="onRecipientInput"/>
-            <input class="co-input" type="number" placeholder="手机号" value="{{recipientPhone}}" data-field="recipientPhone" bindinput="onRecipientInput"/>
-            <input class="co-input" placeholder="详细地址" value="{{recipientAddress}}" data-field="recipientAddress" bindinput="onRecipientInput"/>
+        </view>
+
+        <!-- 地址选择器（底部弹层） -->
+        <view class="co-addr-picker-overlay {{showAddressPicker ? 'show' : ''}}" catchtap="onCloseAddressPicker">
+          <view class="co-addr-picker {{showAddressPicker ? 'show' : ''}}" catchtap="noop">
+            <view class="co-addr-picker-header">
+              <text class="co-addr-picker-title">选择收货地址</text>
+              <view class="co-addr-picker-close" catchtap="onCloseAddressPicker">
+                <text>✕</text>
+              </view>
+            </view>
+            <scroll-view class="co-addr-picker-list" scroll-y enhanced show-scrollbar="{{false}}">
+              <view
+                class="co-addr-picker-item {{selectedAddressId === item.id ? 'active' : ''}}"
+                wx:for="{{addresses}}"
+                wx:key="id"
+                data-id="{{item.id}}"
+                bindtap="onSelectAddress"
+              >
+                <view class="co-addr-picker-radio">
+                  <view class="co-addr-picker-dot" wx:if="{{selectedAddressId === item.id}}"></view>
+                </view>
+                <view class="co-addr-picker-info">
+                  <view class="co-addr-picker-contact">
+                    <text class="co-addr-picker-name">{{item.name}}</text>
+                    <text class="co-addr-picker-phone">{{item.phone}}</text>
+                    <view class="co-addr-tag" wx:if="{{item.tag}}">
+                      <text>{{item.tag}}</text>
+                    </view>
+                    <view class="co-addr-tag co-addr-tag-default" wx:if="{{item.isDefault}}">
+                      <text>默认</text>
+                    </view>
+                  </view>
+                  <text class="co-addr-picker-detail">{{item.region[0]}} {{item.region[1]}} {{item.region[2]}} {{item.detail}}</text>
+                </view>
+              </view>
+            </scroll-view>
+            <view class="co-addr-picker-footer">
+              <view class="co-addr-manage-btn" bindtap="onManageAddresses">
+                <text>📋 管理地址</text>
+              </view>
+            </view>
           </view>
         </view>
 

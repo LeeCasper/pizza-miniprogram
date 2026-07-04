@@ -29,10 +29,10 @@ Page({
 
     // 结账抽屉
     checkoutOpen: false,
-    recipientName: '',
-    recipientPhone: '',
-    recipientAddress: '',
-    showAddressForm: true,
+    addresses: [],
+    selectedAddressId: null,
+    selectedAddress: null,
+    showAddressPicker: false,
     note: '',
     shippingFee: 10,
     paymentMethod: 'wechat',
@@ -42,12 +42,15 @@ Page({
 
   onLoad(options) {
     const layout = getBackBtnTopBar();
-    // 计算滚动区高度：窗口高度 − 顶栏 − 底栏(约 140rpx)
     const win = wx.getWindowInfo();
     const rpx = win.windowWidth / 750;
     const bottomBarPx = 140 * rpx;
-    // padding-top 已处理顶栏偏移，高度只需减底栏
     const scrollViewHeight = win.windowHeight - bottomBarPx;
+    this.setData({
+      statusBarHeight: layout.statusBarHeight,
+      topBarTotalHeight: layout.topBarTotalHeight,
+      scrollViewHeight: scrollViewHeight,
+    });
 
     const id = options.id;
     if (!id) {
@@ -57,6 +60,14 @@ Page({
     }
     this.setData({ productId: id });
     this.fetchDetail();
+    this.fetchAddresses();
+  },
+
+  onShow() {
+    // 从地址管理页返回后刷新地址列表
+    if (this.data.productId) {
+      this.fetchAddresses();
+    }
   },
 
   fetchDetail() {
@@ -200,16 +211,18 @@ Page({
   onBuy() {
     const p = this.data.product;
     if (!p) return;
-    this.setData({
-      checkoutOpen: true,
-      paymentMethod: 'wechat',
-      submitting: false,
+    this.fetchAddresses().then(() => {
+      this.setData({
+        checkoutOpen: true,
+        paymentMethod: 'wechat',
+        submitting: false,
+      });
+      this.updateTotalPrice();
     });
-    this.updateTotalPrice();
   },
 
   onCloseCheckout() {
-    this.setData({ checkoutOpen: false });
+    this.setData({ checkoutOpen: false, showAddressPicker: false });
   },
 
   updateTotalPrice() {
@@ -219,8 +232,66 @@ Page({
     this.setData({ totalPrice: total });
   },
 
+  // ── 收货地址 ──
+  fetchAddresses() {
+    return api.get('/addresses').then(res => {
+      if (res.code === 0 && Array.isArray(res.data)) {
+        const list = res.data;
+        // 找到默认地址，没有则选第一个
+        let selId = this.data.selectedAddressId;
+        let selAddr = null;
+        if (list.length > 0) {
+          const def = list.find(a => a.isDefault);
+          if (def) {
+            selId = def.id;
+            selAddr = def;
+          } else if (!selId || !list.find(a => a.id === selId)) {
+            selId = list[0].id;
+            selAddr = list[0];
+          } else {
+            selAddr = list.find(a => a.id === selId) || list[0];
+          }
+        } else {
+          selId = null;
+          selAddr = null;
+        }
+        this.setData({
+          addresses: list,
+          selectedAddressId: selId,
+          selectedAddress: selAddr,
+        });
+      }
+    }).catch(() => {});
+  },
+
   onAddressTap() {
-    this.setData({ showAddressForm: !this.data.showAddressForm });
+    const { addresses } = this.data;
+    if (addresses.length > 0) {
+      this.setData({ showAddressPicker: true });
+    } else {
+      wx.navigateTo({ url: '/pages/address/address' });
+    }
+  },
+
+  onSelectAddress(e) {
+    const id = e.currentTarget.dataset.id;
+    const addr = this.data.addresses.find(a => a.id === id);
+    if (addr) {
+      this.setData({
+        selectedAddressId: id,
+        selectedAddress: addr,
+        showAddressPicker: false,
+      });
+    }
+  },
+
+  onCloseAddressPicker() {
+    this.setData({ showAddressPicker: false });
+  },
+
+  onManageAddresses() {
+    this.setData({ showAddressPicker: false });
+    wx.navigateTo({ url: '/pages/address/address' });
   },
 
   onPaymentMethodChange(e) {
@@ -238,21 +309,16 @@ Page({
   },
 
   onSubmitOrder() {
-    const { product, quantity, recipientName, recipientPhone, recipientAddress, paymentMethod, submitting } = this.data;
+    const { product, quantity, selectedAddress, paymentMethod, submitting } = this.data;
     if (submitting) return;
 
-    if (!recipientName.trim()) {
-      wx.showToast({ title: '请填写收货人姓名', icon: 'none' });
+    if (!selectedAddress) {
+      wx.showToast({ title: '请选择收货地址', icon: 'none' });
       return;
     }
-    if (!/^1\d{10}$/.test(recipientPhone.trim())) {
-      wx.showToast({ title: '请填写正确的手机号', icon: 'none' });
-      return;
-    }
-    if (!recipientAddress.trim()) {
-      wx.showToast({ title: '请填写收货地址', icon: 'none' });
-      return;
-    }
+
+    const addr = selectedAddress;
+    const fullAddress = (addr.region || []).join(' ') + ' ' + addr.detail;
 
     this.setData({ submitting: true });
     this.updateTotalPrice();
@@ -260,9 +326,10 @@ Page({
     api.post('/shop/orders', {
       productId: product.id,
       quantity,
-      recipientName: recipientName.trim(),
-      recipientPhone: recipientPhone.trim(),
-      recipientAddress: recipientAddress.trim(),
+      recipientName: addr.name,
+      recipientPhone: addr.phone,
+      recipientAddress: fullAddress,
+      addressId: addr.id,
       note: this.data.note.trim() || null,
       paymentMethod,
     }).then(res => {

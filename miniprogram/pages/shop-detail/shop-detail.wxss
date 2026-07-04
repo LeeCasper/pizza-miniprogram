@@ -333,17 +333,101 @@
 .co-address { display: flex; flex-direction: column; gap: 12rpx; }
 .co-addr-header { display: flex; align-items: center; gap: 8rpx; }
 .co-addr-icon { font-size: 32rpx; }
-.co-addr-label { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
-.co-addr-contact { display: flex; align-items: center; gap: 20rpx; }
+.co-addr-label { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); flex: 1; }
+.co-addr-arrow { font-size: 40rpx; color: var(--color-on-surface-variant); line-height: 1; }
+.co-addr-contact { display: flex; align-items: center; gap: 16rpx; flex-wrap: wrap; }
 .co-addr-name { font-size: 30rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
 .co-addr-phone { font-size: 28rpx; color: var(--color-on-surface); }
+.co-addr-tag {
+  font-size: 20rpx; padding: 2rpx 12rpx; border-radius: 8rpx;
+  background: rgba(192,86,58,0.10); color: #C0563A;
+}
+.co-addr-tag-default {
+  background: rgba(192,86,58,0.08); color: #C0563A;
+}
 .co-addr-detail {
   font-size: 24rpx; color: var(--color-on-surface-variant);
   line-height: 1.6;
 }
 .co-addr-empty { padding: 16rpx 0; }
 .co-addr-empty-text { font-size: 28rpx; color: var(--color-on-surface-variant); }
-.co-addr-form { display: flex; flex-direction: column; gap: 12rpx; padding-top: 12rpx; border-top: var(--clay-border-subtle); }
+
+/* ═══ 地址选择器 ═══ */
+.co-addr-picker-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 300;
+  background: rgba(0,0,0,0.35);
+  visibility: hidden; opacity: 0;
+  transition: visibility 0s 0.3s, opacity 0.3s;
+}
+.co-addr-picker-overlay.show { visibility: visible; opacity: 1; transition: visibility 0s, opacity 0.3s; }
+.co-addr-picker {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  background: var(--clay-bg-nav);
+  border-radius: 32rpx 32rpx 0 0;
+  max-height: 70vh; display: flex; flex-direction: column;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.co-addr-picker.show { transform: translateY(0); }
+.co-addr-picker-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 28rpx 32rpx 20rpx;
+  border-bottom: var(--clay-border-subtle);
+  flex-shrink: 0;
+}
+.co-addr-picker-title { font-size: 32rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); }
+.co-addr-picker-close {
+  width: 56rpx; height: 56rpx; border-radius: 50%;
+  background: var(--clay-bg-card); border: var(--clay-border-subtle);
+  display: flex; align-items: center; justify-content: center;
+}
+.co-addr-picker-close text { font-size: 28rpx; color: var(--color-on-surface-variant); }
+.co-addr-picker-list {
+  flex: 1; overflow-y: auto; padding: 16rpx 24rpx;
+  max-height: 480rpx;
+}
+.co-addr-picker-item {
+  display: flex; align-items: flex-start; gap: 16rpx;
+  padding: 24rpx 20rpx;
+  border-radius: 20rpx;
+  background: var(--clay-bg-card);
+  border: var(--clay-border-subtle);
+  margin-bottom: 12rpx;
+  transition: border-color 0.15s;
+}
+.co-addr-picker-item.active { border-color: #C0563A; background: #FDF0EB; }
+.co-addr-picker-radio {
+  width: 40rpx; height: 40rpx; border-radius: 50%;
+  border: 2rpx solid rgba(180,160,140,0.40);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 4rpx;
+}
+.co-addr-picker-item.active .co-addr-picker-radio { border-color: #C0563A; }
+.co-addr-picker-dot {
+  width: 20rpx; height: 20rpx; border-radius: 50%;
+  background: #C0563A;
+}
+.co-addr-picker-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8rpx; }
+.co-addr-picker-contact { display: flex; align-items: center; gap: 16rpx; flex-wrap: wrap; }
+.co-addr-picker-name { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
+.co-addr-picker-phone { font-size: 26rpx; color: var(--color-on-surface); }
+.co-addr-picker-detail {
+  font-size: 24rpx; color: var(--color-on-surface-variant);
+  line-height: 1.5; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.co-addr-picker-footer {
+  padding: 20rpx 24rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  border-top: var(--clay-border-subtle);
+  flex-shrink: 0;
+}
+.co-addr-manage-btn {
+  width: 100%; height: 80rpx; border-radius: 20rpx;
+  background: var(--clay-bg-elevated); border: var(--clay-border-subtle);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28rpx; color: var(--color-on-surface);
+}
+.co-addr-manage-btn:active { background: var(--clay-bg-light); }
 
 /* ═══ 输入框 ═══ */
 .co-input {
