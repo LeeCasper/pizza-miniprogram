@@ -32,11 +32,12 @@ Page({
     recipientName: '',
     recipientPhone: '',
     recipientAddress: '',
+    showAddressForm: true,
     note: '',
+    shippingFee: 10,
     paymentMethod: 'wechat',
     submitting: false,
     totalPrice: '0.00',
-    submitBtnText: '微信支付 ¥0.00',
   },
 
   onLoad(options) {
@@ -212,14 +213,14 @@ Page({
   },
 
   updateTotalPrice() {
-    const { product, quantity, paymentMethod, submitting } = this.data;
+    const { product, quantity, shippingFee } = this.data;
     const price = product ? product.price : 0;
-    const total = (price * quantity).toFixed(2);
-    const label = paymentMethod === 'balance' ? '余额支付' : '微信支付';
-    this.setData({
-      totalPrice: total,
-      submitBtnText: submitting ? '提交中…' : (label + ' ¥' + total),
-    });
+    const total = (price * quantity + shippingFee).toFixed(2);
+    this.setData({ totalPrice: total });
+  },
+
+  onAddressTap() {
+    this.setData({ showAddressForm: !this.data.showAddressForm });
   },
 
   onPaymentMethodChange(e) {
