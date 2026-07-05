@@ -313,7 +313,7 @@
             </scroll-view>
             <view class="co-addr-picker-footer">
               <view class="co-addr-manage-btn" bindtap="onManageAddresses">
-                <text>📋 管理地址</text>
+                <image class="co-addr-manage-icon" src="/images/icon-manage-address.png" mode="aspectFit"></image><text>管理地址</text>
               </view>
             </view>
           </view>

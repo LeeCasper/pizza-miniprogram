@@ -447,9 +447,10 @@
 .co-addr-manage-btn {
   width: 100%; height: 80rpx; border-radius: 20rpx;
   background: var(--clay-bg-elevated); border: var(--clay-border-subtle);
-  display: flex; align-items: center; justify-content: center;
+  display: flex; align-items: center; justify-content: center; gap: 10rpx;
   font-size: 28rpx; color: var(--color-on-surface);
 }
+.co-addr-manage-icon { width: 36rpx; height: 36rpx; }
 .co-addr-manage-btn:active { background: var(--clay-bg-light); }
 
 
