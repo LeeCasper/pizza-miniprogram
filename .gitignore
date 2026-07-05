@@ -24,6 +24,13 @@ Desktop.ini
 image.png
 stitch_data/
 
+# Design exports at repo root (copied into miniprogram/images/ as needed)
+/收货地址.png
+/运输.png
+/查看备注.png
+/支付方式.png
+/*.gif
+
 # Environment files (contain secrets)
 .env
 pizza-server/.env
