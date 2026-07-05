@@ -215,7 +215,7 @@
         <!-- ── 收货地址卡片 ── -->
         <view class="co-card co-address" bindtap="onAddressTap">
           <view class="co-addr-header">
-            <text class="co-addr-icon">📍</text>
+            <image class="co-addr-icon" src="/images/icon-address.png" mode="aspectFit"></image>
             <text class="co-addr-label">收货地址</text>
             <text class="co-addr-arrow">›</text>
           </view>
@@ -283,7 +283,7 @@
         <view class="co-card co-shipping">
           <view class="co-ship-row">
             <view class="co-ship-left">
-              <text class="co-ship-icon">🚚</text>
+              <image class="co-ship-icon" src="/images/icon-shipping.png" mode="aspectFit"></image>
               <text class="co-ship-label">配送方式</text>
             </view>
             <view class="co-ship-right">
@@ -299,7 +299,7 @@
         <!-- ── 备注 ── -->
         <view class="co-card co-notes">
           <view class="co-notes-header">
-            <text class="co-notes-icon">✏️</text>
+            <image class="co-notes-icon" src="/images/icon-notes.png" mode="aspectFit"></image>
             <text class="co-notes-label">备注</text>
           </view>
           <input class="co-input co-notes-input" placeholder="选填，请先和商家协商确认" value="{{note}}" bindinput="onNoteInput"/>
@@ -308,7 +308,7 @@
         <!-- ── 支付方式 ── -->
         <view class="co-card co-payment">
           <view class="co-pay-header">
-            <text class="co-pay-icon">💳</text>
+            <image class="co-pay-icon" src="/images/icon-payment.png" mode="aspectFit"></image>
             <text class="co-pay-title">支付方式</text>
           </view>
           <view class="co-pay-list">
@@ -316,14 +316,14 @@
               <view class="co-pay-radio">
                 <view class="co-pay-radio-dot" wx:if="{{paymentMethod === 'wechat'}}"></view>
               </view>
-              <view class="co-pay-badge co-pay-badge-wx">💚</view>
+              <image class="co-pay-badge-img" src="/images/wechat-pay.png" mode="aspectFit"></image>
               <text class="co-pay-name">微信支付</text>
             </view>
             <view class="co-pay-item {{paymentMethod === 'balance' ? 'active' : ''}}" data-method="balance" catchtap="onPaymentMethodChange">
               <view class="co-pay-radio">
                 <view class="co-pay-radio-dot" wx:if="{{paymentMethod === 'balance'}}"></view>
               </view>
-              <view class="co-pay-badge co-pay-badge-bal">💰</view>
+              <image class="co-pay-badge-img" src="/images/balance-pay.png" mode="aspectFit"></image>
               <text class="co-pay-name">余额支付</text>
             </view>
           </view>

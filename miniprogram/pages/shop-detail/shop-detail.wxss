@@ -332,7 +332,7 @@
 /* ═══ 地址卡片 ═══ */
 .co-address { display: flex; flex-direction: column; gap: 12rpx; }
 .co-addr-header { display: flex; align-items: center; gap: 8rpx; }
-.co-addr-icon { font-size: 32rpx; }
+.co-addr-icon { width: 44rpx; height: 44rpx; flex-shrink: 0; }
 .co-addr-label { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); flex: 1; }
 .co-addr-arrow { font-size: 40rpx; color: var(--color-on-surface-variant); line-height: 1; }
 .co-addr-contact { display: flex; align-items: center; gap: 16rpx; flex-wrap: wrap; }
@@ -446,7 +446,7 @@
   padding: 24rpx 28rpx;
 }
 .co-ship-left { display: flex; align-items: center; gap: 10rpx; }
-.co-ship-icon { font-size: 32rpx; }
+.co-ship-icon { width: 44rpx; height: 44rpx; flex-shrink: 0; }
 .co-ship-label { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
 .co-ship-right { display: flex; align-items: baseline; gap: 8rpx; }
 .co-ship-name { font-size: 26rpx; color: var(--color-on-surface); }
@@ -461,14 +461,14 @@
 /* ═══ 备注 ═══ */
 .co-notes { display: flex; flex-direction: column; gap: 14rpx; }
 .co-notes-header { display: flex; align-items: center; gap: 8rpx; }
-.co-notes-icon { font-size: 28rpx; }
+.co-notes-icon { width: 44rpx; height: 44rpx; flex-shrink: 0; }
 .co-notes-label { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
 .co-notes-input { background: var(--clay-bg-elevated); }
 
 /* ═══ 支付方式 ═══ */
 .co-payment { display: flex; flex-direction: column; gap: 20rpx; }
 .co-pay-header { display: flex; align-items: center; gap: 8rpx; }
-.co-pay-icon { font-size: 28rpx; }
+.co-pay-icon { width: 44rpx; height: 44rpx; flex-shrink: 0; }
 .co-pay-title { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
 .co-pay-list { display: flex; flex-direction: column; gap: 14rpx; }
 .co-pay-item {
@@ -492,13 +492,9 @@
   width: 20rpx; height: 20rpx; border-radius: 50%;
   background: #C0563A;
 }
-.co-pay-badge {
-  width: 48rpx; height: 48rpx; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
+.co-pay-badge-img {
+  width: 48rpx; height: 48rpx; flex-shrink: 0;
 }
-.co-pay-badge-wx { background: rgba(9,184,62,0.12); }
-.co-pay-badge-bal { background: rgba(22,120,255,0.12); }
 .co-pay-name { font-size: 28rpx; color: var(--color-on-surface); }
 
 /* ═══ 订单金额明细 ═══ */
