@@ -329,15 +329,44 @@
 .co-price-val { font-size: 36rpx; font-weight: var(--font-weight-bold); color: var(--color-primary); }
 .co-prod-qty { font-size: 24rpx; color: var(--color-on-surface-variant); }
 
-/* ═══ 地址卡片 ═══ */
-.co-address { display: flex; flex-direction: column; gap: 12rpx; }
-.co-addr-header { display: flex; align-items: center; gap: 8rpx; }
-.co-addr-icon { width: 44rpx; height: 44rpx; flex-shrink: 0; }
-.co-addr-label { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); flex: 1; }
-.co-addr-arrow { font-size: 40rpx; color: var(--color-on-surface-variant); line-height: 1; }
-.co-addr-contact { display: flex; align-items: center; gap: 16rpx; flex-wrap: wrap; }
-.co-addr-name { font-size: 30rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
-.co-addr-phone { font-size: 28rpx; color: var(--color-on-surface); }
+/* ═══ 一体设置卡片 ═══ */
+.co-settings { padding: 0; overflow: hidden; }
+
+/* 通用行 */
+.co-set-row {
+  display: flex; align-items: center; gap: 16rpx;
+  padding: 28rpx;
+}
+.co-set-row + .co-set-row { border-top: var(--clay-border-subtle); }
+.co-set-row:active { background: var(--clay-bg-elevated); }
+
+.co-set-icon { width: 44rpx; height: 44rpx; flex-shrink: 0; }
+.co-set-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6rpx; }
+.co-set-title { display: flex; align-items: baseline; gap: 12rpx; }
+.co-set-label { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
+.co-set-label-fixed { flex-shrink: 0; }
+.co-set-val { font-size: 26rpx; color: var(--color-on-surface); }
+.co-set-sub {
+  font-size: 24rpx; color: var(--color-on-surface-variant);
+  line-height: 1.5; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.co-set-placeholder { font-size: 28rpx; color: var(--color-on-surface-variant); }
+.co-set-arrow { font-size: 40rpx; color: var(--color-on-surface-variant); line-height: 1; flex-shrink: 0; }
+.co-set-fee { font-size: 26rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); flex-shrink: 0; }
+
+/* 备注输入 */
+.co-set-input {
+  flex: 1; height: 60rpx; padding: 0 16rpx; min-width: 0;
+  border-radius: 12rpx; background: var(--clay-bg-elevated);
+  border: var(--clay-border-subtle);
+  font-size: 26rpx; color: var(--color-on-surface);
+}
+
+/* 支付方式 section（卡片内最后一块） */
+.co-set-section { border-top: var(--clay-border-subtle); padding: 24rpx 28rpx; }
+.co-set-section-head { display: flex; align-items: center; gap: 16rpx; margin-bottom: 18rpx; }
+
+/* 地址标签 */
 .co-addr-tag {
   font-size: 20rpx; padding: 2rpx 12rpx; border-radius: 8rpx;
   background: rgba(192,86,58,0.10); color: #C0563A;
@@ -345,12 +374,6 @@
 .co-addr-tag-default {
   background: rgba(192,86,58,0.08); color: #C0563A;
 }
-.co-addr-detail {
-  font-size: 24rpx; color: var(--color-on-surface-variant);
-  line-height: 1.6;
-}
-.co-addr-empty { padding: 16rpx 0; }
-.co-addr-empty-text { font-size: 28rpx; color: var(--color-on-surface-variant); }
 
 /* ═══ 地址选择器 ═══ */
 .co-addr-picker-overlay {
@@ -429,47 +452,8 @@
 }
 .co-addr-manage-btn:active { background: var(--clay-bg-light); }
 
-/* ═══ 输入框 ═══ */
-.co-input {
-  width: 100%; height: 76rpx; padding: 0 20rpx;
-  border-radius: 16rpx;
-  background: var(--clay-bg-elevated);
-  border: var(--clay-border-subtle);
-  font-size: 26rpx; color: var(--color-on-surface);
-  box-sizing: border-box;
-}
 
-/* ═══ 配送方式 ═══ */
-.co-shipping { padding: 0; overflow: hidden; }
-.co-ship-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 24rpx 28rpx;
-}
-.co-ship-left { display: flex; align-items: center; gap: 10rpx; }
-.co-ship-icon { width: 44rpx; height: 44rpx; flex-shrink: 0; }
-.co-ship-label { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
-.co-ship-right { display: flex; align-items: baseline; gap: 8rpx; }
-.co-ship-name { font-size: 26rpx; color: var(--color-on-surface); }
-.co-ship-fee { font-size: 26rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
-.co-ship-estimate {
-  padding: 12rpx 28rpx;
-  background: var(--clay-bg-elevated);
-  border-top: var(--clay-border-subtle);
-}
-.co-ship-est-text { font-size: 22rpx; color: var(--color-on-surface-variant); }
-
-/* ═══ 备注 ═══ */
-.co-notes { display: flex; flex-direction: column; gap: 14rpx; }
-.co-notes-header { display: flex; align-items: center; gap: 8rpx; }
-.co-notes-icon { width: 44rpx; height: 44rpx; flex-shrink: 0; }
-.co-notes-label { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
-.co-notes-input { background: var(--clay-bg-elevated); }
-
-/* ═══ 支付方式 ═══ */
-.co-payment { display: flex; flex-direction: column; gap: 20rpx; }
-.co-pay-header { display: flex; align-items: center; gap: 8rpx; }
-.co-pay-icon { width: 44rpx; height: 44rpx; flex-shrink: 0; }
-.co-pay-title { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
+/* 支付列表 */
 .co-pay-list { display: flex; flex-direction: column; gap: 14rpx; }
 .co-pay-item {
   display: flex; align-items: center; gap: 16rpx;
