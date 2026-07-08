@@ -26,7 +26,7 @@
         </view>
       </view>
       <!-- 装饰插图 -->
-      <text class="pts-balance-decor">🎁</text>
+      <image class="pts-balance-decor" src="/images/points-decor.png" mode="aspectFit"></image>
     </view>
 
     <!-- ═══ 分类导航 ═══ -->
