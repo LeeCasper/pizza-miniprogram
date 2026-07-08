@@ -9,7 +9,7 @@
   </view>
   <view class="shop-closed">
     <image class="shop-closed-img" src="/images/shop-closed.gif" mode="widthFix"></image>
-    <text class="shop-closed-title">正在开发中</text>
+    <text class="shop-closed-title">正在开发中<text class="shop-closed-cursor">|</text></text>
   </view>
 </view>
 

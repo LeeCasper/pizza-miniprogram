@@ -533,7 +533,10 @@
 .shop-closed-img { width: 300rpx; margin-bottom: 20rpx; }
 .shop-closed-title {
   font-size: 36rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface);
-  animation: shop-closed-pulse 2s ease-in-out infinite;
+}
+.shop-closed-cursor {
+  font-weight: 400; color: var(--color-primary);
+  animation: shop-cursor-blink 1s step-end infinite;
 }
 
 .shop-scroll { overflow-x: hidden; box-sizing: border-box; }

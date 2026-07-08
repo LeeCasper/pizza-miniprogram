@@ -306,8 +306,8 @@ swiper, swiper-item {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* 商城停用标题呼吸动画 */
-@keyframes shop-closed-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.96); }
+/* 商城停用标题打字机光标闪烁 */
+@keyframes shop-cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
