@@ -381,14 +381,6 @@
 }
 
 /* 权益图标背景色 */
-.benefit-icon-discount { background: #fcead7; }
-.benefit-icon-points   { background: #fdf2d7; }
-.benefit-icon-cashback { background: #e6f0fa; }
-.benefit-icon-birthday { background: #e8f2e9; }
-.benefit-icon-coupon   { background: #f4e6ec; }
-.benefit-icon-shipping { background: #fae8db; }
-.benefit-icon-service  { background: #e6f3f5; }
-.benefit-icon-new      { background: #f0e6fa; }
 
 /* ==============================
    等级规则卡片
