@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { h, ref, onMounted } from 'vue';
 import {
   NButton, NCard, NDataTable, NForm, NFormItem, NInput, NInputNumber,
-  NModal, NPopconfirm, NSpace, NSwitch, useMessage,
+  NModal, NPopconfirm, NSpace, NSwitch, NTag, useMessage,
 } from 'naive-ui';
-import ImageUpload from '@/components/common/ImageUpload.vue';
 import type { DataTableColumns } from 'naive-ui';
+import ImageUpload from '@/components/common/ImageUpload.vue';
 import {
   fetchPointsCategories, fetchCreatePointsCategory,
   fetchUpdatePointsCategory, fetchDeletePointsCategory,
@@ -18,38 +18,42 @@ const message = useMessage();
 const loading = ref(false);
 const categories = ref<PointsCategory[]>([]);
 
-// Modal for add/edit
 const modalOpen = ref(false);
 const modalTitle = ref('新建分类');
 const editingKey = ref<string | null>(null);
 const form = ref({ key: '', name: '', icon: '', sortOrder: 0, isActive: 1 });
 
 const columns: DataTableColumns<PointsCategory> = [
-  { title: '标识', key: 'key', width: 140, ellipsis: { tooltip: true } },
-  { title: '名称', key: 'name', width: 140 },
-  { title: '图标', key: 'icon', width: 120, ellipsis: { tooltip: true } },
-  { title: '排序', key: 'sort_order', width: 80 },
+  { title: '标识', key: 'key', width: 120, ellipsis: { tooltip: true } },
   {
-    title: '启用', key: 'is_active', width: 80,
-    render: (row) => row.is_active ? '是' : '否',
+    title: '图标', key: 'icon', width: 80,
+    render(row) {
+      return row.icon ? h('img', { src: row.icon, style: 'width:36px;height:36px;border-radius:8px;object-fit:cover' }) : '';
+    },
+  },
+  { title: '名称', key: 'name', width: 120 },
+  { title: '排序', key: 'sort_order', width: 70 },
+  {
+    title: '启用', key: 'is_active', width: 70,
+    render(row) {
+      return h(NTag, { type: row.is_active ? 'success' : 'default', size: 'small' }, { default: () => row.is_active ? '是' : '否' });
+    },
   },
   {
-    title: '操作', key: 'actions', width: 180,
-    render: (row) => h(NSpace, null, {
-      default: () => [
-        h(NButton, { size: 'tiny', onClick: () => openEdit(row) }, { default: () => '编辑' }),
-        h(NPopconfirm, { onPositiveClick: () => handleDelete(row.key) }, {
-          trigger: () => h(NButton, { size: 'tiny', type: 'error' }, { default: () => '删除' }),
-          default: () => '确定删除此分类？',
-        }),
-      ],
-    }),
+    title: '操作', key: 'actions', width: 160,
+    render(row) {
+      return h(NSpace, null, {
+        default: () => [
+          h(NButton, { size: 'tiny', quaternary: true, onClick: () => openEdit(row) }, { default: () => '编辑' }),
+          h(NPopconfirm, { onPositiveClick: () => handleDelete(row.key) }, {
+            trigger: () => h(NButton, { size: 'tiny', quaternary: true, type: 'error' }, { default: () => '删除' }),
+            default: () => '确定删除此分类？',
+          }),
+        ],
+      });
+    },
   },
-] as any;
-
-function h(tag: any, props: any, children: any): any {
-  return { tag, props, children };
-}
+];
 
 onMounted(() => fetchData());
 
