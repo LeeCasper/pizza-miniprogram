@@ -26,7 +26,6 @@
 }
 .shop-closed-img { width: 300rpx; margin-bottom: 40rpx; }
 .shop-closed-title { font-size: 36rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); margin-bottom: 20rpx; }
-.shop-closed-notice { font-size: 28rpx; color: var(--color-on-surface-variant); text-align: center; line-height: 1.6; }
 
 /* ── 滚动区 ── */
 .shop-scroll { overflow-x: hidden; box-sizing: border-box; }

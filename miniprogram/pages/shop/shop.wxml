@@ -7,8 +7,7 @@
   <!-- 商城停用提示 -->
   <view class="shop-closed" wx:if="{{!shopEnabled && !loading}}">
     <image class="shop-closed-img" src="/images/shop-closed.gif" mode="widthFix"></image>
-    <text class="shop-closed-title">商城维护中</text>
-    <text class="shop-closed-notice">{{shopNotice || '会员商城暂时关闭，敬请期待'}}</text>
+    <text class="shop-closed-title">正在开发中</text>
   </view>
 
   <scroll-view scroll-y class="shop-scroll" enhanced show-scrollbar="{{false}}" style="height: {{scrollViewHeight}}px;" wx:if="{{shopEnabled}}">

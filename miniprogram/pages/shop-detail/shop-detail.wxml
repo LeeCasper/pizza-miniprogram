@@ -9,8 +9,7 @@
   </view>
   <view class="shop-closed">
     <image class="shop-closed-img" src="/images/shop-closed.gif" mode="widthFix"></image>
-    <text class="shop-closed-title">商城维护中</text>
-    <text class="shop-closed-notice">{{shopNotice || '会员商城暂时关闭，敬请期待'}}</text>
+    <text class="shop-closed-title">正在开发中</text>
   </view>
 </view>
 
