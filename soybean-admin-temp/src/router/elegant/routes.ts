@@ -317,6 +317,15 @@ export const generatedRoutes: GeneratedRoute[] = [
     },
     children: [
       {
+        name: 'points_categories',
+        path: '/points/categories',
+        component: 'view.points_categories',
+        meta: {
+          title: 'points_categories',
+          i18nKey: 'route.points_categories'
+        }
+      },
+      {
         name: 'points_form',
         path: '/points/form',
         component: 'view.points_form',

@@ -268,6 +268,7 @@ const local: App.I18n.Schema = {
     users: '用户管理',
     users_list: '用户列表',
     points: '积分商城',
+    points_categories: '积分分类管理',
     points_list: '积分商品列表',
     points_create: '新建积分商品',
     points_edit: '编辑积分商品',

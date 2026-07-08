@@ -98,6 +98,12 @@ router.put('/member-tiers/:id/toggle', ctrl.toggleMemberTier);
 router.get('/users', ctrl.listUsers);
 router.put('/users/:id', ctrl.updateUser);
 
+// Points categories
+router.get('/points/categories', ctrl.listPointsCategories);
+router.post('/points/categories', ctrl.createPointsCategory);
+router.put('/points/categories/:key', ctrl.updatePointsCategory);
+router.delete('/points/categories/:key', ctrl.deletePointsCategory);
+
 // Points products
 router.get('/points/products', ctrl.listPointsProducts);
 router.get('/points/products/:id', ctrl.getPointsProduct);

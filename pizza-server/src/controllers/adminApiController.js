@@ -542,6 +542,67 @@ const adminApiController = {
     }
   },
 
+  // ── Points Categories CRUD ──────────────────────────
+
+  async listPointsCategories(req, res) {
+    try {
+      const cats = await (require('../services/pointsCategoryService')).adminList();
+      return res.json({ code: 0, data: cats });
+    } catch (err) {
+      log.error({ err }, 'ListPointsCategories error');
+      return res.status(500).json({ code: 500, message: '获取分类失败' });
+    }
+  },
+
+  async createPointsCategory(req, res) {
+    try {
+      const { key, name, icon, sortOrder, isActive } = req.body;
+      if (!key || !/^[a-z0-9_]+$/.test(key)) {
+        return res.status(400).json({ code: 400, message: '分类标识只能包含小写字母、数字和下划线' });
+      }
+      if (!name || !name.trim()) {
+        return res.status(400).json({ code: 400, message: '分类名称不能为空' });
+      }
+      const svc = require('../services/pointsCategoryService');
+      const existing = await svc.findByKey(key);
+      if (existing) {
+        return res.status(400).json({ code: 400, message: '该分类标识已存在' });
+      }
+      const data = await svc.create({ key, name: name.trim(), icon: icon || null, sortOrder, isActive });
+      return res.status(201).json({ code: 0, data });
+    } catch (err) {
+      log.error({ err }, 'CreatePointsCategory error');
+      return res.status(500).json({ code: 500, message: '创建分类失败' });
+    }
+  },
+
+  async updatePointsCategory(req, res) {
+    try {
+      const svc = require('../services/pointsCategoryService');
+      const data = await svc.update(req.params.key, req.body);
+      if (!data) return res.status(404).json({ code: 404, message: '分类不存在' });
+      return res.json({ code: 0, data });
+    } catch (err) {
+      log.error({ err }, 'UpdatePointsCategory error');
+      return res.status(500).json({ code: 500, message: '更新分类失败' });
+    }
+  },
+
+  async deletePointsCategory(req, res) {
+    try {
+      const svc = require('../services/pointsCategoryService');
+      const count = await svc.countProducts(req.params.key);
+      if (count > 0) {
+        return res.status(400).json({ code: 400, message: `该分类下还有 ${count} 个商品，无法删除` });
+      }
+      await svc.remove(req.params.key);
+      return res.json({ code: 0, message: '删除成功' });
+    } catch (err) {
+      log.error({ err }, 'DeletePointsCategory error');
+      return res.status(500).json({ code: 500, message: '删除分类失败' });
+    }
+  },
+
   // ── Points Products CRUD ────────────────────────────
 
   /**
@@ -580,6 +641,7 @@ const adminApiController = {
     try {
       const b = req.body;
       const id = await pointsService.createProduct({
+        pointsCategoryKey: b.pointsCategoryKey || null,
         name: b.name,
         desc: b.desc,
         detailDesc: b.detailDesc,
@@ -626,6 +688,7 @@ const adminApiController = {
       if (b.stock !== undefined) updateData.stock = parseInt(b.stock);
       if (b.isActive !== undefined) updateData.is_active = b.isActive ? 1 : 0;
       if (b.highlights !== undefined) updateData.highlights = Array.isArray(b.highlights) ? b.highlights : [];
+      if (b.pointsCategoryKey !== undefined) updateData.points_category_key = b.pointsCategoryKey || null;
       if (b.couponMinSpend !== undefined) updateData.coupon_min_spend = parseFloat(b.couponMinSpend);
       if (b.couponValidDays !== undefined) updateData.coupon_valid_days = parseInt(b.couponValidDays);
 

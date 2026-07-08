@@ -3,13 +3,15 @@ const { api, fixImageUrl } = require('../../utils/api');
 const app = getApp();
 const { getSimpleTopBar } = require('../../utils/layout');
 
-// Category definitions (matches Stitch design)
-const CATEGORIES = [
+// Fallback categories (used when API unavailable)
+const FALLBACK_CATEGORIES = [
   { key: 'all', name: '全部商品', emoji: '🎁' },
   { key: 'daily', name: '生活日用', emoji: '🛍️' },
   { key: 'coupon', name: '卡券权益', emoji: '🎫' },
   { key: 'goods', name: '优选好物', emoji: '🍳' },
 ];
+
+const CAT_EMOJI_MAP = { all: '🎁', daily: '🛍️', coupon: '🎫', goods: '🍳' };
 
 Page({
   data: {
@@ -17,7 +19,7 @@ Page({
     topBarTotalHeight: 80,
     products: [],
     filteredProducts: [],
-    categories: CATEGORIES,
+    categories: FALLBACK_CATEGORIES,
     activeCat: 'all',
     userPoints: 0,
     detailProduct: null,
@@ -30,7 +32,25 @@ Page({
       ...getSimpleTopBar(),
       userPoints: app.globalData.userInfo.points || 0,
     });
+    this.fetchCategories();
     this.fetchProducts();
+  },
+
+  fetchCategories() {
+    api.publicGet('/config/points-categories').then(res => {
+      if (res.code === 0 && res.data && res.data.length > 0) {
+        const cats = [
+          { key: 'all', name: '全部商品', emoji: '🎁', icon: '' },
+          ...res.data.map(c => ({
+            key: c.key,
+            name: c.name,
+            icon: c.icon || '',
+            emoji: CAT_EMOJI_MAP[c.key] || '📦',
+          })),
+        ];
+        this.setData({ categories: cats });
+      }
+    }).catch(() => {});
   },
 
   fetchProducts() {

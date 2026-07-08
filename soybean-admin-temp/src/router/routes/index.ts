@@ -541,6 +541,15 @@ const customRoutes: CustomRoute[] = [
         },
       },
       {
+        name: 'points_categories',
+        path: '/points/categories',
+        component: 'view.points_categories',
+        meta: {
+          title: '积分分类管理',
+          i18nKey: 'route.points_categories',
+        },
+      },
+      {
         name: 'points_edit',
         path: '/points/:id/edit',
         component: 'view.points_form',

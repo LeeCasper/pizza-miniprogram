@@ -28,6 +28,17 @@ router.get('/beian', (req, res) => {
   });
 });
 
+// Points mall categories
+router.get('/points-categories', async (req, res) => {
+  try {
+    const svc = require('../services/pointsCategoryService');
+    const list = await svc.findAll();
+    res.json({ code: 0, data: list });
+  } catch (err) {
+    res.status(500).json({ code: 500, message: '获取失败' });
+  }
+});
+
 router.get('/default-avatars', async (req, res) => {
   try {
     const list = await defaultAvatarService.list();

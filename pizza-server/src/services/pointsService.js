@@ -48,11 +48,11 @@ const pointsService = {
 
   async createProduct(data) {
     const [result] = await pool.query(
-      `INSERT INTO points_products (name, \`desc\`, detail_desc, points, image, stock, tag, highlights,
+      `INSERT INTO points_products (points_category_key, name, \`desc\`, detail_desc, points, image, stock, tag, highlights,
         redeem_type, coupon_name, coupon_category, coupon_value, coupon_discount_type,
         coupon_discount_value, coupon_min_spend, coupon_valid_days, use_tip)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [data.name, data.desc || '', data.detailDesc || '', data.points, data.image || '', data.stock ?? -1,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [data.pointsCategoryKey || null, data.name, data.desc || '', data.detailDesc || '', data.points, data.image || '', data.stock ?? -1,
        data.tag || '', JSON.stringify(data.highlights || []),
        data.redeemType || 'coupon', data.couponName || '', data.couponCategory || 'redeem',
        data.couponValue || '', data.couponDiscountType || 'free_redeem',
@@ -63,7 +63,7 @@ const pointsService = {
   },
 
   async updateProduct(id, data) {
-    const fields = ['name', 'desc', 'detail_desc', 'points', 'image', 'stock', 'tag', 'is_active',
+    const fields = ['points_category_key', 'name', 'desc', 'detail_desc', 'points', 'image', 'stock', 'tag', 'is_active',
       'redeem_type', 'coupon_name', 'coupon_category', 'coupon_value', 'coupon_discount_type',
       'coupon_discount_value', 'coupon_min_spend', 'coupon_valid_days', 'use_tip'];
     const sets = [];
@@ -95,6 +95,7 @@ const pointsService = {
 function formatProduct(row) {
   return {
     id: row.id,
+    pointsCategoryKey: row.points_category_key || null,
     name: row.name,
     desc: row.desc,
     detailDesc: row.detail_desc,

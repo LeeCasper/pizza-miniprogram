@@ -76,6 +76,7 @@ def deploy_backend():
         'pizza-server/db/migrate_drop_tier_colors.sql',
         'pizza-server/db/migrate_drop_accent_color.sql',
         'pizza-server/db/migrate_detail_images.sql',
+        'pizza-server/db/migrate_points_categories.sql',
     ]
     for m in migrations:
         stdin, stdout, stderr = ssh.exec_command(
