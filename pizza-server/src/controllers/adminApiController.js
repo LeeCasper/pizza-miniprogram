@@ -705,11 +705,11 @@ const adminApiController = {
    */
   async deletePointsProduct(req, res) {
     try {
-      await pointsService.softDelete(req.params.id);
-      return res.json({ code: 0, message: '积分商品已下架' });
+      await pointsService.hardDelete(req.params.id);
+      return res.json({ code: 0, message: '积分商品已删除' });
     } catch (err) {
       log.error({ err }, 'DeletePointsProduct error');
-      return res.status(500).json({ code: 500, message: '下架积分商品失败' });
+      return res.status(500).json({ code: 500, message: '删除积分商品失败' });
     }
   },
 

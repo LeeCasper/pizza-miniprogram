@@ -83,7 +83,7 @@ async function handleDelete(id: number, name: string) {
     onPositiveClick: async () => {
       const { error } = await fetchDeletePointsProduct(id);
       if (!error) {
-        window.$message?.success('已下架');
+        window.$message?.success('已删除');
         loadProducts();
       }
     },

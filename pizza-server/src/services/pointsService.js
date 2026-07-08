@@ -87,6 +87,10 @@ const pointsService = {
     await pool.query('UPDATE points_products SET is_active = 0 WHERE id = ?', [id]);
   },
 
+  async hardDelete(id) {
+    await pool.query('DELETE FROM points_products WHERE id = ?', [id]);
+  },
+
   async toggle(id) {
     await pool.query('UPDATE points_products SET is_active = IF(is_active, 0, 1) WHERE id = ?', [id]);
   },
