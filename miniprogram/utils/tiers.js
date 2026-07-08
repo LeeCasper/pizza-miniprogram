@@ -86,41 +86,41 @@ function buildBenefitItems(tier) {
   // 1. 折扣优惠
   if (tier.discountRate < 1) {
     const discountNum = (tier.discountRate * 10).toFixed(1);
-    items.push({ icon: '🏷️', iconBg: 'benefit-icon-discount', label: '折扣优惠', desc: '消费享专属折扣', value: discountNum + '折' });
+    items.push({ icon: '/images/icon-discount.png', iconType: 'image', iconBg: 'benefit-icon-discount', label: '折扣优惠', desc: '消费享专属折扣', value: discountNum + '折' });
   }
 
   // 2. 积分倍率
   if (tier.pointsRewardRate > 1) {
-    items.push({ icon: '⭐', iconBg: 'benefit-icon-points', label: '积分倍率', desc: '消费积分获取倍率', value: tier.pointsRewardRate.toFixed(1) + '倍' });
+    items.push({ icon: '/images/icon-points-rate.png', iconType: 'image', iconBg: 'benefit-icon-points', label: '积分倍率', desc: '消费积分获取倍率', value: tier.pointsRewardRate.toFixed(1) + '倍' });
   } else {
-    items.push({ icon: '⭐', iconBg: 'benefit-icon-points', label: '积分倍率', desc: '消费积分获取倍率', value: '基础' });
+    items.push({ icon: '/images/icon-points-rate.png', iconType: 'image', iconBg: 'benefit-icon-points', label: '积分倍率', desc: '消费积分获取倍率', value: '基础' });
   }
 
   // 3. 消费返积分
   const cashbackRate = tier.pointsRewardRate;
-  items.push({ icon: '💰', iconBg: 'benefit-icon-cashback', label: '消费返积分', desc: '每消费1元返积分', value: cashbackRate.toFixed(0) + '积分' });
+  items.push({ icon: '💰', iconType: 'emoji', iconBg: 'benefit-icon-cashback', label: '消费返积分', desc: '每消费1元返积分', value: cashbackRate.toFixed(0) + '积分' });
 
   // 4. 生日礼遇
-  items.push({ icon: '🎂', iconBg: 'benefit-icon-birthday', label: '生日礼遇', desc: '生日当月专属福利', value: tier.birthdayGift ? '专属' : '无' });
+  items.push({ icon: '/images/icon-birthday.png', iconType: 'image', iconBg: 'benefit-icon-birthday', label: '生日礼遇', desc: '生日当月专属福利', value: tier.birthdayGift ? '专属' : '无' });
 
   // 5. 升级礼券
   if (tier.couponValue > 0) {
-    items.push({ icon: '🎫', iconBg: 'benefit-icon-coupon', label: '专享优惠券', desc: '升级即送优惠券', value: '¥' + tier.couponValue });
+    items.push({ icon: '🎫', iconType: 'emoji', iconBg: 'benefit-icon-coupon', label: '专享优惠券', desc: '升级即送优惠券', value: '¥' + tier.couponValue });
   }
 
   // 6. 运费优惠 (rose_gold+)
   if (tier.levelIndex >= 3) {
-    items.push({ icon: '🚚', iconBg: 'benefit-icon-shipping', label: '运费优惠', desc: tier.levelIndex >= 4 ? '免配送费' : '运费减免', value: tier.levelIndex >= 4 ? '免费' : '减半' });
+    items.push({ icon: '/images/icon-shipping-fee.png', iconType: 'image', iconBg: 'benefit-icon-shipping', label: '运费优惠', desc: tier.levelIndex >= 4 ? '免配送费' : '运费减免', value: tier.levelIndex >= 4 ? '免费' : '减半' });
   }
 
   // 7. 专属客服 (platinum+)
   if (tier.levelIndex >= 4) {
-    items.push({ icon: '🎧', iconBg: 'benefit-icon-service', label: '专属客服', desc: '优先客服响应', value: '优先' });
+    items.push({ icon: '🎧', iconType: 'emoji', iconBg: 'benefit-icon-service', label: '专属客服', desc: '优先客服响应', value: '优先' });
   }
 
   // 8. 新品优先 (gold+)
   if (tier.levelIndex >= 2) {
-    items.push({ icon: '🆕', iconBg: 'benefit-icon-new', label: '新品优先购', desc: '新品优先购买权', value: '优先' });
+    items.push({ icon: '/images/icon-new.png', iconType: 'image', iconBg: 'benefit-icon-new', label: '新品优先购', desc: '新品优先购买权', value: '优先' });
   }
 
   return items;

@@ -68,7 +68,8 @@
       <view class="benefits-grid" wx:if="{{selectedTier}}">
         <view class="benefit-grid-item" wx:for="{{selectedTier.benefitItems}}" wx:key="label" wx:for-item="b">
           <view class="benefit-grid-icon {{b.iconBg}}">
-            <text class="benefit-grid-emoji">{{b.icon}}</text>
+            <image wx:if="{{b.iconType === 'image'}}" class="benefit-grid-img" src="{{b.icon}}" mode="aspectFit"></image>
+            <text wx:else class="benefit-grid-emoji">{{b.icon}}</text>
           </view>
           <view class="benefit-grid-info">
             <text class="benefit-grid-label">{{b.label}}</text>

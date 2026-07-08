@@ -349,6 +349,7 @@
 .benefit-grid-emoji {
   font-size: 30rpx;
 }
+.benefit-grid-img { width: 40rpx; height: 40rpx; }
 
 .benefit-grid-info {
   flex: 1;
