@@ -1,5 +1,13 @@
 <!-- 商城页 — 会员商城（黏土风；与 pages/shop 同步。商品不入购物车，可收藏，点卡片进详情） -->
-<scroll-view scroll-y class="shop-scroll" enhanced show-scrollbar="{{false}}" style="height: {{scrollViewHeight}}px;">
+
+<!-- 商城停用提示 -->
+<view class="shop-closed" wx:if="{{!shopEnabled}}">
+  <image class="shop-closed-img" src="/images/empty-shop.png" mode="widthFix"></image>
+  <text class="shop-closed-title">商城维护中</text>
+  <text class="shop-closed-notice">{{shopNotice || '会员商城暂时关闭，敬请期待'}}</text>
+</view>
+
+<scroll-view scroll-y class="shop-scroll" enhanced show-scrollbar="{{false}}" style="height: {{scrollViewHeight}}px;" wx:if="{{shopEnabled}}">
   <view class="shop-scroll-inner">
     <!-- 顶部 Hero（促销 Banner） -->
     <view class="shop-hero" wx:if="{{shopBanners.length > 0}}">

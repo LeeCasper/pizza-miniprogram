@@ -324,11 +324,13 @@ const systemConfigService = {
         orderCancelMinutes: map.biz_order_cancel_minutes || '',
         unpaidTimeoutMinutes: map.biz_order_unpaid_timeout_minutes || '',
         storeName: map.biz_order_store_name || '',
+        shopEnabled: map.biz_shop_enabled || '',
+        shopNotice: map.biz_shop_notice || '',
         icpBeian: map.biz_icp_beian || '',
         gonganBeian: map.biz_gongan_beian || '',
       };
     } catch (_) {
-      return { orderCancelMinutes: '', unpaidTimeoutMinutes: '', storeName: '', icpBeian: '', gonganBeian: '' };
+      return { orderCancelMinutes: '', unpaidTimeoutMinutes: '', storeName: '', shopEnabled: '', shopNotice: '', icpBeian: '', gonganBeian: '' };
     }
   },
 
@@ -341,6 +343,8 @@ const systemConfigService = {
       orderCancelMinutes: 'biz_order_cancel_minutes',
       unpaidTimeoutMinutes: 'biz_order_unpaid_timeout_minutes',
       storeName: 'biz_order_store_name',
+      shopEnabled: 'biz_shop_enabled',
+      shopNotice: 'biz_shop_notice',
       icpBeian: 'biz_icp_beian',
       gonganBeian: 'biz_gongan_beian',
     };
@@ -377,6 +381,8 @@ const systemConfigService = {
       if (dbConfig.orderCancelMinutes !== '') config.business.orderCancelMinutes = parseInt(dbConfig.orderCancelMinutes, 10) || 1;
       if (dbConfig.unpaidTimeoutMinutes !== '') config.business.unpaidTimeoutMinutes = parseInt(dbConfig.unpaidTimeoutMinutes, 10) || 30;
       if (dbConfig.storeName) config.business.storeName = dbConfig.storeName;
+      if (dbConfig.shopEnabled !== '') config.business.shopEnabled = dbConfig.shopEnabled === '0' ? false : (dbConfig.shopEnabled === 'false' ? false : true);
+      if (dbConfig.shopNotice !== '') config.business.shopNotice = dbConfig.shopNotice;
       if (dbConfig.icpBeian !== '') config.business.icpBeian = dbConfig.icpBeian;
       if (dbConfig.gonganBeian !== '') config.business.gonganBeian = dbConfig.gonganBeian;
     }).catch(err => {

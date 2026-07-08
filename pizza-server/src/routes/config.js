@@ -3,6 +3,17 @@ const router = express.Router();
 const config = require('../config');
 const defaultAvatarService = require('../services/defaultAvatarService');
 
+// Shop status + custom notice (for miniprogram gate)
+router.get('/shop', (req, res) => {
+  res.json({
+    code: 0,
+    data: {
+      enabled: config.business.shopEnabled !== false,
+      notice: config.business.shopNotice || '',
+    },
+  });
+});
+
 router.get('/map', (req, res) => {
   res.json({ code: 0, data: { tencentKey: config.map.tencentKey || '' } });
 });

@@ -1,4 +1,19 @@
 <!-- pages/shop-detail/shop-detail.wxml — 商品详情（Stitch 设计稿 1:1 还原） -->
+
+<!-- 商城停用提示 -->
+<view class="sd-page" wx:if="{{!shopEnabled && !loading}}">
+  <view class="sd-top-bar" style="padding-top: {{statusBarHeight}}px;">
+    <view class="sd-back-btn" bindtap="onBack"><text class="sd-back-icon">‹</text></view>
+    <text class="sd-top-title">商品详情</text>
+    <view class="sd-back-btn sd-back-placeholder"></view>
+  </view>
+  <view class="shop-closed">
+    <image class="shop-closed-img" src="/images/empty-shop.png" mode="widthFix"></image>
+    <text class="shop-closed-title">商城维护中</text>
+    <text class="shop-closed-notice">{{shopNotice || '会员商城暂时关闭，敬请期待'}}</text>
+  </view>
+</view>
+
 <view class="sd-page" wx:if="{{product}}">
 
   <!-- ═══ 顶部导航栏（固定 · 黏土风，与 shop-orders 一致） ═══ -->

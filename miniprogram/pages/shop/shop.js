@@ -13,6 +13,8 @@ Page({
     statusBarHeight: 44,
     topBarTotalHeight: 80,
     scrollViewHeight: 0,
+    shopEnabled: true,
+    shopNotice: '',
     shopBanners: [],
     shopCategories: [],
     shopActiveCat: 'all',
@@ -26,7 +28,7 @@ Page({
     const win = wx.getWindowInfo();
     const rpx = win.windowWidth / 750;
     this.setData(layout);
-    this.fetchShopData();
+    this.checkShopStatus();
   },
 
   onShow() {
@@ -34,8 +36,25 @@ Page({
     if (tabBar && tabBar.data.selected !== 2) {
       tabBar.setData({ selected: 2 });
     }
-    // 已加载过则刷新收藏态（从详情页返回时）
-    if (this.data.shopProducts.length) this.fetchShopData();
+    if (this.data.shopEnabled && this.data.shopProducts.length) this.fetchShopData();
+  },
+
+  checkShopStatus() {
+    api.publicGet('/config/shop').then(res => {
+      if (res.code === 0) {
+        const enabled = res.data.enabled !== false;
+        this.setData({
+          shopEnabled: enabled,
+          shopNotice: res.data.notice || '会员商城暂时关闭，敬请期待',
+        });
+        if (enabled) this.fetchShopData();
+        else this.setData({ loading: false });
+      } else {
+        this.fetchShopData();
+      }
+    }).catch(() => {
+      this.fetchShopData();
+    });
   },
 
   fetchShopData() {

@@ -66,6 +66,8 @@ const config = {
     orderCancelMinutes: 1,
     unpaidTimeoutMinutes: 30,
     storeName: '爱家店',
+    shopEnabled: true,
+    shopNotice: '',
     icpBeian: '',
     gonganBeian: '',
   },

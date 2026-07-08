@@ -27,6 +27,9 @@ Page({
     // Tab 切换
     activeTab: 'detail', // detail | ingredients | reviews
 
+    shopEnabled: true,
+    shopNotice: '',
+
     // 结账抽屉
     checkoutOpen: false,
     addresses: [],
@@ -59,7 +62,7 @@ Page({
       return;
     }
     this.setData({ productId: id });
-    this.fetchDetail();
+    this.checkShopStatus();
     this.fetchAddresses();
   },
 
@@ -68,6 +71,24 @@ Page({
     if (this.data.productId) {
       this.fetchAddresses();
     }
+  },
+
+  checkShopStatus() {
+    api.publicGet('/config/shop').then(res => {
+      if (res.code === 0) {
+        const enabled = res.data.enabled !== false;
+        this.setData({
+          shopEnabled: enabled,
+          shopNotice: res.data.notice || '会员商城暂时关闭，敬请期待',
+        });
+        if (enabled) this.fetchDetail();
+        else this.setData({ loading: false });
+      } else {
+        this.fetchDetail();
+      }
+    }).catch(() => {
+      this.fetchDetail();
+    });
   },
 
   fetchDetail() {

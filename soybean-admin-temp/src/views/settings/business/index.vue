@@ -7,6 +7,7 @@ import {
   NFormItem,
   NInput,
   NInputNumber,
+  NSwitch,
   useMessage,
 } from 'naive-ui';
 import { fetchBusinessSettings, fetchUpdateBusinessSettings } from '@/service/api';
@@ -21,6 +22,8 @@ const form = ref({
   orderCancelMinutes: 1,
   unpaidTimeoutMinutes: 30,
   storeName: '',
+  shopEnabled: true,
+  shopNotice: '',
   icpBeian: '',
   gonganBeian: '',
 });
@@ -32,6 +35,8 @@ onMounted(async () => {
     form.value.orderCancelMinutes = data.orderCancelMinutes ?? 1;
     form.value.unpaidTimeoutMinutes = data.unpaidTimeoutMinutes ?? 30;
     form.value.storeName = data.storeName || '';
+    form.value.shopEnabled = data.shopEnabled !== false;
+    form.value.shopNotice = data.shopNotice || '';
     form.value.icpBeian = data.icpBeian || '';
     form.value.gonganBeian = data.gonganBeian || '';
   }
@@ -45,6 +50,8 @@ async function handleSave() {
     orderCancelMinutes: form.value.orderCancelMinutes,
     unpaidTimeoutMinutes: form.value.unpaidTimeoutMinutes,
     storeName: form.value.storeName,
+    shopEnabled: form.value.shopEnabled,
+    shopNotice: form.value.shopNotice,
     icpBeian: form.value.icpBeian,
     gonganBeian: form.value.gonganBeian,
   };
@@ -94,6 +101,23 @@ async function handleSave() {
         <NInput v-model:value="form.storeName" placeholder="订单中显示的门店名" />
       </NFormItem>
 
+      <NFormItem label="会员商城开关">
+        <NSwitch :value="form.shopEnabled" @update:value="(v: boolean) => (form.shopEnabled = v)" />
+        <span style="margin-left: 12px; color: #999; font-size: 13px;">
+          {{ form.shopEnabled ? '已开启 — 用户可正常访问会员商城' : '已关闭 — 用户将看到停用提示' }}
+        </span>
+      </NFormItem>
+
+      <NFormItem label="商城停用提示语">
+        <NInput
+          v-model:value="form.shopNotice"
+          placeholder="会员商城暂时关闭，敬请期待…"
+        />
+        <div style="color: #999; font-size: 12px; margin-top: 4px;">
+          关闭商城开关后，小程序端将展示此提示语。留空则显示默认提示。
+        </div>
+      </NFormItem>
+
       <NFormItem label="ICP 备案号">
         <NInput v-model:value="form.icpBeian" placeholder="例如：沪ICP备2024XXXXXX号-1" />
       </NFormItem>
@@ -109,6 +133,10 @@ async function handleSave() {
           <span>· 未支付超时：超过此时间的未支付订单将自动取消并释放库存和优惠券。</span>
           <br />
           <span>· 门店名称：用于订单小票、通知等场景中显示的门店名称。</span>
+          <br />
+          <span>· 会员商城开关：关闭后小程序端商城 tab 和商城页面将显示停用提示，用户无法浏览和购买商品。</span>
+          <br />
+          <span>· 商城停用提示语：自定义关闭时的提示文字，支持修改。</span>
           <br />
           <span>· ICP 备案号和公安备案号：填写后将在管理后台登录页底部展示。留空则不展示对应行。</span>
         </div>

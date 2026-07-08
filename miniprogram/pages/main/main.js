@@ -49,6 +49,8 @@ Page({
     selectedPlan: 'monthly',
     memberOverlayOpen: false,
     shopBanners: [], shopCategories: [],
+    shopEnabled: true,
+    shopNotice: '',
     shopActiveCat: 'all',
     shopProducts: [], shopFilteredProducts: [], shopLoaded: false,
     // 优惠券
@@ -73,7 +75,7 @@ Page({
     const rpx = win.windowWidth / 750;
     this.setData(layout);
     this.fetchProducts();
-    this.fetchShopData();
+    this.checkShopStatus();
     this.fetchOrders();
     this.loadProfileData();
     this._ready = true;
@@ -154,7 +156,25 @@ Page({
     });
   },
 
+  checkShopStatus() {
+    api.publicGet('/config/shop').then(res => {
+      if (res.code === 0) {
+        const enabled = res.data.enabled !== false;
+        this.setData({
+          shopEnabled: enabled,
+          shopNotice: res.data.notice || '会员商城暂时关闭，敬请期待',
+        });
+        if (enabled) this.fetchShopData();
+      } else {
+        this.fetchShopData();
+      }
+    }).catch(() => {
+      this.fetchShopData();
+    });
+  },
+
   fetchShopData() {
+    if (!this.data.shopEnabled) return;
     Promise.all([
       api.get('/shop/products'),
       api.get('/shop/categories'),

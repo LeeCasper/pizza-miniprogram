@@ -1,10 +1,17 @@
-<!-- pages/shop/shop.wxml — 会员商城（黏土风；与 pages/main 商城 tab 同步。商品不入购物车，可收藏） -->
+<!-- pages/shop/shop.wxml — 会员商城（黏土风） -->
 <view class="shop-page" style="padding-top: {{topBarTotalHeight}}px">
   <view class="shop-top-bar" style="padding-top: {{statusBarHeight}}px;">
     <text class="shop-top-title">会员商城</text>
   </view>
 
-  <scroll-view scroll-y class="shop-scroll" enhanced show-scrollbar="{{false}}" style="height: {{scrollViewHeight}}px;">
+  <!-- 商城停用提示 -->
+  <view class="shop-closed" wx:if="{{!shopEnabled && !loading}}">
+    <image class="shop-closed-img" src="/images/empty-shop.png" mode="widthFix"></image>
+    <text class="shop-closed-title">商城维护中</text>
+    <text class="shop-closed-notice">{{shopNotice || '会员商城暂时关闭，敬请期待'}}</text>
+  </view>
+
+  <scroll-view scroll-y class="shop-scroll" enhanced show-scrollbar="{{false}}" style="height: {{scrollViewHeight}}px;" wx:if="{{shopEnabled}}">
     <view class="shop-scroll-inner">
       <view class="shop-hero" wx:if="{{shopBanners.length > 0}}">
         <swiper class="shop-hero-swiper" autoplay interval="4000" circular indicator-dots indicator-color="rgba(255,255,255,0.35)" indicator-active-color="#C0563A">
