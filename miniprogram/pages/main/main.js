@@ -57,6 +57,7 @@ Page({
     availableCoupons: [], selectedCoupon: null, couponPickerOpen: false,
     couponDiscountAmount: 0, couponDiscountText: '0.00',
     tierDiscountAmount: 0, tierDiscountText: '0.00', tierName: '',
+    totalSavedText: '0.00',
     finalPrice: '0.00',
     // 加载态
     productsLoaded: false, ordersLoaded: false,
@@ -545,6 +546,7 @@ Page({
       tierDiscountAmount: tierDiscount,
       tierDiscountText: tierDiscount.toFixed(2),
       tierName,
+      totalSavedText: (couponDiscount + tierDiscount).toFixed(2),
       finalPrice: final.toFixed(2),
     });
   },

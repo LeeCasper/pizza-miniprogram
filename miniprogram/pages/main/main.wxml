@@ -117,11 +117,26 @@
             </view>
           </view>
           <!-- 价格明细 -->
-          <view class="price-breakdown" wx:if="{{couponDiscountAmount > 0 || tierDiscountAmount > 0}}">
-            <view class="price-row"><text>商品合计</text><text>¥{{cartTotal}}</text></view>
-            <view class="price-row discount" wx:if="{{couponDiscountAmount > 0}}"><text>优惠券减免</text><text>-¥{{couponDiscountText}}</text></view>
-            <view class="price-row" wx:if="{{tierDiscountAmount > 0}}"><text>{{tierName}}折扣</text><text>-¥{{tierDiscountText}}</text></view>
-            <view class="price-row total"><text>应付金额</text><text class="final-price">¥{{finalPrice}}</text></view>
+          <view class="price-breakdown">
+            <view class="price-row"><text class="price-label">商品合计</text><text class="price-val">¥{{cartTotal}}</text></view>
+            <view class="price-row price-row-discount" wx:if="{{couponDiscountAmount > 0}}">
+              <text class="price-label">优惠券减免</text><text class="price-val price-val-discount">-¥{{couponDiscountText}}</text>
+            </view>
+            <view class="price-row price-row-discount" wx:if="{{tierDiscountAmount > 0}}">
+              <text class="price-label">{{tierName}}折扣</text><text class="price-val price-val-discount">-¥{{tierDiscountText}}</text>
+            </view>
+            <!-- 合计优惠 -->
+            <view class="price-row price-row-saved" wx:if="{{couponDiscountAmount > 0 || tierDiscountAmount > 0}}">
+              <text class="price-label">已优惠</text><text class="price-val price-val-saved">-¥{{totalSavedText}}</text>
+            </view>
+            <view class="price-divider"></view>
+            <view class="price-row price-row-final">
+              <text class="price-final-label">应付金额</text>
+              <view class="price-final-val">
+                <text class="price-final-sym">¥</text>
+                <text class="price-final-num">{{finalPrice}}</text>
+              </view>
+            </view>
           </view>
           <!-- 支付方式 -->
           <view class="pay-method-row">

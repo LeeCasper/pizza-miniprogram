@@ -351,17 +351,39 @@
 
 /* ===== 价格明细 ===== */
 .price-breakdown {
-  padding: 16rpx 0; margin-bottom: 12rpx;
-  border-bottom: 1rpx solid var(--color-divider);
+  padding: 20rpx;
+  margin-bottom: 16rpx;
+  background: var(--clay-bg-elevated);
+  border-radius: 20rpx;
+  border: var(--clay-border-subtle);
 }
 .price-row {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 6rpx 0; font-size: 26rpx; color: #8A7B66;
+  padding: 6rpx 0; font-size: 26rpx;
 }
-.price-row.discount { color: #5E5142; }
-.price-row.discount text:last-child { color: var(--color-price); }
-.price-row.total { padding-top: 12rpx; font-size: 28rpx; color: #5E5142; font-weight: var(--font-weight-semibold); }
-.final-price { color: var(--color-price); font-size: 32rpx; font-weight: var(--font-weight-bold); }
+.price-label { color: var(--color-on-surface-variant); }
+.price-val { color: var(--color-on-surface); font-weight: var(--font-weight-semibold); }
+.price-row-discount { }
+.price-val-discount { color: #C0563A; }
+
+/* 合计优惠 */
+.price-row-saved { padding: 10rpx 0 4rpx; }
+.price-val-saved {
+  color: #C0563A; font-size: 28rpx; font-weight: var(--font-weight-bold);
+}
+
+/* 分割线 */
+.price-divider {
+  height: 1rpx; margin: 12rpx 0;
+  background: linear-gradient(90deg, transparent, rgba(180,160,140,0.30), transparent);
+}
+
+/* 应付金额 */
+.price-row-final { padding: 4rpx 0 2rpx; }
+.price-final-label { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
+.price-final-val { display: flex; align-items: baseline; gap: 2rpx; }
+.price-final-sym { font-size: 24rpx; font-weight: var(--font-weight-bold); color: var(--color-price); }
+.price-final-num { font-size: 40rpx; font-weight: var(--font-weight-bold); color: var(--color-price); }
 
 /* ===== 优惠券选择弹窗 ===== */
 .coupon-picker-overlay {
