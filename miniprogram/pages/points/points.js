@@ -31,7 +31,7 @@ Page({
   fetchCategories() {
     api.publicGet('/config/points-categories').then(res => {
       if (res.code === 0 && res.data) {
-        const apiCats = (res.data || []).map(c => ({
+        const apiCats = (res.data || []).filter(c => c.key !== 'all').map(c => ({
           key: c.key,
           name: c.name,
           icon: c.icon || '',
