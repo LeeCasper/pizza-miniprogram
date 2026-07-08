@@ -527,6 +527,8 @@
 .pickup-hide-btn:active { transform: scale(0.95); box-shadow: inset 2rpx 2rpx 5rpx rgba(120,108,94,0.2), inset -1rpx -1rpx 3rpx rgba(255,255,255,0.7); }
 
 .order-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1rpx solid var(--color-divider); padding-top: 24rpx; margin-top: 16rpx; flex-wrap: wrap; gap: 16rpx; }
+.order-total-wrap { display: flex; flex-direction: column; align-items: flex-end; gap: 2rpx; }
+.order-total-original { font-size: 22rpx; color: var(--color-on-surface-variant); text-decoration: line-through; }
 .order-total { font-size: 28rpx; color: var(--color-on-surface); flex-shrink: 0; }
 .total-price { font-size: 32rpx; font-weight: var(--font-weight-bold); color: var(--color-price); }
 .order-actions { display: flex; gap: 16rpx; flex-shrink: 0; }

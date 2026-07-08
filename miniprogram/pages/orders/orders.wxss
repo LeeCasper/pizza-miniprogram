@@ -274,6 +274,8 @@
   gap: 16rpx;
 }
 
+.order-total-wrap { display: flex; flex-direction: column; align-items: flex-end; gap: 2rpx; }
+.order-total-original { font-size: 22rpx; color: var(--color-on-surface-variant); text-decoration: line-through; }
 .order-total {
   font-size: 28rpx;
   color: var(--color-on-surface);
