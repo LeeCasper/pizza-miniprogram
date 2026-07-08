@@ -80,7 +80,10 @@
         <!-- 订单底部 -->
         <view class="order-footer">
           <view class="order-total-wrap">
-            <text class="order-total-original" wx:if="{{item.discountAmount > 0}}">¥{{item.total}}</text>
+            <view class="order-discount-btn" wx:if="{{item.discountAmount > 0}}" bindtap="onShowDiscount" data-id="{{item.id}}" data-total="{{item.total}}" data-discount="{{item.discountAmount}}" data-paid="{{item.paidAmount}}">
+              <text class="order-discount-btn-text">已优惠 ¥{{item.discountAmount}}</text>
+              <text class="order-discount-btn-arrow">›</text>
+            </view>
             <text class="order-total">实付 <text class="total-price">¥{{item.paidAmount}}</text></text>
           </view>
           <view class="order-actions">
@@ -103,5 +106,33 @@
     <text class="empty-icon">📋</text>
     <text class="empty-text">暂无订单</text>
     <text class="empty-sub">快去下单吧~</text>
+  </view>
+
+  <!-- 优惠明细弹窗 -->
+  <view class="discount-popup-overlay {{discountPopupOpen ? 'show' : ''}}" catchtap="onCloseDiscount">
+    <view class="discount-popup {{discountPopupOpen ? 'show' : ''}}" catchtap="noop">
+      <view class="discount-popup-header">
+        <text class="discount-popup-title">优惠明细</text>
+        <view class="discount-popup-close" catchtap="onCloseDiscount"><text>✕</text></view>
+      </view>
+      <view class="discount-popup-body">
+        <view class="discount-popup-row">
+          <text class="discount-popup-label">商品原价</text>
+          <text class="discount-popup-val">¥{{discountPopupTotal}}</text>
+        </view>
+        <view class="discount-popup-divider"></view>
+        <view class="discount-popup-row discount-popup-row-save">
+          <text class="discount-popup-label">优惠减免</text>
+          <text class="discount-popup-val discount-popup-val-save">-¥{{discountPopupAmount}}</text>
+        </view>
+        <view class="discount-popup-row discount-popup-row-final">
+          <text class="discount-popup-label">实付金额</text>
+          <view class="discount-popup-final-price">
+            <text class="discount-popup-final-sym">¥</text>
+            <text class="discount-popup-final-num">{{discountPopupPaid}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
   </view>
 </view>

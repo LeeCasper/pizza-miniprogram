@@ -275,7 +275,13 @@
 }
 
 .order-total-wrap { display: flex; flex-direction: column; align-items: flex-end; gap: 2rpx; }
-.order-total-original { font-size: 22rpx; color: var(--color-on-surface-variant); text-decoration: line-through; }
+.order-discount-btn {
+  display: flex; align-items: center; gap: 4rpx;
+  padding: 6rpx 14rpx; border-radius: 20rpx;
+  background: rgba(192,86,58,0.08); border: 1rpx solid rgba(192,86,58,0.20);
+}
+.order-discount-btn-text { font-size: 22rpx; color: #C0563A; font-weight: var(--font-weight-semibold); }
+.order-discount-btn-arrow { font-size: 24rpx; color: #C0563A; }
 .order-total {
   font-size: 28rpx;
   color: var(--color-on-surface);
@@ -346,3 +352,52 @@
   color: var(--color-on-surface-variant);
   opacity: 0.7;
 }
+
+/* ===== 优惠明细弹窗 ===== */
+.discount-popup-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 300;
+  background: rgba(0,0,0,0.35);
+  visibility: hidden; opacity: 0;
+  transition: visibility 0s 0.3s, opacity 0.3s;
+}
+.discount-popup-overlay.show { visibility: visible; opacity: 1; transition: visibility 0s, opacity 0.3s; }
+.discount-popup {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  background: var(--clay-bg-nav);
+  border-radius: 32rpx 32rpx 0 0;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.discount-popup.show { transform: translateY(0); }
+.discount-popup-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 28rpx 32rpx 20rpx;
+  border-bottom: var(--clay-border-subtle);
+}
+.discount-popup-title { font-size: 32rpx; font-weight: var(--font-weight-bold); color: var(--color-on-surface); }
+.discount-popup-close {
+  width: 56rpx; height: 56rpx; border-radius: 50%;
+  background: var(--clay-bg-card); border: var(--clay-border-subtle);
+  display: flex; align-items: center; justify-content: center;
+}
+.discount-popup-close text { font-size: 28rpx; color: var(--color-on-surface-variant); }
+.discount-popup-body {
+  padding: 32rpx 32rpx;
+  padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
+}
+.discount-popup-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14rpx 0;
+}
+.discount-popup-label { font-size: 28rpx; color: var(--color-on-surface-variant); }
+.discount-popup-val { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
+.discount-popup-row-save { }
+.discount-popup-val-save { color: #C0563A; }
+.discount-popup-divider {
+  height: 1rpx; margin: 8rpx 0;
+  background: linear-gradient(90deg, transparent, rgba(180,160,140,0.30), transparent);
+}
+.discount-popup-row-final { padding-top: 8rpx; }
+.discount-popup-final-price { display: flex; align-items: baseline; gap: 2rpx; }
+.discount-popup-final-sym { font-size: 28rpx; font-weight: var(--font-weight-bold); color: var(--color-primary); }
+.discount-popup-final-num { font-size: 44rpx; font-weight: var(--font-weight-bold); color: var(--color-primary); }

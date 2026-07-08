@@ -59,6 +59,11 @@ Page({
     tierDiscountAmount: 0, tierDiscountText: '0.00', tierName: '',
     totalSavedText: '0.00',
     finalPrice: '0.00',
+    // 优惠明细弹窗
+    discountPopupOpen: false,
+    discountPopupTotal: '0.00',
+    discountPopupAmount: '0.00',
+    discountPopupPaid: '0.00',
     // 加载态
     productsLoaded: false, ordersLoaded: false,
     showQuickLogin: false,
@@ -665,6 +670,20 @@ Page({
 
   onCancelDisabled() {
     wx.showToast({ title: '下单超过1分钟，无法取消', icon: 'none' });
+  },
+
+  // ── 优惠明细弹窗 ──
+  onShowDiscount(e) {
+    const { total, discount, paid } = e.currentTarget.dataset;
+    this.setData({
+      discountPopupOpen: true,
+      discountPopupTotal: parseFloat(total).toFixed(2),
+      discountPopupAmount: parseFloat(discount).toFixed(2),
+      discountPopupPaid: parseFloat(paid).toFixed(2),
+    });
+  },
+  onCloseDiscount() {
+    this.setData({ discountPopupOpen: false });
   },
 
   // ── 会员订阅（商城 tab） ──────────────────────
