@@ -31,6 +31,14 @@
 
     <!-- ═══ 分类导航 ═══ -->
     <view class="pts-cat-card">
+      <!-- 全部商品（固定） -->
+      <view class="pts-cat-item {{activeCat === 'all' ? 'active' : ''}}" bindtap="onCatChange" data-key="all">
+        <view class="pts-cat-iconwrap pts-cat-bg-all">
+          <text class="pts-cat-emoji">🎁</text>
+        </view>
+        <text class="pts-cat-name">全部商品</text>
+      </view>
+      <!-- 后台分类 -->
       <view
         wx:for="{{categories}}"
         wx:key="key"

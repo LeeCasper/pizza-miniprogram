@@ -11,7 +11,7 @@ Page({
     topBarTotalHeight: 80,
     products: [],
     filteredProducts: [],
-    categories: [{ key: 'all', name: '全部商品', emoji: '🎁', icon: '' }],
+    categories: [],
     activeCat: 'all',
     userPoints: 0,
     detailProduct: null,
@@ -31,17 +31,13 @@ Page({
   fetchCategories() {
     api.publicGet('/config/points-categories').then(res => {
       if (res.code === 0 && res.data) {
-        const apiCats = (res.data || []).filter(c => c.key !== 'all').map(c => ({
+        const apiCats = (res.data || []).map(c => ({
           key: c.key,
           name: c.name,
           icon: c.icon || '',
           emoji: CAT_EMOJI_MAP[c.key] || '📦',
         }));
-        const cats = [
-          { key: 'all', name: '全部商品', emoji: '🎁', icon: '' },
-          ...apiCats,
-        ];
-        this.setData({ categories: cats });
+        this.setData({ categories: apiCats });
       }
     }).catch(() => {});
   },

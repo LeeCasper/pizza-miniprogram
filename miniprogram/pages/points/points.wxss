@@ -88,6 +88,8 @@
   width: 88rpx; height: 88rpx; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
 }
+/* Default icon background (overridden by specific .pts-cat-bg-* below) */
+.pts-cat-iconwrap { background: rgba(180,160,140,0.10); }
 .pts-cat-bg-all    { background: rgba(245,130,32,0.10); }
 .pts-cat-bg-daily  { background: rgba(52,199,89,0.10); }
 .pts-cat-bg-coupon { background: rgba(0,122,255,0.10); }

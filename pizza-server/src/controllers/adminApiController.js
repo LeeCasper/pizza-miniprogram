@@ -560,9 +560,6 @@ const adminApiController = {
       if (!key || !/^[a-z0-9_]+$/.test(key)) {
         return res.status(400).json({ code: 400, message: '分类标识只能包含小写字母、数字和下划线' });
       }
-      if (key === 'all') {
-        return res.status(400).json({ code: 400, message: '"all" 为系统保留标识，请使用其他标识' });
-      }
       if (!name || !name.trim()) {
         return res.status(400).json({ code: 400, message: '分类名称不能为空' });
       }
