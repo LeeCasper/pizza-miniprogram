@@ -98,7 +98,7 @@ function buildBenefitItems(tier) {
 
   // 3. 消费返积分
   const cashbackRate = tier.pointsRewardRate;
-  items.push({ icon: '/images/icon-points-rate.png', iconType: 'image', iconBg: 'benefit-icon-cashback', label: '消费返积分', desc: '每消费1元返积分', value: cashbackRate.toFixed(0) + '积分' });
+  items.push({ icon: '/images/grid-points.png', iconType: 'image', iconBg: 'benefit-icon-cashback', label: '消费返积分', desc: '每消费1元返积分', value: cashbackRate.toFixed(0) + '积分' });
 
   // 4. 生日礼遇
   items.push({ icon: '/images/icon-birthday.png', iconType: 'image', iconBg: 'benefit-icon-birthday', label: '生日礼遇', desc: '生日当月专属福利', value: tier.birthdayGift ? '专属' : '无' });
