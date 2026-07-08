@@ -60,11 +60,7 @@ Page({
 
   filterByCat(products, catKey) {
     if (catKey === 'all') return products;
-    // Map Stitch categories to backend redeem_type or coupon_category
-    if (catKey === 'coupon') return products.filter(p => p.redeemType === 'coupon');
-    if (catKey === 'daily') return products.filter(p => p.redeemType === 'physical' || !p.redeemType);
-    if (catKey === 'goods') return products.filter(p => p.redeemType === 'physical');
-    return products;
+    return products.filter(p => p.pointsCategoryKey === catKey);
   },
 
   onCatChange(e) {
