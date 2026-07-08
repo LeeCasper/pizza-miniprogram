@@ -1,13 +1,24 @@
-// pages/points/points.js
+// pages/points/points.js — 积分商城（Stitch 设计稿 1:1 还原）
 const { api, fixImageUrl } = require('../../utils/api');
 const app = getApp();
 const { getSimpleTopBar } = require('../../utils/layout');
+
+// Category definitions (matches Stitch design)
+const CATEGORIES = [
+  { key: 'all', name: '全部商品', emoji: '🎁' },
+  { key: 'daily', name: '生活日用', emoji: '🛍️' },
+  { key: 'coupon', name: '卡券权益', emoji: '🎫' },
+  { key: 'goods', name: '优选好物', emoji: '🍳' },
+];
 
 Page({
   data: {
     statusBarHeight: 44,
     topBarTotalHeight: 80,
     products: [],
+    filteredProducts: [],
+    categories: CATEGORIES,
+    activeCat: 'all',
     userPoints: 0,
     detailProduct: null,
     detailOpen: false,
@@ -27,7 +38,8 @@ Page({
     api.get('/points/products').then(res => {
       if (res.code === 0) {
         const products = (res.data || []).map(p => ({ ...p, image: fixImageUrl(p.image) }));
-        this.setData({ products, loading: false });
+        const filtered = this.filterByCat(products, this.data.activeCat);
+        this.setData({ products, filteredProducts: filtered, loading: false });
       } else {
         this.setData({ loading: false });
       }
@@ -35,6 +47,22 @@ Page({
       this.setData({ loading: false });
       wx.showToast({ title: '加载失败', icon: 'none' });
     });
+  },
+
+  filterByCat(products, catKey) {
+    if (catKey === 'all') return products;
+    // Map Stitch categories to backend redeem_type or coupon_category
+    if (catKey === 'coupon') return products.filter(p => p.redeemType === 'coupon');
+    if (catKey === 'daily') return products.filter(p => p.redeemType === 'physical' || !p.redeemType);
+    if (catKey === 'goods') return products.filter(p => p.redeemType === 'physical');
+    return products;
+  },
+
+  onCatChange(e) {
+    const { key } = e.currentTarget.dataset;
+    if (key === this.data.activeCat) return;
+    const filtered = this.filterByCat(this.data.products, key);
+    this.setData({ activeCat: key, filteredProducts: filtered });
   },
 
   onBack() {
@@ -50,14 +78,12 @@ Page({
     this.setData({ detailOpen: false, detailProduct: null });
   },
 
-  // 详情页内兑换
   onDetailRedeem() {
     const item = this.data.detailProduct;
     if (!item) return;
     this.doRedeem(item);
   },
 
-  // 列表直接兑换
   onRedeem(e) {
     const { item } = e.currentTarget.dataset;
     if (!item) return;
@@ -84,7 +110,6 @@ Page({
                 detailOpen: false,
                 detailProduct: null,
               });
-              // Update global points
               app.globalData.userInfo.points = newPoints;
               wx.showToast({ title: '兑换成功！', icon: 'success' });
             }
@@ -106,7 +131,6 @@ Page({
     api.get('/points/history').then(res => {
       wx.hideLoading();
       if (res.code === 0 && res.data && res.data.length > 0) {
-        // Show history items in a simple modal
         const items = res.data.slice(0, 10).map(h => {
           const sign = h.pointsChange > 0 ? '+' : '';
           const date = h.createdAt ? new Date(h.createdAt).toLocaleDateString('zh-CN') : '';

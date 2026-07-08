@@ -1,57 +1,80 @@
-<!--pages/points/points.wxml-->
-<view class="page-container" style="padding-top: {{topBarTotalHeight}}px">
+<!--pages/points/points.wxml — 积分商城（Stitch 设计稿 1:1 还原）-->
+<view class="pts-page">
+
   <!-- 顶部导航 -->
-  <view class="top-bar" style="padding-top: {{statusBarHeight}}px;">
-    <view class="back-btn" bindtap="onBack">
-      <image src="/images/back.png" class="back-icon" mode="aspectFit"></image>
+  <view class="pts-top-bar" style="padding-top: {{statusBarHeight}}px;">
+    <view class="pts-back-btn" bindtap="onBack">
+      <image src="/images/back.png" class="pts-back-icon" mode="aspectFit"></image>
     </view>
-    <text class="top-title">积分商城</text>
-    <view class="top-spacer"></view>
+    <text class="pts-top-title">积分商城</text>
+    <view class="pts-top-spacer"></view>
   </view>
 
-  <scroll-view scroll-y class="main-scroll" style="flex: 1; height: 0;">
-    <view class="scroll-inner">
-      <!-- 积分余额 -->
-      <view class="points-header card-cream">
-        <view class="points-header-left">
-          <text class="points-header-label">可用积分</text>
-          <view class="points-header-value-row">
-            <text class="points-header-value">{{userPoints}}</text>
-            <text class="points-header-unit">pts</text>
-          </view>
+  <scroll-view scroll-y class="pts-scroll" enhanced show-scrollbar="{{false}}">
+
+    <!-- ═══ 积分余额卡片（橙色渐变） ═══ -->
+    <view class="pts-balance-card">
+      <view class="pts-balance-body">
+        <text class="pts-balance-label">可用积分</text>
+        <view class="pts-balance-row">
+          <text class="pts-balance-num">{{userPoints}}</text>
+          <text class="pts-balance-unit">积分</text>
         </view>
-        <view class="points-header-action" bindtap="onPointsHistory">
-          <text>积分明细 →</text>
+        <view class="pts-balance-action" bindtap="onPointsHistory">
+          <text>积分明细</text>
+          <text class="pts-balance-arrow">›</text>
         </view>
       </view>
+      <!-- 装饰插图 -->
+      <text class="pts-balance-decor">🎁</text>
+    </view>
 
-      <!-- 商品网格 -->
-      <view class="mall-grid">
-        <view
-          wx:for="{{products}}"
-          wx:key="id"
-          class="mall-card card"
-          bindtap="onProductTap"
-          data-item="{{item}}"
-        >
-          <view class="mall-image-wrap">
-            <image class="mall-image" src="{{item.image}}" mode="aspectFill"></image>
-            <view wx:if="{{item.tag}}" class="mall-tag">{{item.tag}}</view>
+    <!-- ═══ 分类导航 ═══ -->
+    <view class="pts-cat-card">
+      <view
+        wx:for="{{categories}}"
+        wx:key="key"
+        class="pts-cat-item {{activeCat === item.key ? 'active' : ''}}"
+        bindtap="onCatChange"
+        data-key="{{item.key}}"
+      >
+        <view class="pts-cat-iconwrap pts-cat-bg-{{item.key}}">
+          <image wx:if="{{item.icon}}" class="pts-cat-icon" src="{{item.icon}}" mode="aspectFit"></image>
+          <text wx:else class="pts-cat-emoji">{{item.emoji}}</text>
+        </view>
+        <text class="pts-cat-name">{{item.name}}</text>
+      </view>
+    </view>
+
+    <!-- ═══ 精选推荐 ═══ -->
+    <view class="pts-section-header">
+      <text class="pts-section-title">精选推荐</text>
+    </view>
+
+    <!-- 商品网格 2 列 -->
+    <view class="pts-grid" wx:if="{{filteredProducts.length > 0}}">
+      <view
+        class="pts-card"
+        wx:for="{{filteredProducts}}"
+        wx:key="id"
+        bindtap="onProductTap"
+        data-item="{{item}}"
+      >
+        <view class="pts-card-imgwrap">
+          <image class="pts-card-img" src="{{item.image}}" mode="aspectFill"></image>
+          <view class="pts-card-tag" wx:if="{{item.tag}}">
+            <text>{{item.tag}}</text>
           </view>
-          <view class="mall-info">
-            <text class="mall-name">{{item.name}}</text>
-            <text class="mall-desc">{{item.desc}}</text>
-            <view class="mall-bottom">
-              <view class="mall-points">
-                <text class="points-num">{{item.points}}</text>
-                <text class="points-label">积分</text>
-              </view>
-              <view class="mall-stock">
-                <text>库存 {{item.stock}}</text>
-              </view>
+        </view>
+        <view class="pts-card-body">
+          <text class="pts-card-name">{{item.name}}</text>
+          <view class="pts-card-bottom">
+            <view class="pts-card-price">
+              <text class="pts-card-points">{{item.points}}</text>
+              <text class="pts-card-unit">积分</text>
             </view>
             <view
-              class="redeem-btn {{userPoints >= item.points ? '' : 'disabled'}}"
+              class="pts-redeem-btn {{userPoints >= item.points ? '' : 'disabled'}}"
               catchtap="onRedeem"
               data-item="{{item}}"
             >
@@ -61,58 +84,65 @@
         </view>
       </view>
     </view>
+
+    <!-- 空状态 -->
+    <view class="pts-empty" wx:else>
+      <text class="pts-empty-text">暂无商品</text>
+    </view>
+
+    <view style="height: calc(120rpx + env(safe-area-inset-bottom));"></view>
   </scroll-view>
 
-  <!-- 产品详情弹窗 -->
-  <view class="detail-overlay {{detailOpen ? 'show' : ''}}" catchtap="onDetailClose">
-    <view class="detail-drawer {{detailOpen ? 'show' : ''}}" catchtap="noop">
-      <view class="detail-nav">
-        <view class="detail-back-btn" catchtap="onDetailClose">
-          <image src="/images/back.png" class="detail-back-icon" mode="aspectFit"></image>
+  <!-- ═══ 产品详情弹窗 ═══ -->
+  <view class="pts-detail-overlay {{detailOpen ? 'show' : ''}}" catchtap="onDetailClose">
+    <view class="pts-detail-drawer {{detailOpen ? 'show' : ''}}" catchtap="noop">
+      <view class="pts-detail-nav">
+        <view class="pts-detail-back" catchtap="onDetailClose">
+          <image src="/images/back.png" class="pts-back-icon" mode="aspectFit"></image>
         </view>
-        <text class="detail-nav-title">商品详情</text>
-        <view class="detail-nav-spacer"></view>
+        <text class="pts-detail-nav-title">商品详情</text>
+        <view class="pts-top-spacer"></view>
       </view>
 
-      <scroll-view scroll-y class="detail-body" enhanced show-scrollbar="{{false}}">
-        <image class="detail-image" src="{{detailProduct.image}}" mode="widthFix"></image>
+      <scroll-view scroll-y class="pts-detail-body" enhanced show-scrollbar="{{false}}">
+        <image class="pts-detail-img" src="{{detailProduct.image}}" mode="widthFix"></image>
 
-        <view class="detail-header">
-          <view class="detail-title-row">
-            <text class="detail-name">{{detailProduct.name}}</text>
-            <view class="detail-points-badge">
-              <text class="detail-points-num">{{detailProduct.points}}</text>
-              <text class="detail-points-label">积分</text>
+        <view class="pts-detail-info">
+          <view class="pts-detail-name-row">
+            <text class="pts-detail-name">{{detailProduct.name}}</text>
+            <view class="pts-detail-points-badge">
+              <text class="pts-detail-points-num">{{detailProduct.points}}</text>
+              <text class="pts-detail-points-unit">积分</text>
             </view>
           </view>
-          <view wx:if="{{detailProduct.tag}}" class="detail-tags">
-            <text class="detail-tag">{{detailProduct.tag}}</text>
-            <text class="detail-size">库存 {{detailProduct.stock}}</text>
+          <view class="pts-detail-meta" wx:if="{{detailProduct.tag}}">
+            <text class="pts-detail-tag">{{detailProduct.tag}}</text>
+            <text class="pts-detail-stock">库存 {{detailProduct.stock}}</text>
           </view>
         </view>
 
-        <text class="detail-desc">{{detailProduct.detailDesc}}</text>
+        <text class="pts-detail-desc" wx:if="{{detailProduct.detailDesc}}">{{detailProduct.detailDesc}}</text>
 
-        <view class="detail-highlights">
-          <text class="detail-section-label">商品亮点</text>
-          <view class="highlight-list">
-            <view wx:for="{{detailProduct.highlights}}" wx:key="*this" class="highlight-item">
-              <text class="highlight-dot">•</text>
+        <view class="pts-detail-highlights" wx:if="{{detailProduct.highlights.length > 0}}">
+          <text class="pts-highlights-title">商品亮点</text>
+          <view class="pts-highlight-list">
+            <view wx:for="{{detailProduct.highlights}}" wx:key="*this" class="pts-highlight-item">
+              <text class="pts-highlight-dot">•</text>
               <text>{{item}}</text>
             </view>
           </view>
         </view>
 
-        <view class="detail-bottom-spacer"></view>
+        <view style="height: calc(160rpx + env(safe-area-inset-bottom));"></view>
       </scroll-view>
 
-      <view class="detail-footer">
-        <view class="detail-footer-info">
-          <text class="footer-points-num">{{detailProduct.points}}</text>
-          <text class="footer-points-label">积分兑换</text>
+      <view class="pts-detail-footer">
+        <view class="pts-detail-footer-info">
+          <text class="pts-footer-points">{{detailProduct.points}}</text>
+          <text class="pts-footer-label">积分兑换</text>
         </view>
         <view
-          class="detail-redeem-btn {{userPoints >= detailProduct.points ? '' : 'disabled'}}"
+          class="pts-detail-redeem-btn {{userPoints >= detailProduct.points ? '' : 'disabled'}}"
           catchtap="onDetailRedeem"
         >
           <text>{{userPoints >= detailProduct.points ? '立即兑换' : '积分不足'}}</text>
