@@ -10,7 +10,7 @@
     <view class="pts-top-spacer"></view>
   </view>
 
-  <scroll-view scroll-y class="pts-scroll" enhanced show-scrollbar="{{false}}">
+  <scroll-view scroll-y class="pts-scroll" enhanced show-scrollbar="{{false}}" style="padding-top: {{topBarTotalHeight}}px;">
 
     <!-- ═══ 积分余额卡片（橙色渐变） ═══ -->
     <view class="pts-balance-card">
