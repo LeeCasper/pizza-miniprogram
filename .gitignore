@@ -37,6 +37,14 @@ stitch_data/
 /积分1.png
 /未命名的设计.png
 /物流运费.png
+# Exclude junk/installer files at root
+/ClashPlus-*.exe
+/icon_*.eps
+/image2-*.png
+/pin (*.jpg
+/pin (*.png
+/礼物 (*.png
+/礼物 (*.jpg
 /*.gif
 /huaban-*
 
