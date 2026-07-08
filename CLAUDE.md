@@ -61,14 +61,20 @@ src/
 │   ├── errorHandler.js     — global error handler
 │   └── requestId.js        — X-Request-Id per request (crypto.randomBytes)
 ├── controllers/            — Request handlers
-├── services/               — Business logic + SQL queries (33 files)
-│   ├── systemConfigService.js — 5-group admin-configurable settings (pay/printer/map/business/storage)
+├── services/               — Business logic + SQL queries
+│   ├── systemConfigService.js — 7-group admin-configurable settings (pay/printer/map/business/logistics/storage)
 │   ├── cosService.js       — Tencent COS object storage (upload, delete, isConfigured)
 │   ├── defaultAvatarService.js — Default avatar CRUD + getRandom() for new users
 │   ├── kuaidi100Service.js  — kuaidi100 logistics API (tracking query, auto-detect carrier, MD5 signing)
 │   ├── logisticsService.js  — Logistics tracking orchestration for shop orders
+│   ├── shopProductService.js — Shop product CRUD with favorites join
+│   ├── shopOrderService.js — Shop order lifecycle & state machine
+│   ├── shopPaymentService.js — Shop order payment (WeChat Pay + balance)
 │   ├── shopRefundService.js — Shop order refunds (balance credit-back + WeChat Pay)
 │   ├── shopFavoriteService.js — Shop product favorites
+│   ├── bannerService.js    — Banner CRUD with scope system (pos/shop/both)
+│   ├── couponTemplateService.js — Coupon template CRUD + claimable logic
+│   ├── couponClaimService.js — Coupon claim with weekly/monthly limits
 │   ├── luckyWheelService.js + luckyWheel.logic.js — Lucky wheel game backend + logic
 │   ├── carrierMap.js       — Carrier name-to-code mapping + tracking-number prefix detection (20+ carriers)
 │   ├── orderCleanupService.js — Auto-cancel unpaid orders (cron-driven)
@@ -79,9 +85,12 @@ src/
 │   └── printerService.js   — Cloud receipt printing
 ├── routes/                 — Express Routers (mounted at /api/v1/*)
 │   ├── adminApi.js         — Admin JSON API (/api/v1/admin/*), JWT + adminOnly
+│   ├── shop.js             — Public shop API (products, categories, orders, payment)
 │   ├── logistics.js        — Logistics tracking endpoints
 │   ├── luckyWheel.js       — Lucky wheel game endpoints
-│   └── shop.js             — Shop (会员商城) endpoints
+│   ├── config.js           — Public config (/config/map, /config/beian, /config/shop, /config/default-avatars)
+│   ├── payment.js          — WeChat Pay callbacks (raw body for signature verification)
+│   ├── orders.js, products.js, cart.js, addresses.js, coupons.js, points.js, auth.js, user.js, stores.js, upload.js, banners.js
 └── utils/
     ├── jwt.js              — JWT sign/verify
     ├── wechat.js           — WeChat login (code→openid) + getAccessToken (cached 2h) + getPhoneNumber(code)
@@ -99,12 +108,14 @@ src/
 
 ### Route Conventions
 
-- Public API routes: `/api/v1/auth` (login, logout, **phone** binding), `/api/v1/products`, `/api/v1/banners`, `/api/v1/config` (map, beian, **default-avatars**)
+- Public API routes: `/api/v1/auth` (login, logout, **phone** binding), `/api/v1/products`, `/api/v1/banners`, `/api/v1/config` (map, beian, **shop**-status, **default-avatars**)
 - User API routes: `/api/v1/user/*` — profile, settings, member-tiers, **balance** (history + recharge)
 - Payment routes: `/api/v1/pay/*` — order payment, recharge, WeChat Pay notify callbacks
 - Admin API routes: `/api/v1/admin/*` — all behind `auth` + `adminOnly` middleware
   - CRUD: products, orders, coupons, coupon-templates, member-tiers, users, points, banners
-  - Settings: `/admin/settings/{pay,printer,map,store,business,storage}` (GET/PUT)
+  - Settings: `/admin/settings/{pay,printer,map,store,business,logistics,storage}` (GET/PUT)
+  - Shop admin: `/admin/shop/{products,categories,orders}` (full CRUD)
+  - Logistics: `/admin/shop/auto-detect-carrier` (tracking number → carrier)
   - **Member tier colors**: frontend-only (`utils/tiers.js`); DB columns dropped, API no longer returns them
 	  - **Default avatars**: `/admin/default-avatars` (GET/POST/DELETE)
   - Ops: `/admin/audit-logs`, `/admin/reconciliation`, `/admin/payment-records`
@@ -130,20 +141,22 @@ Both stopped during graceful shutdown. Both only log when count > 0.
 
 ### System Config (Admin-Configurable)
 
-`system_config` table stores key-value pairs. `systemConfigService` manages 5 groups, each with a **get/update/sync triplet**:
+`system_config` table stores key-value pairs. `systemConfigService` manages 7 groups, each with a **get/update/sync triplet**:
 
 | Group | DB Prefix | Notable Fields |
 |-------|-----------|---------------|
 | **pay** | `wx_pay_*` | mchId, apiV3Key, certs, notifyUrl, refundNotifyUrl |
 | **printer** | `printer_*` | enabled, sn, copies, storeName |
 | **map** | `map_*` | tencentKey |
-| **business** | `biz_*` | orderCancelMinutes (1), unpaidTimeoutMinutes (30), storeName ('爱家店') |
-| **storage** | `cos_*` | Tencent COS config (SecretId, SecretKey, Bucket, Region) |
+| **business** | `biz_*` | orderCancelMinutes (1), unpaidTimeoutMinutes (30), storeName ('爱家店'), shopEnabled (bool), shopNotice (str), icpBeian, gonganBeian |
+| **logistics** | `logistics_*` | kuaidi100 customer, key, enabled |
+| **storage** | `storage_*` | Tencent COS config (SecretId, SecretKey, Bucket, Region) |
 
 - Writes use `INSERT ... ON DUPLICATE KEY UPDATE` (UPSERT) — keys auto-created on first save.
-- **Startup sync**: All 5 groups synced from DB to in-memory `config` in the `listen()` callback.
+- **Startup sync**: All 7 groups synced from DB to in-memory `config` in the `listen()` callback.
 - **Write-time sync**: After each `updateXConfig()`, the corresponding `syncXConfigToMemory()` runs immediately.
 - Priority chain: `.env` defaults → loaded into `config/index.js` → overridden by DB values at startup and on admin save.
+- **Shop gate**: `biz_shop_enabled` (bool) controls whether the entire 会员商城 module is visible. When false, miniprogram shows an animated "正在开发中" closed state. `biz_shop_notice` is the custom notice text.
 
 ### Order State Machine
 
@@ -466,6 +479,28 @@ box-shadow: inset 0 2rpx 4rpx rgba(255,255,255,0.85), 0 6rpx 18rpx rgba(120,108,
 **⚠ 与其他页面的关系**：`--glass-*` token 族**保留不动**，供首页/订单/会员/个人中心等其他页面继续使用。
 黏土风仅限会员商城模块。两个 token 族在 `app.wxss` 中并列共存，互不冲突。
 
+### Shop Gate (商城开关)
+
+`GET /api/v1/config/shop` returns `{ enabled, notice }`. Admin can toggle via 业务配置. When `enabled: false`:
+- Shop tab in main, standalone shop page, and shop-detail all show animated closed state (GIF + "正在开发中" with blinking cursor)
+- `fetchShopData()` is gated behind `checkShopStatus()` in both `shop.js` and `main.js`
+- Fallback: if API call fails, shop loads normally (fail-open, not fail-closed)
+
+### Checkout Patterns
+
+**Shop checkout** (shop-detail): Address-selection drawer → pick from saved addresses via `/api/v1/addresses`, pay with WeChat/Balance, unified settings card (address/shipping/notes/payment merged into single `.co-settings` card). Custom PNG icons for each section.
+
+**POS checkout** (main page): Cart drawer with coupon picker + tier discount calculation. Price breakdown always visible in `.price-breakdown` card: 商品合计, 优惠券减免, 会员折扣, 已优惠汇总, 应付金额. Discount details shown via "已优惠 ¥X ›" button → popup.
+
+**Order cards**: Display `paidAmount` (not `total`) as "实付 ¥X". `discountAmount > 0` shows "已优惠 ¥X" pill button → tap opens discount detail popup.
+
+### Shop Product Images
+
+Two separate fields on `shop_products`:
+- `images` (JSON array) — carousel/swiper images at top of detail page
+- `detail_images` (JSON array) — description images in the "详情" tab, rendered full-width with `mode="widthFix"`
+- Admin form labels: "商品主图" and "商品详情图" (added via `migrate_detail_images.sql`)
+
 ### Data Layer
 
 `utils/data.js` exports mock data (still used as fallback when API unavailable): `products`, `categories`, `orders`, `pointsProducts`, `dietaryRestrictions`, `coupons`, `addresses`.
@@ -496,7 +531,7 @@ Uses `visibility: hidden` + `transform: translateY(100%)` for slide-up. Always a
 ```
 miniprogram/
 ├── app.js              — App lifecycle, globalData, cart methods, auto-login
-├── app.json            — Page registration (14 pages), window config
+├── app.json            — Page registration (16 pages), window config
 ├── app.wxss            — Design tokens, utility classes, global reset
 ├── utils/
 │   ├── api.js          — HTTP client (wx.request wrapper), doLogin()
