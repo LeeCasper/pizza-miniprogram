@@ -138,11 +138,6 @@ async function handleSubmit() {
 
       <NFormItem label="商品图片">
         <ImageUpload v-model="form.image" :width="160" :height="160" />
-        <NCollapse style="margin-top:8px;width:100%">
-          <NCollapseItem title="或手动输入图片 URL" name="url">
-            <NInput v-model:value="form.image" placeholder="https://..." />
-          </NCollapseItem>
-        </NCollapse>
       </NFormItem>
 
       <NFormItem label="简介">

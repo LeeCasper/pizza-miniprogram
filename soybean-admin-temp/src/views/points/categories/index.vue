@@ -4,6 +4,7 @@ import {
   NButton, NCard, NDataTable, NForm, NFormItem, NInput, NInputNumber,
   NModal, NPopconfirm, NSpace, NSwitch, useMessage,
 } from 'naive-ui';
+import ImageUpload from '@/components/common/ImageUpload.vue';
 import type { DataTableColumns } from 'naive-ui';
 import {
   fetchPointsCategories, fetchCreatePointsCategory,
@@ -133,8 +134,8 @@ async function handleDelete(key: string) {
       <NFormItem label="名称" required>
         <NInput v-model:value="form.name" placeholder="分类名称" />
       </NFormItem>
-      <NFormItem label="图标URL">
-        <NInput v-model:value="form.icon" placeholder="图标地址（可选）" />
+      <NFormItem label="图标">
+        <ImageUpload v-model="form.icon" :width="80" :height="80" />
       </NFormItem>
       <NFormItem label="排序">
         <NInputNumber v-model:value="form.sortOrder" :min="0" style="width:100%" />
