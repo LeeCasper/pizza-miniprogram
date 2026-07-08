@@ -1460,6 +1460,12 @@ const adminApiController = {
       if (body.gonganBeian !== undefined) {
         entries.gonganBeian = String(body.gonganBeian).trim();
       }
+      if (body.shopEnabled !== undefined) {
+        entries.shopEnabled = body.shopEnabled ? true : false;
+      }
+      if (body.shopNotice !== undefined) {
+        entries.shopNotice = String(body.shopNotice).trim();
+      }
 
       if (Object.keys(entries).length > 0) {
         await systemConfigService.updateBusinessConfig(entries);
