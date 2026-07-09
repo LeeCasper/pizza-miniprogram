@@ -169,35 +169,41 @@
           <text class="pt-panel-title">选择取餐时间</text>
           <text class="pt-panel-close" catchtap="onClosePickupTime">✕</text>
         </view>
-        <view class="pt-panel-body">
-          <view class="pt-section-label">快速选择</view>
-          <view class="pt-quick-row">
-            <view class="pt-quick-item {{pickupTimeIndex === 'now' ? 'active' : ''}}" bindtap="onPickupQuick" data-key="now">
-              <text class="pt-quick-num">现在</text>
-              <text class="pt-quick-sub">约{{quickNow}}</text>
-            </view>
-            <view class="pt-quick-item {{pickupTimeIndex === 'm30' ? 'active' : ''}}" bindtap="onPickupQuick" data-key="m30">
-              <text class="pt-quick-num">30分钟后</text>
-              <text class="pt-quick-sub">约{{quickM30}}</text>
-            </view>
-            <view class="pt-quick-item {{pickupTimeIndex === 'h1' ? 'active' : ''}}" bindtap="onPickupQuick" data-key="h1">
-              <text class="pt-quick-num">1小时后</text>
-              <text class="pt-quick-sub">约{{quickH1}}</text>
-            </view>
+        <!-- 快速选择 -->
+        <view class="pt-quick-row">
+          <view class="pt-quick-item {{pickupTimeIndex === 'now' ? 'active' : ''}}" bindtap="onPickupQuick" data-key="now">
+            <text class="pt-quick-num">现在</text>
           </view>
-          <view class="pt-section-label">精确时间</view>
-          <view class="pt-grid">
-            <view
-              wx:for="{{pickupTimeSlots}}"
-              wx:key="value"
-              class="pt-slot {{item.selected ? 'active' : ''}} {{item.past ? 'disabled' : ''}}"
-              bindtap="{{item.past ? '' : 'onPickupTimeSelect'}}"
-              data-value="{{item.value}}"
-              data-text="{{item.text}}"
-              data-iso="{{item.iso}}"
-            >
-              <text>{{item.text}}</text>
-            </view>
+          <view class="pt-quick-item {{pickupTimeIndex === 'm30' ? 'active' : ''}}" bindtap="onPickupQuick" data-key="m30">
+            <text class="pt-quick-num">30分后</text>
+          </view>
+          <view class="pt-quick-item {{pickupTimeIndex === 'h1' ? 'active' : ''}}" bindtap="onPickupQuick" data-key="h1">
+            <text class="pt-quick-num">1小时后</text>
+          </view>
+        </view>
+        <!-- 滚轮选择器 -->
+        <view class="pt-picker-wrap">
+          <view class="pt-picker-mask"></view>
+          <view class="pt-picker-indicator"></view>
+          <picker-view
+            class="pt-picker-view"
+            value="{{pickupPickerValue}}"
+            bindchange="onPickupPickerChange"
+            indicator-style="height: 88rpx;"
+            mask-style="background: transparent;"
+          >
+            <picker-view-column>
+              <view wx:for="{{pickupHours}}" wx:key="*this" class="pt-pv-item">{{item}}时</view>
+            </picker-view-column>
+            <picker-view-column>
+              <view wx:for="{{pickupMinutes}}" wx:key="*this" class="pt-pv-item">{{item}}分</view>
+            </picker-view-column>
+          </picker-view>
+        </view>
+        <!-- 确认按钮 -->
+        <view class="pt-confirm-wrap">
+          <view class="pt-confirm-btn" bindtap="onPickupConfirm">
+            <text>确认 {{pickupPreviewText || '请选择'}}</text>
           </view>
         </view>
       </view>
