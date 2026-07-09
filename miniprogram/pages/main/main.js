@@ -32,6 +32,8 @@ Page({
     cart: {}, cartItems: [], cartCount: 0, cartTotal: 0, cartOpen: false,
     paymentMethod: 'wechat', // 'wechat' | 'balance'
     pickupTimeValue: '', pickupTimeText: '', pickupTime: '',
+    pickupTimeOpen: false, pickupTimeSlots: [], pickupTimeIndex: '',
+    quickNow: '', quickM30: '', quickH1: '',
     detailProduct: null, detailOpen: false, detailQuantity: 1,
     dietaryRestrictions, selectedRestrictions: {},
     // 订单
@@ -431,17 +433,86 @@ Page({
     this.setData({ paymentMethod: method });
   },
 
-  onPickupTimeChange(e) {
-    const timeStr = e.detail.value; // "HH:mm"
-    if (!timeStr) return;
+  _buildPickupSlots() {
     const now = new Date();
-    const [h, m] = timeStr.split(':').map(Number);
+    const min = Math.ceil((now.getMinutes() + 1) / 15) * 15;
+    let h = now.getHours();
+    let m = min;
+    if (m >= 60) { h += 1; m = 0; }
     const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    const isoStr = `${today}T${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00`;
+
+    const pad = n => String(n).padStart(2, '0');
+    const fmt = (hh, mm) => `${pad(hh)}:${pad(mm)}`;
+
+    // Quick refs
+    const qNow = new Date(now.getTime() + 5 * 60000);
+    const qM30 = new Date(now.getTime() + 35 * 60000);
+    const qH1 = new Date(now.getTime() + 65 * 60000);
+    this.setData({
+      quickNow: fmt(qNow.getHours(), qNow.getMinutes()),
+      quickM30: fmt(qM30.getHours(), qM30.getMinutes()),
+      quickH1: fmt(qH1.getHours(), qH1.getMinutes()),
+    });
+
+    const slots = [];
+    for (let i = 0; i < 28; i++) {
+      const hh = h + Math.floor((m + i * 15) / 60);
+      const mm = (m + i * 15) % 60;
+      if (hh >= 22) break; // Stop at 22:00
+      const timeStr = fmt(hh, mm);
+      const iso = new Date(`${today}T${timeStr}:00`).toISOString();
+      slots.push({
+        value: timeStr,
+        text: timeStr,
+        iso,
+        past: false,
+        selected: this.data.pickupTimeValue === timeStr,
+      });
+    }
+    this.setData({ pickupTimeSlots: slots });
+  },
+
+  onPickupTimeTap() {
+    this._buildPickupSlots();
+    this.setData({ pickupTimeOpen: true });
+  },
+
+  onClosePickupTime() {
+    this.setData({ pickupTimeOpen: false });
+  },
+
+  onPickupTimeSelect(e) {
+    const { value, text, iso } = e.currentTarget.dataset;
+    this.setData({
+      pickupTimeValue: value,
+      pickupTimeText: `今天 ${value}`,
+      pickupTime: iso,
+      pickupTimeIndex: value,
+      pickupTimeOpen: false,
+    });
+    // Update slot selected states
+    const slots = this.data.pickupTimeSlots.map(s => ({ ...s, selected: s.value === value }));
+    this.setData({ pickupTimeSlots: slots });
+  },
+
+  onPickupQuick(e) {
+    const { key } = e.currentTarget.dataset;
+    const now = new Date();
+    let target;
+    if (key === 'now') target = new Date(now.getTime() + 5 * 60000);
+    else if (key === 'm30') target = new Date(now.getTime() + 35 * 60000);
+    else if (key === 'h1') target = new Date(now.getTime() + 65 * 60000);
+    if (!target) return;
+
+    const pad = n => String(n).padStart(2, '0');
+    const timeStr = `${pad(target.getHours())}:${pad(target.getMinutes())}`;
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     this.setData({
       pickupTimeValue: timeStr,
       pickupTimeText: `今天 ${timeStr}`,
-      pickupTime: new Date(isoStr).toISOString(),
+      pickupTime: new Date(`${today}T${timeStr}:00`).toISOString(),
+      pickupTimeIndex: key,
+      pickupTimeOpen: false,
     });
   },
 
