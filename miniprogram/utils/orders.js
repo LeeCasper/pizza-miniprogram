@@ -24,7 +24,22 @@ function formatOrder(o) {
     isPaid: !!o.paymentMethod,
     canCancel: !!o.canCancel,
     cancelDeadline: o.cancelDeadline || null,
+    pickupTimeText: formatPickupTimeText(o.pickupTime),
+    canPickup: o.status === 'preparing',
   };
+}
+
+function formatPickupTimeText(isoStr) {
+  if (!isoStr) return '';
+  try {
+    const d = new Date(isoStr);
+    if (isNaN(d.getTime())) return '';
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const hour = String(d.getHours()).padStart(2, '0');
+    const min = String(d.getMinutes()).padStart(2, '0');
+    return `${month}-${day} ${hour}:${min}`;
+  } catch (_) { return ''; }
 }
 
 module.exports = { ORDER_STATUS_MAP, formatOrder };

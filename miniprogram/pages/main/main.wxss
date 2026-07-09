@@ -349,6 +349,18 @@
 .coupon-select-name { font-size: 24rpx; color: #8A7B66; max-width: 280rpx; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .coupon-arrow { font-size: 32rpx; color: #ccc; margin-left: 4rpx; }
 
+/* ===== 预约取餐时间 ===== */
+.pickup-time-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20rpx 0; margin-bottom: 16rpx;
+  border-bottom: 1rpx solid var(--color-divider);
+}
+.pickup-time-label { font-size: 28rpx; color: #5E5142; flex-shrink: 0; }
+.pickup-time-right { display: flex; align-items: center; gap: 8rpx; }
+.pickup-time-value { font-size: 26rpx; color: #5E5142; }
+.pickup-time-value.placeholder { color: #bbb; }
+.pickup-time-arrow { font-size: 32rpx; color: #ccc; }
+
 /* ===== 价格明细 ===== */
 .price-breakdown {
   padding: 20rpx;
@@ -495,6 +507,7 @@
 .order-store-name { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .order-no { font-size: 24rpx; color: var(--color-on-surface-variant); }
 .order-time { font-size: 24rpx; color: var(--color-on-surface-variant); }
+.order-pickup-time { font-size: 24rpx; color: #C0563A; background: #FFF3ED; padding: 4rpx 12rpx; border-radius: 8rpx; margin-top: 6rpx; display: inline-block; }
 .order-header-right { display: flex; align-items: center; gap: 12rpx; flex-shrink: 0; }
 .order-status { padding: 8rpx 24rpx; border-radius: var(--radius-full); font-size: 24rpx; font-weight: var(--font-weight-semibold); flex-shrink: 0; box-shadow: inset 1rpx 1rpx 2rpx rgba(255,255,255,0.55), inset -1rpx -1rpx 3rpx rgba(120,108,94,0.2); }
 .order-status.completed { background: var(--color-tertiary-container); color: var(--color-tertiary); }
@@ -590,6 +603,8 @@
 .order-action-btn { padding: 14rpx 34rpx; border-radius: var(--radius-full); font-size: 26rpx; font-weight: var(--font-weight-semibold); white-space: nowrap; transition: transform 0.12s ease; }
 .order-action-btn.outline { color: #8A7B66; background: #EFE7DA; box-shadow: inset 2rpx 2rpx 4rpx rgba(120,108,94,0.18), inset -2rpx -2rpx 4rpx rgba(255,255,255,0.85); }
 .order-action-btn.primary { background: linear-gradient(160deg, #C9684C 0%, #A8472E 100%); color: #FFFFFF; box-shadow: inset 2rpx 2rpx 4rpx rgba(255,255,255,0.28), inset -3rpx -3rpx 7rpx rgba(120,40,28,0.4), 0 5rpx 13rpx rgba(150,60,40,0.28); }
+.order-action-btn.pickup-btn { background: var(--clay-bg-primary); color: #FFFFFF; box-shadow: var(--clay-shadow-button); }
+.order-action-btn.pickup-btn:active { transform: scale(0.96); opacity: 0.9; }
 .order-action-btn.pay-btn { background: linear-gradient(160deg, #CE4636 0%, #A22A1E 100%); color: #FFFFFF; box-shadow: inset 2rpx 2rpx 4rpx rgba(255,255,255,0.3), inset -3rpx -4rpx 8rpx rgba(120,30,20,0.45), 0 6rpx 16rpx rgba(150,40,28,0.4); }
 .order-action-btn.pay-btn:active { transform: scale(0.96); opacity: 0.9; }
 .order-action-btn.disabled { color: #bbb; background: #F0EBE3; box-shadow: none; opacity: 0.7; }

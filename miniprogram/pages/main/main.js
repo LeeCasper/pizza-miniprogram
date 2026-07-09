@@ -31,6 +31,7 @@ Page({
     banners: [],
     cart: {}, cartItems: [], cartCount: 0, cartTotal: 0, cartOpen: false,
     paymentMethod: 'wechat', // 'wechat' | 'balance'
+    pickupTimeValue: '', pickupTimeText: '', pickupTime: '',
     detailProduct: null, detailOpen: false, detailQuantity: 1,
     dietaryRestrictions, selectedRestrictions: {},
     // 订单
@@ -339,7 +340,7 @@ Page({
   onCartIncrease(e) { app.addToCart(e.currentTarget.dataset.product); },
   onCartBarTap() { this.setData({ cartOpen: true }); this.fetchAvailableCoupons(); this.recalcPrice(); },
   onCartClose() { this.setData({ cartOpen: false, couponPickerOpen: false }); },
-  onClearCart() { app.clearCart(); this.setData({ cartOpen: false, selectedCoupon: null, couponPickerOpen: false }); },
+  onClearCart() { app.clearCart(); this.setData({ cartOpen: false, selectedCoupon: null, couponPickerOpen: false, pickupTime: '', pickupTimeText: '', pickupTimeValue: '' }); },
 
   onCheckout() {
     if (this.data.cartCount === 0) {
@@ -372,6 +373,9 @@ Page({
     if (this.data.selectedCoupon) {
       payload.couponId = this.data.selectedCoupon.id;
     }
+    if (this.data.pickupTime) {
+      payload.pickupTime = this.data.pickupTime;
+    }
 
     wx.showLoading({ title: '提交中...' });
     api.post('/orders', payload).then(res => {
@@ -379,7 +383,7 @@ Page({
       if (res.code === 0) {
         const orderData = res.data;
         app.clearCart();
-        this.setData({ cartOpen: false, selectedCoupon: null, couponPickerOpen: false });
+        this.setData({ cartOpen: false, selectedCoupon: null, couponPickerOpen: false, pickupTime: '', pickupTimeText: '', pickupTimeValue: '' });
 
         // If wechat payment, initiate payment flow
         if (pm === 'wechat' && orderData.paymentStatus === 'unpaid') {
@@ -425,6 +429,20 @@ Page({
   onSwitchPaymentMethod(e) {
     const { method } = e.currentTarget.dataset;
     this.setData({ paymentMethod: method });
+  },
+
+  onPickupTimeChange(e) {
+    const timeStr = e.detail.value; // "HH:mm"
+    if (!timeStr) return;
+    const now = new Date();
+    const [h, m] = timeStr.split(':').map(Number);
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const isoStr = `${today}T${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00`;
+    this.setData({
+      pickupTimeValue: timeStr,
+      pickupTimeText: `今天 ${timeStr}`,
+      pickupTime: new Date(isoStr).toISOString(),
+    });
   },
 
   // ── 优惠券 ──────────────────────────────────
@@ -641,6 +659,34 @@ Page({
       }
     });
   },
+  onPickupComplete(e) {
+    const { id } = e.currentTarget.dataset;
+    wx.showModal({
+      title: '确认取餐',
+      content: '确认已到店取餐吗？',
+      confirmText: '已取餐',
+      cancelText: '再等等',
+      confirmColor: '#C0563A',
+      success: (res) => {
+        if (!res.confirm) return;
+        wx.showLoading({ title: '处理中...' });
+        api.put('/orders/' + id + '/complete').then(result => {
+          wx.hideLoading();
+          if (result.code === 0) {
+            wx.showToast({ title: '已确认取餐', icon: 'success' });
+            this.fetchOrders();
+          } else {
+            wx.showToast({ title: result.message || '操作失败', icon: 'none' });
+            this.fetchOrders();
+          }
+        }).catch(() => {
+          wx.hideLoading();
+          wx.showToast({ title: '操作失败', icon: 'none' });
+        });
+      },
+    });
+  },
+
   onCancelOrder(e) {
     const { id, paid } = e.currentTarget.dataset;
     const isPaid = paid === true || paid === 'true';

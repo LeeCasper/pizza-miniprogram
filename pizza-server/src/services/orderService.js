@@ -218,6 +218,14 @@ const orderService = {
     return this.findById(orderId);
   },
 
+  async markPickedUp(orderId, userId) {
+    const [result] = await pool.query(
+      "UPDATE orders SET status = 'completed', updated_at = NOW() WHERE id = ? AND user_id = ? AND status = 'preparing'",
+      [orderId, userId]
+    );
+    return result.affectedRows > 0;
+  },
+
   async getTodayMaxSeq(datePrefix) {
     const [rows] = await pool.query(
       "SELECT MAX(CAST(SUBSTRING(id, 9) AS UNSIGNED)) AS maxSeq FROM orders WHERE id LIKE ?",
@@ -412,6 +420,7 @@ function formatOrder(row, cancelMinutes) {
     paymentMethod: row.payment_method || null,
     transactionId: row.transaction_id || null,
     paidAt: row.paid_at || null,
+    pickupTime: row.pickup_time || null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

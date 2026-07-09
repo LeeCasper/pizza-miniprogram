@@ -90,6 +90,7 @@ const schemas = {
     couponId: Joi.number().integer().positive().optional(),
     note: Joi.string().max(500).optional().allow(''),
     paymentMethod: Joi.string().valid('wechat', 'balance').optional().default('wechat'),
+    pickupTime: Joi.date().iso().optional(),
   }),
 
   redeemPoints: Joi.object({

@@ -27,6 +27,7 @@
             </view>
             <text class="order-no">单号 {{item.id}}</text>
             <text class="order-time">{{item.time}}</text>
+            <text class="order-pickup-time" wx:if="{{item.pickupTimeText}}">🕐 取餐 {{item.pickupTimeText}}</text>
           </view>
           <view class="order-header-right">
             <text class="payment-badge {{item.isPaid ? 'paid' : 'unpaid'}}">{{item.paymentStatusText}}</text>
@@ -71,6 +72,7 @@
             <text class="order-total">实付 <text class="total-price">¥{{item.paidAmount}}</text></text>
           </view>
           <view class="order-actions">
+            <view class="order-action-btn pickup-btn" wx:if="{{item.canPickup}}" bindtap="onPickupComplete" data-id="{{item.id}}"><text>已取餐</text></view>
             <view class="order-action-btn pay-btn" wx:if="{{!item.isPaid && item.status !== 'cancelled'}}" bindtap="onPayOrder" data-id="{{item.id}}"><text>去支付</text></view>
             <view class="order-action-btn outline" wx:if="{{item.canCancel}}" bindtap="onCancelOrder" data-id="{{item.id}}" data-paid="{{item.isPaid}}"><text>{{item.isPaid ? '取消退款' : '取消订单'}}</text></view>
             <view class="cancel-disabled-wrap" wx:elif="{{item.status !== 'cancelled' && item.status !== 'completed'}}">

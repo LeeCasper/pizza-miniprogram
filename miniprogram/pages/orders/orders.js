@@ -150,6 +150,34 @@ Page({
     });
   },
 
+  onPickupComplete(e) {
+    const { id } = e.currentTarget.dataset;
+    wx.showModal({
+      title: '确认取餐',
+      content: '确认已到店取餐吗？',
+      confirmText: '已取餐',
+      cancelText: '再等等',
+      confirmColor: '#C0563A',
+      success: (res) => {
+        if (!res.confirm) return;
+        wx.showLoading({ title: '处理中...' });
+        api.put('/orders/' + id + '/complete').then(result => {
+          wx.hideLoading();
+          if (result.code === 0) {
+            wx.showToast({ title: '已确认取餐', icon: 'success' });
+            this.fetchOrders();
+          } else {
+            wx.showToast({ title: result.message || '操作失败', icon: 'none' });
+            this.fetchOrders();
+          }
+        }).catch(() => {
+          wx.hideLoading();
+          wx.showToast({ title: '操作失败', icon: 'none' });
+        });
+      },
+    });
+  },
+
   onCancelOrder(e) {
     const { id, paid } = e.currentTarget.dataset;
     const isPaid = paid === true || paid === 'true';

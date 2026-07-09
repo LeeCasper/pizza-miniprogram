@@ -43,7 +43,7 @@ const orderController = {
       await conn.beginTransaction();
 
       const userId = req.user.id;
-      const { couponId, note, paymentMethod = 'wechat' } = req.body;
+      const { couponId, note, paymentMethod = 'wechat', pickupTime } = req.body;
 
       // 1. Get cart items with current prices
       const cartItems = await cartService.getCartWithProducts(userId);
@@ -206,10 +206,10 @@ const orderController = {
 
       // 6. Insert order
       await conn.query(
-        `INSERT INTO orders (id, user_id, status, total, discount_amount, paid_amount, pickup_code, store_name, coupon_used_id, note, payment_method, paid_at)
-         VALUES (?, ?, 'waiting', ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO orders (id, user_id, status, total, discount_amount, paid_amount, pickup_code, store_name, coupon_used_id, note, pickup_time, payment_method, paid_at)
+         VALUES (?, ?, 'waiting', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [orderId, userId, total.toFixed(2), discountAmount.toFixed(2), paidAmount.toFixed(2),
-         pickupCode, require('../config').business.storeName, couponUsedId, note || '', paymentMethodValue, paidAt]
+         pickupCode, require('../config').business.storeName, couponUsedId, note || '', pickupTime || null, paymentMethodValue, paidAt]
       );
 
       // 7. Insert order items
@@ -382,6 +382,39 @@ const orderController = {
         : '订单已取消';
 
       res.json({ code: 0, data: cancelled, refund, message });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async complete(req, res, next) {
+    try {
+      const existing = await orderService.findById(req.params.id);
+      if (!existing || existing.userId !== req.user.id) {
+        return res.status(400).json({ code: 400, message: '订单不存在' });
+      }
+      if (existing.status !== 'preparing') {
+        return res.status(400).json({
+          code: 400,
+          message: existing.status === 'completed'
+            ? '订单已取餐'
+            : '订单尚未开始制作，无法确认取餐',
+        });
+      }
+
+      await orderService.markPickedUp(req.params.id, req.user.id);
+
+      await auditService.record({
+        actorType: 'user',
+        actorId: req.user.id,
+        action: 'order.user_picked_up',
+        entityType: 'order',
+        entityId: req.params.id,
+        before: { status: 'preparing' },
+        after: { status: 'completed' },
+      });
+
+      res.json({ code: 0, message: '已确认取餐' });
     } catch (err) {
       next(err);
     }

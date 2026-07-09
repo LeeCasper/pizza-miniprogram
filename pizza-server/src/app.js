@@ -14,6 +14,7 @@ const { requestId } = require('./middleware/requestId');
 const { createLogger } = require('./utils/logger');
 const couponService = require('./services/couponService');
 const orderCleanupService = require('./services/orderCleanupService');
+const orderAutoCompleteService = require('./services/orderAutoCompleteService');
 const pool = require('./config/database');
 
 const serverLog = createLogger('Server');
@@ -236,6 +237,18 @@ const orderCleanupJob = cron.schedule('*/5 * * * *', async () => {
   }
 });
 
+// ── Cron: auto-complete picked-up orders every 5 minutes ──
+const autoCompleteJob = cron.schedule('*/5 * * * *', async () => {
+  try {
+    const count = await orderAutoCompleteService.autoCompleteOrders();
+    if (count > 0) {
+      cronLog.info({ count }, 'Auto-completed pickup orders');
+    }
+  } catch (err) {
+    cronLog.error({ err }, 'Auto-complete error');
+  }
+});
+
 // ── Graceful shutdown ──────────────────────────────────
 let isShuttingDown = false;
 
@@ -252,6 +265,7 @@ async function shutdown(signal) {
   // 2. Stop cron jobs
   couponCronJob.stop();
   orderCleanupJob.stop();
+  autoCompleteJob.stop();
 
   // 3. Close DB pool
   try {

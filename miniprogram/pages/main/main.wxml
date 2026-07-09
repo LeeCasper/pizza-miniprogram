@@ -138,6 +138,16 @@
               </view>
             </view>
           </view>
+          <!-- 预约取餐时间 -->
+          <picker mode="time" value="{{pickupTimeValue}}" bindchange="onPickupTimeChange">
+            <view class="pickup-time-row">
+              <text class="pickup-time-label">🕐 预约取餐</text>
+              <view class="pickup-time-right">
+                <text class="pickup-time-value {{pickupTimeText ? '' : 'placeholder'}}">{{pickupTimeText || '请选择取餐时间'}}</text>
+                <text class="pickup-time-arrow">›</text>
+              </view>
+            </view>
+          </picker>
           <!-- 支付方式 -->
           <view class="pay-method-row">
             <view class="pay-method-item {{paymentMethod === 'wechat' ? 'active' : ''}}" bindtap="onSwitchPaymentMethod" data-method="wechat">
