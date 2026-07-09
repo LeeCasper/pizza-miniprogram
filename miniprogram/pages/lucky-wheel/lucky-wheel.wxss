@@ -174,7 +174,7 @@
   0%, 100% { box-shadow: 0 4rpx 16rpx rgba(245, 158, 11, 0.22), 0 0 0 4rpx rgba(251, 191, 36, 0.08); }
   50% { box-shadow: 0 6rpx 22rpx rgba(245, 158, 11, 0.35), 0 0 0 10rpx rgba(251, 191, 36, 0.16); }
 }
-.free-badge-icon { font-size: 34rpx; margin-right: 4rpx; }
+.free-badge-icon { width: 38rpx; height: 38rpx; margin-right: 4rpx; flex-shrink: 0; }
 .free-badge-text { font-size: 30rpx; color: #92400E; font-weight: 500; }
 .free-badge-num { font-size: 44rpx; color: #EA580C; font-weight: 800; line-height: 1; margin: 0 4rpx; }
 

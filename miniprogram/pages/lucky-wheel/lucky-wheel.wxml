@@ -73,7 +73,7 @@
       <!-- Status line — free count gets prominent badge -->
       <view class="status-line">
         <view wx:if="{{freeRemaining > 0}}" class="free-badge">
-          <text class="free-badge-icon">🎁</text>
+          <image class="free-badge-icon" src="/images/icon-free-draw.png" mode="aspectFit"></image>
           <text class="free-badge-text">今日免费 </text>
           <text class="free-badge-num">{{freeRemaining}}</text>
           <text class="free-badge-text"> 次</text>
