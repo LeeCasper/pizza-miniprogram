@@ -98,16 +98,15 @@
         </view>
       </view>
 
-      <!-- Share: visuals are views/image (no button text-clipping); transparent button overlay catches the tap -->
-      <view class="share-card">
+      <!-- Share button — whole card tappable -->
+      <button class="share-card" open-type="share" hover-class="share-card-press">
         <image class="share-icon" src="/images/share.png" mode="aspectFit"></image>
         <view class="share-mid">
           <text class="share-title">分享活动 邀请好友</text>
           <text class="share-sub">邀请好友一起抽大奖</text>
         </view>
         <text class="share-arrow">›</text>
-        <button class="share-hit" open-type="share" hover-class="none"></button>
-      </view>
+      </button>
 
       <!-- Footer -->
       <view class="lw-footer">🛡 公平公正公开 · 中奖概率透明</view>
