@@ -160,6 +160,23 @@
 .spin-go2 { color: #FFFFFF; font-size: 38rpx; font-weight: 700; line-height: 1.15; }
 
 .status-line { margin-top: 8rpx; margin-bottom: 28rpx; font-size: 26rpx; color: var(--color-on-surface-variant); }
+/* Free-draw badge */
+.free-badge {
+  display: inline-flex; align-items: center;
+  padding: 14rpx 28rpx;
+  border-radius: 40rpx;
+  background: linear-gradient(135deg, #FFF7ED 0%, #FEEBD6 100%);
+  border: 2rpx solid rgba(245, 158, 11, 0.35);
+  box-shadow: 0 4rpx 16rpx rgba(245, 158, 11, 0.22), 0 0 0 4rpx rgba(251, 191, 36, 0.08);
+  animation: freePulse 2s ease-in-out infinite;
+}
+@keyframes freePulse {
+  0%, 100% { box-shadow: 0 4rpx 16rpx rgba(245, 158, 11, 0.22), 0 0 0 4rpx rgba(251, 191, 36, 0.08); }
+  50% { box-shadow: 0 6rpx 22rpx rgba(245, 158, 11, 0.35), 0 0 0 10rpx rgba(251, 191, 36, 0.16); }
+}
+.free-badge-icon { font-size: 36rpx; margin-right: 6rpx; }
+.free-badge-text { font-size: 26rpx; color: #92400E; font-weight: 500; }
+.free-badge-num { font-size: 40rpx; color: #EA580C; font-weight: 800; line-height: 1; margin: 0 2rpx; }
 
 /* ── Info links card ── */
 .info-card {

@@ -70,9 +70,14 @@
         </view>
       </view>
 
-      <!-- Status line -->
+      <!-- Status line — free count gets prominent badge -->
       <view class="status-line">
-        <text wx:if="{{freeRemaining > 0}}">今日免费剩 {{freeRemaining}} 次</text>
+        <view wx:if="{{freeRemaining > 0}}" class="free-badge">
+          <text class="free-badge-icon">🎁</text>
+          <text class="free-badge-text">今日免费 </text>
+          <text class="free-badge-num">{{freeRemaining}}</text>
+          <text class="free-badge-text"> 次</text>
+        </view>
         <text wx:elif="{{drawsRemaining > 0}}">加抽 {{pointsCost}} 积分/次 · 当前 {{userPoints}} 积分</text>
         <text wx:else>今日次数已用完，明天再来~</text>
       </view>
