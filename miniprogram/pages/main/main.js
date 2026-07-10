@@ -33,9 +33,6 @@ Page({
     paymentMethod: 'wechat', // 'wechat' | 'balance'
     orderNote: '',
     pickupTimeValue: '', pickupTimeText: '', pickupTime: '',
-    pickupTimeOpen: false, pickupTimeIndex: '',
-    pickupHours: [], pickupMinutes: [],
-    pickupPickerValue: [0, 0], pickupPreviewText: '',
     detailProduct: null, detailOpen: false, detailQuantity: 1,
     dietaryRestrictions, selectedRestrictions: {},
     // 订单
@@ -445,73 +442,13 @@ Page({
     this.setData({ paymentMethod: method });
   },
 
-  _buildPickupPicker() {
+  onPickupTimeChange(e) {
+    const timeStr = e.detail.value; // "HH:mm"
+    if (!timeStr) return;
     const now = new Date();
-    const pad = n => String(n).padStart(2, '0');
-
-    // Earliest allowed: now + 15 min
-    const minTime = new Date(now.getTime() + 15 * 60000);
-    const minH = minTime.getHours();
-    const minM = minTime.getMinutes();
-
-    // Build hours: from minH to 21
-    const hours = [];
-    for (let h = minH; h <= 21; h++) {
-      hours.push(pad(h));
-    }
-
-    // Build full minutes array ['00'..'59']
-    const minutes = [];
-    for (let i = 0; i < 60; i++) {
-      minutes.push(pad(i));
-    }
-
-    // Find first valid minute index for the first hour
-    let initMinIdx = 0;
-    if (hours.length > 0 && parseInt(hours[0]) === minH) {
-      initMinIdx = Math.max(0, minM);
-    }
-
-    const prevM = minutes[initMinIdx];
-    const preview = `${hours[0]}:${prevM}`;
-
-    this.setData({
-      pickupHours: hours,
-      pickupMinutes: minutes,
-      pickupPickerValue: [0, initMinIdx],
-      pickupPreviewText: preview,
-    });
-  },
-
-  onPickupTimeTap() {
-    this._buildPickupPicker();
-    this.setData({ pickupTimeOpen: true, pickupTimeIndex: '' });
-  },
-
-  onClosePickupTime() {
-    this.setData({ pickupTimeOpen: false });
-  },
-
-  onPickupPickerChange(e) {
-    const [hi, mi] = e.detail.value;
-    const pad = n => String(n).padStart(2, '0');
-    const h = this.data.pickupHours[hi];
-    const m = this.data.pickupMinutes[mi];
-    this.setData({
-      pickupPickerValue: [hi, mi],
-      pickupPreviewText: `${pad(h)}:${pad(m)}`,
-    });
-  },
-
-  onPickupConfirm() {
-    const [hi, mi] = this.data.pickupPickerValue;
-    const pad = n => String(n).padStart(2, '0');
-    const h = this.data.pickupHours[hi];
-    const m = this.data.pickupMinutes[mi];
-    const timeStr = `${pad(h)}:${pad(m)}`;
-    const now = new Date();
+    const [h, m] = timeStr.split(':').map(Number);
     const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    const pickupDate = new Date(`${today}T${timeStr}:00`);
+    const pickupDate = new Date(`${today}T${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00`);
     // Guard: must be at least 15 min from now
     if (pickupDate.getTime() < now.getTime() + 15 * 60000) {
       wx.showToast({ title: '请选择至少15分钟后的时间', icon: 'none' });
@@ -521,28 +458,6 @@ Page({
       pickupTimeValue: timeStr,
       pickupTimeText: `今天 ${timeStr}`,
       pickupTime: pickupDate.toISOString(),
-      pickupTimeOpen: false,
-    });
-  },
-
-  onPickupQuick(e) {
-    const { key } = e.currentTarget.dataset;
-    const now = new Date();
-    let target;
-    if (key === 'now') target = new Date(now.getTime() + 5 * 60000);
-    else if (key === 'm30') target = new Date(now.getTime() + 35 * 60000);
-    else if (key === 'h1') target = new Date(now.getTime() + 65 * 60000);
-    if (!target) return;
-
-    const pad = n => String(n).padStart(2, '0');
-    const timeStr = `${pad(target.getHours())}:${pad(target.getMinutes())}`;
-    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    this.setData({
-      pickupTimeValue: timeStr,
-      pickupTimeText: `今天 ${timeStr}`,
-      pickupTime: new Date(`${today}T${timeStr}:00`).toISOString(),
-      pickupTimeIndex: key,
-      pickupTimeOpen: false,
     });
   },
 

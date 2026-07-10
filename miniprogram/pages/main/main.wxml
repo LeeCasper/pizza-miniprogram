@@ -139,16 +139,18 @@
             </view>
           </view>
           <!-- 预约取餐时间 -->
-          <view class="pickup-time-row" bindtap="onPickupTimeTap">
-            <view class="pickup-time-left">
-              <image class="pickup-time-icon" src="/images/icon-pickup-time.png" mode="aspectFit"></image>
-              <text class="pickup-time-label">预约取餐</text>
+          <picker mode="time" value="{{pickupTimeValue}}" bindchange="onPickupTimeChange">
+            <view class="pickup-time-row">
+              <view class="pickup-time-left">
+                <image class="pickup-time-icon" src="/images/icon-pickup-time.png" mode="aspectFit"></image>
+                <text class="pickup-time-label">预约取餐</text>
+              </view>
+              <view class="pickup-time-right">
+                <text class="pickup-time-value {{pickupTimeText ? '' : 'placeholder'}}">{{pickupTimeText || '请选择取餐时间'}}</text>
+                <text class="pickup-time-arrow">›</text>
+              </view>
             </view>
-            <view class="pickup-time-right">
-              <text class="pickup-time-value {{pickupTimeText ? '' : 'placeholder'}}">{{pickupTimeText || '请选择取餐时间'}}</text>
-              <text class="pickup-time-arrow">›</text>
-            </view>
-          </view>
+          </picker>
           <!-- 备注 -->
           <view class="note-row">
             <image class="note-icon" src="/images/icon-notes.png" mode="aspectFit"></image>
@@ -166,53 +168,6 @@
             </view>
           </view>
           <view class="checkout-btn" bindtap="onCheckout"><text>确认下单 ¥{{finalPrice}}</text></view>
-        </view>
-      </view>
-    </view>
-
-    <!-- 取餐时间选择面板 -->
-    <view class="pt-panel-overlay {{pickupTimeOpen ? 'show' : ''}}" catchtap="onClosePickupTime">
-      <view class="pt-panel {{pickupTimeOpen ? 'show' : ''}}" catchtap="noop">
-        <view class="pt-panel-header">
-          <text class="pt-panel-title">选择取餐时间</text>
-          <text class="pt-panel-close" catchtap="onClosePickupTime">✕</text>
-        </view>
-        <!-- 快速选择 -->
-        <view class="pt-quick-row">
-          <view class="pt-quick-item {{pickupTimeIndex === 'now' ? 'active' : ''}}" bindtap="onPickupQuick" data-key="now">
-            <text class="pt-quick-num">现在</text>
-          </view>
-          <view class="pt-quick-item {{pickupTimeIndex === 'm30' ? 'active' : ''}}" bindtap="onPickupQuick" data-key="m30">
-            <text class="pt-quick-num">30分后</text>
-          </view>
-          <view class="pt-quick-item {{pickupTimeIndex === 'h1' ? 'active' : ''}}" bindtap="onPickupQuick" data-key="h1">
-            <text class="pt-quick-num">1小时后</text>
-          </view>
-        </view>
-        <!-- 提示 -->
-        <view class="pt-hint">🍕 制作需要大概 10 分钟</view>
-        <!-- 滚轮选择器 (picker-view 原生惯性滚动 + 居中吸附) -->
-        <view class="pt-picker-wrap">
-          <picker-view
-            class="pt-picker-view"
-            value="{{pickupPickerValue}}"
-            bindchange="onPickupPickerChange"
-            indicator-style="height:88rpx;border-top:2rpx solid rgba(180,160,140,0.35);border-bottom:2rpx solid rgba(180,160,140,0.35);background:linear-gradient(180deg,rgba(253,240,235,0.55),rgba(253,240,235,0.30));border-radius:12rpx;"
-            mask-style="background:linear-gradient(180deg,rgba(248,243,234,1) 0%,rgba(248,243,234,1) 8%,rgba(248,243,234,1) 18%,rgba(248,243,234,0.55) 30%,rgba(248,243,234,0) 42%,rgba(248,243,234,0) 58%,rgba(248,243,234,0.55) 70%,rgba(248,243,234,1) 82%,rgba(248,243,234,1) 92%,rgba(248,243,234,1) 100%);"
-          >
-            <picker-view-column>
-              <view wx:for="{{pickupHours}}" wx:key="*this" class="pt-pv-item">{{item}} 时</view>
-            </picker-view-column>
-            <picker-view-column>
-              <view wx:for="{{pickupMinutes}}" wx:key="*this" class="pt-pv-item">{{item}} 分</view>
-            </picker-view-column>
-          </picker-view>
-        </view>
-        <!-- 确认按钮 -->
-        <view class="pt-confirm-wrap">
-          <view class="pt-confirm-btn" bindtap="onPickupConfirm">
-            <text>确认 {{pickupPreviewText || '请选择'}}</text>
-          </view>
         </view>
       </view>
     </view>
