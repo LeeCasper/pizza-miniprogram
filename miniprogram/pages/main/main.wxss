@@ -427,47 +427,18 @@
   font-size: 24rpx; color: #8B5E3C; font-weight: 600; letter-spacing: 1rpx;
 }
 
-/* Custom scroll picker */
+/* picker-view 滚轮选择器 */
 .pt-picker-wrap {
-  position: relative; height: 440rpx; margin: 0 28rpx; flex-shrink: 0;
+  height: 440rpx; margin: 0 28rpx; flex-shrink: 0;
 }
-.pt-picker-mask {
-  position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 2;
-  background: linear-gradient(180deg,
-    rgba(248,243,234,1) 0%,
-    rgba(248,243,234,0.55) 28%,
-    rgba(248,243,234,0) 50%,
-    rgba(248,243,234,0.55) 72%,
-    rgba(248,243,234,1) 100%
-  );
-  pointer-events: none;
+.pt-picker-view {
+  width: 100%; height: 100%;
 }
-.pt-picker-indicator {
-  position: absolute; top: 50%; left: 0; right: 0;
-  height: 88rpx; transform: translateY(-50%); z-index: 1;
-  border-top: 2rpx solid rgba(180,160,140,0.25);
-  border-bottom: 2rpx solid rgba(180,160,140,0.25);
-  pointer-events: none;
+/* picker item */
+.pt-pv-item {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 34rpx; color: #5E5142; font-weight: 600;
 }
-.pt-picker-cols {
-  position: relative; z-index: 3; display: flex; height: 100%;
-}
-.pt-pv-col {
-  flex: 1; height: 100%; overflow-y: auto;
-}
-.pt-pv-cell {
-  height: 88rpx; line-height: 88rpx; text-align: center;
-  font-size: 34rpx; color: #b0a090; font-weight: 500;
-  transition: all 0.2s;
-}
-.pt-pv-cell.active {
-  color: #C0563A; font-weight: 700; font-size: 36rpx;
-  background: linear-gradient(180deg, rgba(253,240,235,0.9), rgba(252,230,220,0.85));
-  border-radius: 16rpx;
-  box-shadow: inset 0 1rpx 1rpx rgba(255,255,255,0.8);
-  margin: 0 8rpx;
-}
-.pt-pv-spacer { height: 176rpx; flex-shrink: 0; }
 
 /* Confirm button */
 .pt-confirm-wrap { padding: 20rpx 28rpx 0; flex-shrink: 0; }

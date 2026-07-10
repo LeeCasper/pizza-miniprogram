@@ -191,46 +191,22 @@
         </view>
         <!-- 提示 -->
         <view class="pt-hint">🍕 制作需要大概 10 分钟</view>
-        <!-- 自定义双列滚轮 -->
+        <!-- 滚轮选择器 (picker-view 原生惯性滚动 + 居中吸附) -->
         <view class="pt-picker-wrap">
-          <view class="pt-picker-mask"></view>
-          <view class="pt-picker-indicator"></view>
-          <view class="pt-picker-cols">
-            <!-- 小时列 -->
-            <scroll-view
-              scroll-y enhanced show-scrollbar="{{false}}"
-              class="pt-pv-col"
-              scroll-top="{{pickupHourScroll}}"
-              scroll-with-animation="{{true}}"
-              bindscrolltoupper="noop"
-            >
-              <view class="pt-pv-spacer"></view>
-              <view
-                wx:for="{{pickupHours}}" wx:key="*this" wx:for-index="hi"
-                class="pt-pv-cell {{hi === pickupPickerValue[0] ? 'active' : ''}}"
-                data-hi="{{hi}}"
-                bindtap="onPickupHourTap"
-              >{{item}}</view>
-              <view class="pt-pv-spacer"></view>
-            </scroll-view>
-            <!-- 分钟列 -->
-            <scroll-view
-              scroll-y enhanced show-scrollbar="{{false}}"
-              class="pt-pv-col"
-              scroll-top="{{pickupMinuteScroll}}"
-              scroll-with-animation="{{true}}"
-              bindscrolltoupper="noop"
-            >
-              <view class="pt-pv-spacer"></view>
-              <view
-                wx:for="{{pickupMinutes}}" wx:key="*this" wx:for-index="mi"
-                class="pt-pv-cell {{mi === pickupPickerValue[1] ? 'active' : ''}}"
-                data-mi="{{mi}}"
-                bindtap="onPickupMinuteTap"
-              >{{item}}</view>
-              <view class="pt-pv-spacer"></view>
-            </scroll-view>
-          </view>
+          <picker-view
+            class="pt-picker-view"
+            value="{{pickupPickerValue}}"
+            bindchange="onPickupPickerChange"
+            indicator-style="height:88rpx;border-top:2rpx solid rgba(180,160,140,0.30);border-bottom:2rpx solid rgba(180,160,140,0.30);background:rgba(192,86,58,0.04);"
+            mask-style="background:linear-gradient(180deg,rgba(248,243,234,1) 0%,rgba(248,243,234,0.5) 30%,rgba(248,243,234,0) 50%,rgba(248,243,234,0.5) 70%,rgba(248,243,234,1) 100%);"
+          >
+            <picker-view-column>
+              <view wx:for="{{pickupHours}}" wx:key="*this" class="pt-pv-item">{{item}} 时</view>
+            </picker-view-column>
+            <picker-view-column>
+              <view wx:for="{{pickupMinutes}}" wx:key="*this" class="pt-pv-item">{{item}} 分</view>
+            </picker-view-column>
+          </picker-view>
         </view>
         <!-- 确认按钮 -->
         <view class="pt-confirm-wrap">

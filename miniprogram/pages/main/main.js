@@ -36,7 +36,6 @@ Page({
     pickupTimeOpen: false, pickupTimeIndex: '',
     pickupHours: [], pickupMinutes: [],
     pickupPickerValue: [0, 0], pickupPreviewText: '',
-    pickupHourScroll: 0, pickupMinuteScroll: 0,
     detailProduct: null, detailOpen: false, detailQuantity: 1,
     dietaryRestrictions, selectedRestrictions: {},
     // 订单
@@ -481,8 +480,6 @@ Page({
       pickupMinutes: minutes,
       pickupPickerValue: [0, initMinIdx],
       pickupPreviewText: preview,
-      pickupHourScroll: 0,
-      pickupMinuteScroll: initMinIdx * 88,
     });
   },
 
@@ -495,17 +492,8 @@ Page({
     this.setData({ pickupTimeOpen: false });
   },
 
-  _scrollToCell(hi, mi) {
-    const CELL_H = 88; // rpx
-    this.setData({
-      pickupHourScroll: hi * CELL_H,
-      pickupMinuteScroll: mi * CELL_H,
-    });
-  },
-
-  onPickupHourTap(e) {
-    const hi = e.currentTarget.dataset.hi;
-    const [_, mi] = this.data.pickupPickerValue;
+  onPickupPickerChange(e) {
+    const [hi, mi] = e.detail.value;
     const pad = n => String(n).padStart(2, '0');
     const h = this.data.pickupHours[hi];
     const m = this.data.pickupMinutes[mi];
@@ -513,20 +501,6 @@ Page({
       pickupPickerValue: [hi, mi],
       pickupPreviewText: `${pad(h)}:${pad(m)}`,
     });
-    this._scrollToCell(hi, mi);
-  },
-
-  onPickupMinuteTap(e) {
-    const mi = e.currentTarget.dataset.mi;
-    const [hi] = this.data.pickupPickerValue;
-    const pad = n => String(n).padStart(2, '0');
-    const h = this.data.pickupHours[hi];
-    const m = this.data.pickupMinutes[mi];
-    this.setData({
-      pickupPickerValue: [hi, mi],
-      pickupPreviewText: `${pad(h)}:${pad(m)}`,
-    });
-    this._scrollToCell(hi, mi);
   },
 
   onPickupConfirm() {
