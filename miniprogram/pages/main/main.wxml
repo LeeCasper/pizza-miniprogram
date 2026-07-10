@@ -181,6 +181,8 @@
             <text class="pt-quick-num">1小时后</text>
           </view>
         </view>
+        <!-- 提示 -->
+        <view class="pt-hint">🍕 制作需要大概 10 分钟</view>
         <!-- 自定义双列滚轮 -->
         <view class="pt-picker-wrap">
           <view class="pt-picker-mask"></view>
