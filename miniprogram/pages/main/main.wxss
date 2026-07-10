@@ -432,6 +432,7 @@
 .pt-picker-view { width: 100%; height: 352rpx; position: relative; z-index: 3; }
 .pt-pv-item {
   display: flex; align-items: center; justify-content: center;
+  height: 88rpx; line-height: 88rpx;
   font-size: 34rpx; color: #5E5142; font-weight: 600;
 }
 
