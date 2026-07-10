@@ -36,6 +36,7 @@ Page({
     pickupTimeOpen: false, pickupTimeIndex: '',
     pickupHours: [], pickupMinutes: [],
     pickupPickerValue: [0, 0], pickupPreviewText: '',
+    pickupHourScroll: 0, pickupMinuteScroll: 0,
     detailProduct: null, detailOpen: false, detailQuantity: 1,
     dietaryRestrictions, selectedRestrictions: {},
     // 订单
@@ -480,6 +481,8 @@ Page({
       pickupMinutes: minutes,
       pickupPickerValue: [0, initMinIdx],
       pickupPreviewText: preview,
+      pickupHourScroll: 0,
+      pickupMinuteScroll: initMinIdx * 88,
     });
   },
 
@@ -492,6 +495,14 @@ Page({
     this.setData({ pickupTimeOpen: false });
   },
 
+  _scrollToCell(hi, mi) {
+    const CELL_H = 88; // rpx
+    this.setData({
+      pickupHourScroll: hi * CELL_H,
+      pickupMinuteScroll: mi * CELL_H,
+    });
+  },
+
   onPickupHourTap(e) {
     const hi = e.currentTarget.dataset.hi;
     const [_, mi] = this.data.pickupPickerValue;
@@ -502,6 +513,7 @@ Page({
       pickupPickerValue: [hi, mi],
       pickupPreviewText: `${pad(h)}:${pad(m)}`,
     });
+    this._scrollToCell(hi, mi);
   },
 
   onPickupMinuteTap(e) {
@@ -514,6 +526,7 @@ Page({
       pickupPickerValue: [hi, mi],
       pickupPreviewText: `${pad(h)}:${pad(m)}`,
     });
+    this._scrollToCell(hi, mi);
   },
 
   onPickupConfirm() {

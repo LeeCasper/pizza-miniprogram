@@ -454,12 +454,10 @@
 }
 .pt-pv-col {
   flex: 1; height: 100%; overflow-y: auto;
-  scroll-snap-type: y mandatory;
 }
 .pt-pv-cell {
   height: 88rpx; line-height: 88rpx; text-align: center;
   font-size: 34rpx; color: #b0a090; font-weight: 500;
-  scroll-snap-align: center;
   transition: all 0.2s;
 }
 .pt-pv-cell.active {

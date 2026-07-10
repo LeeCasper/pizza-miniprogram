@@ -200,12 +200,13 @@
             <scroll-view
               scroll-y enhanced show-scrollbar="{{false}}"
               class="pt-pv-col"
-              scroll-into-view="{{'ph-' + pickupPickerValue[0]}}"
-              scroll-with-animation="{{false}}"
+              scroll-top="{{pickupHourScroll}}"
+              scroll-with-animation="{{true}}"
+              bindscrolltoupper="noop"
             >
+              <view class="pt-pv-spacer"></view>
               <view
                 wx:for="{{pickupHours}}" wx:key="*this" wx:for-index="hi"
-                id="ph-{{hi}}"
                 class="pt-pv-cell {{hi === pickupPickerValue[0] ? 'active' : ''}}"
                 data-hi="{{hi}}"
                 bindtap="onPickupHourTap"
@@ -216,12 +217,13 @@
             <scroll-view
               scroll-y enhanced show-scrollbar="{{false}}"
               class="pt-pv-col"
-              scroll-into-view="{{'pm-' + pickupPickerValue[1]}}"
-              scroll-with-animation="{{false}}"
+              scroll-top="{{pickupMinuteScroll}}"
+              scroll-with-animation="{{true}}"
+              bindscrolltoupper="noop"
             >
+              <view class="pt-pv-spacer"></view>
               <view
                 wx:for="{{pickupMinutes}}" wx:key="*this" wx:for-index="mi"
-                id="pm-{{mi}}"
                 class="pt-pv-cell {{mi === pickupPickerValue[1] ? 'active' : ''}}"
                 data-mi="{{mi}}"
                 bindtap="onPickupMinuteTap"
