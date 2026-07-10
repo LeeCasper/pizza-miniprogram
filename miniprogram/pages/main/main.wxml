@@ -140,7 +140,10 @@
           </view>
           <!-- 预约取餐时间 -->
           <view class="pickup-time-row" bindtap="onPickupTimeTap">
-            <text class="pickup-time-label">🕐 预约取餐</text>
+            <view class="pickup-time-left">
+              <image class="pickup-time-icon" src="/images/icon-pickup-time.png" mode="aspectFit"></image>
+              <text class="pickup-time-label">预约取餐</text>
+            </view>
             <view class="pickup-time-right">
               <text class="pickup-time-value {{pickupTimeText ? '' : 'placeholder'}}">{{pickupTimeText || '请选择取餐时间'}}</text>
               <text class="pickup-time-arrow">›</text>
