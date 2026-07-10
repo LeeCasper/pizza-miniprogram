@@ -181,24 +181,44 @@
             <text class="pt-quick-num">1小时后</text>
           </view>
         </view>
-        <!-- 滚轮选择器 -->
+        <!-- 自定义双列滚轮 -->
         <view class="pt-picker-wrap">
           <view class="pt-picker-mask"></view>
           <view class="pt-picker-indicator"></view>
-          <picker-view
-            class="pt-picker-view"
-            value="{{pickupPickerValue}}"
-            bindchange="onPickupPickerChange"
-            indicator-style="height: 88rpx;"
-            mask-style="background: transparent;"
-          >
-            <picker-view-column>
-              <view wx:for="{{pickupHours}}" wx:key="*this" style="height:88rpx;line-height:88rpx;display:flex;align-items:center;justify-content:center;font-size:34rpx;color:#5E5142;font-weight:600;">{{item}} 时</view>
-            </picker-view-column>
-            <picker-view-column>
-              <view wx:for="{{pickupMinutes}}" wx:key="*this" style="height:88rpx;line-height:88rpx;display:flex;align-items:center;justify-content:center;font-size:34rpx;color:#5E5142;font-weight:600;">{{item}} 分</view>
-            </picker-view-column>
-          </picker-view>
+          <view class="pt-picker-cols">
+            <!-- 小时列 -->
+            <scroll-view
+              scroll-y enhanced show-scrollbar="{{false}}"
+              class="pt-pv-col"
+              scroll-into-view="{{'ph-' + pickupPickerValue[0]}}"
+              scroll-with-animation="{{false}}"
+            >
+              <view
+                wx:for="{{pickupHours}}" wx:key="*this" wx:for-index="hi"
+                id="ph-{{hi}}"
+                class="pt-pv-cell {{hi === pickupPickerValue[0] ? 'active' : ''}}"
+                data-hi="{{hi}}"
+                bindtap="onPickupHourTap"
+              >{{item}}</view>
+              <view class="pt-pv-spacer"></view>
+            </scroll-view>
+            <!-- 分钟列 -->
+            <scroll-view
+              scroll-y enhanced show-scrollbar="{{false}}"
+              class="pt-pv-col"
+              scroll-into-view="{{'pm-' + pickupPickerValue[1]}}"
+              scroll-with-animation="{{false}}"
+            >
+              <view
+                wx:for="{{pickupMinutes}}" wx:key="*this" wx:for-index="mi"
+                id="pm-{{mi}}"
+                class="pt-pv-cell {{mi === pickupPickerValue[1] ? 'active' : ''}}"
+                data-mi="{{mi}}"
+                bindtap="onPickupMinuteTap"
+              >{{item}}</view>
+              <view class="pt-pv-spacer"></view>
+            </scroll-view>
+          </view>
         </view>
         <!-- 确认按钮 -->
         <view class="pt-confirm-wrap">

@@ -472,13 +472,28 @@ Page({
     this.setData({ pickupTimeOpen: false });
   },
 
-  onPickupPickerChange(e) {
-    const [hi, mi] = e.detail.value;
+  onPickupHourTap(e) {
+    const hi = e.currentTarget.dataset.hi;
+    const [_, mi] = this.data.pickupPickerValue;
     const pad = n => String(n).padStart(2, '0');
     const h = this.data.pickupHours[hi];
     const m = this.data.pickupMinutes[mi];
-    const preview = `${pad(h)}:${pad(m)}`;
-    this.setData({ pickupPickerValue: [hi, mi], pickupPreviewText: preview });
+    this.setData({
+      pickupPickerValue: [hi, mi],
+      pickupPreviewText: `${pad(h)}:${pad(m)}`,
+    });
+  },
+
+  onPickupMinuteTap(e) {
+    const mi = e.currentTarget.dataset.mi;
+    const [hi] = this.data.pickupPickerValue;
+    const pad = n => String(n).padStart(2, '0');
+    const h = this.data.pickupHours[hi];
+    const m = this.data.pickupMinutes[mi];
+    this.setData({
+      pickupPickerValue: [hi, mi],
+      pickupPreviewText: `${pad(h)}:${pad(m)}`,
+    });
   },
 
   onPickupConfirm() {
