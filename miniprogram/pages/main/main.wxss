@@ -467,8 +467,8 @@
 .pt-confirm-btn {
   display: flex; align-items: center; justify-content: center;
   padding: 24rpx 0; border-radius: 24rpx;
-  background: var(--clay-bg-primary);
-  box-shadow: var(--clay-shadow-button);
+  background: linear-gradient(180deg, #E8453C, #C0392B);
+  box-shadow: 0 4rpx 14rpx rgba(192,57,43,0.35), inset 0 1rpx 1rpx rgba(255,255,255,0.25);
   font-size: 32rpx; font-weight: 700; color: #FFFFFF;
 }
 .pt-confirm-btn:active { opacity: 0.88; transform: scale(0.98); }
@@ -488,7 +488,7 @@
 .price-label { color: var(--color-on-surface-variant); }
 .price-val { color: var(--color-on-surface); font-weight: var(--font-weight-semibold); }
 .price-row-discount { }
-.price-val-discount { color: #C0563A; }
+.price-val-discount { color: #c0413a; }
 
 /* 合计优惠 */
 .price-row-saved { padding: 10rpx 0 4rpx; }
