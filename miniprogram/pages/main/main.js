@@ -372,13 +372,16 @@ Page({
       }
     }
 
+    if (!this.data.pickupTime) {
+      wx.showToast({ title: '请选择预约取餐时间', icon: 'none' });
+      return;
+    }
+
     const payload = { paymentMethod: pm };
     if (this.data.selectedCoupon) {
       payload.couponId = this.data.selectedCoupon.id;
     }
-    if (this.data.pickupTime) {
-      payload.pickupTime = this.data.pickupTime;
-    }
+    payload.pickupTime = this.data.pickupTime;
 
     wx.showLoading({ title: '提交中...' });
     api.post('/orders', payload).then(res => {
