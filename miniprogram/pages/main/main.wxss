@@ -394,7 +394,7 @@
 .pt-panel-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 32rpx 32rpx 20rpx; flex-shrink: 0;
-  border-bottom: 1rpx solid rgba(180,160,140,0.18);
+  border-bottom: 0rpx solid rgba(180,160,140,0.18);
 }
 .pt-panel-title { font-size: 34rpx; font-weight: 700; color: #5E5142; }
 .pt-panel-close { font-size: 36rpx; color: #b0a090; padding: 8rpx; }
@@ -424,7 +424,7 @@
 /* Hint */
 .pt-hint {
   text-align: center; padding: 16rpx 28rpx 0; flex-shrink: 0;
-  font-size: 24rpx; color: #c09070;
+  font-size: 24rpx; color: #8B5E3C; font-weight: 600; letter-spacing: 1rpx;
 }
 
 /* Custom scroll picker */
