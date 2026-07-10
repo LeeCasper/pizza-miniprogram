@@ -33,7 +33,7 @@ Page({
     paymentMethod: 'wechat', // 'wechat' | 'balance'
     pickupTimeValue: '', pickupTimeText: '', pickupTime: '',
     pickupTimeOpen: false, pickupTimeIndex: '',
-    pickupHours: [], pickupMinutes: ['00', '15', '30', '45'],
+    pickupHours: [], pickupMinutes: [],
     pickupPickerValue: [0, 0], pickupPreviewText: '',
     detailProduct: null, detailOpen: false, detailQuantity: 1,
     dietaryRestrictions, selectedRestrictions: {},
@@ -452,20 +452,24 @@ Page({
       hours.push(pad(h));
     }
 
-    // Minutes always ['00','15','30','45'], but filter for first hour
-    const allMins = ['00', '15', '30', '45'];
-    let initMinIdx = 0;
-    // Find first valid minute index for the first hour
-    if (hours.length > 0 && parseInt(hours[0]) === minH) {
-      initMinIdx = allMins.findIndex(m => parseInt(m) >= minM);
-      if (initMinIdx < 0) initMinIdx = 0;
+    // Build full minutes array ['00'..'59']
+    const minutes = [];
+    for (let i = 0; i < 60; i++) {
+      minutes.push(pad(i));
     }
 
-    const prevM = allMins[initMinIdx];
+    // Find first valid minute index for the first hour
+    let initMinIdx = 0;
+    if (hours.length > 0 && parseInt(hours[0]) === minH) {
+      initMinIdx = Math.max(0, minM);
+    }
+
+    const prevM = minutes[initMinIdx];
     const preview = `${hours[0]}:${prevM}`;
 
     this.setData({
       pickupHours: hours,
+      pickupMinutes: minutes,
       pickupPickerValue: [0, initMinIdx],
       pickupPreviewText: preview,
     });
