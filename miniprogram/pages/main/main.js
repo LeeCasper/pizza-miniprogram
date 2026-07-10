@@ -436,29 +436,34 @@ Page({
 
   _buildPickupPicker() {
     const now = new Date();
-    const startH = now.getHours();
-    // Build hours: from current hour to 21, zero-padded
-    const hours = [];
-    for (let h = startH; h <= 21; h++) {
-      hours.push(String(h).padStart(2, '0'));
-    }
-    // Calculate initial minute index (round up to next 15-min)
-    const curMin = now.getMinutes();
-    let initMinIdx = 0;
-    if (curMin < 15) initMinIdx = 1;
-    else if (curMin < 30) initMinIdx = 2;
-    else if (curMin < 45) initMinIdx = 3;
-    else initMinIdx = 0; // next hour, minute 00
-
-    // Build preview
     const pad = n => String(n).padStart(2, '0');
-    const prevH = hours[0];
-    const prevM = this.data.pickupMinutes[initMinIdx === 0 && startH < 21 ? 0 : Math.min(initMinIdx, 3)];
-    const preview = `${pad(prevH)}:${pad(prevM)}`;
+
+    // Earliest allowed: now + 15 min
+    const minTime = new Date(now.getTime() + 15 * 60000);
+    const minH = minTime.getHours();
+    const minM = minTime.getMinutes();
+
+    // Build hours: from minH to 21
+    const hours = [];
+    for (let h = minH; h <= 21; h++) {
+      hours.push(pad(h));
+    }
+
+    // Minutes always ['00','15','30','45'], but filter for first hour
+    const allMins = ['00', '15', '30', '45'];
+    let initMinIdx = 0;
+    // Find first valid minute index for the first hour
+    if (hours.length > 0 && parseInt(hours[0]) === minH) {
+      initMinIdx = allMins.findIndex(m => parseInt(m) >= minM);
+      if (initMinIdx < 0) initMinIdx = 0;
+    }
+
+    const prevM = allMins[initMinIdx];
+    const preview = `${hours[0]}:${prevM}`;
 
     this.setData({
       pickupHours: hours,
-      pickupPickerValue: [0, Math.min(initMinIdx, 3)],
+      pickupPickerValue: [0, initMinIdx],
       pickupPreviewText: preview,
     });
   },
@@ -504,10 +509,16 @@ Page({
     const timeStr = `${pad(h)}:${pad(m)}`;
     const now = new Date();
     const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const pickupDate = new Date(`${today}T${timeStr}:00`);
+    // Guard: must be at least 15 min from now
+    if (pickupDate.getTime() < now.getTime() + 15 * 60000) {
+      wx.showToast({ title: '请选择至少15分钟后的时间', icon: 'none' });
+      return;
+    }
     this.setData({
       pickupTimeValue: timeStr,
       pickupTimeText: `今天 ${timeStr}`,
-      pickupTime: new Date(`${today}T${timeStr}:00`).toISOString(),
+      pickupTime: pickupDate.toISOString(),
       pickupTimeOpen: false,
     });
   },
