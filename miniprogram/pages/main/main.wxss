@@ -460,10 +460,14 @@
   height: 88rpx; line-height: 88rpx; text-align: center;
   font-size: 34rpx; color: #b0a090; font-weight: 500;
   scroll-snap-align: center;
-  transition: color 0.15s, font-weight 0.15s;
+  transition: all 0.2s;
 }
 .pt-pv-cell.active {
-  color: #5E5142; font-weight: 700; font-size: 36rpx;
+  color: #C0563A; font-weight: 700; font-size: 36rpx;
+  background: linear-gradient(180deg, rgba(253,240,235,0.9), rgba(252,230,220,0.85));
+  border-radius: 16rpx;
+  box-shadow: inset 0 1rpx 1rpx rgba(255,255,255,0.8);
+  margin: 0 8rpx;
 }
 .pt-pv-spacer { height: 176rpx; flex-shrink: 0; }
 
