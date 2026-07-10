@@ -437,10 +437,10 @@ Page({
   _buildPickupPicker() {
     const now = new Date();
     const startH = now.getHours();
-    // Build hours: from current hour to 21
+    // Build hours: from current hour to 21, zero-padded
     const hours = [];
     for (let h = startH; h <= 21; h++) {
-      hours.push(String(h));
+      hours.push(String(h).padStart(2, '0'));
     }
     // Calculate initial minute index (round up to next 15-min)
     const curMin = now.getMinutes();
