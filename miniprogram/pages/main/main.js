@@ -31,6 +31,7 @@ Page({
     banners: [],
     cart: {}, cartItems: [], cartCount: 0, cartTotal: 0, cartOpen: false,
     paymentMethod: 'wechat', // 'wechat' | 'balance'
+    orderNote: '',
     pickupTimeValue: '', pickupTimeText: '', pickupTime: '',
     pickupTimeOpen: false, pickupTimeIndex: '',
     pickupHours: [], pickupMinutes: [],
@@ -343,7 +344,7 @@ Page({
   onCartIncrease(e) { app.addToCart(e.currentTarget.dataset.product); },
   onCartBarTap() { this.setData({ cartOpen: true }); this.fetchAvailableCoupons(); this.recalcPrice(); },
   onCartClose() { this.setData({ cartOpen: false, couponPickerOpen: false }); },
-  onClearCart() { app.clearCart(); this.setData({ cartOpen: false, selectedCoupon: null, couponPickerOpen: false, pickupTime: '', pickupTimeText: '', pickupTimeValue: '' }); },
+  onClearCart() { app.clearCart(); this.setData({ cartOpen: false, selectedCoupon: null, couponPickerOpen: false, pickupTime: '', pickupTimeText: '', pickupTimeValue: '', orderNote: '' }); },
 
   onCheckout() {
     if (this.data.cartCount === 0) {
@@ -382,6 +383,9 @@ Page({
       payload.couponId = this.data.selectedCoupon.id;
     }
     payload.pickupTime = this.data.pickupTime;
+    if (this.data.orderNote.trim()) {
+      payload.note = this.data.orderNote.trim();
+    }
 
     wx.showLoading({ title: '提交中...' });
     api.post('/orders', payload).then(res => {
@@ -389,7 +393,7 @@ Page({
       if (res.code === 0) {
         const orderData = res.data;
         app.clearCart();
-        this.setData({ cartOpen: false, selectedCoupon: null, couponPickerOpen: false, pickupTime: '', pickupTimeText: '', pickupTimeValue: '' });
+        this.setData({ cartOpen: false, selectedCoupon: null, couponPickerOpen: false, pickupTime: '', pickupTimeText: '', pickupTimeValue: '', orderNote: '' });
 
         // If wechat payment, initiate payment flow
         if (pm === 'wechat' && orderData.paymentStatus === 'unpaid') {
@@ -430,6 +434,10 @@ Page({
       wx.hideLoading();
       wx.showToast({ title: '下单失败，请重试', icon: 'none' });
     });
+  },
+
+  onNoteInput(e) {
+    this.setData({ orderNote: e.detail.value });
   },
 
   onSwitchPaymentMethod(e) {

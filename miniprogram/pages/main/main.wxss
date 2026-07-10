@@ -349,6 +349,15 @@
 .coupon-select-name { font-size: 24rpx; color: #8A7B66; max-width: 280rpx; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .coupon-arrow { font-size: 32rpx; color: #ccc; margin-left: 4rpx; }
 
+/* ===== 备注 ===== */
+.note-row {
+  display: flex; align-items: center; gap: 12rpx;
+  padding: 16rpx 0; margin-bottom: 16rpx;
+  border-bottom: 1rpx solid var(--color-divider);
+}
+.note-icon { width: 36rpx; height: 36rpx; flex-shrink: 0; opacity: 0.6; }
+.note-input { flex: 1; font-size: 26rpx; color: #5E5142; }
+
 /* ===== 预约取餐时间 ===== */
 .pickup-time-row {
   display: flex; align-items: center; justify-content: space-between;

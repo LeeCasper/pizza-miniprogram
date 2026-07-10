@@ -149,6 +149,11 @@
               <text class="pickup-time-arrow">›</text>
             </view>
           </view>
+          <!-- 备注 -->
+          <view class="note-row">
+            <image class="note-icon" src="/images/icon-notes.png" mode="aspectFit"></image>
+            <input class="note-input" value="{{orderNote}}" bindinput="onNoteInput" placeholder="备注（选填，如：不要辣、多放酱）" maxlength="100" confirm-type="done" />
+          </view>
           <!-- 支付方式 -->
           <view class="pay-method-row">
             <view class="pay-method-item {{paymentMethod === 'wechat' ? 'active' : ''}}" bindtap="onSwitchPaymentMethod" data-method="wechat">
