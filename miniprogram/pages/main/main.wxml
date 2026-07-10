@@ -197,8 +197,8 @@
             class="pt-picker-view"
             value="{{pickupPickerValue}}"
             bindchange="onPickupPickerChange"
-            indicator-style="height:88rpx;border-top:2rpx solid rgba(180,160,140,0.30);border-bottom:2rpx solid rgba(180,160,140,0.30);background:rgba(192,86,58,0.05);border-radius:8rpx;"
-            mask-style="background:linear-gradient(180deg,rgba(248,243,234,1) 0%,rgba(248,243,234,1) 15%,rgba(248,243,234,0) 38%,rgba(248,243,234,0) 62%,rgba(248,243,234,1) 85%,rgba(248,243,234,1) 100%);"
+            indicator-style="height:88rpx;border-top:2rpx solid rgba(180,160,140,0.35);border-bottom:2rpx solid rgba(180,160,140,0.35);background:linear-gradient(180deg,rgba(253,240,235,0.55),rgba(253,240,235,0.30));border-radius:12rpx;"
+            mask-style="background:linear-gradient(180deg,rgba(248,243,234,1) 0%,rgba(248,243,234,1) 8%,rgba(248,243,234,1) 18%,rgba(248,243,234,0.55) 30%,rgba(248,243,234,0) 42%,rgba(248,243,234,0) 58%,rgba(248,243,234,0.55) 70%,rgba(248,243,234,1) 82%,rgba(248,243,234,1) 92%,rgba(248,243,234,1) 100%);"
           >
             <picker-view-column>
               <view wx:for="{{pickupHours}}" wx:key="*this" class="pt-pv-item">{{item}} 时</view>

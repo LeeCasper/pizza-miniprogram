@@ -427,12 +427,15 @@
   font-size: 24rpx; color: #8B5E3C; font-weight: 600; letter-spacing: 1rpx;
 }
 
-/* picker-view 滚轮选择器 */
+/* picker-view 滚轮选择器 — 3D 曲面效果 */
 .pt-picker-wrap {
   height: 440rpx; margin: 0 28rpx; flex-shrink: 0;
+  perspective: 1200rpx;
+  perspective-origin: center center;
 }
 .pt-picker-view {
   width: 100%; height: 100%;
+  transform: rotateX(8deg);
 }
 /* picker item */
 .pt-pv-item {
