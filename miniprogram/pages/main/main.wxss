@@ -371,6 +371,10 @@
 .pickup-time-value { font-size: 26rpx; color: #C0563A; font-weight: 600; }
 .pickup-time-value.placeholder { color: #bbb; font-weight: 400; }
 .pickup-time-arrow { font-size: 32rpx; color: #ccc; }
+.pickup-hint {
+  text-align: center; padding: 0 0 12rpx;
+  font-size: 22rpx; color: #b08a6a; font-weight: 500;
+}
 
 /* ===== 价格明细 ===== */
 .price-breakdown {

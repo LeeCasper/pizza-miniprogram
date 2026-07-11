@@ -151,6 +151,7 @@
               </view>
             </view>
           </picker>
+          <view class="pickup-hint">🍕 制作需要大概 10 分钟</view>
           <!-- 备注 -->
           <view class="note-row">
             <image class="note-icon" src="/images/icon-notes.png" mode="aspectFit"></image>
