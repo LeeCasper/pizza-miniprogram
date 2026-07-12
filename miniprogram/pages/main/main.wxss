@@ -615,7 +615,7 @@
 .pickup-hide-btn:active { transform: scale(0.95); box-shadow: inset 2rpx 2rpx 5rpx rgba(120,108,94,0.2), inset -1rpx -1rpx 3rpx rgba(255,255,255,0.7); }
 
 .order-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1rpx solid var(--color-divider); padding-top: 24rpx; margin-top: 16rpx; gap: 20rpx; }
-.order-total-wrap { display: flex; align-items: center; gap: 12rpx; flex-shrink: 0; }
+.order-total-wrap { display: flex; flex-direction: column; align-items: flex-end; gap: 4rpx; flex-shrink: 0; }
 .order-discount-btn {
   display: inline-flex; align-items: center; gap: 4rpx;
   padding: 6rpx 14rpx; border-radius: 20rpx; white-space: nowrap;
