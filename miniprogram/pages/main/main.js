@@ -39,8 +39,10 @@ Page({
     dietaryRestrictions, selectedRestrictions: {},
     // 订单
     tabs: [
-      { key: 'all', name: '全部' }, { key: 'preparing', name: '制作中' },
-      { key: 'waiting', name: '待取餐' }, { key: 'completed', name: '已完成' }
+      { key: 'all', name: '全部' },
+      { key: 'waiting', name: '待取餐' },
+      { key: 'completed', name: '已完成' },
+      { key: 'cancelled', name: '已取消' },
     ],
     activeTab: 'all', orders: [], filteredOrders: [],
     // 个人中心
@@ -245,7 +247,7 @@ Page({
           return fo;
         });
         const { activeTab } = this.data;
-        const filtered = activeTab === 'all' ? ordersWithDigits : ordersWithDigits.filter(o => o.status === activeTab);
+        const filtered = this._filterByTab(ordersWithDigits, activeTab);
         this.setData({ orders: ordersWithDigits, filteredOrders: filtered, ordersLoaded: true });
         this._scheduleCancelDeadlineRefresh(ordersWithDigits);
       }
@@ -275,7 +277,7 @@ Page({
           return o;
         });
         const { activeTab } = this.data;
-        const filtered = activeTab === 'all' ? orders : orders.filter(o => o.status === activeTab);
+        const filtered = this._filterByTab(orders, activeTab);
         this.setData({ orders, filteredOrders: filtered });
       }, nearest - now + 500);
     }
@@ -687,10 +689,16 @@ Page({
 
   // ── 订单 ────────────────────────────────────
 
+  _filterByTab(orders, tabKey) {
+    if (tabKey === 'all') return orders;
+    if (tabKey === 'waiting') return orders.filter(o => o.status === 'waiting' || o.status === 'preparing');
+    return orders.filter(o => o.status === tabKey);
+  },
+
   onTabChange(e) {
     const { key } = e.currentTarget.dataset;
     const { orders } = this.data;
-    this.setData({ activeTab: key, filteredOrders: key === 'all' ? [...orders] : orders.filter(o => o.status === key) });
+    this.setData({ activeTab: key, filteredOrders: this._filterByTab(orders, key) });
   },
   onShowPickupCode(e) {
     const { id } = e.currentTarget.dataset;

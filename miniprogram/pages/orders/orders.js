@@ -11,9 +11,9 @@ Page({
     topBarTotalHeight: 80,
     tabs: [
       { key: 'all', name: '全部' },
-      { key: 'preparing', name: '制作中' },
       { key: 'waiting', name: '待取餐' },
-      { key: 'completed', name: '已完成' }
+      { key: 'completed', name: '已完成' },
+      { key: 'cancelled', name: '已取消' },
     ],
     activeTab: 'all',
     orders: [],
@@ -74,14 +74,16 @@ Page({
     this.filterOrders();
   },
 
+  _filterByTab(orders, tabKey) {
+    if (tabKey === 'all') return orders;
+    if (tabKey === 'waiting') return orders.filter(o => o.status === 'waiting' || o.status === 'preparing');
+    return orders.filter(o => o.status === tabKey);
+  },
+
   filterOrders() {
     const { activeTab, orders } = this.data;
     let filtered;
-    if (activeTab === 'all') {
-      filtered = [...orders];
-    } else {
-      filtered = orders.filter(o => o.status === activeTab);
-    }
+    filtered = this._filterByTab(orders, activeTab);
     this.setData({ filteredOrders: filtered });
   },
 
@@ -233,7 +235,7 @@ Page({
           return o;
         });
         const { activeTab } = this.data;
-        const filtered = activeTab === 'all' ? orders : orders.filter(o => o.status === activeTab);
+        const filtered = this._filterByTab(orders, activeTab);
         this.setData({ orders, filteredOrders: filtered });
       }, nearest - now + 500);
     }
