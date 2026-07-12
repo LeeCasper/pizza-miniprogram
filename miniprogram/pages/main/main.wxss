@@ -602,35 +602,23 @@
 
 /* 取餐码 */
 .pickup-section { border-top: 1rpx solid var(--color-divider); padding: 28rpx 0 8rpx; }
-/* ── 已取餐按钮 — 独占一行，主操作 ── */
-.pickup-btn {
-  display: flex; align-items: center; justify-content: center; gap: 16rpx;
-  width: 100%; padding: 26rpx 0; margin-top: 20rpx; border-radius: 22rpx;
-  background: linear-gradient(180deg, #E06B5E 0%, #B84136 100%);
-  box-shadow:
-    inset 0 2rpx 3rpx rgba(255,255,255,0.30),
-    0 6rpx 20rpx rgba(184,65,54,0.32),
-    0 2rpx 4rpx rgba(140,70,55,0.18);
+/* ── 已取餐按钮 ── */
+.order-action-btn.pickup-btn {
+  background: linear-gradient(180deg, #D4846B 0%, #B04A32 100%);
+  color: #FFFFFF;
+  box-shadow: inset 0 2rpx 2rpx rgba(255,255,255,0.35), 0 4rpx 12rpx rgba(176,74,50,0.28), 0 1rpx 3rpx rgba(120,60,44,0.16);
 }
-.pickup-btn:active { transform: scale(0.97); opacity: 0.92; }
-.pickup-btn-icon { font-size: 36rpx; }
-.pickup-btn-text { font-size: 32rpx; color: #FFFFFF; font-weight: 700; letter-spacing: 2rpx; }
-
-/* ── 订单摘要行 ── */
-.order-summary {
-  display: flex; align-items: center; justify-content: flex-end; gap: 16rpx;
-  width: 100%;
-}
+.order-action-btn.pickup-btn:active { transform: scale(0.96); opacity: 0.9; }
 .pickup-revealed { display: flex; flex-direction: column; align-items: center; gap: 20rpx; padding: 28rpx 24rpx; background: #EFE7DA; border-radius: 24rpx; box-shadow: inset 3rpx 3rpx 7rpx rgba(120,108,94,0.2), inset -3rpx -3rpx 7rpx rgba(255,255,255,0.85); }
 .pickup-label { font-size: 22rpx; color: var(--color-on-surface-variant); letter-spacing: 6rpx; text-transform: uppercase; }
 .pickup-code-row { display: flex; gap: 16rpx; }
-.pickup-digit { width: 52rpx; height: 64rpx; line-height: 64rpx; text-align: center; font-size: 32rpx; font-weight: var(--font-weight-bold); color: var(--color-primary); background: linear-gradient(160deg, #FFFFFF 0%, #F4EFE6 100%); border-radius: 12rpx; box-shadow: inset 2rpx 2rpx 5rpx rgba(120,108,94,0.22), inset -2rpx -2rpx 5rpx rgba(255,255,255,0.9); font-family: 'SF Mono', 'Menlo', 'Courier New', monospace; }
+.pickup-digit { width: 64rpx; height: 80rpx; line-height: 80rpx; text-align: center; font-size: 40rpx; font-weight: var(--font-weight-bold); color: var(--color-primary); background: linear-gradient(160deg, #FFFFFF 0%, #F4EFE6 100%); border-radius: 14rpx; box-shadow: inset 2rpx 2rpx 5rpx rgba(120,108,94,0.22), inset -2rpx -2rpx 5rpx rgba(255,255,255,0.9); font-family: 'SF Mono', 'Menlo', 'Courier New', monospace; }
 .pickup-hint { font-size: 22rpx; color: var(--color-on-surface-variant); opacity: 0.6; }
 .pickup-hide-btn { padding: 12rpx 40rpx; border-radius: var(--radius-full); background: linear-gradient(160deg, #FFFFFF 0%, #F1ECE3 100%); font-size: 24rpx; color: var(--color-on-surface-variant); font-weight: var(--font-weight-medium); box-shadow: inset 2rpx 2rpx 4rpx rgba(255,255,255,0.85), inset -2rpx -3rpx 6rpx rgba(120,108,94,0.16), 0 3rpx 9rpx rgba(120,108,94,0.12); }
 .pickup-hide-btn:active { transform: scale(0.95); box-shadow: inset 2rpx 2rpx 5rpx rgba(120,108,94,0.2), inset -1rpx -1rpx 3rpx rgba(255,255,255,0.7); }
 
-.order-footer { display: flex; flex-direction: column; border-top: 1rpx solid var(--color-divider); padding-top: 20rpx; margin-top: 16rpx; }
-.order-total-wrap { display: none; }
+.order-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1rpx solid var(--color-divider); padding-top: 24rpx; margin-top: 16rpx; flex-wrap: wrap; gap: 16rpx; }
+.order-total-wrap { display: flex; flex-direction: column; align-items: flex-end; gap: 2rpx; }
 .order-discount-btn {
   display: flex; align-items: center; gap: 4rpx;
   padding: 6rpx 14rpx; border-radius: 20rpx;
@@ -689,7 +677,7 @@
 .discount-popup-final-price { display: flex; align-items: baseline; gap: 2rpx; }
 .discount-popup-final-sym { font-size: 28rpx; font-weight: var(--font-weight-bold); color: var(--color-price); }
 .discount-popup-final-num { font-size: 44rpx; font-weight: var(--font-weight-bold); color: var(--color-price); }
-.order-actions { display: flex; gap: 16rpx; flex-shrink: 0; justify-content: center; margin-top: 16rpx; }
+.order-actions { display: flex; gap: 16rpx; flex-shrink: 0; }
 .order-action-btn { padding: 14rpx 34rpx; border-radius: var(--radius-full); font-size: 26rpx; font-weight: var(--font-weight-semibold); white-space: nowrap; transition: transform 0.12s ease; }
 .order-action-btn.outline { color: #8A7B66; background: #EFE7DA; box-shadow: inset 2rpx 2rpx 4rpx rgba(120,108,94,0.18), inset -2rpx -2rpx 4rpx rgba(255,255,255,0.85); }
 .order-action-btn.primary { background: linear-gradient(160deg, #C9684C 0%, #A8472E 100%); color: #FFFFFF; box-shadow: inset 2rpx 2rpx 4rpx rgba(255,255,255,0.28), inset -3rpx -3rpx 7rpx rgba(120,40,28,0.4), 0 5rpx 13rpx rgba(150,60,40,0.28); }
