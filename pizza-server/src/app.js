@@ -63,13 +63,14 @@ app.use(cors({
 // ── Rate limiting ─────────────────────────────────────
 app.set('trust proxy', 1);
 
-// Global API rate limit: 200 req / 15 min per IP
+// Global API rate limit: 600 req / 15 min per IP (10× miniprogram startup burst)
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 200,
+  max: 600,
   standardHeaders: true,
   legacyHeaders: false,
   message: { code: 429, message: '请求过于频繁，请稍后再试' },
+  skip: (req) => req.path === '/health',
 });
 app.use('/api/', apiLimiter);
 
