@@ -227,11 +227,11 @@
 }
 
 .pickup-digit {
-  width: 64rpx;
-  height: 80rpx;
-  line-height: 80rpx;
+  width: 52rpx;
+  height: 64rpx;
+  line-height: 64rpx;
   text-align: center;
-  font-size: 40rpx;
+  font-size: 32rpx;
   font-weight: var(--font-weight-bold);
   color: var(--color-on-surface);
   background: var(--glass-bg-elevated);
