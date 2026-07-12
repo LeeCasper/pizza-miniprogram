@@ -436,6 +436,7 @@ Page({
           });
         } else {
           wx.showToast({ title: res.message || '支付成功！', icon: 'success' });
+          this.loadProfileData();
           this.fetchOrders();
         }
       }
