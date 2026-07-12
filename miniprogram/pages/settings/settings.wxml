@@ -16,7 +16,7 @@
       <view class="settings-group card">
         <!-- 账号安全 -->
         <view class="settings-item" bindtap="onOpenDrawer" data-type="account">
-          <text class="settings-item-icon">🔒</text>
+          <image class="settings-item-icon" src="/images/icon-setting-account.png" mode="aspectFit"></image>
           <text class="settings-item-label">账号安全</text>
           <text class="settings-item-arrow">→</text>
         </view>
@@ -25,7 +25,7 @@
 
         <!-- 通知设置 -->
         <view class="settings-item switch-item">
-          <text class="settings-item-icon">🔔</text>
+          <image class="settings-item-icon" src="/images/icon-setting-notify.png" mode="aspectFit"></image>
           <text class="settings-item-label">通知设置</text>
           <switch
             checked="{{notificationEnabled}}"
@@ -38,7 +38,7 @@
       <!-- 组2：清除缓存 -->
       <view class="settings-group card">
         <view class="settings-item" bindtap="onClearCache">
-          <text class="settings-item-icon">🗂️</text>
+          <image class="settings-item-icon" src="/images/icon-setting-cache.png" mode="aspectFit"></image>
           <text class="settings-item-label">清除缓存</text>
           <view class="settings-item-right">
             <text class="settings-item-hint">{{cacheSize}}</text>
@@ -50,7 +50,7 @@
       <!-- 组3：关于 + 协议 + 隐私 -->
       <view class="settings-group card">
         <view class="settings-item" bindtap="onOpenDrawer" data-type="about">
-          <text class="settings-item-icon">ℹ️</text>
+          <image class="settings-item-icon" src="/images/icon-setting-about.png" mode="aspectFit"></image>
           <text class="settings-item-label">关于我们</text>
           <text class="settings-item-arrow">→</text>
         </view>
@@ -58,7 +58,7 @@
         <view class="settings-divider"></view>
 
         <view class="settings-item" bindtap="onOpenDrawer" data-type="agreement">
-          <text class="settings-item-icon">📄</text>
+          <image class="settings-item-icon" src="/images/icon-setting-agreement.png" mode="aspectFit"></image>
           <text class="settings-item-label">用户协议</text>
           <text class="settings-item-arrow">→</text>
         </view>
@@ -66,7 +66,7 @@
         <view class="settings-divider"></view>
 
         <view class="settings-item" bindtap="onOpenDrawer" data-type="privacy">
-          <text class="settings-item-icon">🛡️</text>
+          <image class="settings-item-icon" src="/images/icon-setting-privacy.png" mode="aspectFit"></image>
           <text class="settings-item-label">隐私政策</text>
           <text class="settings-item-arrow">→</text>
         </view>
