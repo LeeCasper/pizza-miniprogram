@@ -34,8 +34,7 @@ Page({
     orderNote: '',
     pickupTimeValue: '', pickupTimeText: '', pickupTime: '',
     pickupTimeOpen: false, pickupTimeIndex: '',
-    pickupHours: [], pickupMinutes: [],
-    pickupPickerValue: [0, 0], pickupPreviewText: '',
+    pickupRange: [[], []], pickupPickerValue: [0, 0], pickupPreviewText: '',
     detailProduct: null, detailOpen: false, detailQuantity: 1,
     dietaryRestrictions, selectedRestrictions: {},
     // 订单
@@ -453,19 +452,21 @@ Page({
     const minM = minTime.getMinutes();
 
     const hours = [];
-    for (let h = minH; h <= 21; h++) hours.push(pad(h));
+    for (let h = minH; h <= 21; h++) hours.push(pad(h) + ' 时');
     const minutes = [];
-    for (let i = 0; i < 60; i++) minutes.push(pad(i));
+    for (let i = 0; i < 60; i++) minutes.push(pad(i) + ' 分');
 
     let initMi = 0;
     if (hours.length > 0 && parseInt(hours[0]) === minH) {
       initMi = Math.max(0, minM);
     }
 
-    const preview = `${hours[0]}:${minutes[initMi]}`;
+    const rawH = pad(hours[0] ? parseInt(hours[0]) : minH);
+    const rawM = pad(initMi);
     this.setData({
-      pickupHours: hours, pickupMinutes: minutes,
-      pickupPickerValue: [0, initMi], pickupPreviewText: preview,
+      pickupRange: [hours, minutes],
+      pickupPickerValue: [0, initMi],
+      pickupPreviewText: `${rawH}:${rawM}`,
     });
   },
 
@@ -476,21 +477,33 @@ Page({
 
   onClosePickupTime() { this.setData({ pickupTimeOpen: false }); },
 
+  onPickupColumnChange(e) {
+    const { column, value } = e.detail;
+    if (column === 0) {
+      // Hour changed — rebuild picker value
+      const [_, mi] = this.data.pickupPickerValue;
+      this.setData({ pickupPickerValue: [value, mi] });
+    }
+  },
+
   onPickupPickerChange(e) {
     const [hi, mi] = e.detail.value;
-    const pad = n => String(n).padStart(2, '0');
+    const range = this.data.pickupRange;
+    const hStr = (range[0][hi] || '00 时').replace(' 时', '');
+    const mStr = (range[1][mi] || '00 分').replace(' 分', '');
     this.setData({
       pickupPickerValue: [hi, mi],
-      pickupPreviewText: `${pad(this.data.pickupHours[hi])}:${pad(this.data.pickupMinutes[mi])}`,
+      pickupPreviewText: `${hStr}:${mStr}`,
     });
   },
 
   onPickupConfirm() {
     const [hi, mi] = this.data.pickupPickerValue;
+    const range = this.data.pickupRange;
+    const hStr = (range[0][hi] || '00').replace(' 时', '').trim();
+    const mStr = (range[1][mi] || '00').replace(' 分', '').trim();
     const pad = n => String(n).padStart(2, '0');
-    const h = this.data.pickupHours[hi];
-    const m = this.data.pickupMinutes[mi];
-    const timeStr = `${pad(h)}:${pad(m)}`;
+    const timeStr = `${pad(hStr)}:${pad(mStr)}`;
     const now = new Date();
     const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     const pickupDate = new Date(`${today}T${timeStr}:00`);

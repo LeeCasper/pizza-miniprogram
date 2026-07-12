@@ -184,21 +184,14 @@
           <view class="tp-quick-btn {{pickupTimeIndex === 'm20' ? 'active' : ''}}" bindtap="onPickupQuick" data-key="m20">20分钟后</view>
           <view class="tp-quick-btn {{pickupTimeIndex === 'm30' ? 'active' : ''}}" bindtap="onPickupQuick" data-key="m30">30分钟后</view>
         </view>
-        <!-- 滚轮 -->
-        <picker-view
-          class="tp-picker"
-          value="{{pickupPickerValue}}"
-          bindchange="onPickupPickerChange"
-          indicator-style="height:80rpx;border-top:2rpx solid rgba(180,160,140,0.25);border-bottom:2rpx solid rgba(180,160,140,0.25);"
-          mask-style="background:linear-gradient(180deg,rgba(248,243,234,1) 0%,rgba(248,243,234,0.7) 25%,rgba(248,243,234,0) 45%,rgba(248,243,234,0) 55%,rgba(248,243,234,0.7) 75%,rgba(248,243,234,1) 100%);"
-        >
-          <picker-view-column>
-            <view wx:for="{{pickupHours}}" wx:key="index" style="height:80rpx;line-height:80rpx;text-align:center;font-size:34rpx;color:#5E5142;font-weight:600;">{{item}} 时</view>
-          </picker-view-column>
-          <picker-view-column>
-            <view wx:for="{{pickupMinutes}}" wx:key="index" style="height:80rpx;line-height:80rpx;text-align:center;font-size:34rpx;color:#5E5142;font-weight:600;">{{item}} 分</view>
-          </picker-view-column>
-        </picker-view>
+        <!-- 精确时间 — 系统原生多列选择器 -->
+        <picker mode="multiSelector" range="{{pickupRange}}" value="{{pickupPickerValue}}" bindchange="onPickupPickerChange" bindcolumnchange="onPickupColumnChange">
+          <view class="tp-picker-tap">
+            <text class="tp-picker-label">精确时间</text>
+            <text class="tp-picker-val">{{pickupPreviewText || '请选择'}}</text>
+            <text class="tp-picker-arrow">›</text>
+          </view>
+        </picker>
         <view class="tp-confirm" bindtap="onPickupConfirm">确认 {{pickupPreviewText || '请选择'}}</view>
       </view>
     </view>
