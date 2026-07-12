@@ -602,13 +602,10 @@
 
 /* 取餐码 */
 .pickup-section { border-top: 1rpx solid var(--color-divider); padding: 28rpx 0 8rpx; }
-/* ── 已取餐按钮 ── */
-.order-action-btn.pickup-btn {
-  background: linear-gradient(180deg, #D4846B 0%, #B04A32 100%);
-  color: #FFFFFF;
-  box-shadow: inset 0 2rpx 2rpx rgba(255,255,255,0.35), 0 4rpx 12rpx rgba(176,74,50,0.28), 0 1rpx 3rpx rgba(120,60,44,0.16);
-}
-.order-action-btn.pickup-btn:active { transform: scale(0.96); opacity: 0.9; }
+.pickup-btn { display: flex; align-items: center; justify-content: center; gap: 12rpx; padding: 24rpx; border-radius: 24rpx; background: linear-gradient(160deg, #FFFFFF 0%, #F1ECE3 100%); box-shadow: inset 3rpx 3rpx 6rpx rgba(255,255,255,0.85), inset -3rpx -4rpx 8rpx rgba(120,108,94,0.16), 0 5rpx 14rpx rgba(120,108,94,0.14); }
+.pickup-btn:active { transform: scale(0.97); box-shadow: inset 3rpx 3rpx 7rpx rgba(120,108,94,0.22), inset -2rpx -2rpx 5rpx rgba(255,255,255,0.7); }
+.pickup-btn-icon { width: 44rpx; height: 44rpx; }
+.pickup-btn-text { font-size: 28rpx; color: var(--color-primary); font-weight: var(--font-weight-semibold); }
 .pickup-revealed { display: flex; flex-direction: column; align-items: center; gap: 20rpx; padding: 28rpx 24rpx; background: #EFE7DA; border-radius: 24rpx; box-shadow: inset 3rpx 3rpx 7rpx rgba(120,108,94,0.2), inset -3rpx -3rpx 7rpx rgba(255,255,255,0.85); }
 .pickup-label { font-size: 22rpx; color: var(--color-on-surface-variant); letter-spacing: 6rpx; text-transform: uppercase; }
 .pickup-code-row { display: flex; gap: 16rpx; }
@@ -681,6 +678,8 @@
 .order-action-btn { padding: 14rpx 34rpx; border-radius: var(--radius-full); font-size: 26rpx; font-weight: var(--font-weight-semibold); white-space: nowrap; transition: transform 0.12s ease; }
 .order-action-btn.outline { color: #8A7B66; background: #EFE7DA; box-shadow: inset 2rpx 2rpx 4rpx rgba(120,108,94,0.18), inset -2rpx -2rpx 4rpx rgba(255,255,255,0.85); }
 .order-action-btn.primary { background: linear-gradient(160deg, #C9684C 0%, #A8472E 100%); color: #FFFFFF; box-shadow: inset 2rpx 2rpx 4rpx rgba(255,255,255,0.28), inset -3rpx -3rpx 7rpx rgba(120,40,28,0.4), 0 5rpx 13rpx rgba(150,60,40,0.28); }
+.order-action-btn.pickup-btn { background: var(--clay-bg-primary); color: #FFFFFF; box-shadow: var(--clay-shadow-button); }
+.order-action-btn.pickup-btn:active { transform: scale(0.96); opacity: 0.9; }
 .order-action-btn.pay-btn { background: linear-gradient(160deg, #CE4636 0%, #A22A1E 100%); color: #FFFFFF; box-shadow: inset 2rpx 2rpx 4rpx rgba(255,255,255,0.3), inset -3rpx -4rpx 8rpx rgba(120,30,20,0.45), 0 6rpx 16rpx rgba(150,40,28,0.4); }
 .order-action-btn.pay-btn:active { transform: scale(0.96); opacity: 0.9; }
 .order-action-btn.disabled { color: #bbb; background: #F0EBE3; box-shadow: none; opacity: 0.7; }

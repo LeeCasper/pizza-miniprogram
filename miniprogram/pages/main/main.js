@@ -94,11 +94,15 @@ Page({
   },
 
   onShow() {
+    if (!this._firstShow) {
+      this._firstShow = true;
+      // onLoad already fetched everything — skip duplicate calls
+      if (this._ready) { this.syncCart(); } else { this._ready = true; }
+      return;
+    }
     if (this._ready) { this.syncCart(); } else { this._ready = true; }
     this.loadProfileData();
-    // Refresh orders when showing
     this.fetchOrders();
-    // Refresh shop favorites when returning from detail page
     if (this.data.currentTab === 2 && this.data.shopLoaded) this.fetchShopData();
   },
 
