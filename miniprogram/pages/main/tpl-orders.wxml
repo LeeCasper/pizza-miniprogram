@@ -75,10 +75,7 @@
             <view class="order-action-btn pickup-btn" wx:if="{{item.canPickup}}" bindtap="onPickupComplete" data-id="{{item.id}}"><text>已取餐</text></view>
             <view class="order-action-btn pay-btn" wx:if="{{!item.isPaid && item.status !== 'cancelled'}}" bindtap="onPayOrder" data-id="{{item.id}}"><text>去支付</text></view>
             <view class="order-action-btn outline" wx:if="{{item.canCancel}}" bindtap="onCancelOrder" data-id="{{item.id}}" data-paid="{{item.isPaid}}"><text>{{item.isPaid ? '取消退款' : '取消订单'}}</text></view>
-            <view class="cancel-disabled-wrap" wx:elif="{{item.status !== 'cancelled' && item.status !== 'completed'}}">
-              <view class="order-action-btn disabled" catchtap="onCancelDisabled"><text>取消订单</text></view>
-              <text class="cancel-disabled-hint">订单超过一分钟，已无法取消</text>
-            </view>
+            <view class="order-action-btn disabled" wx:elif="{{item.status !== 'cancelled' && item.status !== 'completed'}}" catchtap="onCancelDisabled"><text>取消订单</text></view>
           </view>
         </view>
       </view>
