@@ -458,9 +458,9 @@ Page({
     const [h, m] = timeStr.split(':').map(Number);
     const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     const pickupDate = new Date(`${today}T${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00`);
-    // Guard: must be at least 15 min from now
-    if (pickupDate.getTime() < now.getTime() + 15 * 60000) {
-      wx.showToast({ title: '请选择至少15分钟后的时间', icon: 'none' });
+    // Guard: must be at least 10 min from now (prep time)
+    if (pickupDate.getTime() < now.getTime() + 10 * 60000) {
+      wx.showToast({ title: '制作需要10分钟，请选择稍晚的时间', icon: 'none' });
       return;
     }
     this.setData({
