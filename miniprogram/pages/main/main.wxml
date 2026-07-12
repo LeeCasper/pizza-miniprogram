@@ -139,18 +139,16 @@
             </view>
           </view>
           <!-- 预约取餐时间 -->
-          <picker mode="time" value="{{pickupTimeValue}}" start="{{pickupMinTime}}" bindchange="onPickupTimeChange">
-            <view class="pickup-time-row">
-              <view class="pickup-time-left">
-                <image class="pickup-time-icon" src="/images/icon-pickup-time.png" mode="aspectFit"></image>
-                <text class="pickup-time-label">预约取餐</text>
-              </view>
-              <view class="pickup-time-right">
-                <text class="pickup-time-value {{pickupTimeText ? '' : 'placeholder'}}">{{pickupTimeText || '请选择取餐时间'}}</text>
-                <text class="pickup-time-arrow">›</text>
-              </view>
+          <view class="pickup-time-row" bindtap="onPickupTimeTap">
+            <view class="pickup-time-left">
+              <image class="pickup-time-icon" src="/images/icon-pickup-time.png" mode="aspectFit"></image>
+              <text class="pickup-time-label">预约取餐</text>
             </view>
-          </picker>
+            <view class="pickup-time-right">
+              <text class="pickup-time-value {{pickupTimeText ? '' : 'placeholder'}}">{{pickupTimeText || '请选择取餐时间'}}</text>
+              <text class="pickup-time-arrow">›</text>
+            </view>
+          </view>
           <!-- 备注 -->
           <view class="note-row">
             <image class="note-icon" src="/images/icon-notes.png" mode="aspectFit"></image>
@@ -169,6 +167,39 @@
           </view>
           <view class="checkout-btn" bindtap="onCheckout"><text>确认下单 ¥{{finalPrice}}</text></view>
         </view>
+      </view>
+    </view>
+
+    <!-- 取餐时间选择面板 -->
+    <view class="tp-overlay {{pickupTimeOpen ? 'show' : ''}}" catchtap="onClosePickupTime">
+      <view class="tp-panel {{pickupTimeOpen ? 'show' : ''}}" catchtap="noop">
+        <view class="tp-header">
+          <text class="tp-title">选择取餐时间</text>
+          <text class="tp-close" catchtap="onClosePickupTime">✕</text>
+        </view>
+        <view class="tp-hint">🍕 制作需要大概 10 分钟</view>
+        <!-- 快速选择 -->
+        <view class="tp-quick">
+          <view class="tp-quick-btn {{pickupTimeIndex === 'm10' ? 'active' : ''}}" bindtap="onPickupQuick" data-key="m10">10分钟后</view>
+          <view class="tp-quick-btn {{pickupTimeIndex === 'm20' ? 'active' : ''}}" bindtap="onPickupQuick" data-key="m20">20分钟后</view>
+          <view class="tp-quick-btn {{pickupTimeIndex === 'm30' ? 'active' : ''}}" bindtap="onPickupQuick" data-key="m30">30分钟后</view>
+        </view>
+        <!-- 滚轮 -->
+        <picker-view
+          class="tp-picker"
+          value="{{pickupPickerValue}}"
+          bindchange="onPickupPickerChange"
+          indicator-style="height:80rpx;border-top:2rpx solid rgba(180,160,140,0.28);border-bottom:2rpx solid rgba(180,160,140,0.28);border-radius:10rpx;"
+          mask-style="background:linear-gradient(180deg,rgba(248,243,234,1) 0%,rgba(248,243,234,1) 10%,rgba(248,243,234,0.4) 30%,rgba(248,243,234,0) 48%,rgba(248,243,234,0) 52%,rgba(248,243,234,0.4) 70%,rgba(248,243,234,1) 90%,rgba(248,243,234,1) 100%);"
+        >
+          <picker-view-column>
+            <view wx:for="{{pickupHours}}" wx:key="*this" class="tp-pv-item">{{item}} 时</view>
+          </picker-view-column>
+          <picker-view-column>
+            <view wx:for="{{pickupMinutes}}" wx:key="*this" class="tp-pv-item">{{item}} 分</view>
+          </picker-view-column>
+        </picker-view>
+        <view class="tp-confirm" bindtap="onPickupConfirm">确认 {{pickupPreviewText || '请选择'}}</view>
       </view>
     </view>
 

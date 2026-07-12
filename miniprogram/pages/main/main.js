@@ -32,7 +32,10 @@ Page({
     cart: {}, cartItems: [], cartCount: 0, cartTotal: 0, cartOpen: false,
     paymentMethod: 'wechat', // 'wechat' | 'balance'
     orderNote: '',
-    pickupTimeValue: '', pickupTimeText: '', pickupTime: '', pickupMinTime: '',
+    pickupTimeValue: '', pickupTimeText: '', pickupTime: '',
+    pickupTimeOpen: false, pickupTimeIndex: '',
+    pickupHours: [], pickupMinutes: [],
+    pickupPickerValue: [0, 0], pickupPreviewText: '',
     detailProduct: null, detailOpen: false, detailQuantity: 1,
     dietaryRestrictions, selectedRestrictions: {},
     // 订单
@@ -339,16 +342,7 @@ Page({
   onDecrease(e) { app.decreaseQuantity(e.currentTarget.dataset.id); },
   // 购物车内「+」：直接加一件（onAddToCart 是给列表用的「打开详情抽屉」，不能复用，否则在结算弹窗里会把详情弹到背后且数量不增）
   onCartIncrease(e) { app.addToCart(e.currentTarget.dataset.product); },
-  onCartBarTap() {
-    const now = new Date(Date.now() + 10 * 60000);
-    const pad = n => String(n).padStart(2, '0');
-    this.setData({
-      cartOpen: true,
-      pickupMinTime: `${pad(now.getHours())}:${pad(now.getMinutes())}`,
-    });
-    this.fetchAvailableCoupons();
-    this.recalcPrice();
-  },
+  onCartBarTap() { this.setData({ cartOpen: true }); this.fetchAvailableCoupons(); this.recalcPrice(); },
   onCartClose() { this.setData({ cartOpen: false, couponPickerOpen: false }); },
   onClearCart() { app.clearCart(); this.setData({ cartOpen: false, selectedCoupon: null, couponPickerOpen: false, pickupTime: '', pickupTimeText: '', pickupTimeValue: '', orderNote: '' }); },
 
@@ -451,14 +445,55 @@ Page({
     this.setData({ paymentMethod: method });
   },
 
-  onPickupTimeChange(e) {
-    const timeStr = e.detail.value; // "HH:mm"
-    if (!timeStr) return;
+  _buildPickupPicker() {
     const now = new Date();
-    const [h, m] = timeStr.split(':').map(Number);
+    const pad = n => String(n).padStart(2, '0');
+    const minTime = new Date(now.getTime() + 10 * 60000);
+    const minH = minTime.getHours();
+    const minM = minTime.getMinutes();
+
+    const hours = [];
+    for (let h = minH; h <= 21; h++) hours.push(pad(h));
+    const minutes = [];
+    for (let i = 0; i < 60; i++) minutes.push(pad(i));
+
+    let initMi = 0;
+    if (hours.length > 0 && parseInt(hours[0]) === minH) {
+      initMi = Math.max(0, minM);
+    }
+
+    const preview = `${hours[0]}:${minutes[initMi]}`;
+    this.setData({
+      pickupHours: hours, pickupMinutes: minutes,
+      pickupPickerValue: [0, initMi], pickupPreviewText: preview,
+    });
+  },
+
+  onPickupTimeTap() {
+    this._buildPickupPicker();
+    this.setData({ pickupTimeOpen: true, pickupTimeIndex: '' });
+  },
+
+  onClosePickupTime() { this.setData({ pickupTimeOpen: false }); },
+
+  onPickupPickerChange(e) {
+    const [hi, mi] = e.detail.value;
+    const pad = n => String(n).padStart(2, '0');
+    this.setData({
+      pickupPickerValue: [hi, mi],
+      pickupPreviewText: `${pad(this.data.pickupHours[hi])}:${pad(this.data.pickupMinutes[mi])}`,
+    });
+  },
+
+  onPickupConfirm() {
+    const [hi, mi] = this.data.pickupPickerValue;
+    const pad = n => String(n).padStart(2, '0');
+    const h = this.data.pickupHours[hi];
+    const m = this.data.pickupMinutes[mi];
+    const timeStr = `${pad(h)}:${pad(m)}`;
+    const now = new Date();
     const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    const pickupDate = new Date(`${today}T${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00`);
-    // Guard: must be at least 10 min from now (prep time)
+    const pickupDate = new Date(`${today}T${timeStr}:00`);
     if (pickupDate.getTime() < now.getTime() + 10 * 60000) {
       wx.showToast({ title: '制作需要10分钟，请选择稍晚的时间', icon: 'none' });
       return;
@@ -467,6 +502,23 @@ Page({
       pickupTimeValue: timeStr,
       pickupTimeText: `今天 ${timeStr}`,
       pickupTime: pickupDate.toISOString(),
+      pickupTimeOpen: false,
+    });
+  },
+
+  onPickupQuick(e) {
+    const { key } = e.currentTarget.dataset;
+    const mins = { m10: 10, m20: 20, m30: 30 };
+    const target = new Date(Date.now() + (mins[key] + 10) * 60000);
+    const pad = n => String(n).padStart(2, '0');
+    const timeStr = `${pad(target.getHours())}:${pad(target.getMinutes())}`;
+    const today = `${target.getFullYear()}-${String(target.getMonth() + 1).padStart(2, '0')}-${String(target.getDate()).padStart(2, '0')}`;
+    this.setData({
+      pickupTimeValue: timeStr,
+      pickupTimeText: `今天 ${timeStr}`,
+      pickupTime: new Date(`${today}T${timeStr}:00`).toISOString(),
+      pickupTimeIndex: key,
+      pickupTimeOpen: false,
     });
   },
 
