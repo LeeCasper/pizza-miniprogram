@@ -44,10 +44,10 @@
               </view>
               <view class="card-actions" catchtap="noop">
                 <view class="action-btn edit-btn" catchtap="onEdit" data-id="{{item.id}}">
-                  <text>✏️</text>
+                  <image class="action-icon" src="/images/icon-edit.png" mode="aspectFit"></image>
                 </view>
                 <view class="action-btn delete-btn" catchtap="onDelete" data-id="{{item.id}}">
-                  <text>🗑️</text>
+                  <image class="action-icon" src="/images/icon-delete.png" mode="aspectFit"></image>
                 </view>
               </view>
             </view>

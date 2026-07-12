@@ -142,6 +142,7 @@
   background: var(--glass-bg-elevated);
   transform: scale(0.9);
 }
+.action-icon { width: 32rpx; height: 32rpx; }
 
 /* ======= 空状态 ======= */
 .empty-state {
