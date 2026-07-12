@@ -1,76 +1,69 @@
-# WeChat Mini Program
-miniprogram/project.private.config.json
-
-# Dependencies (if any in future)
-node_modules/
-miniprogram_npm/
-
-# IDE / Editor
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
-Thumbs.db
-
-# OS files
-Desktop.ini
 
 # Claude
-.claude/
-
 # Debug screenshots & design exports
-image.png
-stitch_data/
-
+# Dependencies (if any in future)
 # Design exports at repo root (copied into miniprogram/images/ as needed)
-/收货地址.png
-/运输.png
-/查看备注.png
-/支付方式.png
-/管理.png
-/icon_*.png
-/折扣.png
-/生日.png
-/新品.png
-/积分1.png
-/未命名的设计.png
-/未命名的设计1.png
-/未命名的设计_*.png
-/物流运费.png
+# Environment files (contain secrets)
 # Exclude junk/installer files at root
+# IDE / Editor
+# One-off diagnostic/deploy scripts with server access
+# OS files
+# WeChat Mini Program
+*.swo
+*.swp
+*~
+.claude/
+.DS_Store
+.env
+.idea/
+.vscode/
+/*.gif
 /ClashPlus-*.exe
+/huaban-*
 /icon_*.eps
+/icon_*.png
 /image2-*.png
 /pin (*.jpg
 /pin (*.png
-/礼物 (*.png
+/查看备注.png
+/管理.png
+/积分1.png
 /礼物 (*.jpg
-/*.gif
-/huaban-*
-
-# Environment files (contain secrets)
-.env
-pizza-server/.env
-soybean-admin-temp/.env
-
-# One-off diagnostic/deploy scripts with server access
-soybean-admin-temp/fix_images.py
-soybean-admin-temp/check_mysql.py
-soybean-admin-temp/check_nginx.py
-soybean-admin-temp/check_deploy.py
-original-d060a2b66ff42f9b6e7cb3360c60cef8.gif
-huaban-7187332978.gif
+/礼物 (*.png
+/生日.png
+/收货地址.png
+/未命名的设计.png
+/未命名的设计_*.png
+/未命名的设计1.png
+/物流运费.png
+/新品.png
+/运输.png
+/折扣.png
+/支付方式.png
+Desktop.ini
 huaban-7187332978 (1).gif
+huaban-7187332978.gif
 huaban-7187332978.mp4
 huaban-7187332978_1.gif
-全部 (1).png
+image.png
+miniprogram/project.private.config.json
+miniprogram_npm/
+node_modules/
+original-d060a2b66ff42f9b6e7cb3360c60cef8.gif
+pizza-server/.env
+soybean-admin-temp/.env
+soybean-admin-temp/check_deploy.py
+soybean-admin-temp/check_mysql.py
+soybean-admin-temp/check_nginx.py
+soybean-admin-temp/fix_images.py
+stitch_data/
+Thumbs.db
 抽奖.png
+关于我们.png
+清除缓存.png
+全部 (1).png
+通知.png
+隐私政策.png
+用户协议.png
 预约.png
 账号安全.png
-通知.png
-清除缓存.png
-关于我们.png
-用户协议.png
-隐私政策.png
