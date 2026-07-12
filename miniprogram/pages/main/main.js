@@ -32,7 +32,7 @@ Page({
     cart: {}, cartItems: [], cartCount: 0, cartTotal: 0, cartOpen: false,
     paymentMethod: 'wechat', // 'wechat' | 'balance'
     orderNote: '',
-    pickupTimeValue: '', pickupTimeText: '', pickupTime: '',
+    pickupTimeValue: '', pickupTimeText: '', pickupTime: '', pickupMinTime: '',
     detailProduct: null, detailOpen: false, detailQuantity: 1,
     dietaryRestrictions, selectedRestrictions: {},
     // 订单
@@ -339,7 +339,16 @@ Page({
   onDecrease(e) { app.decreaseQuantity(e.currentTarget.dataset.id); },
   // 购物车内「+」：直接加一件（onAddToCart 是给列表用的「打开详情抽屉」，不能复用，否则在结算弹窗里会把详情弹到背后且数量不增）
   onCartIncrease(e) { app.addToCart(e.currentTarget.dataset.product); },
-  onCartBarTap() { this.setData({ cartOpen: true }); this.fetchAvailableCoupons(); this.recalcPrice(); },
+  onCartBarTap() {
+    const now = new Date(Date.now() + 10 * 60000);
+    const pad = n => String(n).padStart(2, '0');
+    this.setData({
+      cartOpen: true,
+      pickupMinTime: `${pad(now.getHours())}:${pad(now.getMinutes())}`,
+    });
+    this.fetchAvailableCoupons();
+    this.recalcPrice();
+  },
   onCartClose() { this.setData({ cartOpen: false, couponPickerOpen: false }); },
   onClearCart() { app.clearCart(); this.setData({ cartOpen: false, selectedCoupon: null, couponPickerOpen: false, pickupTime: '', pickupTimeText: '', pickupTimeValue: '', orderNote: '' }); },
 
