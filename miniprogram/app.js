@@ -208,7 +208,7 @@ App({
       total += item.price * item.quantity;
     });
     this.globalData.cartCount = count;
-    this.globalData.cartTotal = total;
+    this.globalData.cartTotal = Math.round(total * 100) / 100;
 
     // 通知所有页面更新购物车
     const pages = getCurrentPages();
