@@ -452,27 +452,20 @@ Page({
     const minH = minTime.getHours();
     const minM = minTime.getMinutes();
 
-    // Pad with empty items to avoid picker-view boundary rendering bug
-    const padItem = (arr, real) => ['', '', ...real, '', ''];
+    const hours = [];
+    for (let h = minH; h <= 21; h++) hours.push(pad(h));
+    const minutes = [];
+    for (let i = 0; i < 60; i++) minutes.push(pad(i));
 
-    const realHours = [];
-    for (let h = minH; h <= 21; h++) realHours.push(pad(h));
-    const realMinutes = [];
-    for (let i = 0; i < 60; i++) realMinutes.push(pad(i));
-
-    const hours = padItem(realHours);
-    const minutes = padItem(realMinutes);
-
-    let initMi = 2; // offset by 2 padding items
-    if (realHours.length > 0 && parseInt(realHours[0]) === minH) {
-      initMi = 2 + Math.max(0, minM);
+    let initMi = 0;
+    if (hours.length > 0 && parseInt(hours[0]) === minH) {
+      initMi = Math.max(0, minM);
     }
 
-    const preview = `${realHours[0]}:${realMinutes[Math.max(0, minM)]}`;
+    const preview = `${hours[0]}:${minutes[initMi]}`;
     this.setData({
       pickupHours: hours, pickupMinutes: minutes,
-      pickupPickerValue: [2, initMi], pickupPreviewText: preview,
-      _realHoursLen: realHours.length, _realMinsLen: realMinutes.length,
+      pickupPickerValue: [0, initMi], pickupPreviewText: preview,
     });
   },
 
@@ -485,23 +478,18 @@ Page({
 
   onPickupPickerChange(e) {
     const [hi, mi] = e.detail.value;
-    const realH = this.data.pickupHours[hi] || '';
-    const realM = this.data.pickupMinutes[mi] || '';
+    const pad = n => String(n).padStart(2, '0');
     this.setData({
       pickupPickerValue: [hi, mi],
-      pickupPreviewText: realH && realM ? `${realH}:${realM}` : this.data.pickupPreviewText,
+      pickupPreviewText: `${pad(this.data.pickupHours[hi])}:${pad(this.data.pickupMinutes[mi])}`,
     });
   },
 
   onPickupConfirm() {
     const [hi, mi] = this.data.pickupPickerValue;
+    const pad = n => String(n).padStart(2, '0');
     const h = this.data.pickupHours[hi];
     const m = this.data.pickupMinutes[mi];
-    if (!h || !m) {
-      wx.showToast({ title: '请选择有效时间', icon: 'none' });
-      return;
-    }
-    const pad = n => String(n).padStart(2, '0');
     const timeStr = `${pad(h)}:${pad(m)}`;
     const now = new Date();
     const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
