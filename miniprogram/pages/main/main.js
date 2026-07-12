@@ -310,7 +310,11 @@ Page({
     const { activeCategory } = this.data;
     const updatedProducts = this.data.products.map(p => ({ ...p, quantity: cart[p.id] ? cart[p.id].quantity : 0 }));
     const filtered = activeCategory === 'all' ? updatedProducts : updatedProducts.filter(p => p.category === activeCategory || (p.category_key && p.category_key === activeCategory));
-    this.setData({ products: updatedProducts, filteredProducts: filtered, cartItems: Object.values(cart), cartCount: app.globalData.cartCount, cartTotal: app.globalData.cartTotal });
+    const cartItems = Object.values(cart).map(item => ({
+      ...item,
+      displayPrice: (item.price * item.quantity).toFixed(2),
+    }));
+    this.setData({ products: updatedProducts, filteredProducts: filtered, cartItems, cartCount: app.globalData.cartCount, cartTotal: app.globalData.cartTotal });
     this.recalcPrice();
   },
   updateCart() { this.syncCart(); },

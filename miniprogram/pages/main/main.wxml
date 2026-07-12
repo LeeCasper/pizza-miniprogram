@@ -88,7 +88,7 @@
               <view class="cart-item-tags" wx:if="{{item.restrictions && item.restrictions.length > 0}}">
                 <text wx:for="{{item.restrictions}}" wx:key="*this" wx:for-item="r" class="cart-item-tag">{{r}}</text>
               </view>
-              <text class="cart-item-price">¥ {{item.price * item.quantity}}</text>
+              <text class="cart-item-price">¥ {{item.displayPrice}}</text>
             </view>
             <view class="qty-stepper">
               <view class="qty-btn" bindtap="onDecrease" data-id="{{item.id}}"><text class="qty-icon">−</text></view>
