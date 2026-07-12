@@ -189,14 +189,14 @@
           class="tp-picker"
           value="{{pickupPickerValue}}"
           bindchange="onPickupPickerChange"
-          indicator-style="height:80rpx;border-top:2rpx solid rgba(180,160,140,0.28);border-bottom:2rpx solid rgba(180,160,140,0.28);border-radius:10rpx;"
-          mask-style="background:linear-gradient(180deg,rgba(248,243,234,1) 0%,rgba(248,243,234,1) 10%,rgba(248,243,234,0.4) 30%,rgba(248,243,234,0) 48%,rgba(248,243,234,0) 52%,rgba(248,243,234,0.4) 70%,rgba(248,243,234,1) 90%,rgba(248,243,234,1) 100%);"
+          indicator-style="height:80rpx;border-top:2rpx solid rgba(180,160,140,0.25);border-bottom:2rpx solid rgba(180,160,140,0.25);"
+          mask-style="background:linear-gradient(180deg,rgba(248,243,234,1) 0%,rgba(248,243,234,0.7) 25%,rgba(248,243,234,0) 45%,rgba(248,243,234,0) 55%,rgba(248,243,234,0.7) 75%,rgba(248,243,234,1) 100%);"
         >
           <picker-view-column>
-            <view wx:for="{{pickupHours}}" wx:key="index" class="tp-pv-item" style="height:80rpx;line-height:80rpx;">{{item}} 时</view>
+            <view wx:for="{{pickupHours}}" wx:key="index" style="height:80rpx;line-height:80rpx;text-align:center;font-size:34rpx;color:#5E5142;font-weight:600;">{{item}} 时</view>
           </picker-view-column>
           <picker-view-column>
-            <view wx:for="{{pickupMinutes}}" wx:key="index" class="tp-pv-item" style="height:80rpx;line-height:80rpx;">{{item}} 分</view>
+            <view wx:for="{{pickupMinutes}}" wx:key="index" style="height:80rpx;line-height:80rpx;text-align:center;font-size:34rpx;color:#5E5142;font-weight:600;">{{item}} 分</view>
           </picker-view-column>
         </picker-view>
         <view class="tp-confirm" bindtap="onPickupConfirm">确认 {{pickupPreviewText || '请选择'}}</view>
