@@ -1,15 +1,14 @@
 /**
  * Order State Machine — enforces valid status transitions.
  *
- * States: waiting → preparing → completed (terminal)
- *                 ↘ cancelled (terminal)
+ * States: waiting → completed | cancelled (terminal)
  *
  * Guards:
- *   waiting → preparing  requires payment_method IS NOT NULL
+ *   waiting → preparing  requires payment_method IS NOT NULL  (legacy, admin only)
  */
 
 const TRANSITIONS = {
-  waiting:   ['preparing', 'cancelled'],
+  waiting:   ['preparing', 'completed', 'cancelled'],
   preparing: ['completed', 'cancelled'],
   completed: [],   // terminal
   cancelled: [],   // terminal

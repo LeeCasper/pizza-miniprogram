@@ -3,7 +3,7 @@
 
 const ORDER_STATUS_MAP = {
   waiting: '待取餐',
-  preparing: '制作中',
+  preparing: '待取餐',
   completed: '已完成',
   cancelled: '已取消'
 };
@@ -25,7 +25,7 @@ function formatOrder(o) {
     canCancel: !!o.canCancel,
     cancelDeadline: o.cancelDeadline || null,
     pickupTimeText: formatPickupTimeText(o.pickupTime),
-    canPickup: o.status === 'preparing',
+    canPickup: o.status === 'waiting',
   };
 }
 

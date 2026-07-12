@@ -220,7 +220,7 @@ const orderService = {
 
   async markPickedUp(orderId, userId) {
     const [result] = await pool.query(
-      "UPDATE orders SET status = 'completed', updated_at = NOW() WHERE id = ? AND user_id = ? AND status = 'preparing'",
+      "UPDATE orders SET status = 'completed', updated_at = NOW() WHERE id = ? AND user_id = ? AND status = 'waiting'",
       [orderId, userId]
     );
     return result.affectedRows > 0;

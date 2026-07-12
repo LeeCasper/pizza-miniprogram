@@ -393,12 +393,14 @@ const orderController = {
       if (!existing || existing.userId !== req.user.id) {
         return res.status(400).json({ code: 400, message: '订单不存在' });
       }
-      if (existing.status !== 'preparing') {
+      if (existing.status !== 'waiting') {
         return res.status(400).json({
           code: 400,
           message: existing.status === 'completed'
             ? '订单已取餐'
-            : '订单尚未开始制作，无法确认取餐',
+            : existing.status === 'cancelled'
+            ? '订单已取消'
+            : '当前状态无法取餐',
         });
       }
 
@@ -410,7 +412,7 @@ const orderController = {
         action: 'order.user_picked_up',
         entityType: 'order',
         entityId: req.params.id,
-        before: { status: 'preparing' },
+        before: { status: 'waiting' },
         after: { status: 'completed' },
       });
 
