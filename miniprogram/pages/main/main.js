@@ -583,7 +583,7 @@ Page({
   },
 
   recalcPrice() {
-    const cartTotal = parseFloat(this.data.cartTotal) || 0;
+    const cartTotal = parseFloat(app.globalData.cartTotal) || 0;
     if (cartTotal <= 0) {
       this.setData({ couponDiscountAmount: 0, couponDiscountText: '0.00', tierDiscountAmount: 0, tierDiscountText: '0.00', tierName: '', finalPrice: '0.00' });
       return;
