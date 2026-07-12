@@ -585,9 +585,9 @@
 .order-pickup-time { font-size: 24rpx; color: #C0563A; background: #FFF3ED; padding: 4rpx 12rpx; border-radius: 8rpx; margin-top: 6rpx; display: inline-block; }
 .order-header-right { display: flex; align-items: center; gap: 12rpx; flex-shrink: 0; }
 .order-status { padding: 8rpx 24rpx; border-radius: var(--radius-full); font-size: 24rpx; font-weight: var(--font-weight-semibold); flex-shrink: 0; box-shadow: inset 1rpx 1rpx 2rpx rgba(255,255,255,0.55), inset -1rpx -1rpx 3rpx rgba(120,108,94,0.2); }
-.order-status.completed { background: var(--color-tertiary-container); color: var(--color-tertiary); }
-.order-status.preparing { background: var(--color-secondary-container); color: var(--color-secondary-dark); }
-.order-status.waiting { background: var(--color-primary-container); color: var(--color-primary); }
+.order-status.completed { background: linear-gradient(180deg, #E8E3DC 0%, #D9D3CA 100%); color: #5C554A; box-shadow: inset 1rpx 1rpx 2rpx rgba(255,255,255,0.7), 0 2rpx 6rpx rgba(120,108,94,0.10); }
+.order-status.waiting { background: linear-gradient(180deg, #FDF0EB 0%, #FCE4D8 100%); color: #C0563A; box-shadow: inset 1rpx 1rpx 2rpx rgba(255,255,255,0.7), 0 2rpx 6rpx rgba(192,86,58,0.12); }
+.order-status.cancelled { background: linear-gradient(180deg, #F2F0ED 0%, #E8E5E0 100%); color: #9A9084; box-shadow: inset 1rpx 1rpx 2rpx rgba(255,255,255,0.7), 0 2rpx 6rpx rgba(120,108,94,0.08); }
 .payment-badge { padding: 6rpx 20rpx; border-radius: var(--radius-full); font-size: 22rpx; font-weight: var(--font-weight-semibold); flex-shrink: 0; box-shadow: inset 1rpx 1rpx 2rpx rgba(255,255,255,0.55), inset -1rpx -1rpx 3rpx rgba(120,108,94,0.2); }
 .payment-badge.paid { background: var(--color-tertiary-container); color: var(--color-on-tertiary); }
 .payment-badge.unpaid { background: var(--color-secondary-container); color: var(--color-secondary-dark); }

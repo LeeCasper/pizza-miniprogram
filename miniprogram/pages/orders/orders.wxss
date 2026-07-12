@@ -119,18 +119,21 @@
 .payment-badge.unpaid { background: var(--color-secondary-container); color: var(--color-secondary-dark); }
 
 .order-status.completed {
-  background: var(--color-tertiary-container);
-  color: var(--color-tertiary);
-}
-
-.order-status.preparing {
-  background: var(--color-secondary-container);
-  color: var(--color-secondary-dark);
+  background: linear-gradient(180deg, #E8E3DC 0%, #D9D3CA 100%);
+  color: #5C554A;
+  box-shadow: inset 1rpx 1rpx 2rpx rgba(255,255,255,0.7), 0 2rpx 6rpx rgba(120,108,94,0.10);
 }
 
 .order-status.waiting {
-  background: var(--color-primary-container);
-  color: var(--color-primary);
+  background: linear-gradient(180deg, #FDF0EB 0%, #FCE4D8 100%);
+  color: #C0563A;
+  box-shadow: inset 1rpx 1rpx 2rpx rgba(255,255,255,0.7), 0 2rpx 6rpx rgba(192,86,58,0.12);
+}
+
+.order-status.cancelled {
+  background: linear-gradient(180deg, #F2F0ED 0%, #E8E5E0 100%);
+  color: #9A9084;
+  box-shadow: inset 1rpx 1rpx 2rpx rgba(255,255,255,0.7), 0 2rpx 6rpx rgba(120,108,94,0.08);
 }
 
 .order-items {
