@@ -182,32 +182,24 @@
 }
 
 /* 按钮态 */
+/* ── 已取餐按钮 — 独占一行，主操作 ── */
 .pickup-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12rpx;
-  padding: 24rpx;
-  background: var(--glass-bg-primary-light);
-  border-radius: var(--radius-card);
-  border: 2rpx dashed rgba(0, 0, 0, 0.08);
-  transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 16rpx;
+  width: 100%; padding: 26rpx 0; margin-top: 20rpx; border-radius: 22rpx;
+  background: linear-gradient(180deg, #E06B5E 0%, #B84136 100%);
+  box-shadow:
+    inset 0 2rpx 3rpx rgba(255,255,255,0.30),
+    0 6rpx 20rpx rgba(184,65,54,0.32),
+    0 2rpx 4rpx rgba(140,70,55,0.18);
 }
+.pickup-btn:active { transform: scale(0.97); opacity: 0.92; }
+.pickup-btn-icon { font-size: 36rpx; }
+.pickup-btn-text { font-size: 32rpx; color: #FFFFFF; font-weight: 700; letter-spacing: 2rpx; }
 
-.pickup-btn:active {
-  background: rgba(0, 0, 0, 0.04);
-  transform: scale(0.98);
-}
-
-.pickup-btn-icon {
-  width: 44rpx;
-  height: 44rpx;
-}
-
-.pickup-btn-text {
-  font-size: 28rpx;
-  color: var(--color-primary);
-  font-weight: var(--font-weight-semibold);
+/* ── 订单摘要行 ── */
+.order-summary {
+  display: flex; align-items: center; justify-content: flex-end; gap: 16rpx;
+  width: 100%;
 }
 
 /* 已展示态 */
@@ -271,16 +263,8 @@
   transform: scale(0.96);
 }
 
-.order-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-top: 1rpx solid var(--color-divider);
-  padding-top: 24rpx;
-  margin-top: 16rpx;
-  flex-wrap: wrap;
-  gap: 16rpx;
-}
+.order-footer { display: flex; flex-direction: column; border-top: 1rpx solid var(--color-divider); padding-top: 20rpx; margin-top: 16rpx; }
+.order-total-wrap { display: none; }
 
 .order-total-wrap { display: flex; flex-direction: column; align-items: flex-end; gap: 2rpx; }
 .order-discount-btn {
@@ -303,8 +287,7 @@
 }
 
 .order-actions {
-  display: flex;
-  gap: 16rpx;
+  display: flex; gap: 16rpx; justify-content: center; margin-top: 16rpx;
   flex-shrink: 0;
 }
 
@@ -328,8 +311,6 @@
   border: 1rpx solid rgba(255,255,255,0.2);
   color: var(--color-on-primary);
 }
-.order-action-btn.pickup-btn { background: var(--clay-bg-primary); color: #FFFFFF; box-shadow: var(--clay-shadow-button); }
-.order-action-btn.pickup-btn:active { transform: scale(0.96); opacity: 0.9; }
 .order-action-btn.pay-btn { background: linear-gradient(160deg, #7A6F61 0%, #5C5249 100%); color: #FFFFFF; box-shadow: 0 6rpx 16rpx rgba(60, 50, 40, 0.28), inset 2rpx 2rpx 4rpx rgba(255, 255, 255, 0.2), inset -3rpx -4rpx 8rpx rgba(30, 24, 18, 0.28); }
 .order-action-btn.pay-btn:active { transform: scale(0.96); opacity: 0.9; }
 .order-action-btn.disabled { color: #bbb; background: #F0EBE3; box-shadow: none; opacity: 0.7; }
