@@ -343,7 +343,7 @@ Page({
   onDecrease(e) { app.decreaseQuantity(e.currentTarget.dataset.id); },
   // 购物车内「+」：直接加一件（onAddToCart 是给列表用的「打开详情抽屉」，不能复用，否则在结算弹窗里会把详情弹到背后且数量不增）
   onCartIncrease(e) { app.addToCart(e.currentTarget.dataset.product); },
-  onCartBarTap() { this.setData({ cartOpen: true }); this.fetchAvailableCoupons(); this.recalcPrice(); },
+  onCartBarTap() { this.syncCart(); this.setData({ cartOpen: true }); this.fetchAvailableCoupons(); },
   onCartClose() { this.setData({ cartOpen: false, couponPickerOpen: false }); },
   onClearCart() { app.clearCart(); this.setData({ cartOpen: false, selectedCoupon: null, couponPickerOpen: false, pickupTime: '', pickupTimeText: '', pickupTimeValue: '', orderNote: '' }); },
 
