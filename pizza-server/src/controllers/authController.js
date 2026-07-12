@@ -104,6 +104,14 @@ const authController = {
         if (process.env.NODE_ENV === 'development') {
           phone = code.replace(/\D/g, '').slice(0, 11) || '13800138000';
         } else {
+          // 翻译常见微信错误码，给用户可操作的提示
+          const wechatMsg = (err.message || '').toLowerCase();
+          if (wechatMsg.includes('验证') || wechatMsg.includes('verify') || wechatMsg.includes('短信')) {
+            return res.status(400).json({
+              code: 400,
+              message: '该手机号需要在微信中完成短信验证后才能使用。\n请在微信「我 → 设置 → 账号与安全 → 手机号」中重新绑定一次即可。',
+            });
+          }
           throw err;
         }
       }
