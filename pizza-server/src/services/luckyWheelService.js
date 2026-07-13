@@ -32,8 +32,8 @@ async function getLuckyConfig() {
  *  "再来一次" wins (source='again') and bonus re-spins (source='bonus') count toward NEITHER. */
 async function todayCounts(conn, userId) {
   const [[row]] = await conn.query(
-    `SELECT COALESCE(SUM(source <> 'again' AND source <> 'bonus'), 0) AS billable,
-            COALESCE(SUM(source = 'free'), 0) AS freeCnt
+    `SELECT COALESCE(SUM(CASE WHEN source NOT IN ('again','bonus') THEN 1 ELSE 0 END), 0) AS billable,
+            COALESCE(SUM(CASE WHEN source = 'free' THEN 1 ELSE 0 END), 0) AS freeCnt
        FROM lucky_wheel_draws
       WHERE user_id = ? AND DATE(created_at) = CURDATE()`,
     [userId]
@@ -48,7 +48,8 @@ async function getWheelConfig(userId) {
     'SELECT id, type, name, color, icon FROM lucky_wheel_prizes WHERE is_active = 1 ORDER BY sort_order, id'
   );
   const [[counts]] = await pool.query(
-    `SELECT COALESCE(SUM(source <> 'again' AND source <> 'bonus'), 0) AS billable, COALESCE(SUM(source = 'free'), 0) AS freeCnt
+    `SELECT COALESCE(SUM(CASE WHEN source NOT IN ('again','bonus') THEN 1 ELSE 0 END), 0) AS billable,
+            COALESCE(SUM(CASE WHEN source = 'free' THEN 1 ELSE 0 END), 0) AS freeCnt
        FROM lucky_wheel_draws WHERE user_id = ? AND DATE(created_at) = CURDATE()`,
     [userId]
   );
