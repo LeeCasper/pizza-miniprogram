@@ -137,6 +137,7 @@ const userService = {
       avatar: r.avatar,
       bio: r.bio,
       phone: r.phone,
+      birthday: r.birthday instanceof Date ? r.birthday.toISOString().slice(0, 10) : (r.birthday ? String(r.birthday).slice(0, 10) : null),
       points: r.points,
       balance: parseFloat(r.balance || 0),
       totalSpent: parseFloat(r.total_spent || 0),

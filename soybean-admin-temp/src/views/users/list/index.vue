@@ -3,7 +3,7 @@ import { ref, onMounted, h } from 'vue';
 import { NCard, NDataTable, NTag, NAvatar, NButton, NSpace, NIcon, NDrawer, NDrawerContent, NForm, NFormItem, NInput, NInputNumber, NSelect } from 'naive-ui';
 import { EditOutlined } from '@vicons/antd';
 import type { DataTableColumns } from 'naive-ui';
-import { fetchUsers, fetchUpdateUser, fetchMemberTiers, type UserEditData } from '@/service/api';
+import { fetchUsers, fetchUpdateUser, fetchUpdateUserBirthday, fetchMemberTiers, type UserEditData } from '@/service/api';
 import { formatPrice } from '@/utils/format';
 
 defineOptions({ name: 'UserList' });
@@ -11,10 +11,11 @@ defineOptions({ name: 'UserList' });
 const users = ref<any[]>([]);
 const loading = ref(false);
 const drawerOpen = ref(false);
-const editForm = ref<UserEditData & { id: number; name: string }>({
+const editForm = ref<UserEditData & { id: number; name: string; birthday: string }>({
   id: 0,
   name: '',
   phone: '',
+  birthday: '',
   points: 0,
   balance: 0,
   totalSpent: 0,
@@ -48,6 +49,9 @@ const columns: DataTableColumns<any> = [
     render(row) { return row.name || '—'; }
   },
   { title: '手机号', key: 'phone', width: 130 },
+  { title: '生日', key: 'birthday', width: 100,
+    render(row: any) { return row.birthday || '—'; }
+  },
   {
     title: '等级', key: 'memberLevel', width: 80,
     render(row) {
@@ -93,6 +97,7 @@ function handleEdit(row: any) {
     id: row.id,
     name: row.name || '',
     phone: row.phone || '',
+    birthday: row.birthday || '',
     points: row.points || 0,
     balance: Number(row.balance || 0),
     totalSpent: Number(row.totalSpent || 0),
@@ -108,13 +113,21 @@ async function handleSave() {
   }
   saving.value = true;
   try {
-    const { id, name, ...rest } = editForm.value;
+    const { id, name, birthday, ...rest } = editForm.value;
+    // Save general user data
     const { error } = await fetchUpdateUser(id, { name, ...rest } as UserEditData);
     if (error) {
-      window.$message?.error('更新失败，请检查网络连接');
+      window.$message?.error('更新失败');
       return;
     }
-    window.$message?.success('用户信息已更新');
+    // Save birthday separately (admin override, no lock)
+    const bday = birthday || null;
+    const { error: bdayError } = await fetchUpdateUserBirthday(id, bday);
+    if (bdayError) {
+      window.$message?.warning('用户信息已保存，但生日更新失败');
+    } else {
+      window.$message?.success('用户信息已更新');
+    }
     drawerOpen.value = false;
     loadUsers();
   } catch (e: any) {
@@ -139,6 +152,9 @@ onMounted(() => { loadUsers(); loadMemberTierOptions(); });
           </NFormItem>
           <NFormItem label="手机号">
             <NInput v-model:value="editForm.phone" placeholder="请输入手机号" />
+          </NFormItem>
+          <NFormItem label="生日">
+            <NInput v-model:value="editForm.birthday" placeholder="YYYY-MM-DD，如 1990-05-20" />
           </NFormItem>
           <NFormItem label="积分">
             <NInputNumber v-model:value="editForm.points" :min="0" style="width: 100%" />

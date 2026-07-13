@@ -7,6 +7,7 @@ export interface UserEditData {
   balance?: number;
   totalSpent?: number;
   memberLevel?: string;
+  birthday?: string | null;
 }
 
 export function fetchUsers(params?: Record<string, any>) {
@@ -15,4 +16,8 @@ export function fetchUsers(params?: Record<string, any>) {
 
 export function fetchUpdateUser(id: number, data: UserEditData) {
   return request<any>({ url: `/users/${id}`, method: 'put', data });
+}
+
+export function fetchUpdateUserBirthday(id: number, birthday: string | null) {
+  return request<any>({ url: `/users/${id}/birthday`, method: 'put', data: { birthday } });
 }
