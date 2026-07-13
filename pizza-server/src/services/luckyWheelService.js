@@ -27,12 +27,12 @@ async function getLuckyConfig() {
   };
 }
 
-/** Today's draw counts for a user. `billable` = non-'again' rows → gates the daily
- *  ceiling (maxPerDay); `freeCnt` = source='free' rows → gates the free sub-quota.
- *  "再来一次" wins are free re-spins recorded as 'again' and count toward NEITHER. */
+/** Today's draw counts for a user. `billable` = non-'again' & non-'bonus' rows → gates
+ *  the daily ceiling (maxPerDay); `freeCnt` = source='free' rows → gates the free sub-quota.
+ *  "再来一次" wins (source='again') and bonus re-spins (source='bonus') count toward NEITHER. */
 async function todayCounts(conn, userId) {
   const [[row]] = await conn.query(
-    `SELECT COALESCE(SUM(source <> 'again'), 0) AS billable,
+    `SELECT COALESCE(SUM(source <> 'again' AND source <> 'bonus'), 0) AS billable,
             COALESCE(SUM(source = 'free'), 0) AS freeCnt
        FROM lucky_wheel_draws
       WHERE user_id = ? AND DATE(created_at) = CURDATE()`,
@@ -48,7 +48,7 @@ async function getWheelConfig(userId) {
     'SELECT id, type, name, color, icon FROM lucky_wheel_prizes WHERE is_active = 1 ORDER BY sort_order, id'
   );
   const [[counts]] = await pool.query(
-    `SELECT COALESCE(SUM(source <> 'again'), 0) AS billable, COALESCE(SUM(source = 'free'), 0) AS freeCnt
+    `SELECT COALESCE(SUM(source <> 'again' AND source <> 'bonus'), 0) AS billable, COALESCE(SUM(source = 'free'), 0) AS freeCnt
        FROM lucky_wheel_draws WHERE user_id = ? AND DATE(created_at) = CURDATE()`,
     [userId]
   );
