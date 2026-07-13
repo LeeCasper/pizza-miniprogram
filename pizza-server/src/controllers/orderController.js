@@ -129,8 +129,10 @@ const orderController = {
       if (tierDiscountRate < 1.0) {
         const afterCoupon = total - discountAmount;
         tierDiscountAmount = Math.round((afterCoupon * (1 - tierDiscountRate)) * 100) / 100;
-        discountAmount += tierDiscountAmount;
       }
+
+      const couponDiscountAmount = discountAmount; // coupon portion before tier is added
+      discountAmount += tierDiscountAmount;         // combined total for paid_amount calc
 
       const paidAmount = Math.max(0, total - discountAmount);
 
@@ -206,9 +208,9 @@ const orderController = {
 
       // 6. Insert order
       await conn.query(
-        `INSERT INTO orders (id, user_id, status, total, discount_amount, paid_amount, pickup_code, store_name, coupon_used_id, note, pickup_time, payment_method, paid_at)
-         VALUES (?, ?, 'waiting', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [orderId, userId, total.toFixed(2), discountAmount.toFixed(2), paidAmount.toFixed(2),
+        `INSERT INTO orders (id, user_id, status, total, discount_amount, coupon_discount, tier_discount, paid_amount, pickup_code, store_name, coupon_used_id, note, pickup_time, payment_method, paid_at)
+         VALUES (?, ?, 'waiting', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [orderId, userId, total.toFixed(2), discountAmount.toFixed(2), couponDiscountAmount.toFixed(2), tierDiscountAmount.toFixed(2), paidAmount.toFixed(2),
          pickupCode, require('../config').business.storeName, couponUsedId, note || '', pickupTime || null, paymentMethodValue, paidAt]
       );
 

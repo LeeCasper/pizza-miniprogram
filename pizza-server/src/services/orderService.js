@@ -412,6 +412,8 @@ function formatOrder(row, cancelMinutes) {
     status: row.status,
     total: parseFloat(row.total),
     discountAmount: parseFloat(row.discount_amount || 0),
+    couponDiscount: parseFloat(row.coupon_discount || 0),
+    tierDiscount: parseFloat(row.tier_discount || 0),
     paidAmount: parseFloat(row.paid_amount || 0),
     pickupCode: row.pickup_code,
     storeName: row.store_name,

@@ -26,6 +26,8 @@ function formatOrder(o) {
     cancelDeadline: o.cancelDeadline || null,
     pickupTimeText: formatPickupTimeText(o.pickupTime),
     canPickup: o.status === 'waiting',
+    couponDiscount: parseFloat(o.couponDiscount || 0),
+    tierDiscount: parseFloat(o.tierDiscount || 0),
   };
 }
 

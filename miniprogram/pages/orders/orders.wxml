@@ -81,7 +81,7 @@
         <!-- 订单底部 -->
         <view class="order-footer">
           <view class="order-total-wrap">
-            <view class="order-discount-btn" wx:if="{{item.discountAmount > 0}}" bindtap="onShowDiscount" data-id="{{item.id}}" data-total="{{item.total}}" data-discount="{{item.discountAmount}}" data-paid="{{item.paidAmount}}">
+            <view class="order-discount-btn" wx:if="{{item.discountAmount > 0}}" bindtap="onShowDiscount" data-id="{{item.id}}" data-total="{{item.total}}" data-discount="{{item.discountAmount}}" data-paid="{{item.paidAmount}}" data-coupon-discount="{{item.couponDiscount}}" data-tier-discount="{{item.tierDiscount}}">
               <text class="order-discount-btn-text">已优惠 ¥{{item.discountAmount}}</text>
               <text class="order-discount-btn-arrow">›</text>
             </view>
@@ -120,8 +120,17 @@
           <text class="discount-popup-val">¥{{discountPopupTotal}}</text>
         </view>
         <view class="discount-popup-divider"></view>
+        <view class="discount-popup-row" wx:if="{{discountPopupCoupon > 0}}">
+          <text class="discount-popup-label">优惠券减免</text>
+          <text class="discount-popup-val discount-popup-val-save">-¥{{discountPopupCoupon}}</text>
+        </view>
+        <view class="discount-popup-row" wx:if="{{discountPopupTier > 0}}">
+          <text class="discount-popup-label">会员折扣</text>
+          <text class="discount-popup-val discount-popup-val-save">-¥{{discountPopupTier}}</text>
+        </view>
+        <view class="discount-popup-divider"></view>
         <view class="discount-popup-row discount-popup-row-save">
-          <text class="discount-popup-label">优惠减免</text>
+          <text class="discount-popup-label">合计优惠</text>
           <text class="discount-popup-val discount-popup-val-save">-¥{{discountPopupAmount}}</text>
         </view>
         <view class="discount-popup-row discount-popup-row-final">

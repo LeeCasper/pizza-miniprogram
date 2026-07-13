@@ -78,6 +78,7 @@ def deploy_backend():
         'pizza-server/db/migrate_detail_images.sql',
         'pizza-server/db/migrate_points_categories.sql',
         'pizza-server/db/migrate_pickup_time.sql',
+        'pizza-server/db/migrate_discount_breakdown.sql',
     ]
     for m in migrations:
         stdin, stdout, stderr = ssh.exec_command(

@@ -24,6 +24,8 @@ Page({
     discountPopupTotal: '0.00',
     discountPopupAmount: '0.00',
     discountPopupPaid: '0.00',
+    discountPopupCoupon: '0.00',
+    discountPopupTier: '0.00',
   },
 
   onLoad() {
@@ -243,12 +245,14 @@ Page({
 
   // ── 优惠明细弹窗 ──
   onShowDiscount(e) {
-    const { total, discount, paid } = e.currentTarget.dataset;
+    const { total, discount, paid, couponDiscount, tierDiscount } = e.currentTarget.dataset;
     this.setData({
       discountPopupOpen: true,
       discountPopupTotal: parseFloat(total).toFixed(2),
       discountPopupAmount: parseFloat(discount).toFixed(2),
       discountPopupPaid: parseFloat(paid).toFixed(2),
+      discountPopupCoupon: parseFloat(couponDiscount || 0).toFixed(2),
+      discountPopupTier: parseFloat(tierDiscount || 0).toFixed(2),
     });
   },
   onCloseDiscount() {
