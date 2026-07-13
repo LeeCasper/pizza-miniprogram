@@ -45,8 +45,6 @@ Page({
       { key: 'cancelled', name: '已取消' },
     ],
     activeTab: 'all', orders: [], filteredOrders: [],
-    zoneOrders: { waiting: [], completed: [], cancelled: [] },
-    zoneVisibility: { waiting: false, completed: false, cancelled: false },
     // 个人中心
     userInfo: {}, cardCount: 0,
     editProfileOpen: false, editForm: { name: '', bio: '', avatar: '', birthday: '' },
@@ -255,7 +253,6 @@ Page({
         const { activeTab } = this.data;
         const filtered = this._filterByTab(ordersWithDigits, activeTab);
         this.setData({ orders: ordersWithDigits, filteredOrders: filtered, ordersLoaded: true });
-        this._updateZoneView();
         this._scheduleCancelDeadlineRefresh(ordersWithDigits);
       }
     }).catch(() => {
@@ -286,7 +283,6 @@ Page({
         const { activeTab } = this.data;
         const filtered = this._filterByTab(orders, activeTab);
         this.setData({ orders, filteredOrders: filtered });
-        this._updateZoneView();
       }, nearest - now + 500);
     }
   },
@@ -708,55 +704,20 @@ Page({
     return orders.filter(o => o.status === tabKey);
   },
 
-  _groupByStatus(orders) {
-    return {
-      waiting: orders.filter(o => o.status === 'waiting' || o.status === 'preparing'),
-      completed: orders.filter(o => o.status === 'completed'),
-      cancelled: orders.filter(o => o.status === 'cancelled'),
-    };
-  },
-
-  _updateZoneView() {
-    const { activeTab, orders } = this.data;
-    const grouped = this._groupByStatus(orders);
-    if (activeTab === 'all') {
-      this.setData({
-        zoneOrders: grouped,
-        zoneVisibility: {
-          waiting: grouped.waiting.length > 0,
-          completed: grouped.completed.length > 0,
-          cancelled: grouped.cancelled.length > 0,
-        },
-      });
-    } else {
-      this.setData({
-        zoneOrders: grouped,
-        zoneVisibility: {
-          waiting: activeTab === 'waiting' && grouped.waiting.length > 0,
-          completed: activeTab === 'completed' && grouped.completed.length > 0,
-          cancelled: activeTab === 'cancelled' && grouped.cancelled.length > 0,
-        },
-      });
-    }
-  },
-
   onTabChange(e) {
     const { key } = e.currentTarget.dataset;
     const { orders } = this.data;
     this.setData({ activeTab: key, filteredOrders: this._filterByTab(orders, key) });
-    this._updateZoneView();
   },
   onShowPickupCode(e) {
     const { id } = e.currentTarget.dataset;
     const update = list => list.map(o => o.id === id ? { ...o, codeRevealed: true } : o);
     this.setData({ filteredOrders: update(this.data.filteredOrders), orders: update(this.data.orders) });
-    this._updateZoneView();
   },
   onHidePickupCode(e) {
     const { id } = e.currentTarget.dataset;
     const update = list => list.map(o => o.id === id ? { ...o, codeRevealed: false } : o);
     this.setData({ filteredOrders: update(this.data.filteredOrders), orders: update(this.data.orders) });
-    this._updateZoneView();
   },
   onOrderDetail(e) { wx.showToast({ title: '订单详情: ' + e.currentTarget.dataset.id, icon: 'none' }); },
   onPayOrder(e) {

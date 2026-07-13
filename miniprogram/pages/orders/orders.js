@@ -18,8 +18,6 @@ Page({
     activeTab: 'all',
     orders: [],
     filteredOrders: [],
-    zoneOrders: { waiting: [], completed: [], cancelled: [] },
-    zoneVisibility: { waiting: false, completed: false, cancelled: false },
     loading: true,
     // 优惠明细弹窗
     discountPopupOpen: false,
@@ -55,8 +53,7 @@ Page({
         const ordersWithDigits = (res.data || []).map(formatOrder);
         this.setData({ orders: ordersWithDigits, loading: false });
         this.filterOrders();
-        this._updateZoneView();
-        this._scheduleCancelDeadlineRefresh(ordersWithDigits);
+            this._scheduleCancelDeadlineRefresh(ordersWithDigits);
       } else {
         this.setData({ loading: false });
       }
@@ -75,7 +72,6 @@ Page({
     const { key } = e.currentTarget.dataset;
     this.setData({ activeTab: key });
     this.filterOrders();
-    this._updateZoneView();
   },
 
   _filterByTab(orders, tabKey) {
@@ -84,44 +80,11 @@ Page({
     return orders.filter(o => o.status === tabKey);
   },
 
-  _groupByStatus(orders) {
-    return {
-      waiting: orders.filter(o => o.status === 'waiting' || o.status === 'preparing'),
-      completed: orders.filter(o => o.status === 'completed'),
-      cancelled: orders.filter(o => o.status === 'cancelled'),
-    };
-  },
-
-  _updateZoneView() {
-    const { activeTab, orders } = this.data;
-    const grouped = this._groupByStatus(orders);
-    if (activeTab === 'all') {
-      this.setData({
-        zoneOrders: grouped,
-        zoneVisibility: {
-          waiting: grouped.waiting.length > 0,
-          completed: grouped.completed.length > 0,
-          cancelled: grouped.cancelled.length > 0,
-        },
-      });
-    } else {
-      this.setData({
-        zoneOrders: grouped,
-        zoneVisibility: {
-          waiting: activeTab === 'waiting' && grouped.waiting.length > 0,
-          completed: activeTab === 'completed' && grouped.completed.length > 0,
-          cancelled: activeTab === 'cancelled' && grouped.cancelled.length > 0,
-        },
-      });
-    }
-  },
-
   filterOrders() {
     const { activeTab, orders } = this.data;
     let filtered;
     filtered = this._filterByTab(orders, activeTab);
     this.setData({ filteredOrders: filtered });
-    this._updateZoneView();
   },
 
   onOrderDetail(e) {
@@ -174,7 +137,6 @@ Page({
       filteredOrders: update(filteredOrders),
       orders: update(orders)
     });
-    this._updateZoneView();
   },
 
   onHidePickupCode(e) {
@@ -188,7 +150,6 @@ Page({
       filteredOrders: update(filteredOrders),
       orders: update(orders)
     });
-    this._updateZoneView();
   },
 
   onPickupComplete(e) {
@@ -276,8 +237,7 @@ Page({
         const { activeTab } = this.data;
         const filtered = this._filterByTab(orders, activeTab);
         this.setData({ orders, filteredOrders: filtered });
-        this._updateZoneView();
-      }, nearest - now + 500);
+          }, nearest - now + 500);
     }
   },
 

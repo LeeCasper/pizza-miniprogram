@@ -534,149 +534,60 @@
 .coupon-picker-empty { padding: 80rpx 0; text-align: center; color: #bbb; font-size: 28rpx; }
 
 /* ===== 订单 ===== */
-/* ── 状态 Tab：彩色胶囊，每种状态有独立配色 ── */
+/* ── 状态 Tab：融入内容区，无硬分割 ── */
 .order-tabs {
   position: sticky; top: 0; z-index: 5;
-  margin: 0 -40rpx; padding: 16rpx 40rpx;
-  background: var(--glass-bg-nav);
-  border-bottom: var(--glass-border-subtle);
+  margin: 0 -40rpx; padding: 20rpx 40rpx 16rpx;
+  /* 与页面背景一致的半透明底，不形成硬分割线 */
+  background: linear-gradient(180deg, rgba(255,252,248,0.95) 60%, rgba(255,252,248,0) 100%);
 }
 .tabs-scroll { white-space: nowrap; background: transparent; }
-.tabs-list { display: flex; flex-direction: row; flex-wrap: nowrap; gap: 14rpx; }
+.tabs-list { display: flex; flex-direction: row; flex-wrap: nowrap; gap: 20rpx; }
 
-/* Tab 胶囊 — 每种状态独立配色（与 zone 呼应） */
+/* Tab 胶囊 — 极简圆角矩形，每种状态独立配色 */
 .tab-item {
-  display: flex; align-items: center; gap: 10rpx;
-  padding: 18rpx 34rpx; border-radius: var(--radius-full); font-size: 28rpx;
-  font-weight: var(--font-weight-semibold); color: var(--color-on-surface-variant);
-  background: #EFE7DA;
-  box-shadow: inset 2rpx 2rpx 5rpx rgba(120,108,94,0.18), inset -2rpx -2rpx 5rpx rgba(255,255,255,0.85);
+  padding: 18rpx 40rpx;
+  border-radius: 28rpx;
+  font-size: 28rpx;
+  font-weight: var(--font-weight-semibold);
+  color: #9B8B7A;
+  background: rgba(180,160,140,0.10);
   flex-shrink: 0;
-  transition: all 0.28s cubic-bezier(0.34, 1.4, 0.5, 1);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.tab-item:active { transform: scale(0.94); }
+.tab-item:active { transform: scale(0.95); }
 
-/* Tab 指示点（未选中时显示淡化状态色） */
-.tab-dot { width: 14rpx; height: 14rpx; border-radius: 50%; flex-shrink: 0; opacity: 0.45; transition: opacity 0.28s; }
-.tab-dot.dot-all    { background: #B8A899; }
-.tab-dot.dot-waiting { background: #D4846B; }
-.tab-dot.dot-completed { background: #66BB6A; }
-.tab-dot.dot-cancelled { background: #EF5350; }
-
-/* 选中态 — 各状态独立深色 */
-.tab-item.active { color: #FFFFFF; transform: scale(1.03); }
-.tab-item.active.tab-all       { background: linear-gradient(160deg, #9B8B7A 0%, #6B5D4F 100%); box-shadow: inset 2rpx 2rpx 4rpx rgba(255,255,255,0.25), inset -2rpx -3rpx 6rpx rgba(60,40,30,0.35), 0 5rpx 12rpx rgba(100,80,60,0.3); }
-.tab-item.active.tab-waiting   { background: linear-gradient(160deg, #C9684C 0%, #A8472E 100%); box-shadow: inset 2rpx 2rpx 4rpx rgba(255,255,255,0.3), inset -3rpx -3rpx 7rpx rgba(120,40,28,0.4), 0 5rpx 12rpx rgba(150,60,40,0.3); }
-.tab-item.active.tab-completed { background: linear-gradient(160deg, #4CAF50 0%, #2E7D32 100%); box-shadow: inset 2rpx 2rpx 4rpx rgba(255,255,255,0.3), inset -2rpx -3rpx 6rpx rgba(30,80,30,0.4), 0 5rpx 12rpx rgba(46,125,50,0.3); }
-.tab-item.active.tab-cancelled { background: linear-gradient(160deg, #EF5350 0%, #C62828 100%); box-shadow: inset 2rpx 2rpx 4rpx rgba(255,255,255,0.3), inset -2rpx -3rpx 6rpx rgba(150,20,20,0.4), 0 5rpx 12rpx rgba(198,40,40,0.3); }
-.tab-item.active .tab-dot { opacity: 1; background: rgba(255,255,255,0.85); }
+/* 选中态 — 各状态独立配色（黏土凸面质感） */
+.tab-item.active { color: #FFFFFF; transform: scale(1.02); }
+.tab-item.active.tab-all {
+  background: linear-gradient(160deg, #8A7B6A 0%, #5C5040 100%);
+  box-shadow: inset 2rpx 2rpx 3rpx rgba(255,255,255,0.25), inset -2rpx -3rpx 5rpx rgba(40,30,20,0.35), 0 4rpx 12rpx rgba(100,80,60,0.28);
+}
+.tab-item.active.tab-waiting {
+  background: linear-gradient(160deg, #D4846B 0%, #B04A32 100%);
+  box-shadow: inset 2rpx 2rpx 3rpx rgba(255,255,255,0.28), inset -2rpx -3rpx 5rpx rgba(140,40,20,0.40), 0 4rpx 12rpx rgba(180,70,40,0.30);
+}
+.tab-item.active.tab-completed {
+  background: linear-gradient(160deg, #5CB860 0%, #2E7D32 100%);
+  box-shadow: inset 2rpx 2rpx 3rpx rgba(255,255,255,0.28), inset -2rpx -3rpx 5rpx rgba(20,70,25,0.40), 0 4rpx 12rpx rgba(46,125,50,0.28);
+}
+.tab-item.active.tab-cancelled {
+  background: linear-gradient(160deg, #9E9E9E 0%, #616161 100%);
+  box-shadow: inset 2rpx 2rpx 3rpx rgba(255,255,255,0.25), inset -2rpx -3rpx 5rpx rgba(40,40,40,0.35), 0 4rpx 12rpx rgba(80,80,80,0.25);
+}
 
 .orders-scroll { padding: 0 0 63rpx; overflow-x: hidden; box-sizing: border-box; }
 .scroll-inner { padding: 0 40rpx; }
 
-/* ═══════════════════════════════════════════ */
-/*  ── 状态区域（Color Zone）──               */
-/*  每个 zone = 状态标题栏 + 所属订单卡片         */
-/*  标题栏与卡片共享同一色系背景，融为一体         */
-/* ═══════════════════════════════════════════ */
-
-.status-zone {
-  margin-top: 24rpx;
-  border-radius: 24rpx;
-  overflow: hidden;
-  /* 外层柔和投影 */
-  box-shadow: 0 4rpx 16rpx rgba(120,108,94,0.08);
-}
-
-/* ── Zone 标题栏 ── */
-.zone-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 22rpx 28rpx 18rpx;
-}
-.zone-header-left { display: flex; align-items: center; gap: 14rpx; }
-.zone-icon { font-size: 36rpx; line-height: 1; }
-.zone-label { font-size: 30rpx; font-weight: var(--font-weight-bold); }
-.zone-count {
-  font-size: 22rpx; font-weight: var(--font-weight-semibold);
-  padding: 4rpx 16rpx; border-radius: var(--radius-full);
-  background: rgba(255,255,255,0.65);
-}
-
-/* ── Zone 卡片区 ── */
-.zone-body { padding: 0 20rpx 20rpx; }
-
-/* ── Zone 内订单卡片 ── */
-.zone-body .order-card {
-  margin-bottom: 18rpx;
-  border-radius: 20rpx;
-  /* 继承粘土质感，略微提亮以在 zone 背景上浮现 */
-  background: linear-gradient(160deg, #FFFFFF 0%, #F8F4ED 100%);
-  box-shadow: inset 2rpx 2rpx 5rpx rgba(255,255,255,0.8), inset -3rpx -4rpx 8rpx rgba(120,108,94,0.10), 0 3rpx 10rpx rgba(120,108,94,0.08);
-}
-.zone-body .order-card:last-child { margin-bottom: 4rpx; }
-
-/* ── 各 Zone 独立配色 ── */
-
-/* 待取餐 — 暖橘色系 */
-.zone-waiting {
-  background: linear-gradient(180deg, #FEF9F5 0%, #FCF2E8 100%);
-  border: 2rpx solid rgba(192, 86, 58, 0.13);
-}
-.zone-waiting .zone-header {
-  border-bottom: 2rpx solid rgba(192, 86, 58, 0.10);
-}
-.zone-waiting .zone-label { color: #B85134; }
-.zone-waiting .zone-icon { filter: none; }
-.zone-waiting .zone-count {
-  color: #B85134;
-  background: rgba(192, 86, 58, 0.10);
-}
-.zone-waiting .order-card {
-  border-left: 5rpx solid #E8C0AE;
-}
-
-/* 已完成 — 清新绿色系 */
-.zone-completed {
-  background: linear-gradient(180deg, #F8FBF6 0%, #F0F7ED 100%);
-  border: 2rpx solid rgba(76, 175, 80, 0.13);
-}
-.zone-completed .zone-header {
-  border-bottom: 2rpx solid rgba(76, 175, 80, 0.10);
-}
-.zone-completed .zone-label { color: #388E3C; }
-.zone-completed .zone-count {
-  color: #388E3C;
-  background: rgba(76, 175, 80, 0.10);
-}
-.zone-completed .order-card {
-  border-left: 5rpx solid #A5D6A7;
-}
-
-/* 已取消 — 柔和红色系 */
-.zone-cancelled {
-  background: linear-gradient(180deg, #FEF8F8 0%, #FCF1F1 100%);
-  border: 2rpx solid rgba(229, 115, 115, 0.13);
-}
-.zone-cancelled .zone-header {
-  border-bottom: 2rpx solid rgba(229, 115, 115, 0.10);
-}
-.zone-cancelled .zone-label { color: #C62828; }
-.zone-cancelled .zone-count {
-  color: #C62828;
-  background: rgba(229, 115, 115, 0.10);
-}
-.zone-cancelled .order-card {
-  border-left: 5rpx solid #EF9A9A;
-}
-
-/* ═══════════════════════════════════════════ */
-/*  ── 订单卡片内部（保持原结构） ──            */
-/* ═══════════════════════════════════════════ */
-
+/* 订单卡片：粘土风浮起面板 */
 .order-card {
   position: relative;
+  margin-bottom: 28rpx;
   padding: 32rpx;
   overflow: hidden;
+  border-radius: 28rpx;
+  background: linear-gradient(160deg, #FFFFFF 0%, #F3EEE5 100%);
+  box-shadow: inset 3rpx 3rpx 7rpx rgba(255,255,255,0.85), inset -4rpx -5rpx 11rpx rgba(120,108,94,0.14), 0 8rpx 22rpx rgba(120,108,94,0.16);
 }
 .order-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24rpx; }
 .order-header-left { display: flex; flex-direction: column; gap: 8rpx; flex: 1; overflow: hidden; min-width: 0; }
