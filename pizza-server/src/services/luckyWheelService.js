@@ -90,8 +90,10 @@ async function draw(userId, source) {
     if (billable >= cfg.maxPerDay) { await conn.rollback(); return { error: '今日抽奖次数已达上限', reason: 'reach_max' }; }
 
     let cost = 0;
-    if (source === 'free' || source === 'bonus') {
-      if (source === 'free' && freeCnt >= cfg.freePerDay) { await conn.rollback(); return { error: '今日免费次数已用完', reason: 'no_free' }; }
+    if (source === 'free') {
+      if (freeCnt >= cfg.freePerDay) { await conn.rollback(); return { error: '今日免费次数已用完', reason: 'no_free' }; }
+    } else if (source === 'bonus') {
+      // bonus: 再来一次链 — 先不扣积分，等开出非 again 奖品再扣
     } else { // 'points'
       cost = cfg.pointsCost;
       if (Number(u.points) < cost) { await conn.rollback(); return { error: '积分不足', reason: 'no_points' }; }
@@ -119,6 +121,13 @@ async function draw(userId, source) {
     // "再来一次" is a free re-spin: recorded as 'again', costs nothing,
     // counts toward NEITHER the free sub-quota NOR the daily billable ceiling.
     const isAgain = prize.type === 'again';
+
+    // bonus 链：抽中 again → 继续免费；链断（非 again）→ 扣积分
+    if (source === 'bonus' && !isAgain) {
+      cost = cfg.pointsCost;
+      if (Number(u.points) < cost) { await conn.rollback(); return { error: '积分不足', reason: 'no_points' }; }
+    }
+
     const recordedSource = isAgain ? 'again' : source;
     const effectiveCost = isAgain ? 0 : cost;
 
@@ -190,8 +199,8 @@ async function draw(userId, source) {
 
     // Post-commit: recompute remaining for the response.
     const cfg2 = cfg; // unchanged within request
-    // 'again' and 'bonus' are free re-spins — do NOT advance the daily ceiling.
-    const newBillable = (isAgain || recordedSource === 'bonus') ? billable : billable + 1;
+    // 'again' does not advance the daily ceiling. 'bonus' only advances when chain ends.
+    const newBillable = isAgain ? billable : billable + 1;
     const newFree = recordedSource === 'free' ? freeCnt + 1 : freeCnt;
     return {
       prizeId: prize.id,
