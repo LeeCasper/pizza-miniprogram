@@ -681,7 +681,7 @@
 .dp-left { display: flex; align-items: center; gap: 16rpx; }
 .dp-icon { font-size: 36rpx; line-height: 1; }
 .dp-label { font-size: 28rpx; color: var(--color-on-surface); font-weight: var(--font-weight-medium); }
-.dp-val { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
+.dp-val { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); text-align: right; min-width: 140rpx; flex-shrink: 0; }
 
 /* ── 优惠明细区域 ── */
 .dp-discounts {
@@ -708,7 +708,7 @@
   border-top: 2rpx solid rgba(180,160,140,0.25);
 }
 .dp-summary-label { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
-.dp-summary-val { font-size: 30rpx; font-weight: var(--font-weight-bold); color: #C0563A; }
+.dp-summary-val { font-size: 30rpx; font-weight: var(--font-weight-bold); color: #C0563A; text-align: right; min-width: 140rpx; flex-shrink: 0; }
 
 /* ── 实付 ── */
 .dp-final {
