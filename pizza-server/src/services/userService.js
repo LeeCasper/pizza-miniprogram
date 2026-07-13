@@ -35,11 +35,48 @@ const userService = {
     const values = [];
     if (name !== undefined) { sets.push('name = ?'); values.push(name); }
     if (bio !== undefined) { sets.push('bio = ?'); values.push(bio); }
-    if (birthday !== undefined) { sets.push('birthday = ?'); values.push(birthday || null); }
+    if (birthday !== undefined) {
+      // 生日仅可设置一次，已有生日则拒绝
+      const [existing] = await pool.query('SELECT birthday FROM users WHERE id = ?', [id]);
+      if (existing.length && existing[0].birthday && birthday) {
+        return { code: 'BIRTHDAY_LOCKED', message: '生日已设置，如需修改请联系管理员' };
+      }
+      sets.push('birthday = ?'); values.push(birthday || null);
+    }
     if (sets.length === 0) return this.findById(id);
     values.push(id);
     await pool.query(`UPDATE users SET ${sets.join(', ')} WHERE id = ?`, values);
     return this.findById(id);
+  },
+
+  /**
+   * 查询当天生日的用户（今年尚未领取生日券的）。
+   * birthday 列是 DATE 类型，用 MONTH/DAY 匹配忽略年份。
+   */
+  async findTodayBirthdayUsers() {
+    const today = new Date();
+    const month = today.getMonth() + 1;
+    const day = today.getDate();
+    const year = today.getFullYear();
+    const [rows] = await pool.query(
+      `SELECT id, name, member_level, birthday FROM users
+       WHERE birthday IS NOT NULL
+         AND MONTH(birthday) = ? AND DAY(birthday) = ?
+         AND (birthday_claimed_year IS NULL OR birthday_claimed_year < ?)`,
+      [month, day, year]
+    );
+    return rows;
+  },
+
+  /** 标记用户本年度生日券已领取 */
+  async markBirthdayClaimed(userId, year) {
+    await pool.query('UPDATE users SET birthday_claimed_year = ? WHERE id = ?', [year, userId]);
+  },
+
+  /** 管理员修改用户生日（不受一次性限制） */
+  async adminUpdateBirthday(userId, birthday) {
+    await pool.query('UPDATE users SET birthday = ?, birthday_claimed_year = NULL WHERE id = ?', [birthday || null, userId]);
+    return this.findById(userId);
   },
 
   async updateAvatar(id, avatar) {

@@ -214,6 +214,19 @@ app.use((req, res) => {
 // ── Error handler ──────────────────────────────────────
 app.use(errorHandler);
 
+// ── Cron: issue birthday coupons daily at 8am ────────────
+const birthdayCouponService = require('./services/birthdayCouponService');
+const birthdayCouponJob = cron.schedule('0 8 * * *', async () => {
+  try {
+    const { issued, total } = await birthdayCouponService.issueDaily();
+    if (issued > 0) {
+      cronLog.info({ issued, total }, 'Issued birthday coupons');
+    }
+  } catch (err) {
+    cronLog.error({ err }, 'Birthday coupon error');
+  }
+});
+
 // ── Cron: expire overdue coupons daily at 2am ──────────
 const couponCronJob = cron.schedule('0 2 * * *', async () => {
   try {
@@ -264,6 +277,7 @@ async function shutdown(signal) {
   });
 
   // 2. Stop cron jobs
+  birthdayCouponJob.stop();
   couponCronJob.stop();
   orderCleanupJob.stop();
   autoCompleteJob.stop();

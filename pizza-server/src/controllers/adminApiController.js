@@ -542,6 +542,22 @@ const adminApiController = {
     }
   },
 
+  /** 管理员修改用户生日（不受一次性限制） */
+  async updateUserBirthday(req, res) {
+    try {
+      const { birthday } = req.body; // 'YYYY-MM-DD' or null
+      if (birthday && !/^\d{4}-\d{2}-\d{2}$/.test(birthday)) {
+        return res.status(400).json({ code: 400, message: '生日格式错误，应为 YYYY-MM-DD' });
+      }
+      const user = await userService.adminUpdateBirthday(req.params.id, birthday || null);
+      if (!user) return res.status(404).json({ code: 404, message: '用户不存在' });
+      return res.json({ code: 0, message: '生日已更新', data: user });
+    } catch (err) {
+      log.error({ err }, 'UpdateUserBirthday error');
+      return res.status(500).json({ code: 500, message: err.message || '更新生日失败' });
+    }
+  },
+
   // ── Points Categories CRUD ──────────────────────────
 
   async listPointsCategories(req, res) {

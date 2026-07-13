@@ -133,6 +133,8 @@ const profileMethods = {
   onBirthdayRowTap() {
     if (!this.data.userInfo.birthday) {
       this.onOpenEditProfile();
+    } else {
+      wx.showToast({ title: '生日已设置，如需修改请联系管理员', icon: 'none' });
     }
   },
 
@@ -145,12 +147,14 @@ const profileMethods = {
     const birthday = editForm.birthday || '';
     const avatarChanged = editForm.avatar && editForm.avatar !== ui.avatar && !editForm.avatar.startsWith('https://');
 
-    // 乐观更新 UI + 关闭抽屉
-    ui.name = name; ui.bio = bio; ui.birthday = birthday || null;
-    var bdInfo = computeBirthdayInfo(birthday || null);
+    // 乐观更新 UI + 关闭抽屉（生日仅首次设置时发送）
+    const hadBirthday = !!ui.birthday;
+    ui.name = name; ui.bio = bio;
+    if (!hadBirthday && birthday) { ui.birthday = birthday; }
+    var bdInfo = computeBirthdayInfo(ui.birthday || null);
     this.setData({
       editProfileOpen: false,
-      userInfo: { ...this.data.userInfo, name, bio, birthday: birthday || null, avatar: editForm.avatar || ui.avatar },
+      userInfo: { ...this.data.userInfo, name, bio, birthday: ui.birthday || null, avatar: editForm.avatar || ui.avatar },
       birthdayDisplay: bdInfo.birthdayDisplay,
       birthdayCountdown: bdInfo.birthdayCountdown,
       isBirthdayToday: bdInfo.isBirthdayToday,
@@ -162,11 +166,20 @@ const profileMethods = {
       ? this._uploadAvatar(editForm.avatar).then(url => { ui.avatar = url; }).catch(() => {})
       : Promise.resolve();
 
+    const profilePayload = { name, bio };
+    if (!hadBirthday && birthday) { profilePayload.birthday = birthday; }
+
     const that = this;
-    avatarPromise.then(() => api.put('/user/profile', { name, bio, birthday })).then(() => {
+    avatarPromise.then(() => api.put('/user/profile', profilePayload)).then(() => {
       wx.showToast({ title: '保存成功', icon: 'success' });
       that._reloadProfile();
-    }).catch(() => { wx.showToast({ title: '保存成功（本地）', icon: 'success' }); });
+    }).catch((err) => {
+      if (err && err.code === 400) {
+        wx.showToast({ title: '生日已设置，如需修改请联系管理员', icon: 'none' });
+      } else {
+        wx.showToast({ title: '保存成功（本地）', icon: 'success' });
+      }
+    });
   },
 
   // ── 会员卡轮播 ──────────────────────────────

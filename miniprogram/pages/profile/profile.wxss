@@ -572,6 +572,7 @@
 .birthday-unset:active { opacity: 0.7; }
 .birthday-prompt { flex: 1; font-size: 24rpx; color: var(--color-primary); }
 .birthday-arrow { font-size: 32rpx; color: var(--color-on-surface-variant); flex-shrink: 0; }
+.birthday-lock { font-size: 24rpx; flex-shrink: 0; opacity: 0.5; }
 
 /* ========== 右侧统计 ========== */
 .profile-stats {

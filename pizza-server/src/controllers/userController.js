@@ -50,6 +50,9 @@ const userController = {
   async updateProfile(req, res, next) {
     try {
       const user = await userService.updateProfile(req.user.id, req.body);
+      if (user && user.code === 'BIRTHDAY_LOCKED') {
+        return res.status(400).json({ code: 400, message: user.message });
+      }
       res.json({ code: 0, data: user, message: '保存成功' });
     } catch (err) {
       next(err);

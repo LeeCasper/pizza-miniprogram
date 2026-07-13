@@ -58,13 +58,15 @@
       </view>
     </view>
 
-    <!-- 生日行 -->
+    <!-- 生日行 — 已设置 -->
     <view class="birthday-row {{isBirthdayToday ? 'birthday-today' : ''}}" wx:if="{{hasBirthday}}" bindtap="onBirthdayRowTap">
       <image wx:if="{{!isBirthdayToday}}" class="birthday-icon-img" src="/images/birthday-cake.png" mode="aspectFit"></image>
       <text wx:else class="birthday-icon">🎉</text>
       <text class="birthday-text" wx:if="{{!isBirthdayToday}}">{{birthdayDisplay}} · {{birthdayCountdown}}</text>
       <text class="birthday-celebration" wx:if="{{isBirthdayToday}}">今天是您的生日！生日快乐！ 🎉</text>
+      <text class="birthday-lock" wx:if="{{!isBirthdayToday}}">🔒</text>
     </view>
+    <!-- 生日行 — 未设置 -->
     <view class="birthday-row birthday-unset" wx:if="{{!hasBirthday}}" bindtap="onBirthdayRowTap">
       <image class="birthday-icon-img" src="/images/birthday-cake.png" mode="aspectFit"></image>
       <text class="birthday-prompt">设置生日，享会员生日专属福利</text>
@@ -240,7 +242,7 @@
           <text class="edit-field-label">个性签名</text>
           <input class="edit-field-input" value="{{editForm.bio}}" bindinput="onBioInput" placeholder="请输入个性签名" maxlength="30"/>
         </view>
-        <view class="edit-field">
+        <view class="edit-field" wx:if="{{!userInfo.birthday}}">
           <text class="edit-field-label">生日</text>
           <picker mode="date" value="{{editForm.birthday}}" start="1930-01-01" end="2020-12-31" bindchange="onBirthdayChange">
             <view class="edit-field-picker">
@@ -248,6 +250,10 @@
               <text class="edit-field-picker-arrow">›</text>
             </view>
           </picker>
+        </view>
+        <view class="edit-field" wx:else>
+          <text class="edit-field-label">生日</text>
+          <text class="edit-field-value">{{userInfo.birthday}}</text>
         </view>
       </view>
     </view>

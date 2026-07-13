@@ -963,6 +963,7 @@
 .birthday-unset:active { opacity: 0.85; }
 .birthday-prompt { flex: 1; font-size: 24rpx; color: var(--color-primary); }
 .birthday-arrow { font-size: 32rpx; color: var(--color-on-surface-variant); flex-shrink: 0; }
+.birthday-lock { font-size: 24rpx; flex-shrink: 0; opacity: 0.5; }
 /* 右侧统计 */
 .profile-stats { display: flex; flex-direction: column; align-items: flex-end; flex-shrink: 0; margin-left: auto; gap: 2rpx; }
 .profile-stat { display: flex; flex-direction: row; align-items: baseline; gap: 8rpx; padding: 4rpx 16rpx; }
@@ -1282,6 +1283,7 @@
 .edit-field-picker-text { font-size: 30rpx; color: var(--color-on-surface); }
 .edit-field-picker-text.placeholder { color: var(--color-on-surface-variant); opacity: 0.5; }
 .edit-field-picker-arrow { font-size: 32rpx; color: var(--color-on-surface-variant); flex-shrink: 0; }
+.edit-field-value { font-size: 28rpx; color: var(--color-on-surface-variant); text-align: right; }
 
 /* ===== 产品详情弹窗 ===== */
 .detail-overlay {
