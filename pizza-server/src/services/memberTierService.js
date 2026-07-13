@@ -26,16 +26,16 @@ const memberTierService = {
   async create(data) {
     const {
       level_key, name, level_index, min_spent, discount_rate,
-      points_reward_rate, birthday_gift, coupon_value
+      points_reward_rate, birthday_gift, coupon_value, birthday_coupon_value
     } = data;
     const [result] = await pool.query(
       `INSERT INTO member_tiers (level_key, name, level_index, min_spent, discount_rate,
-       points_reward_rate, birthday_gift, coupon_value)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+       points_reward_rate, birthday_gift, coupon_value, birthday_coupon_value)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         level_key, name, level_index,
         min_spent || 0, discount_rate || 1.00,
-        points_reward_rate || 1.00, birthday_gift || '', coupon_value || 0
+        points_reward_rate || 1.00, birthday_gift || '', coupon_value || 0, birthday_coupon_value || 0
       ]
     );
     return this.getById(result.insertId);
@@ -44,7 +44,7 @@ const memberTierService = {
   async update(id, data) {
     const fields = [
       'level_key', 'name', 'level_index', 'min_spent', 'discount_rate',
-      'points_reward_rate', 'birthday_gift', 'coupon_value',
+      'points_reward_rate', 'birthday_gift', 'coupon_value', 'birthday_coupon_value',
       'is_active'
     ];
     const sets = [];
@@ -83,6 +83,7 @@ function formatTier(row) {
     pointsRewardRate: parseFloat(row.points_reward_rate || 1),
     birthdayGift: row.birthday_gift,
     couponValue: parseFloat(row.coupon_value || 0),
+    birthdayCouponValue: parseFloat(row.birthday_coupon_value || 0),
     isActive: !!row.is_active,
     createdAt: row.created_at,
     updatedAt: row.updated_at,

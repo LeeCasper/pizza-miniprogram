@@ -80,6 +80,7 @@ def deploy_backend():
         'pizza-server/db/migrate_pickup_time.sql',
         'pizza-server/db/migrate_discount_breakdown.sql',
         'pizza-server/db/migrate_birthday_lock.sql',
+        'pizza-server/db/migrate_birthday_coupon_value.sql',
     ]
     for m in migrations:
         stdin, stdout, stderr = ssh.exec_command(

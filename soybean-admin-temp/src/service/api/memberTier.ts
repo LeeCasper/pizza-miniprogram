@@ -10,6 +10,7 @@ export interface MemberTier {
   pointsRewardRate: number;
   birthdayGift: string;
   couponValue: number;
+  birthdayCouponValue: number;
   isActive?: boolean;
   createdAt?: string;
   updatedAt?: string;

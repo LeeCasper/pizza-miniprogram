@@ -21,6 +21,7 @@ const form = ref<Partial<MemberTier>>({
   pointsRewardRate: 1.00,
   birthdayGift: '',
   couponValue: 0,
+  birthdayCouponValue: 0,
 });
 
 onMounted(async () => {
@@ -39,6 +40,7 @@ onMounted(async () => {
         pointsRewardRate: data.pointsRewardRate,
         birthdayGift: data.birthdayGift,
         couponValue: data.couponValue,
+        birthdayCouponValue: data.birthdayCouponValue,
       };
     }
     loading.value = false;
@@ -98,11 +100,14 @@ async function handleSave() {
         <NFormItem label="积分倍率">
           <NInputNumber v-model:value="form.pointsRewardRate" :min="1" :step="0.1" :style="{ width: '100%' }" placeholder="1.0 = 1元1分" />
         </NFormItem>
-        <NFormItem label="生日礼物">
-          <NInput v-model:value="form.birthdayGift" placeholder="生日当月享X折优惠" />
+        <NFormItem label="生日礼物描述">
+          <NInput v-model:value="form.birthdayGift" placeholder="如：生日当月享专属优惠" />
+        </NFormItem>
+        <NFormItem label="生日券金额(元)">
+          <NInputNumber v-model:value="form.birthdayCouponValue" :min="0" :step="0.01" :style="{ width: '100%' }" placeholder="生日当天自动发放的无门槛券面额" />
         </NFormItem>
         <NFormItem label="升级奖券(元)">
-          <NInputNumber v-model:value="form.couponValue" :min="0" :step="0.01" :style="{ width: '100%' }" />
+          <NInputNumber v-model:value="form.couponValue" :min="0" :step="0.01" :style="{ width: '100%' }" placeholder="会员升级时发放的奖励券面额" />
         </NFormItem>
       </NForm>
     </NSpin>

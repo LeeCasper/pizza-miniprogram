@@ -23,8 +23,9 @@ const columns: DataTableColumns<MemberTier> = [
   { title: '最低消费', key: 'minSpent', width: 100, render(row) { return formatPrice(row.minSpent); } },
   { title: '折扣率', key: 'discountRate', width: 80, render(row) { return row.discountRate < 1 ? `${((1 - row.discountRate) * 100).toFixed(0)}折` : '原价'; } },
   { title: '积分倍率', key: 'pointsRewardRate', width: 80, render(row) { return `x${row.pointsRewardRate}`; } },
-  { title: '生日礼物', key: 'birthdayGift', width: 180, ellipsis: { tooltip: true } },
-  { title: '奖券', key: 'couponValue', width: 80, render(row) { return formatPrice(row.couponValue); } },
+  { title: '生日礼物', key: 'birthdayGift', width: 140, ellipsis: { tooltip: true } },
+  { title: '生日券', key: 'birthdayCouponValue', width: 80, render(row) { return formatPrice(row.birthdayCouponValue); } },
+  { title: '升级奖券', key: 'couponValue', width: 80, render(row) { return formatPrice(row.couponValue); } },
   {
     title: '状态', key: 'isActive', width: 80,
     render(row) {

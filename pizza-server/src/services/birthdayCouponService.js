@@ -32,9 +32,9 @@ const birthdayCouponService = {
     let issued = 0;
     for (const user of users) {
       try {
-        // 确定用户的会员等级对应的 coupon_value
+        // 确定用户的会员等级对应的生日券金额
         const tier = tiers.find(t => t.levelKey === user.member_level) || tiers[tiers.length - 1];
-        const couponValue = tier ? (tier.couponValue || 0) : 0;
+        const couponValue = tier ? (tier.birthdayCouponValue || 0) : 0;
 
         if (couponValue <= 0) {
           log.warn({ userId: user.id, memberLevel: user.member_level }, 'Birthday coupon skipped: coupon_value is 0');
