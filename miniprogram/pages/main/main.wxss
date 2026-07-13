@@ -669,25 +669,60 @@
 }
 .discount-popup-close text { font-size: 28rpx; color: var(--color-on-surface-variant); }
 .discount-popup-body {
-  padding: 32rpx 32rpx;
+  padding: 28rpx 32rpx;
   padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
 }
-.discount-popup-row {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 14rpx 0;
+
+/* ── 明细行 ── */
+.dp-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20rpx 0;
 }
-.discount-popup-label { font-size: 28rpx; color: var(--color-on-surface-variant); }
-.discount-popup-val { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
-.discount-popup-row-save { }
-.discount-popup-val-save { color: #C0563A; }
-.discount-popup-divider {
-  height: 1rpx; margin: 8rpx 0;
-  background: linear-gradient(90deg, transparent, rgba(180,160,140,0.30), transparent);
+.dp-left { display: flex; align-items: center; gap: 16rpx; }
+.dp-icon { font-size: 36rpx; line-height: 1; }
+.dp-label { font-size: 28rpx; color: var(--color-on-surface); font-weight: var(--font-weight-medium); }
+.dp-val { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
+
+/* ── 优惠明细区域 ── */
+.dp-discounts {
+  margin: 12rpx 0;
+  padding: 16rpx 24rpx;
+  background: linear-gradient(160deg, #FDF7F3 0%, #FDF3EC 100%);
+  border-radius: 20rpx;
+  border: 2rpx solid rgba(192, 86, 58, 0.10);
 }
-.discount-popup-row-final { padding-top: 8rpx; }
-.discount-popup-final-price { display: flex; align-items: baseline; gap: 2rpx; }
-.discount-popup-final-sym { font-size: 28rpx; font-weight: var(--font-weight-bold); color: var(--color-price); }
-.discount-popup-final-num { font-size: 44rpx; font-weight: var(--font-weight-bold); color: var(--color-price); }
+.dp-discounts .dp-row { padding: 12rpx 0; }
+.dp-discounts .dp-row:first-child { padding-top: 0; }
+.dp-discounts .dp-row:last-child { padding-bottom: 0; }
+.dp-discounts .dp-row + .dp-row {
+  border-top: 1rpx dashed rgba(192, 86, 58, 0.15);
+}
+.dp-save .dp-label { color: #8A6A55; }
+.dp-val-save { color: #C0563A !important; }
+
+/* ── 合计优惠 ── */
+.dp-summary {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20rpx 0 16rpx;
+  margin-top: 8rpx;
+  border-top: 2rpx solid rgba(180,160,140,0.25);
+}
+.dp-summary-label { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
+.dp-summary-val { font-size: 30rpx; font-weight: var(--font-weight-bold); color: #C0563A; }
+
+/* ── 实付 ── */
+.dp-final {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20rpx 24rpx;
+  margin-top: 8rpx;
+  background: linear-gradient(160deg, #FEFCFA 0%, #F9F4ED 100%);
+  border-radius: 20rpx;
+  border: 2rpx solid rgba(180,160,140,0.18);
+}
+.dp-final-label { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); }
+.dp-final-price { display: flex; align-items: baseline; gap: 2rpx; }
+.dp-final-sym { font-size: 28rpx; font-weight: var(--font-weight-bold); color: var(--color-price); }
+.dp-final-num { font-size: 40rpx; font-weight: var(--font-weight-bold); color: var(--color-price); }
 .order-actions { display: flex; gap: 16rpx; flex-shrink: 0; }
 .order-action-btn { padding: 14rpx 34rpx; border-radius: var(--radius-full); font-size: 26rpx; font-weight: var(--font-weight-semibold); white-space: nowrap; transition: transform 0.12s ease; }
 .order-action-btn.outline { color: #8A7B66; background: #EFE7DA; box-shadow: inset 2rpx 2rpx 4rpx rgba(120,108,94,0.18), inset -2rpx -2rpx 4rpx rgba(255,255,255,0.85); }

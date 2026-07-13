@@ -96,29 +96,42 @@
       <view class="discount-popup-close" catchtap="onCloseDiscount"><text>✕</text></view>
     </view>
     <view class="discount-popup-body">
-      <view class="discount-popup-row">
-        <text class="discount-popup-label">商品原价</text>
-        <text class="discount-popup-val">¥{{discountPopupTotal}}</text>
+      <!-- 原价 -->
+      <view class="dp-row">
+        <view class="dp-left">
+          <text class="dp-icon">📋</text>
+          <text class="dp-label">商品原价</text>
+        </view>
+        <text class="dp-val">¥{{discountPopupTotal}}</text>
       </view>
-      <view class="discount-popup-divider"></view>
-      <view class="discount-popup-row" wx:if="{{discountPopupCoupon > 0}}">
-        <text class="discount-popup-label">优惠券减免</text>
-        <text class="discount-popup-val discount-popup-val-save">-¥{{discountPopupCoupon}}</text>
+      <!-- 优惠明细分组 -->
+      <view class="dp-discounts" wx:if="{{discountPopupCoupon > 0 || discountPopupTier > 0}}">
+        <view class="dp-row dp-save" wx:if="{{discountPopupCoupon > 0}}">
+          <view class="dp-left">
+            <text class="dp-icon">🎫</text>
+            <text class="dp-label">优惠券</text>
+          </view>
+          <text class="dp-val dp-val-save">-¥{{discountPopupCoupon}}</text>
+        </view>
+        <view class="dp-row dp-save" wx:if="{{discountPopupTier > 0}}">
+          <view class="dp-left">
+            <text class="dp-icon">👑</text>
+            <text class="dp-label">会员折扣</text>
+          </view>
+          <text class="dp-val dp-val-save">-¥{{discountPopupTier}}</text>
+        </view>
       </view>
-      <view class="discount-popup-row" wx:if="{{discountPopupTier > 0}}">
-        <text class="discount-popup-label">会员折扣</text>
-        <text class="discount-popup-val discount-popup-val-save">-¥{{discountPopupTier}}</text>
+      <!-- 合计优惠 -->
+      <view class="dp-summary">
+        <text class="dp-summary-label">合计优惠</text>
+        <text class="dp-summary-val">-¥{{discountPopupAmount}}</text>
       </view>
-      <view class="discount-popup-divider"></view>
-      <view class="discount-popup-row discount-popup-row-save">
-        <text class="discount-popup-label">合计优惠</text>
-        <text class="discount-popup-val discount-popup-val-save">-¥{{discountPopupAmount}}</text>
-      </view>
-      <view class="discount-popup-row discount-popup-row-final">
-        <text class="discount-popup-label">实付金额</text>
-        <view class="discount-popup-final-price">
-          <text class="discount-popup-final-sym">¥</text>
-          <text class="discount-popup-final-num">{{discountPopupPaid}}</text>
+      <!-- 实付 -->
+      <view class="dp-final">
+        <text class="dp-final-label">实付金额</text>
+        <view class="dp-final-price">
+          <text class="dp-final-sym">¥</text>
+          <text class="dp-final-num">{{discountPopupPaid}}</text>
         </view>
       </view>
     </view>
