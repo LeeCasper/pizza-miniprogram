@@ -99,7 +99,7 @@
       <!-- 原价 -->
       <view class="dp-row">
         <view class="dp-left">
-          <text class="dp-icon">📋</text>
+          <image class="dp-icon" src="/images/icon-price.png" mode="aspectFit"></image>
           <text class="dp-label">商品原价</text>
         </view>
         <text class="dp-val">¥{{discountPopupTotal}}</text>
@@ -108,14 +108,14 @@
       <view class="dp-discounts" wx:if="{{discountPopupCoupon > 0 || discountPopupTier > 0}}">
         <view class="dp-row dp-save" wx:if="{{discountPopupCoupon > 0}}">
           <view class="dp-left">
-            <text class="dp-icon">🎫</text>
+            <image class="dp-icon" src="/images/icon-coupon.png" mode="aspectFit"></image>
             <text class="dp-label">优惠券</text>
           </view>
           <text class="dp-val dp-val-save">-¥{{discountPopupCoupon}}</text>
         </view>
         <view class="dp-row dp-save" wx:if="{{discountPopupTier > 0}}">
           <view class="dp-left">
-            <text class="dp-icon">👑</text>
+            <image class="dp-icon" src="/images/icon-member.png" mode="aspectFit"></image>
             <text class="dp-label">会员折扣</text>
           </view>
           <text class="dp-val dp-val-save">-¥{{discountPopupTier}}</text>

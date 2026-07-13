@@ -165,7 +165,7 @@
   padding: 20rpx 0;
 }
 .dp-left { display: flex; align-items: center; gap: 16rpx; }
-.dp-icon { font-size: 36rpx; line-height: 1; }
+.dp-icon { width: 40rpx; height: 40rpx; flex-shrink: 0; }
 .dp-label { font-size: 28rpx; color: var(--color-on-surface); font-weight: var(--font-weight-medium); }
 .dp-val { font-size: 28rpx; font-weight: var(--font-weight-semibold); color: var(--color-on-surface); text-align: right; min-width: 140rpx; flex-shrink: 0; }
 
