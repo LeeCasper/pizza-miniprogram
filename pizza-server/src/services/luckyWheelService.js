@@ -90,8 +90,8 @@ async function draw(userId, source) {
     if (billable >= cfg.maxPerDay) { await conn.rollback(); return { error: '今日抽奖次数已达上限', reason: 'reach_max' }; }
 
     let cost = 0;
-    if (source === 'free') {
-      if (freeCnt >= cfg.freePerDay) { await conn.rollback(); return { error: '今日免费次数已用完', reason: 'no_free' }; }
+    if (source === 'free' || source === 'bonus') {
+      if (source === 'free' && freeCnt >= cfg.freePerDay) { await conn.rollback(); return { error: '今日免费次数已用完', reason: 'no_free' }; }
     } else { // 'points'
       cost = cfg.pointsCost;
       if (Number(u.points) < cost) { await conn.rollback(); return { error: '积分不足', reason: 'no_points' }; }
@@ -190,8 +190,8 @@ async function draw(userId, source) {
 
     // Post-commit: recompute remaining for the response.
     const cfg2 = cfg; // unchanged within request
-    // 'again' is a free re-spin — it does NOT advance the daily ceiling.
-    const newBillable = isAgain ? billable : billable + 1;
+    // 'again' and 'bonus' are free re-spins — do NOT advance the daily ceiling.
+    const newBillable = (isAgain || recordedSource === 'bonus') ? billable : billable + 1;
     const newFree = recordedSource === 'free' ? freeCnt + 1 : freeCnt;
     return {
       prizeId: prize.id,
