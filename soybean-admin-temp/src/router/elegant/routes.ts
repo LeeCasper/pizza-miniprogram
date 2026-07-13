@@ -69,6 +69,26 @@ export const generatedRoutes: GeneratedRoute[] = [
     ]
   },
   {
+    name: 'birthdaybenefits',
+    path: '/birthday-benefits',
+    component: 'layout.base',
+    meta: {
+      title: 'birthdaybenefits',
+      i18nKey: 'route.birthdaybenefits'
+    },
+    children: [
+      {
+        name: 'birthdaybenefits_list',
+        path: '/birthday-benefits/list',
+        component: 'view.birthdaybenefits_list',
+        meta: {
+          title: 'birthdaybenefits_list',
+          i18nKey: 'route.birthdaybenefits_list'
+        }
+      }
+    ]
+  },
+  {
     name: 'coupons',
     path: '/coupons',
     component: 'layout.base',
