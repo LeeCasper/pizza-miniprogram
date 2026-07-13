@@ -27,18 +27,21 @@ const memberTierService = {
     const {
       level_key, name, level_index, min_spent, discount_rate,
       points_reward_rate, birthday_gift, coupon_value,
-      birthday_coupon_value, birthday_coupon_type, birthday_coupon_min_spend, birthday_coupon_valid_days
+      birthday_coupon_value, birthday_coupon_type, birthday_coupon_min_spend, birthday_coupon_valid_days,
+      birthday_coupon2_value, birthday_coupon2_type, birthday_coupon2_min_spend, birthday_coupon2_valid_days
     } = data;
     const [result] = await pool.query(
       `INSERT INTO member_tiers (level_key, name, level_index, min_spent, discount_rate,
        points_reward_rate, birthday_gift, coupon_value,
-       birthday_coupon_value, birthday_coupon_type, birthday_coupon_min_spend, birthday_coupon_valid_days)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       birthday_coupon_value, birthday_coupon_type, birthday_coupon_min_spend, birthday_coupon_valid_days,
+       birthday_coupon2_value, birthday_coupon2_type, birthday_coupon2_min_spend, birthday_coupon2_valid_days)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         level_key, name, level_index,
         min_spent || 0, discount_rate || 1.00,
         points_reward_rate || 1.00, birthday_gift || '', coupon_value || 0,
-        birthday_coupon_value || 0, birthday_coupon_type || 'fixed_amount', birthday_coupon_min_spend || 0, birthday_coupon_valid_days || 30
+        birthday_coupon_value || 0, birthday_coupon_type || 'fixed_amount', birthday_coupon_min_spend || 0, birthday_coupon_valid_days || 30,
+        birthday_coupon2_value || 0, birthday_coupon2_type || 'fixed_amount', birthday_coupon2_min_spend || 0, birthday_coupon2_valid_days || 30
       ]
     );
     return this.getById(result.insertId);
@@ -49,6 +52,7 @@ const memberTierService = {
       'level_key', 'name', 'level_index', 'min_spent', 'discount_rate',
       'points_reward_rate', 'birthday_gift', 'coupon_value',
       'birthday_coupon_value', 'birthday_coupon_type', 'birthday_coupon_min_spend', 'birthday_coupon_valid_days',
+      'birthday_coupon2_value', 'birthday_coupon2_type', 'birthday_coupon2_min_spend', 'birthday_coupon2_valid_days',
       'is_active'
     ];
     const sets = [];
@@ -91,6 +95,10 @@ function formatTier(row) {
     birthdayCouponType: row.birthday_coupon_type || 'fixed_amount',
     birthdayCouponMinSpend: parseFloat(row.birthday_coupon_min_spend || 0),
     birthdayCouponValidDays: parseInt(row.birthday_coupon_valid_days || 30, 10),
+    birthdayCoupon2Value: parseFloat(row.birthday_coupon2_value || 0),
+    birthdayCoupon2Type: row.birthday_coupon2_type || 'fixed_amount',
+    birthdayCoupon2MinSpend: parseFloat(row.birthday_coupon2_min_spend || 0),
+    birthdayCoupon2ValidDays: parseInt(row.birthday_coupon2_valid_days || 30, 10),
     isActive: !!row.is_active,
     createdAt: row.created_at,
     updatedAt: row.updated_at,

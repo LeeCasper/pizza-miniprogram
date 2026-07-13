@@ -11,6 +11,13 @@ export interface MemberTier {
   birthdayGift: string;
   couponValue: number;
   birthdayCouponValue: number;
+  birthdayCouponType?: string;
+  birthdayCouponMinSpend?: number;
+  birthdayCouponValidDays?: number;
+  birthdayCoupon2Value?: number;
+  birthdayCoupon2Type?: string;
+  birthdayCoupon2MinSpend?: number;
+  birthdayCoupon2ValidDays?: number;
   isActive?: boolean;
   createdAt?: string;
   updatedAt?: string;
