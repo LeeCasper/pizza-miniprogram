@@ -1024,7 +1024,10 @@ const adminApiController = {
   async createMemberTier(req, res) {
     try {
       const { levelKey, name, levelIndex, minSpent, discountRate,
-              pointsRewardRate, birthdayGift, couponValue } = req.body;
+              pointsRewardRate, birthdayGift, couponValue,
+              birthdayCouponType, birthdayCouponValue, birthdayCouponMinSpend, birthdayCouponValidDays,
+              birthdayCoupon2Type, birthdayCoupon2Value, birthdayCoupon2MinSpend, birthdayCoupon2ValidDays
+            } = req.body;
 
       if (!levelKey || !name || levelIndex === undefined) {
         return res.status(400).json({ code: 400, message: '等级标识、名称、序号为必填项' });
@@ -1045,6 +1048,14 @@ const adminApiController = {
         points_reward_rate: pointsRewardRate,
         birthday_gift: birthdayGift,
         coupon_value: couponValue,
+        birthday_coupon_type: birthdayCouponType,
+        birthday_coupon_value: birthdayCouponValue,
+        birthday_coupon_min_spend: birthdayCouponMinSpend,
+        birthday_coupon_valid_days: birthdayCouponValidDays,
+        birthday_coupon2_type: birthdayCoupon2Type,
+        birthday_coupon2_value: birthdayCoupon2Value,
+        birthday_coupon2_min_spend: birthdayCoupon2MinSpend,
+        birthday_coupon2_valid_days: birthdayCoupon2ValidDays,
       });
       invalidateCache();
       return res.status(201).json({ code: 0, message: '会员等级已创建', data: tier });
@@ -1060,7 +1071,10 @@ const adminApiController = {
   async updateMemberTier(req, res) {
     try {
       const { levelKey, name, levelIndex, minSpent, discountRate,
-              pointsRewardRate, birthdayGift, couponValue, isActive } = req.body;
+              pointsRewardRate, birthdayGift, couponValue, isActive,
+              birthdayCouponType, birthdayCouponValue, birthdayCouponMinSpend, birthdayCouponValidDays,
+              birthdayCoupon2Type, birthdayCoupon2Value, birthdayCoupon2MinSpend, birthdayCoupon2ValidDays
+            } = req.body;
       const updateData = {};
       if (levelKey !== undefined) updateData.level_key = levelKey;
       if (name !== undefined) updateData.name = name;
@@ -1080,6 +1094,14 @@ const adminApiController = {
       }
       if (birthdayGift !== undefined) updateData.birthday_gift = birthdayGift;
       if (couponValue !== undefined) updateData.coupon_value = couponValue;
+      if (birthdayCouponType !== undefined) updateData.birthday_coupon_type = birthdayCouponType;
+      if (birthdayCouponValue !== undefined) updateData.birthday_coupon_value = birthdayCouponValue;
+      if (birthdayCouponMinSpend !== undefined) updateData.birthday_coupon_min_spend = birthdayCouponMinSpend;
+      if (birthdayCouponValidDays !== undefined) updateData.birthday_coupon_valid_days = birthdayCouponValidDays;
+      if (birthdayCoupon2Type !== undefined) updateData.birthday_coupon2_type = birthdayCoupon2Type;
+      if (birthdayCoupon2Value !== undefined) updateData.birthday_coupon2_value = birthdayCoupon2Value;
+      if (birthdayCoupon2MinSpend !== undefined) updateData.birthday_coupon2_min_spend = birthdayCoupon2MinSpend;
+      if (birthdayCoupon2ValidDays !== undefined) updateData.birthday_coupon2_valid_days = birthdayCoupon2ValidDays;
       if (isActive !== undefined) updateData.is_active = isActive ? 1 : 0;
 
       const tier = await memberTierService.update(req.params.id, updateData);

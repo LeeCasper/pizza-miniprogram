@@ -23,6 +23,8 @@ declare module "@elegant-router/types" {
     "banners": "/banners";
     "banners_form": "/banners/form";
     "banners_list": "/banners/list";
+    "birthdaybenefits": "/birthdaybenefits";
+    "birthdaybenefits_list": "/birthdaybenefits/list";
     "coupons": "/coupons";
     "coupons_list": "/coupons/list";
     "coupons_templates": "/coupons/templates";
@@ -39,8 +41,6 @@ declare module "@elegant-router/types" {
     "luckywheel_prizes_list": "/luckywheel/prizes/list";
     "luckywheel_records": "/luckywheel/records";
     "luckywheel_records_list": "/luckywheel/records/list";
-    "birthdaybenefits": "/birthday-benefits";
-    "birthdaybenefits_list": "/birthday-benefits/list";
     "membertiers": "/membertiers";
     "membertiers_form": "/membertiers/form";
     "membertiers_list": "/membertiers/list";
@@ -111,13 +111,13 @@ declare module "@elegant-router/types" {
     | "404"
     | "500"
     | "banners"
+    | "birthdaybenefits"
     | "coupons"
     | "dashboard"
     | "files"
     | "iframe-page"
     | "login"
     | "luckywheel"
-    | "birthdaybenefits"
     | "membertiers"
     | "orders"
     | "payments"
@@ -149,6 +149,7 @@ declare module "@elegant-router/types" {
     | "login"
     | "banners_form"
     | "banners_list"
+    | "birthdaybenefits_list"
     | "coupons_list"
     | "coupons_templates_form"
     | "coupons_templates_list"
@@ -157,7 +158,6 @@ declare module "@elegant-router/types" {
     | "luckywheel_prizes_form"
     | "luckywheel_prizes_list"
     | "luckywheel_records_list"
-    | "birthdaybenefits_list"
     | "membertiers_form"
     | "membertiers_list"
     | "orders_detail"

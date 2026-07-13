@@ -70,7 +70,7 @@ export const generatedRoutes: GeneratedRoute[] = [
   },
   {
     name: 'birthdaybenefits',
-    path: '/birthday-benefits',
+    path: '/birthdaybenefits',
     component: 'layout.base',
     meta: {
       title: 'birthdaybenefits',
@@ -79,7 +79,7 @@ export const generatedRoutes: GeneratedRoute[] = [
     children: [
       {
         name: 'birthdaybenefits_list',
-        path: '/birthday-benefits/list',
+        path: '/birthdaybenefits/list',
         component: 'view.birthdaybenefits_list',
         meta: {
           title: 'birthdaybenefits_list',

@@ -79,14 +79,14 @@ function openEdit(row: MemberTier) {
 async function handleSave() {
   saving.value = true;
   const { error } = await fetchUpdateMemberTier(editForm.value.id, {
-    birthday_coupon_type: editForm.value.c1Type,
-    birthday_coupon_value: editForm.value.c1Value,
-    birthday_coupon_min_spend: 0, // 无门槛
-    birthday_coupon_valid_days: editForm.value.c1ValidDays,
-    birthday_coupon2_type: editForm.value.c2Type,
-    birthday_coupon2_value: editForm.value.c2Value,
-    birthday_coupon2_min_spend: editForm.value.c2MinSpend,
-    birthday_coupon2_valid_days: editForm.value.c2ValidDays,
+    birthdayCouponType: editForm.value.c1Type,
+    birthdayCouponValue: editForm.value.c1Value,
+    birthdayCouponMinSpend: 0,
+    birthdayCouponValidDays: editForm.value.c1ValidDays,
+    birthdayCoupon2Type: editForm.value.c2Type,
+    birthdayCoupon2Value: editForm.value.c2Value,
+    birthdayCoupon2MinSpend: editForm.value.c2MinSpend,
+    birthdayCoupon2ValidDays: editForm.value.c2ValidDays,
   });
   saving.value = false;
   if (!error) {
