@@ -561,19 +561,19 @@
 .tab-item.active { color: #FFFFFF; transform: scale(1.02); }
 .tab-item.active.tab-all {
   background: linear-gradient(160deg, #8A7B6A 0%, #5C5040 100%);
-  box-shadow: inset 2rpx 2rpx 3rpx rgba(255,255,255,0.25), inset -2rpx -3rpx 5rpx rgba(40,30,20,0.35), 0 4rpx 12rpx rgba(100,80,60,0.28);
+  box-shadow: inset 2rpx 2rpx 3rpx rgba(255,255,255,0.25), inset -2rpx -3rpx 5rpx rgba(40,30,20,0.35);
 }
 .tab-item.active.tab-waiting {
   background: linear-gradient(160deg, #D4846B 0%, #B04A32 100%);
-  box-shadow: inset 2rpx 2rpx 3rpx rgba(255,255,255,0.28), inset -2rpx -3rpx 5rpx rgba(140,40,20,0.40), 0 4rpx 12rpx rgba(180,70,40,0.30);
+  box-shadow: inset 2rpx 2rpx 3rpx rgba(255,255,255,0.28), inset -2rpx -3rpx 5rpx rgba(140,40,20,0.40);
 }
 .tab-item.active.tab-completed {
   background: linear-gradient(160deg, #5CB860 0%, #2E7D32 100%);
-  box-shadow: inset 2rpx 2rpx 3rpx rgba(255,255,255,0.28), inset -2rpx -3rpx 5rpx rgba(20,70,25,0.40), 0 4rpx 12rpx rgba(46,125,50,0.28);
+  box-shadow: inset 2rpx 2rpx 3rpx rgba(255,255,255,0.28), inset -2rpx -3rpx 5rpx rgba(20,70,25,0.40);
 }
 .tab-item.active.tab-cancelled {
   background: linear-gradient(160deg, #9E9E9E 0%, #616161 100%);
-  box-shadow: inset 2rpx 2rpx 3rpx rgba(255,255,255,0.25), inset -2rpx -3rpx 5rpx rgba(40,40,40,0.35), 0 4rpx 12rpx rgba(80,80,80,0.25);
+  box-shadow: inset 2rpx 2rpx 3rpx rgba(255,255,255,0.25), inset -2rpx -3rpx 5rpx rgba(40,40,40,0.35);
 }
 
 .orders-scroll { padding: 0 0 63rpx; overflow-x: hidden; box-sizing: border-box; }
