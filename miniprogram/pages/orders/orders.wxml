@@ -5,98 +5,184 @@
     <text class="top-title">订单中心</text>
   </view>
 
-  <!-- 订单状态Tab -->
+  <!-- 订单状态Tab（彩色胶囊） -->
   <view class="order-tabs">
     <scroll-view scroll-x class="tabs-scroll" enhanced show-scrollbar="{{false}}">
       <view class="tabs-list">
         <view
           wx:for="{{tabs}}"
           wx:key="key"
-          class="tab-item {{activeTab === item.key ? 'active' : ''}}"
+          class="tab-item tab-{{item.key}} {{activeTab === item.key ? 'active' : ''}}"
           bindtap="onTabChange"
           data-key="{{item.key}}"
         >
+          <view class="tab-dot dot-{{item.key}}"></view>
           <text>{{item.name}}</text>
         </view>
       </view>
     </scroll-view>
   </view>
 
-  <!-- 订单列表 -->
+  <!-- ═══ 状态区域（Color Zone）═══ -->
   <scroll-view scroll-y class="orders-scroll" wx:if="{{filteredOrders.length > 0}}" style="flex: 1; height: 0;">
     <view class="scroll-inner">
-      <view
-        wx:for="{{filteredOrders}}"
-        wx:key="id"
-        class="order-card card"
-      >
-        <!-- 订单头部 -->
-        <view class="order-header">
-          <view class="order-header-left">
-            <text class="order-store">🏪 {{item.store}}</text>
-            <text class="order-time">{{item.time}}</text>
-            <text class="order-pickup-time" wx:if="{{item.pickupTimeText}}">🕐 取餐 {{item.pickupTimeText}}</text>
-          </view>
-          <view class="order-header-right">
-            <text class="payment-badge {{item.isPaid ? 'paid' : 'unpaid'}}">{{item.paymentStatusText}}</text>
-            <view class="order-status {{item.status}}">
-              <text>{{item.statusText}}</text>
-            </view>
+
+      <!-- 待取餐 Zone -->
+      <view class="status-zone zone-waiting" wx:if="{{zoneVisibility.waiting}}">
+        <view class="zone-header">
+          <view class="zone-header-left">
+            <text class="zone-icon">🕐</text>
+            <text class="zone-label">待取餐</text>
+            <text class="zone-count">{{zoneOrders.waiting.length}}</text>
           </view>
         </view>
-
-        <!-- 订单商品 -->
-        <view class="order-items">
-          <view wx:for="{{item.items}}" wx:key="name" wx:for-item="prod" class="order-item">
-            <text class="order-item-name">{{prod.name}}</text>
-            <view class="order-item-qty">
-              <text>x{{prod.qty}}</text>
-              <text class="order-item-price">¥{{prod.price}}</text>
-            </view>
-          </view>
-        </view>
-
-        <!-- 取餐码 -->
-        <view class="pickup-section">
-          <block wx:if="{{item.codeRevealed}}">
-            <view class="pickup-revealed">
-              <text class="pickup-label">取餐码</text>
-              <view class="pickup-code-row">
-                <text wx:for="{{item.codeDigits}}" wx:key="*this" wx:for-item="digit" class="pickup-digit">{{digit}}</text>
+        <view class="zone-body">
+          <view wx:for="{{zoneOrders.waiting}}" wx:key="id" class="order-card">
+            <view class="order-header">
+              <view class="order-header-left">
+                <text class="order-store">🏪 {{item.store}}</text>
+                <text class="order-time">{{item.time}}</text>
+                <text class="order-pickup-time" wx:if="{{item.pickupTimeText}}">🕐 取餐 {{item.pickupTimeText}}</text>
               </view>
-              <text class="pickup-hint">请向店员出示此码</text>
-              <view class="pickup-hide-btn" bindtap="onHidePickupCode" data-id="{{item.id}}">
-                <text>收起</text>
+              <view class="order-header-right">
+                <text class="payment-badge {{item.isPaid ? 'paid' : 'unpaid'}}">{{item.paymentStatusText}}</text>
+                <view class="order-status {{item.status}}"><text>{{item.statusText}}</text></view>
               </view>
             </view>
-          </block>
-          <block wx:else>
-            <view class="pickup-btn" bindtap="onShowPickupCode" data-id="{{item.id}}">
-              <image class="pickup-btn-icon" src="/images/pickup-code.png" mode="aspectFit"></image>
-              <text class="pickup-btn-text">查看取餐码</text>
+            <view class="order-items">
+              <view wx:for="{{item.items}}" wx:key="name" wx:for-item="prod" class="order-item">
+                <text class="order-item-name">{{prod.name}}</text>
+                <view class="order-item-qty">
+                  <text>x{{prod.qty}}</text>
+                  <text class="order-item-price">¥{{prod.price}}</text>
+                </view>
+              </view>
             </view>
-          </block>
-        </view>
-
-        <!-- 订单底部 -->
-        <view class="order-footer">
-          <view class="order-total-wrap">
-            <view class="order-discount-btn" wx:if="{{item.discountAmount > 0}}" bindtap="onShowDiscount" data-id="{{item.id}}" data-total="{{item.total}}" data-discount="{{item.discountAmount}}" data-paid="{{item.paidAmount}}">
-              <text class="order-discount-btn-text">已优惠 ¥{{item.discountAmount}}</text>
-              <text class="order-discount-btn-arrow">›</text>
+            <view class="pickup-section">
+              <block wx:if="{{item.codeRevealed}}">
+                <view class="pickup-revealed">
+                  <text class="pickup-label">取餐码</text>
+                  <view class="pickup-code-row">
+                    <text wx:for="{{item.codeDigits}}" wx:key="*this" wx:for-item="digit" class="pickup-digit">{{digit}}</text>
+                  </view>
+                  <text class="pickup-hint">请向店员出示此码</text>
+                  <view class="pickup-hide-btn" bindtap="onHidePickupCode" data-id="{{item.id}}"><text>收起</text></view>
+                </view>
+              </block>
+              <block wx:else>
+                <view class="pickup-btn" bindtap="onShowPickupCode" data-id="{{item.id}}">
+                  <image class="pickup-btn-icon" src="/images/pickup-code.png" mode="aspectFit"></image>
+                  <text class="pickup-btn-text">查看取餐码</text>
+                </view>
+              </block>
             </view>
-            <text class="order-total">实付 <text class="total-price">¥{{item.paidAmount}}</text></text>
-          </view>
-          <view class="order-actions">
-            <view class="order-action-btn pickup-btn" wx:if="{{item.canPickup}}" bindtap="onPickupComplete" data-id="{{item.id}}"><text>已取餐</text></view>
-            <view class="order-action-btn pay-btn" wx:if="{{!item.isPaid && item.status !== 'cancelled'}}" bindtap="onPayOrder" data-id="{{item.id}}"><text>去支付</text></view>
-            <view class="order-action-btn outline" wx:if="{{item.canCancel}}" bindtap="onCancelOrder" data-id="{{item.id}}" data-paid="{{item.isPaid}}">
-              <text>{{item.isPaid ? '取消退款' : '取消订单'}}</text>
+            <view class="order-footer">
+              <view class="order-total-wrap">
+                <view class="order-discount-btn" wx:if="{{item.discountAmount > 0}}" bindtap="onShowDiscount" data-id="{{item.id}}" data-total="{{item.total}}" data-discount="{{item.discountAmount}}" data-paid="{{item.paidAmount}}">
+                  <text class="order-discount-btn-text">已优惠 ¥{{item.discountAmount}}</text>
+                  <text class="order-discount-btn-arrow">›</text>
+                </view>
+                <text class="order-total">实付 <text class="total-price">¥{{item.paidAmount}}</text></text>
+              </view>
+              <view class="order-actions">
+                <view class="order-action-btn pickup-btn" wx:if="{{item.canPickup}}" bindtap="onPickupComplete" data-id="{{item.id}}"><text>已取餐</text></view>
+                <view class="order-action-btn pay-btn" wx:if="{{!item.isPaid && item.status !== 'cancelled'}}" bindtap="onPayOrder" data-id="{{item.id}}"><text>去支付</text></view>
+                <view class="order-action-btn outline" wx:if="{{item.canCancel}}" bindtap="onCancelOrder" data-id="{{item.id}}" data-paid="{{item.isPaid}}"><text>{{item.isPaid ? '取消退款' : '取消订单'}}</text></view>
+                <view class="order-action-btn disabled" wx:elif="{{item.status !== 'cancelled' && item.status !== 'completed'}}" catchtap="onCancelDisabled"><text>取消订单</text></view>
+              </view>
             </view>
-            <view class="order-action-btn disabled" wx:elif="{{item.status !== 'cancelled' && item.status !== 'completed'}}" catchtap="onCancelDisabled"><text>取消订单</text></view>
           </view>
         </view>
       </view>
+
+      <!-- 已完成 Zone -->
+      <view class="status-zone zone-completed" wx:if="{{zoneVisibility.completed}}">
+        <view class="zone-header">
+          <view class="zone-header-left">
+            <text class="zone-icon">✅</text>
+            <text class="zone-label">已完成</text>
+            <text class="zone-count">{{zoneOrders.completed.length}}</text>
+          </view>
+        </view>
+        <view class="zone-body">
+          <view wx:for="{{zoneOrders.completed}}" wx:key="id" class="order-card">
+            <view class="order-header">
+              <view class="order-header-left">
+                <text class="order-store">🏪 {{item.store}}</text>
+                <text class="order-time">{{item.time}}</text>
+                <text class="order-pickup-time" wx:if="{{item.pickupTimeText}}">🕐 取餐 {{item.pickupTimeText}}</text>
+              </view>
+              <view class="order-header-right">
+                <text class="payment-badge {{item.isPaid ? 'paid' : 'unpaid'}}">{{item.paymentStatusText}}</text>
+                <view class="order-status {{item.status}}"><text>{{item.statusText}}</text></view>
+              </view>
+            </view>
+            <view class="order-items">
+              <view wx:for="{{item.items}}" wx:key="name" wx:for-item="prod" class="order-item">
+                <text class="order-item-name">{{prod.name}}</text>
+                <view class="order-item-qty">
+                  <text>x{{prod.qty}}</text>
+                  <text class="order-item-price">¥{{prod.price}}</text>
+                </view>
+              </view>
+            </view>
+            <view class="order-footer">
+              <view class="order-total-wrap">
+                <view class="order-discount-btn" wx:if="{{item.discountAmount > 0}}" bindtap="onShowDiscount" data-id="{{item.id}}" data-total="{{item.total}}" data-discount="{{item.discountAmount}}" data-paid="{{item.paidAmount}}">
+                  <text class="order-discount-btn-text">已优惠 ¥{{item.discountAmount}}</text>
+                  <text class="order-discount-btn-arrow">›</text>
+                </view>
+                <text class="order-total">实付 <text class="total-price">¥{{item.paidAmount}}</text></text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 已取消 Zone -->
+      <view class="status-zone zone-cancelled" wx:if="{{zoneVisibility.cancelled}}">
+        <view class="zone-header">
+          <view class="zone-header-left">
+            <text class="zone-icon">✕</text>
+            <text class="zone-label">已取消</text>
+            <text class="zone-count">{{zoneOrders.cancelled.length}}</text>
+          </view>
+        </view>
+        <view class="zone-body">
+          <view wx:for="{{zoneOrders.cancelled}}" wx:key="id" class="order-card">
+            <view class="order-header">
+              <view class="order-header-left">
+                <text class="order-store">🏪 {{item.store}}</text>
+                <text class="order-time">{{item.time}}</text>
+                <text class="order-pickup-time" wx:if="{{item.pickupTimeText}}">🕐 取餐 {{item.pickupTimeText}}</text>
+              </view>
+              <view class="order-header-right">
+                <text class="payment-badge {{item.isPaid ? 'paid' : 'unpaid'}}">{{item.paymentStatusText}}</text>
+                <view class="order-status {{item.status}}"><text>{{item.statusText}}</text></view>
+              </view>
+            </view>
+            <view class="order-items">
+              <view wx:for="{{item.items}}" wx:key="name" wx:for-item="prod" class="order-item">
+                <text class="order-item-name">{{prod.name}}</text>
+                <view class="order-item-qty">
+                  <text>x{{prod.qty}}</text>
+                  <text class="order-item-price">¥{{prod.price}}</text>
+                </view>
+              </view>
+            </view>
+            <view class="order-footer">
+              <view class="order-total-wrap">
+                <view class="order-discount-btn" wx:if="{{item.discountAmount > 0}}" bindtap="onShowDiscount" data-id="{{item.id}}" data-total="{{item.total}}" data-discount="{{item.discountAmount}}" data-paid="{{item.paidAmount}}">
+                  <text class="order-discount-btn-text">已优惠 ¥{{item.discountAmount}}</text>
+                  <text class="order-discount-btn-arrow">›</text>
+                </view>
+                <text class="order-total">实付 <text class="total-price">¥{{item.paidAmount}}</text></text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+
     </view>
   </scroll-view>
 
