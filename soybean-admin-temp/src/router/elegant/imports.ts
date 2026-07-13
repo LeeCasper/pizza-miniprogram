@@ -22,6 +22,7 @@ export const views: Record<LastLevelRouteKey, RouteComponent | (() => Promise<Ro
   login: () => import("@/views/_builtin/login/index.vue"),
   banners_form: () => import("@/views/banners/form/index.vue"),
   banners_list: () => import("@/views/banners/list/index.vue"),
+  birthdaybenefits_list: () => import("@/views/birthdayBenefits/list/index.vue"),
   coupons_list: () => import("@/views/coupons/list/index.vue"),
   coupons_templates_form: () => import("@/views/coupons/templates/form/index.vue"),
   coupons_templates_list: () => import("@/views/coupons/templates/list/index.vue"),

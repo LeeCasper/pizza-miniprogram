@@ -562,6 +562,28 @@ const customRoutes: CustomRoute[] = [
       },
     ],
   },
+  {
+    name: 'birthdaybenefits',
+    path: '/birthday-benefits',
+    component: 'layout.base',
+    meta: {
+      title: '生日福利',
+      i18nKey: 'route.birthdaybenefits',
+      icon: 'mdi:cake-variant',
+      order: 5.6,
+    },
+    children: [
+      {
+        name: 'birthdaybenefits_list',
+        path: '/birthday-benefits/list',
+        component: 'view.birthdaybenefits_list',
+        meta: {
+          title: '生日福利设置',
+          i18nKey: 'route.birthdaybenefits_list',
+        },
+      },
+    ],
+  },
 ];
 
 /** create routes when the auth route mode is static */

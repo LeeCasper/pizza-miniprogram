@@ -169,6 +169,8 @@ const routeMap: RouteMap = {
   "banners": "/banners",
   "banners_form": "/banners/form",
   "banners_list": "/banners/list",
+  "birthdaybenefits": "/birthday-benefits",
+  "birthdaybenefits_list": "/birthday-benefits/list",
   "coupons": "/coupons",
   "coupons_list": "/coupons/list",
   "coupons_templates": "/coupons/templates",

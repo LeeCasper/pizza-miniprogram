@@ -237,6 +237,8 @@ const local: App.I18n.Schema = {
     banners_create: '新建轮播图',
     banners_edit: '编辑轮播图',
     banners_form: '轮播图表单',
+    birthdaybenefits: '生日福利',
+    birthdaybenefits_list: '生日福利设置',
     orders: '订单管理',
     orders_list: '订单列表',
     orders_detail: '订单详情',

@@ -241,6 +241,8 @@ const local: App.I18n.Schema = {
     banners_create: 'Add Banner',
     banners_edit: 'Edit Banner',
     banners_form: 'Banner Form',
+    birthdaybenefits: 'Birthday Benefits',
+    birthdaybenefits_list: 'Birthday Benefits',
     orders: 'Orders',
     orders_list: 'Order List',
     orders_detail: 'Order Detail',

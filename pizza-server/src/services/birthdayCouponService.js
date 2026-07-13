@@ -1,16 +1,20 @@
 /**
  * 生日券自动发放服务
  *
- * 每天 8:00 执行：查询当天生日的用户 → 按会员等级发放固定金额券 → 标记已领取。
+ * 每天 8:00 执行：查询当天生日的用户 → 按会员等级配置发放优惠券 → 标记已领取。
  * 每年只发一次（birthday_claimed_year 防重复）。
+ *
+ * 生日券配置（来自 member_tiers）：
+ *   birthday_coupon_value      — 券面额/折扣率
+ *   birthday_coupon_type       — fixed_amount | percentage
+ *   birthday_coupon_min_spend  — 最低消费门槛
+ *   birthday_coupon_valid_days — 有效天数
  */
 const pool = require('../config/database');
 const userService = require('./userService');
 const memberTierService = require('./memberTierService');
 const { createLogger } = require('../utils/logger');
 const log = createLogger('BirthdayCoupon');
-
-const BIRTHDAY_COUPON_VALID_DAYS = 30; // 生日券有效期（天）
 
 const birthdayCouponService = {
 
@@ -23,55 +27,60 @@ const birthdayCouponService = {
     const today = new Date();
     const year = today.getFullYear();
 
-    // 计算有效期
-    const validFrom = today.toISOString().slice(0, 10);
-    const validToDate = new Date(today);
-    validToDate.setDate(validToDate.getDate() + BIRTHDAY_COUPON_VALID_DAYS);
-    const validTo = validToDate.toISOString().slice(0, 10);
-
     let issued = 0;
     for (const user of users) {
       try {
-        // 确定用户的会员等级对应的生日券金额
         const tier = tiers.find(t => t.levelKey === user.member_level) || tiers[tiers.length - 1];
-        const couponValue = tier ? (tier.birthdayCouponValue || 0) : 0;
-
-        if (couponValue <= 0) {
-          log.warn({ userId: user.id, memberLevel: user.member_level }, 'Birthday coupon skipped: coupon_value is 0');
+        if (!tier || !tier.birthdayCouponValue || tier.birthdayCouponValue <= 0) {
+          log.info({ userId: user.id, memberLevel: user.member_level }, 'Birthday skipped: no coupon configured');
           continue;
         }
 
         const code = `BDAY-${year}-${String(user.id).padStart(6, '0')}`;
 
-        // 检查是否已发过（幂等保护）
+        // 幂等保护
         const [existing] = await pool.query(
           "SELECT id FROM coupons WHERE user_id = ? AND code = ? AND source = 'birthday'",
           [user.id, code]
         );
-        if (existing.length) continue; // 已发放，跳过
+        if (existing.length) continue;
+
+        const couponType = tier.birthdayCouponType || 'fixed_amount';
+        const couponValue = tier.birthdayCouponValue;
+        const minSpend = tier.birthdayCouponMinSpend || 0;
+        const validDays = tier.birthdayCouponValidDays || 30;
+
+        const validFrom = today.toISOString().slice(0, 10);
+        const validToDate = new Date(today);
+        validToDate.setDate(validToDate.getDate() + validDays);
+        const validTo = validToDate.toISOString().slice(0, 10);
+
+        const typeLabel = couponType === 'percentage' ? `${couponValue}折` : `¥${couponValue}`;
+        const desc = `生日快乐！🎂 ${tier.name}专属生日福利`;
 
         await pool.query(
           `INSERT INTO coupons
              (user_id, name, \`desc\`, category, \`value\`, status, code,
               discount_type, discount_value, min_spend, valid_from, valid_to, source, color)
            VALUES (?, ?, ?, 'discount', ?, 'available', ?,
-                   'fixed_amount', ?, 0, ?, ?, 'birthday', '#D32F2F')`,
+                   ?, ?, ?, ?, ?, 'birthday', '#D32F2F')`,
           [
             user.id,
             '生日专享券',
-            `生日快乐！🎂 会员专属生日福利`,
-            `${couponValue}元生日券`,
+            desc,
+            `${typeLabel}生日券`,
             code,
+            couponType,
             couponValue,
+            minSpend,
             validFrom,
             validTo,
           ]
         );
 
-        // 标记本年度已领取
         await userService.markBirthdayClaimed(user.id, year);
         issued++;
-        log.info({ userId: user.id, couponValue, code }, 'Birthday coupon issued');
+        log.info({ userId: user.id, tier: tier.name, couponType, couponValue, minSpend, validDays }, 'Birthday coupon issued');
       } catch (err) {
         log.error({ err, userId: user.id }, 'Failed to issue birthday coupon');
       }
