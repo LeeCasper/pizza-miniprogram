@@ -160,13 +160,14 @@ Page({
 
   onCloseResult() { this.setData({ showResult: false }); },
 
-  // 结果弹窗按钮：中「再来一次」(resultBonus) 时点「继续抽奖」自动开抽，无需再点开始抽奖。
-  // 复用 onSpin —— 服务端已把本次免费/积分额度退还(recordedSource='again',effectiveCost=0),
-  // 故 onSpin 会据刷新后的 freeRemaining 自动免费抽;无免费时仍弹积分确认,不会静默扣分。
-  // 切勿改成发 source:'again' —— 后端只认 {'free','points'},'again' 会被当积分加抽扣分。
+  // 结果弹窗按钮：中「再来一次」时用 'bonus' source 直接免费抽，
+  // 后端 bonus 不消耗免费额度也不扣积分，不检查 freePerDay。
   onResultBtn() {
     this.setData({ showResult: false });
-    if (this.data.resultBonus) this.onSpin();
+    if (this.data.resultBonus) {
+      // 再来一次 → 直接 bonus 免费抽，跳过 onSpin 的积分/额度检查
+      this.doDraw('bonus');
+    }
   },
 
   // ── Rules modal ──
