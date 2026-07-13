@@ -172,7 +172,7 @@
 /* ── 优惠明细区域 ── */
 .dp-discounts {
   margin: 12rpx 0;
-  padding: 16rpx 24rpx;
+  padding: 16rpx 0 16rpx 24rpx;
   background: linear-gradient(160deg, #FDF7F3 0%, #FDF3EC 100%);
   border-radius: 20rpx;
   border: 2rpx solid rgba(192, 86, 58, 0.10);
