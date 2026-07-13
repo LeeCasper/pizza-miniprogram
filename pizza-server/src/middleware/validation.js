@@ -2,7 +2,7 @@ const Joi = require('joi');
 
 const schemas = {
   luckyDraw: Joi.object({
-    source: Joi.string().valid('free', 'points', 'bonus').required(),
+    source: Joi.string().valid('free', 'points').required(),
   }),
   luckyPrize: Joi.object({
     type: Joi.string().valid('coupon', 'points', 'balance', 'thanks', 'again').required(),
