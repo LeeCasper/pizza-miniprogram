@@ -429,7 +429,7 @@ function formatOrder(row, cancelMinutes) {
 
   // Cancel eligibility (only for user-facing queries where cancelMinutes is provided)
   if (cancelMinutes != null && (base.status === 'waiting' || base.status === 'preparing')) {
-    const deadline = new Date(new Date(base.createdAt).getTime() + cancelMinutes * 60000);
+    const deadline = new Date(new Date(String(base.createdAt).replace(' ', 'T')).getTime() + cancelMinutes * 60000);
     base.cancelDeadline = deadline.toISOString();
     base.canCancel = new Date() < deadline;
   } else {
