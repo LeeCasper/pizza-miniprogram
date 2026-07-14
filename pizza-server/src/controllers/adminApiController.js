@@ -558,6 +558,22 @@ const adminApiController = {
     }
   },
 
+  /** 管理员手动触发用户生日券发放（调试/补救用） */
+  async triggerBirthdayCoupons(req, res) {
+    try {
+      const birthdayCouponService = require('../services/birthdayCouponService');
+      const result = await birthdayCouponService.issueForUser(parseInt(req.params.id, 10));
+      return res.json({
+        code: 0,
+        message: result.issued ? `已发放 ${result.coupons.length} 张生日券` : '未发放（非生日/已领取/无券可发）',
+        data: result,
+      });
+    } catch (err) {
+      log.error({ err }, 'TriggerBirthdayCoupons error');
+      return res.status(500).json({ code: 500, message: err.message || '发放失败' });
+    }
+  },
+
   // ── Points Categories CRUD ──────────────────────────
 
   async listPointsCategories(req, res) {

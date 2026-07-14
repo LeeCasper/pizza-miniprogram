@@ -98,6 +98,7 @@ router.put('/member-tiers/:id/toggle', ctrl.toggleMemberTier);
 router.get('/users', ctrl.listUsers);
 router.put('/users/:id', ctrl.updateUser);
 router.put('/users/:id/birthday', ctrl.updateUserBirthday);
+router.post('/users/:id/trigger-birthday-coupons', ctrl.triggerBirthdayCoupons);
 
 // Points categories
 router.get('/points/categories', ctrl.listPointsCategories);

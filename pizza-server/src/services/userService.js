@@ -33,6 +33,7 @@ const userService = {
   async updateProfile(id, { name, bio, birthday }) {
     const sets = [];
     const values = [];
+    let isFirstBirthdaySet = false;
     if (name !== undefined) { sets.push('name = ?'); values.push(name); }
     if (bio !== undefined) { sets.push('bio = ?'); values.push(bio); }
     if (birthday !== undefined) {
@@ -41,11 +42,25 @@ const userService = {
       if (existing.length && existing[0].birthday && birthday) {
         return { code: 'BIRTHDAY_LOCKED', message: '生日已设置，如需修改请联系管理员' };
       }
+      isFirstBirthdaySet = !!(birthday && !(existing.length && existing[0].birthday));
       sets.push('birthday = ?'); values.push(birthday || null);
     }
     if (sets.length === 0) return this.findById(id);
     values.push(id);
     await pool.query(`UPDATE users SET ${sets.join(', ')} WHERE id = ?`, values);
+
+    // 首次设置生日 + 今天就是生日 → 立即发券（不等明天 cron）
+    if (isFirstBirthdaySet && birthday) {
+      try {
+        const birthdayCouponService = require('./birthdayCouponService');
+        await birthdayCouponService.issueForUser(id);
+      } catch (err) {
+        // 不阻塞 profile 更新
+        const { createLogger } = require('../utils/logger');
+        createLogger('UserService').warn({ err, userId: id }, 'First-birthday coupon issuance failed');
+      }
+    }
+
     return this.findById(id);
   },
 
@@ -73,9 +88,21 @@ const userService = {
     await pool.query('UPDATE users SET birthday_claimed_year = ? WHERE id = ?', [year, userId]);
   },
 
-  /** 管理员修改用户生日（不受一次性限制） */
+  /** 管理员修改用户生日（不受一次性限制）。若改为今天则立即发券。 */
   async adminUpdateBirthday(userId, birthday) {
     await pool.query('UPDATE users SET birthday = ?, birthday_claimed_year = NULL WHERE id = ?', [birthday || null, userId]);
+
+    // 改生日为今天 → 立即发券（清除 claimed_year 后重新判断）
+    if (birthday) {
+      try {
+        const birthdayCouponService = require('./birthdayCouponService');
+        await birthdayCouponService.issueForUser(userId);
+      } catch (err) {
+        const { createLogger } = require('../utils/logger');
+        createLogger('UserService').warn({ err, userId }, 'Admin birthday-change coupon issuance failed');
+      }
+    }
+
     return this.findById(userId);
   },
 
