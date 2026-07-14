@@ -15,6 +15,7 @@ const config = {
     connectionLimit: 10,
     queueLimit: 0,
     charset: 'utf8mb4',
+    dateStrings: true,
   },
 
   jwtSecret: process.env.JWT_SECRET || 'dev-secret-change-me',
