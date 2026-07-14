@@ -34,7 +34,9 @@ function formatOrder(o) {
 function formatPickupTimeText(isoStr) {
   if (!isoStr) return '';
   try {
-    const d = new Date(isoStr);
+    // MySQL DATETIME (dateStrings:true) → "YYYY-MM-DD HH:mm:ss"
+    // iOS 仅支持 "YYYY-MM-DDTHH:mm:ss" 格式，替换空格为 T 兼容两端
+    const d = new Date(isoStr.replace(' ', 'T'));
     if (isNaN(d.getTime())) return '';
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');

@@ -138,7 +138,7 @@ Page({
       if (res.code === 0 && res.data && res.data.length > 0) {
         const items = res.data.slice(0, 10).map(h => {
           const sign = h.pointsChange > 0 ? '+' : '';
-          const date = h.createdAt ? new Date(h.createdAt).toLocaleDateString('zh-CN') : '';
+          const date = h.createdAt ? new Date(String(h.createdAt).replace(' ', 'T')).toLocaleDateString('zh-CN') : '';
           return `${date}  ${h.reason}  ${sign}${h.pointsChange}`;
         }).join('\n');
         wx.showModal({
