@@ -13,8 +13,6 @@ Page({
     drawerOpen: false,
     drawerType: '',
     drawerTitle: '',
-    drawerContent: '',
-    drawerLoading: false,
     phoneNumber: '',
     editPhone: '',
     editPhoneOpen: false,
@@ -139,44 +137,24 @@ Page({
       agreement: '用户协议',
       privacy: '隐私政策',
     };
-    const contentKeys = {
-      about: 'content_about',
-      agreement: 'content_agreement',
-      privacy: 'content_privacy',
-    };
+    // 关于/协议/隐私 → 跳转独立内容页（符合微信审核对入口显著的要求）
+    if (type === 'about' || type === 'agreement' || type === 'privacy') {
+      wx.navigateTo({
+        url: '/pages/content/content?type=' + type,
+        fail: function () {
+          wx.showToast({ title: '页面跳转失败', icon: 'none' });
+        }
+      });
+      return;
+    }
+
     this.setData({
       drawerOpen: true,
       drawerType: type,
       drawerTitle: titles[type] || '',
-      drawerContent: '',
-      drawerLoading: !!(contentKeys[type]),
       editPhone: this.data.phoneNumber,
       editPhoneOpen: false,
     });
-
-    // 从服务器获取最新内容
-    if (contentKeys[type]) {
-      api.get('/config/content/' + contentKeys[type]).then(res => {
-        if (res && res.code === 0 && res.data) {
-          var val = (res.data.value || '').trim();
-          // 去掉完整 HTML 文档的包裹标签，提取 body 内容
-          val = val.replace(/<!DOCTYPE[^>]*>/gi, '');
-          val = val.replace(/<html[^>]*>/gi, '').replace(/<\/html>/gi, '');
-          val = val.replace(/<head>[\s\S]*?<\/head>/gi, '');
-          val = val.replace(/<meta[^>]*>/gi, '');
-          val = val.replace(/<body[^>]*>/gi, '').replace(/<\/body>/gi, '');
-          // 纯文本换行 -> <br>
-          if (val && val.indexOf('<') === -1) {
-            val = val.replace(/\n/g, '<br>');
-          }
-          this.setData({ drawerContent: val, drawerLoading: false });
-        } else {
-          this.setData({ drawerLoading: false });
-        }
-      }).catch(() => {
-        this.setData({ drawerLoading: false });
-      });
-    }
   },
 
   onCloseDrawer() {

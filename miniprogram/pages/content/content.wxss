@@ -1,0 +1,65 @@
+/* pages/content/content.wxss */
+
+.page-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--color-surface);
+}
+
+/* 顶部导航 */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40rpx 24rpx;
+  background: var(--glass-bg-nav);
+  border-bottom: var(--glass-border-subtle);
+  box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+.back-btn {
+  width: 80rpx; height: 80rpx;
+  display: flex; align-items: center; justify-content: center;
+}
+.back-icon { width: 40rpx; height: 40rpx; }
+.top-title {
+  font-size: 36rpx;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+}
+.top-spacer { width: 80rpx; }
+
+.main-scroll {
+  box-sizing: border-box;
+  padding: 32rpx 40rpx;
+  overflow-x: hidden;
+}
+
+.loading-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 100rpx 0;
+  font-size: 28rpx;
+  color: var(--color-on-surface-variant);
+  opacity: 0.5;
+}
+
+/* Rich text body — HTML from API */
+.content-body {
+  display: block;
+  width: 100%;
+  font-size: 28rpx;
+  color: var(--color-on-surface);
+  line-height: 1.9;
+  word-break: break-word;
+}
+
+.bottom-spacer {
+  height: 80rpx;
+}

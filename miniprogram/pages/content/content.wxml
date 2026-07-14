@@ -1,0 +1,19 @@
+<!--pages/content/content.wxml-->
+<view class="page-container" style="padding-top: {{topBarTotalHeight}}px">
+  <!-- 顶部导航 -->
+  <view class="top-bar" style="padding-top: {{statusBarHeight}}px;">
+    <view class="back-btn" bindtap="onBack">
+      <image src="/images/back.png" class="back-icon" mode="aspectFit"></image>
+    </view>
+    <text class="top-title">{{pageTitle}}</text>
+    <view class="top-spacer"></view>
+  </view>
+
+  <scroll-view scroll-y enhanced show-scrollbar="{{false}}" class="main-scroll" style="flex:1;height:0">
+    <view wx:if="{{loading}}" class="loading-wrap">
+      <text>加载中...</text>
+    </view>
+    <rich-text wx:else nodes="{{content || '<p style=text-align:center;color:#999>暂无内容</p>'}}" class="content-body"></rich-text>
+    <view class="bottom-spacer"></view>
+  </scroll-view>
+</view>

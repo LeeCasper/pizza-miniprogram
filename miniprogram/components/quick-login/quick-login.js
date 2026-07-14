@@ -195,11 +195,11 @@ Component({
     // ── 协议链接 ────────────────────────────
 
     onShowTerms() {
-      wx.showToast({ title: '用户协议', icon: 'none' });
+      wx.navigateTo({ url: '/pages/content/content?type=agreement' });
     },
 
     onShowPrivacy() {
-      wx.showToast({ title: '隐私政策', icon: 'none' });
+      wx.navigateTo({ url: '/pages/content/content?type=privacy' });
     },
 
     noop() {},
