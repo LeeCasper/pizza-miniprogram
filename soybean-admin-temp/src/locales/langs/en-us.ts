@@ -289,6 +289,7 @@ const local: App.I18n.Schema = {
     settings_logistics: 'Logistics',
     settings_storage: 'Storage',
     settings_avatars: 'Default Avatars',
+    settings_content: 'Content Management',
     shop: 'Shop',
     shop_products_list: 'Shop Products',
     shop_products_form: 'Product Form',

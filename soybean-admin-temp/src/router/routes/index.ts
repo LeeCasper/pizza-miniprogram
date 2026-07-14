@@ -158,6 +158,15 @@ const customRoutes: CustomRoute[] = [
           i18nKey: 'route.settings_avatars',
         },
       },
+      {
+        name: 'settings_content',
+        path: '/settings/content',
+        component: 'view.settings_content',
+        meta: {
+          title: '内容管理',
+          i18nKey: 'route.settings_content',
+        },
+      },
     ],
   },
   // Multi-level routes — parent has layout.base, children have view.xxx

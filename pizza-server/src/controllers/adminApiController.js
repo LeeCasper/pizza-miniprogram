@@ -1883,4 +1883,36 @@ function formatPointsProduct(row) {
   };
 }
 
+  // ── Content Settings (关于我们 / 用户协议 / 隐私政策) ──
+
+  async getContentSettings(req, res) {
+    try {
+      const contentService = require('../services/contentService');
+      const list = await contentService.getAll();
+      return res.json({ code: 0, data: list });
+    } catch (err) {
+      log.error({ err }, 'GetContentSettings error');
+      return res.status(500).json({ code: 500, message: '获取内容设置失败' });
+    }
+  },
+
+  async updateContentSettings(req, res) {
+    try {
+      const { key } = req.params;
+      const { value } = req.body;
+      if (!key || value === undefined) {
+        return res.status(400).json({ code: 400, message: '缺少 key 或 value' });
+      }
+      const contentService = require('../services/contentService');
+      const ok = await contentService.update(key, value);
+      if (!ok) return res.status(400).json({ code: 400, message: '无效的内容 key' });
+      return res.json({ code: 0, message: '保存成功' });
+    } catch (err) {
+      log.error({ err }, 'UpdateContentSettings error');
+      return res.status(500).json({ code: 500, message: '保存内容失败' });
+    }
+  },
+
+};
+
 module.exports = adminApiController;

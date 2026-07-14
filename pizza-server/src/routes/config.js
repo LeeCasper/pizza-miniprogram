@@ -48,4 +48,16 @@ router.get('/default-avatars', async (req, res) => {
   }
 });
 
+// Content pages (关于我们 / 用户协议 / 隐私政策)
+router.get('/content/:key', async (req, res) => {
+  try {
+    const contentService = require('../services/contentService');
+    const item = await contentService.get(req.params.key);
+    if (!item) return res.status(404).json({ code: 404, message: '内容不存在' });
+    res.json({ code: 0, data: item });
+  } catch (err) {
+    res.status(500).json({ code: 500, message: '获取失败' });
+  }
+});
+
 module.exports = router;

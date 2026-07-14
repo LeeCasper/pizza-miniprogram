@@ -153,6 +153,8 @@ router.get('/settings/logistics', ctrl.getLogisticsSettings);
 router.put('/settings/logistics', ctrl.updateLogisticsSettings);
 router.get('/settings/storage', ctrl.getStorageSettings);
 router.put('/settings/storage', ctrl.updateStorageSettings);
+router.get('/settings/content', ctrl.getContentSettings);
+router.put('/settings/content/:key', ctrl.updateContentSettings);
 
 // Default avatars
 router.get('/default-avatars', ctrl.listDefaultAvatars);

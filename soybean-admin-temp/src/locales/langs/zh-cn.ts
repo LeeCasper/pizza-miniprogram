@@ -286,6 +286,7 @@ const local: App.I18n.Schema = {
     settings_logistics: '物流配置',
     settings_storage: '存储配置',
     settings_avatars: '默认头像',
+    settings_content: '内容管理',
     shop: '会员商城',
     shop_products_list: '商城商品',
     shop_products_form: '商品表单',

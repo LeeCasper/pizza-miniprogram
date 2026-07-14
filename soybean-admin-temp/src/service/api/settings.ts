@@ -319,3 +319,27 @@ export function fetchDeleteDefaultAvatar(id: number) {
     method: 'DELETE',
   });
 }
+
+// ── Content Settings (关于我们 / 用户协议 / 隐私政策) ──
+
+export interface ContentItem {
+  config_key: string;
+  config_value: string;
+  updated_at: string | null;
+  label: string;
+}
+
+export function fetchContentSettings() {
+  return request<ContentItem[]>({
+    url: '/settings/content',
+    method: 'GET',
+  });
+}
+
+export function fetchUpdateContentSettings(key: string, value: string) {
+  return request<null>({
+    url: `/settings/content/${key}`,
+    method: 'PUT',
+    data: { value },
+  });
+}
