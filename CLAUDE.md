@@ -76,6 +76,8 @@ src/
 │   ├── couponTemplateService.js — Coupon template CRUD + claimable logic
 │   ├── couponClaimService.js — Coupon claim with weekly/monthly limits
 │   ├── luckyWheelService.js + luckyWheel.logic.js — Lucky wheel game backend + logic
+│   ├── birthdayCouponService.js — Daily birthday coupon auto-issuance (dual coupons per tier, cron-driven)
+│   ├── orderAutoCompleteService.js — Auto-complete orders past pickup_time + 20 min (cron-driven)
 │   ├── carrierMap.js       — Carrier name-to-code mapping + tracking-number prefix detection (20+ carriers)
 │   ├── orderCleanupService.js — Auto-cancel unpaid orders (cron-driven)
 │   ├── auditService.js     — Fire-and-forget audit logging (NEVER throws)
@@ -110,6 +112,7 @@ src/
 
 - Public API routes: `/api/v1/auth` (login, logout, **phone** binding), `/api/v1/products`, `/api/v1/banners`, `/api/v1/config` (map, beian, **shop**-status, **default-avatars**)
 - User API routes: `/api/v1/user/*` — profile, settings, member-tiers, **balance** (history + recharge)
+- Order API routes: `/api/v1/orders/*` — CRUD, cancel, **pickup** (mark as picked up)
 - Payment routes: `/api/v1/pay/*` — order payment, recharge, WeChat Pay notify callbacks
 - Admin API routes: `/api/v1/admin/*` — all behind `auth` + `adminOnly` middleware
   - CRUD: products, orders, coupons, coupon-templates, member-tiers, users, points, banners
@@ -118,6 +121,7 @@ src/
   - Logistics: `/admin/shop/auto-detect-carrier` (tracking number → carrier)
   - **Member tier colors**: frontend-only (`utils/tiers.js`); DB columns dropped, API no longer returns them
 	  - **Default avatars**: `/admin/default-avatars` (GET/POST/DELETE)
+  - **User birthday**: `PUT /admin/users/:id/birthday` — admin override for locked birthdays
   - Ops: `/admin/audit-logs`, `/admin/reconciliation`, `/admin/payment-records`
 - Admin EJS routes: `/admin` — session-based, renders EJS views
 - Upload static files: `/uploads` → `config.upload.dir` (default `uploads/`)
@@ -130,14 +134,16 @@ src/
 - **Migration pattern**: Incremental SQL files named `db/migrate_<feature>.sql` or `db/migrate_phase<N>_<name>.sql`. Run manually via `npm run migrate` or direct `mysql < file.sql`. No auto-migration framework — each migration uses `IF NOT EXISTS` / `ALTER TABLE ... ADD COLUMN` to be idempotent.
 - **deploy.py** runs all migrations in order; duplicates produce harmless `Duplicate column` warnings.
 
-### Cron Jobs (2 active)
+### Cron Jobs (4 active)
 
 | Schedule | Job | Config Source |
 |----------|-----|---------------|
+| `0 8 * * *` | Issue birthday coupons to today's-birthday users (per-tier dual coupons) | Hardcoded |
 | `0 2 * * *` | Expire overdue coupons | Hardcoded |
 | `*/5 * * * *` | Auto-cancel unpaid orders past timeout | `config.business.unpaidTimeoutMinutes` (default 30) |
+| `*/5 * * * *` | Auto-complete orders past `pickup_time + 20 min` | Hardcoded (20 min) |
 
-Both stopped during graceful shutdown. Both only log when count > 0.
+All stopped during graceful shutdown. All only log when count > 0.
 
 ### System Config (Admin-Configurable)
 
@@ -163,13 +169,16 @@ Both stopped during graceful shutdown. Both only log when count > 0.
 ```
 waiting   → preparing (guard: must be paid)
 waiting   → cancelled
-preparing → completed
+waiting   → completed  (auto-complete: pickup_time + 20 min elapsed)
+preparing → completed  (user taps "已取餐" OR auto-complete)
 preparing → cancelled
 completed → (terminal)
 cancelled → (terminal)
 ```
 
 `utils/orderStateMachine.js` exports `validateTransition(currentStatus, newStatus, order)`. Used by `orderService.adminUpdateStatus()`. User-facing cancel enforced by SQL `WHERE status IN ('waiting','preparing')`.
+
+**Pickup time & auto-complete**: Users can optionally set `pickupTime` at checkout (ISO datetime, 15-min granularity). After the order is paid, users can tap "已取餐" (`PUT /api/v1/orders/:id/pickup`) to transition `preparing → completed`. Separately, a cron job (`*/5 * * * *`) auto-completes any order whose `pickup_time` is more than 20 minutes in the past and status is `waiting` or `preparing`.
 
 **Cancel time window**: User can cancel within `config.business.orderCancelMinutes` (default 1 minute). Enforced in `orderController.cancel()`. Admin cancel is unrestricted. Order API returns `canCancel` (bool) + `cancelDeadline` (ISO timestamp) for frontend display.
 
@@ -179,7 +188,7 @@ cancelled → (terminal)
 - Config via `.env` at project root
 - Deploy: `python soybean-admin-temp/deploy.py backend` (git pull → npm install → migrations → pm2 restart)
 - **Health check**: `GET /health` → `{ status: "ok"|"degraded", uptime, db: "ok"|"unreachable" }` (200/503)
-- **Rate limiting**: Global API 200/15min, auth 20/15min, pay 30/15min
+- **Rate limiting**: Global API 600/15min, auth 20/15min, pay 30/15min
 - **Graceful shutdown**: SIGTERM/SIGINT → stop cron → close HTTP → close DB pool. `unhandledRejection` logs but does NOT exit.
 - **Logging**: Pino structured JSON (production), pino-pretty (dev). `createLogger('Module')` per file.
 - **WeChat Pay callbacks**: `/pay/notify` and `/pay/refund-notify` mount `express.raw()` BEFORE `express.json()` for signature verification.
@@ -490,7 +499,7 @@ box-shadow: inset 0 2rpx 4rpx rgba(255,255,255,0.85), 0 6rpx 18rpx rgba(120,108,
 
 **Shop checkout** (shop-detail): Address-selection drawer → pick from saved addresses via `/api/v1/addresses`, pay with WeChat/Balance, unified settings card (address/shipping/notes/payment merged into single `.co-settings` card). Custom PNG icons for each section.
 
-**POS checkout** (main page): Cart drawer with coupon picker + tier discount calculation. Price breakdown always visible in `.price-breakdown` card: 商品合计, 优惠券减免, 会员折扣, 已优惠汇总, 应付金额. Discount details shown via "已优惠 ¥X ›" button → popup.
+**POS checkout** (main page): Cart drawer with pickup time picker (15-min granularity, defaults to empty/ASAP), coupon picker + tier discount calculation. Price breakdown always visible in `.price-breakdown` card: 商品合计, 优惠券减免, 会员折扣, 已优惠汇总, 应付金额. Discount details shown via "已优惠 ¥X ›" button → popup.
 
 **Order cards**: Display `paidAmount` (not `total`) as "实付 ¥X". `discountAmount > 0` shows "已优惠 ¥X" pill button → tap opens discount detail popup.
 
