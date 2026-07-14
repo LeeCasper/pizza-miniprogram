@@ -59,8 +59,8 @@ declare module "@elegant-router/types" {
     "products_list": "/products/list";
     "settings": "/settings";
     "settings_avatars": "/settings/avatars";
-    "settings_content": "/settings/content";
     "settings_business": "/settings/business";
+    "settings_content": "/settings/content";
     "settings_logistics": "/settings/logistics";
     "settings_map": "/settings/map";
     "settings_pay": "/settings/pay";

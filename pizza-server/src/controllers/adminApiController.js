@@ -1,4 +1,4 @@
-const bcrypt = require('bcryptjs');
+﻿const bcrypt = require('bcryptjs');
 const config = require('../config');
 const pool = require('../config/database');
 const { createLogger } = require('../utils/logger');
@@ -1846,6 +1846,36 @@ const adminApiController = {
       res.json({ code: 0, data: await luckyWheelService.adminListRecords(page, limit) });
     } catch (err) { next(err); }
   },
+  // Content Settings (about / agreement / privacy)
+
+  async getContentSettings(req, res) {
+    try {
+      const contentService = require('../services/contentService');
+      const list = await contentService.getAll();
+      return res.json({ code: 0, data: list });
+    } catch (err) {
+      log.error({ err }, 'GetContentSettings error');
+      return res.status(500).json({ code: 500, message: 'Failed to get content' });
+    }
+  },
+
+  async updateContentSettings(req, res) {
+    try {
+      const { key } = req.params;
+      const { value } = req.body;
+      if (!key || value === undefined) {
+        return res.status(400).json({ code: 400, message: 'Missing key or value' });
+      }
+      const contentService = require('../services/contentService');
+      const ok = await contentService.update(key, value);
+      if (!ok) return res.status(400).json({ code: 400, message: 'Invalid content key' });
+      return res.json({ code: 0, message: 'Saved' });
+    } catch (err) {
+      log.error({ err }, 'UpdateContentSettings error');
+      return res.status(500).json({ code: 500, message: 'Failed to save content' });
+    }
+  },
+
 };
 
 function safeJson(val, defaultVal) {
@@ -1882,37 +1912,5 @@ function formatPointsProduct(row) {
     isActive: !!row.is_active,
   };
 }
-
-  // ── Content Settings (关于我们 / 用户协议 / 隐私政策) ──
-
-  async getContentSettings(req, res) {
-    try {
-      const contentService = require('../services/contentService');
-      const list = await contentService.getAll();
-      return res.json({ code: 0, data: list });
-    } catch (err) {
-      log.error({ err }, 'GetContentSettings error');
-      return res.status(500).json({ code: 500, message: '获取内容设置失败' });
-    }
-  },
-
-  async updateContentSettings(req, res) {
-    try {
-      const { key } = req.params;
-      const { value } = req.body;
-      if (!key || value === undefined) {
-        return res.status(400).json({ code: 400, message: '缺少 key 或 value' });
-      }
-      const contentService = require('../services/contentService');
-      const ok = await contentService.update(key, value);
-      if (!ok) return res.status(400).json({ code: 400, message: '无效的内容 key' });
-      return res.json({ code: 0, message: '保存成功' });
-    } catch (err) {
-      log.error({ err }, 'UpdateContentSettings error');
-      return res.status(500).json({ code: 500, message: '保存内容失败' });
-    }
-  },
-
-};
 
 module.exports = adminApiController;

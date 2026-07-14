@@ -422,21 +422,21 @@ export const generatedRoutes: GeneratedRoute[] = [
         }
       },
       {
-        name: 'settings_content',
-        path: '/settings/content',
-        component: 'view.settings_content',
-        meta: {
-          title: 'settings_content',
-          i18nKey: 'route.settings_content'
-        }
-      },
-      {
         name: 'settings_business',
         path: '/settings/business',
         component: 'view.settings_business',
         meta: {
           title: 'settings_business',
           i18nKey: 'route.settings_business'
+        }
+      },
+      {
+        name: 'settings_content',
+        path: '/settings/content',
+        component: 'view.settings_content',
+        meta: {
+          title: 'settings_content',
+          i18nKey: 'route.settings_content'
         }
       },
       {
