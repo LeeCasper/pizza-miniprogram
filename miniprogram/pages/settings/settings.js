@@ -13,6 +13,8 @@ Page({
     drawerOpen: false,
     drawerType: '',
     drawerTitle: '',
+    drawerContent: '',
+    drawerLoading: false,
     phoneNumber: '',
     editPhone: '',
     editPhoneOpen: false,
@@ -137,13 +139,38 @@ Page({
       agreement: '用户协议',
       privacy: '隐私政策',
     };
+    const contentKeys = {
+      about: 'content_about',
+      agreement: 'content_agreement',
+      privacy: 'content_privacy',
+    };
     this.setData({
       drawerOpen: true,
       drawerType: type,
       drawerTitle: titles[type] || '',
+      drawerContent: '',
+      drawerLoading: !!(contentKeys[type]),
       editPhone: this.data.phoneNumber,
       editPhoneOpen: false,
     });
+
+    // 从服务器获取最新内容
+    if (contentKeys[type]) {
+      api.get('/config/content/' + contentKeys[type]).then(res => {
+        if (res && res.code === 0 && res.data) {
+          // 纯文本换行 → <br>，确保 rich-text 正常换行
+          var val = (res.data.value || '').trim();
+          if (val && val.indexOf('<') === -1) {
+            val = val.replace(/\n/g, '<br>');
+          }
+          this.setData({ drawerContent: val, drawerLoading: false });
+        } else {
+          this.setData({ drawerLoading: false });
+        }
+      }).catch(() => {
+        this.setData({ drawerLoading: false });
+      });
+    }
   },
 
   onCloseDrawer() {

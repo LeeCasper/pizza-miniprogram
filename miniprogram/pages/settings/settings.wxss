@@ -330,3 +330,19 @@
 }
 
 .drawer-body-spacer { height: 48rpx; }
+
+/* Rich text content from API */
+.drawer-rich-text {
+  font-size: 28rpx;
+  color: var(--color-on-surface);
+  line-height: 1.8;
+}
+
+.drawer-loading {
+  display: flex;
+  justify-content: center;
+  padding: 60rpx 0;
+  font-size: 28rpx;
+  color: var(--color-on-surface-variant);
+  opacity: 0.5;
+}
