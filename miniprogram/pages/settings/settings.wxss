@@ -333,9 +333,12 @@
 
 /* Rich text content from API */
 .drawer-rich-text {
+  display: block;
+  width: 100%;
   font-size: 28rpx;
   color: var(--color-on-surface);
   line-height: 1.8;
+  word-break: break-word;
 }
 
 .drawer-loading {

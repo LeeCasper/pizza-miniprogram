@@ -158,8 +158,14 @@ Page({
     if (contentKeys[type]) {
       api.get('/config/content/' + contentKeys[type]).then(res => {
         if (res && res.code === 0 && res.data) {
-          // 纯文本换行 → <br>，确保 rich-text 正常换行
           var val = (res.data.value || '').trim();
+          // 去掉完整 HTML 文档的包裹标签，提取 body 内容
+          val = val.replace(/<!DOCTYPE[^>]*>/gi, '');
+          val = val.replace(/<html[^>]*>/gi, '').replace(/<\/html>/gi, '');
+          val = val.replace(/<head>[\s\S]*?<\/head>/gi, '');
+          val = val.replace(/<meta[^>]*>/gi, '');
+          val = val.replace(/<body[^>]*>/gi, '').replace(/<\/body>/gi, '');
+          // 纯文本换行 -> <br>
           if (val && val.indexOf('<') === -1) {
             val = val.replace(/\n/g, '<br>');
           }
