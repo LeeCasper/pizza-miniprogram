@@ -27,6 +27,19 @@ const ENABLED_KEYS = {
   coupon: 'notify_coupon_enabled',
 };
 
+const STATE_KEY = 'notify_miniprogram_state';
+
+/** 读取 miniprogram_state 配置，未设置时自动推断 */
+async function _getMiniprogramState() {
+  try {
+    const [[row]] = await pool.query(
+      'SELECT config_value FROM system_config WHERE config_key = ?', [STATE_KEY]
+    );
+    if (row && row.config_value) return row.config_value;
+  } catch (_) {}
+  return process.env.NODE_ENV === 'production' ? 'formal' : 'developer';
+}
+
 const notificationService = {
 
   // ── 配置读取 ─────────────────────────────────
@@ -114,9 +127,7 @@ const notificationService = {
         template_id: templateId,
         page: page || '',
         data: templateData,
-        // 自动匹配环境：生产→formal，其他→developer
-        // 体验版需要手动改这里为 'trial'
-        miniprogram_state: process.env.NODE_ENV === 'production' ? 'formal' : 'developer',
+        miniprogram_state: await _getMiniprogramState(),
       };
 
       const { data } = await axios.post(url, body, {
