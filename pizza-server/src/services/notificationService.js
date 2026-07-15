@@ -91,9 +91,15 @@ const notificationService = {
     try {
       // 获取模板 ID（未配置则不发送）
       const templateId = await this._getTemplateId(type);
-      if (!templateId) return { sent: false, reason: 'no_template_id' };
+      if (!templateId) {
+        log.warn({ type }, 'Subscribe message NOT sent — template ID not configured in admin panel');
+        return { sent: false, reason: 'no_template_id' };
+      }
 
-      if (!openid) return { sent: false, reason: 'no_openid' };
+      if (!openid) {
+        log.warn({ type }, 'Subscribe message NOT sent — user has no openid');
+        return { sent: false, reason: 'no_openid' };
+      }
 
       const accessToken = await getAccessToken();
       const url = `https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=${accessToken}`;
@@ -139,7 +145,10 @@ const notificationService = {
     try {
       // 获取用户 openid
       const [[user]] = await pool.query('SELECT openid FROM users WHERE id = ?', [order.user_id]);
-      if (!user || !user.openid) return { sent: false, reason: 'no_openid' };
+      if (!user || !user.openid) {
+        log.warn({ userId: order.user_id, orderId: order.id }, 'Order notify skipped — no openid');
+        return { sent: false, reason: 'no_openid' };
+      }
 
       const statusText = { waiting: '待取餐', preparing: '制作中', completed: '已完成', cancelled: '已取消' };
       const status = statusText[order.status] || order.status;
