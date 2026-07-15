@@ -22,6 +22,13 @@ const TPL_KEYS = {
   coupon: 'notify_coupon_tpl',
 };
 
+// 模板字段映射（JSON 格式，key=微信模板字段, value=数据来源）
+// 未配置时使用默认映射
+const FIELD_MAP_KEYS = {
+  order: 'notify_order_fields',
+  coupon: 'notify_coupon_fields',
+};
+
 const STATE_KEY = 'notify_miniprogram_state';
 
 /** 读取 miniprogram_state 配置，未设置时自动推断 */
@@ -65,6 +72,33 @@ const notificationService = {
       );
     }
     return this.getConfig();
+  },
+
+  /** 获取字段映射配置，未配置时使用默认值 */
+  async _getFieldMap(type) {
+    const key = FIELD_MAP_KEYS[type];
+    if (!key) return {};
+    try {
+      const [[row]] = await pool.query(
+        'SELECT config_value FROM system_config WHERE config_key = ?', [key]
+      );
+      if (row && row.config_value) return JSON.parse(row.config_value);
+    } catch (_) {}
+    // 默认映射（匹配微信公共模板库最常见的字段布局）
+    const defaults = {
+      order: {
+        thing1: 'orderId',           // 订单编号
+        character_string2: 'pickupCode', // 取餐码
+        phrase3: 'status',           // 订单状态
+        thing4: 'storeName',        // 门店
+      },
+      coupon: {
+        thing1: 'couponName',        // 券名称
+        time2: 'validTo',            // 有效期
+        thing3: 'tip',               // 提示
+      },
+    };
+    return defaults[type] || {};
   },
 
   /** 获取模板 ID（同时检查是否在后台已配置） */
@@ -153,14 +187,19 @@ const notificationService = {
       const statusText = { waiting: '待取餐', preparing: '制作中', completed: '已完成', cancelled: '已取消' };
       const status = statusText[order.status] || order.status;
 
-      const data = {
-        thing1: { value: String(order.id).slice(-8) },           // 订单编号（后8位）
-        phrase2: { value: status },                                // 订单状态
-        thing3: { value: order.store_name || '王姐手工披萨' },    // 取餐门店
-      };
-
-      if (order.pickup_code) {
-        data.character_string4 = { value: String(order.pickup_code) }; // 取餐码
+      // 构建模板数据：从字段映射配置读取，未配置则用默认值
+      const fieldMap = await this._getFieldMap('order');
+      const data = {};
+      for (const [tplField, sourceKey] of Object.entries(fieldMap)) {
+        let val = '';
+        if (sourceKey === 'orderId') val = String(order.id || '').slice(-8);
+        else if (sourceKey === 'status') val = status;
+        else if (sourceKey === 'storeName') val = order.store_name || '王姐手工披萨';
+        else if (sourceKey === 'pickupCode') val = order.pickup_code ? String(order.pickup_code) : '';
+        else if (sourceKey === 'pickupTime') val = order.pickup_time ? String(order.pickup_time).slice(0, 16) : '';
+        if (val) {
+          data[tplField] = { value: val };
+        }
       }
 
       return this.send(user.openid, 'order', data, `/pages/main/main`);
@@ -181,11 +220,18 @@ const notificationService = {
       const [[user]] = await pool.query('SELECT openid FROM users WHERE id = ?', [userId]);
       if (!user || !user.openid) return { sent: false, reason: 'no_openid' };
 
-      const data = {
-        thing1: { value: couponName.slice(0, 20) },    // 券名称
-        time2: { value: validTo || '请查看券详情' },    // 有效期
-        thing3: { value: '已放入"我的-兑换券"，请及时使用' }, // 提示
+      const values = {
+        couponName: couponName.slice(0, 20),
+        validTo: validTo || '请查看券详情',
+        tip: '已放入"我的-兑换券"，请及时使用',
       };
+      const fieldMap = await this._getFieldMap('coupon');
+      const data = {};
+      for (const [tplField, sourceKey] of Object.entries(fieldMap)) {
+        if (values[sourceKey]) {
+          data[tplField] = { value: values[sourceKey] };
+        }
+      }
 
       return this.send(user.openid, 'coupon', data, '/pages/coupons/coupons');
     } catch (err) {
