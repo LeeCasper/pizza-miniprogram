@@ -22,11 +22,6 @@ const TPL_KEYS = {
   coupon: 'notify_coupon_tpl',
 };
 
-const ENABLED_KEYS = {
-  order: 'notify_order_enabled',
-  coupon: 'notify_coupon_enabled',
-};
-
 const STATE_KEY = 'notify_miniprogram_state';
 
 /** 读取 miniprogram_state 配置，未设置时自动推断 */
@@ -46,18 +41,15 @@ const notificationService = {
 
   /** 获取所有通知配置（管理员用） */
   async getConfig() {
-    const keys = [...Object.values(TPL_KEYS), ...Object.values(ENABLED_KEYS)];
     const [rows] = await pool.query(
-      'SELECT config_key, config_value FROM system_config WHERE config_key IN (?, ?, ?, ?)',
-      keys
+      'SELECT config_key, config_value FROM system_config WHERE config_key IN (?, ?)',
+      [TPL_KEYS.order, TPL_KEYS.coupon]
     );
     const map = {};
     for (const r of rows) map[r.config_key] = r.config_value || '';
     return {
       orderTpl: map[TPL_KEYS.order] || '',
       couponTpl: map[TPL_KEYS.coupon] || '',
-      orderEnabled: map[ENABLED_KEYS.order] !== '0',
-      couponEnabled: map[ENABLED_KEYS.coupon] !== '0',
     };
   },
 
@@ -66,8 +58,6 @@ const notificationService = {
     const entries = [];
     if (data.orderTpl !== undefined) entries.push([TPL_KEYS.order, data.orderTpl || '']);
     if (data.couponTpl !== undefined) entries.push([TPL_KEYS.coupon, data.couponTpl || '']);
-    if (data.orderEnabled !== undefined) entries.push([ENABLED_KEYS.order, data.orderEnabled ? '1' : '0']);
-    if (data.couponEnabled !== undefined) entries.push([ENABLED_KEYS.coupon, data.couponEnabled ? '1' : '0']);
     for (const [key, val] of entries) {
       await pool.query(
         'INSERT INTO system_config (config_key, config_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE config_value = ?',
@@ -77,17 +67,7 @@ const notificationService = {
     return this.getConfig();
   },
 
-  /** 检查某个类型是否已启用 */
-  async _isEnabled(type) {
-    const key = ENABLED_KEYS[type];
-    if (!key) return false;
-    const [[row]] = await pool.query(
-      'SELECT config_value FROM system_config WHERE config_key = ?', [key]
-    );
-    return row ? row.config_value !== '0' : false; // 默认关闭
-  },
-
-  /** 获取模板 ID */
+  /** 获取模板 ID（同时检查是否在后台已配置） */
   async _getTemplateId(type) {
     const key = TPL_KEYS[type];
     if (!key) return null;
@@ -109,11 +89,7 @@ const notificationService = {
    */
   async send(openid, type, templateData, page) {
     try {
-      // 检查是否启用
-      const enabled = await this._isEnabled(type);
-      if (!enabled) return { sent: false, reason: 'disabled' };
-
-      // 获取模板 ID
+      // 获取模板 ID（未配置则不发送）
       const templateId = await this._getTemplateId(type);
       if (!templateId) return { sent: false, reason: 'no_template_id' };
 

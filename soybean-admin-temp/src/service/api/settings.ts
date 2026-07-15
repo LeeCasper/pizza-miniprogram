@@ -349,15 +349,11 @@ export function fetchUpdateContentSettings(key: string, value: string) {
 export interface NotificationSettings {
   orderTpl: string;
   couponTpl: string;
-  orderEnabled: boolean;
-  couponEnabled: boolean;
 }
 
 export interface NotificationSettingsForm {
   orderTpl?: string;
   couponTpl?: string;
-  orderEnabled?: boolean;
-  couponEnabled?: boolean;
 }
 
 export function fetchNotificationSettings() {
