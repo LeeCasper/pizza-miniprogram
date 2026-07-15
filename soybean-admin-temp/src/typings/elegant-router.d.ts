@@ -61,6 +61,7 @@ declare module "@elegant-router/types" {
     "settings_avatars": "/settings/avatars";
     "settings_business": "/settings/business";
     "settings_content": "/settings/content";
+    "settings_notification": "/settings/notification";
     "settings_logistics": "/settings/logistics";
     "settings_map": "/settings/map";
     "settings_pay": "/settings/pay";
@@ -174,6 +175,7 @@ declare module "@elegant-router/types" {
     | "settings_business"
     | "settings_content"
     | "settings_logistics"
+    | "settings_notification"
     | "settings_map"
     | "settings_pay"
     | "settings_printer"

@@ -290,6 +290,7 @@ const local: App.I18n.Schema = {
     settings_storage: 'Storage',
     settings_avatars: 'Default Avatars',
     settings_content: 'Content Management',
+    settings_notification: 'Notifications',
     shop: 'Shop',
     shop_products_list: 'Shop Products',
     shop_products_form: 'Product Form',

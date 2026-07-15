@@ -167,6 +167,15 @@ const customRoutes: CustomRoute[] = [
           i18nKey: 'route.settings_content',
         },
       },
+      {
+        name: 'settings_notification',
+        path: '/settings/notification',
+        component: 'view.settings_notification',
+        meta: {
+          title: '消息通知',
+          i18nKey: 'route.settings_notification',
+        },
+      },
     ],
   },
   // Multi-level routes — parent has layout.base, children have view.xxx

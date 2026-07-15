@@ -440,6 +440,15 @@ export const generatedRoutes: GeneratedRoute[] = [
         }
       },
       {
+        name: 'settings_notification',
+        path: '/settings/notification',
+        component: 'view.settings_notification',
+        meta: {
+          title: 'settings_notification',
+          i18nKey: 'route.settings_notification'
+        }
+      },
+      {
         name: 'settings_logistics',
         path: '/settings/logistics',
         component: 'view.settings_logistics',
