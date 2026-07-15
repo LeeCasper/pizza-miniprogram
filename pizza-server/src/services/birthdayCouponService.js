@@ -109,7 +109,7 @@ const birthdayCouponService = {
     const validTo = new Date(today);
     validTo.setDate(validTo.getDate() + (coupons[0]?.validDays || 30));
     const notificationService = require('./notificationService');
-    notificationService.notifyCouponReceived(userId, '生日专享券', validTo.toISOString().slice(0, 10)).catch(() => {});
+    notificationService.notifyCouponReceived(userId, '生日专享券', validTo.toISOString().slice(0, 10), '生日券').catch(() => {});
 
     return { issued: 1, coupons: coupons.map(c => c.name) };
   },

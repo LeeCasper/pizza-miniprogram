@@ -1189,9 +1189,10 @@ const adminApiController = {
 
       // 发送订阅消息通知
       const couponName = template.name || '优惠券';
+      const couponType = template.category === 'redeem' ? '兑换券' : template.discountType === 'percentage' ? '折扣券' : template.discountType === 'fixed_amount' ? '代金券' : '优惠券';
       const validTo = new Date(Date.now() + (template.validDays || 30) * 86400000).toISOString().slice(0, 10);
       for (const userId of userIds) {
-        require('../services/notificationService').notifyCouponReceived(userId, couponName, validTo).catch(() => {});
+        require('../services/notificationService').notifyCouponReceived(userId, couponName, validTo, couponType).catch(() => {});
       }
 
       return res.json({ code: 0, message: `已成功发放 ${assigned} 张优惠券`, data: { assigned } });

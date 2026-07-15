@@ -184,13 +184,13 @@ const notificationService = {
     } catch (err) { log.error({err},'notifyOrderStatus'); return {sent:false}; }
   },
 
-  async notifyCouponReceived(userId, couponName, validTo) {
+  async notifyCouponReceived(userId, couponName, validTo, couponType) {
     try {
       const [[u]] = await pool.query('SELECT openid FROM users WHERE id=?', [userId]);
       if (!u || !u.openid) return { sent: false };
       return this.send(u.openid, 'coupon', {
         couponName: (couponName||'').slice(0,20),
-        couponType: '生日券',
+        couponType: couponType || '优惠券',
         quantity: '1',
         storeName: '王姐手工披萨',
         validTo: validTo||'',
