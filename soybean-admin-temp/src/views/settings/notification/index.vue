@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { NButton, NCard, NForm, NFormItem, NInput, NAlert, NSpace, useMessage } from 'naive-ui';
+import { NButton, NCard, NForm, NFormItem, NInput, NAlert, useMessage } from 'naive-ui';
 import { fetchNotificationSettings, fetchUpdateNotificationSettings } from '@/service/api';
 
 defineOptions({ name: 'SettingsNotification' });
@@ -42,7 +42,7 @@ async function handleSave() {
       3. 在下方填入模板 ID 和字段映射
     </NAlert>
 
-    <NSpace vertical size="24" class="w-full">
+    <div class="flex-col gap-6 w-full">
       <!-- 订单通知 -->
       <NCard size="small" title="订单状态通知" :bordered="true">
         <NForm label-placement="top" class="max-w-xl">
@@ -85,7 +85,7 @@ async function handleSave() {
       </NCard>
 
       <NButton type="primary" :loading="saving" @click="handleSave" size="large">保存配置</NButton>
-    </NSpace>
+    </div>
   </NCard>
 </template>
 
@@ -93,5 +93,7 @@ async function handleSave() {
 .max-w-xl { max-width: 560px; }
 .w-full { width: 100%; }
 .mb-4 { margin-bottom: 16px; }
+.flex-col { display: flex; flex-direction: column; }
+.gap-6 { gap: 24px; }
 .hint { margin-top: 8px; font-size: 12px; color: #999; line-height: 1.6; }
 </style>
