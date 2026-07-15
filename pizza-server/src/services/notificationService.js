@@ -16,7 +16,8 @@ const log = createLogger('Notification');
 
 // 数据来源 → 中文标签（供管理员参考）
 const SOURCE_LABELS = {
-  orderId: ['订单编号', '订单号', '订单ID', '订单商品'],
+  orderId: ['订单编号', '订单号', '订单ID'],
+  productName: ['订单商品', '商品名称', '商品'],
   status: ['订单状态', '状态', '进度'],
   storeName: ['门店名称', '门店', '店铺', '商家', '餐厅', '商家名称'],
   pickupCode: ['取餐码', '取货码', '提货码'],
@@ -164,6 +165,12 @@ const notificationService = {
     try {
       const [[u]] = await pool.query('SELECT openid FROM users WHERE id=?', [order.user_id]);
       if (!u || !u.openid) return { sent: false, reason: 'no_openid' };
+      // 获取订单第一个商品名
+      let productName = '';
+      try {
+        const [items] = await pool.query('SELECT product_name FROM order_items WHERE order_id=? LIMIT 1', [order.id]);
+        if (items.length > 0) productName = items[0].product_name || '';
+      } catch (_) {}
       const st = { waiting:'待取餐', preparing:'制作中', completed:'已完成', cancelled:'已取消' };
       return this.send(u.openid, 'order', {
         orderId: String(order.id||'').slice(-8),
@@ -172,6 +179,7 @@ const notificationService = {
         pickupCode: order.pickup_code ? String(order.pickup_code) : '',
         pickupTime: order.pickup_time ? String(order.pickup_time).slice(0,16) : '',
         paidAmount: order.paid_amount ? parseFloat(order.paid_amount).toFixed(2) : '',
+        productName: productName || '手工披萨',
       }, '/pages/main/main');
     } catch (err) { log.error({err},'notifyOrderStatus'); return {sent:false}; }
   },
