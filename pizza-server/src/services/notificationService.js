@@ -1,8 +1,9 @@
 /**
- * 订阅消息通知服务
+ * 订阅消息通知服务 v2
  *
- * 核心思路：从微信 API 拉取模板的实际字段列表，再根据字段中文名自动匹配数据源。
- * 不再硬编码字段名，适配任意模板。
+ * 1. 通过微信 gettemplate API 拉取模板的实际字段列表
+ * 2. 根据字段中文名自动匹配数据源
+ * 3. 字段列表缓存在内存中，配置变更时清除
  */
 
 const axios = require('axios');
@@ -12,22 +13,93 @@ const { createLogger } = require('../utils/logger');
 
 const log = createLogger('Notification');
 
-// system_config keys
 const TPL_KEYS = { order: 'notify_order_tpl', coupon: 'notify_coupon_tpl' };
 const STATE_KEY = 'notify_miniprogram_state';
 
-/** 读取 miniprogram_state */
-async function _getMiniprogramState() {
+// 内存缓存：{ [priTmplId]: [{ name: 'thing1', label: '订单编号' }, ...] }
+let _fieldCache = null;
+let _cacheExpires = 0;
+
+/** 从 WeChat API 拉取所有模板及其字段 */
+async function _fetchTemplateFieldsFromWx() {
   try {
-    const [[row]] = await pool.query('SELECT config_value FROM system_config WHERE config_key = ?', [STATE_KEY]);
-    if (row && row.config_value) return row.config_value;
-  } catch (_) {}
-  return process.env.NODE_ENV === 'production' ? 'formal' : 'developer';
+    const token = await getAccessToken();
+    const url = `https://api.weixin.qq.com/wxaapi/newtmpl/gettemplate?access_token=${token}`;
+    const { data } = await axios.get(url, { timeout: 8000 });
+    if (!data || !data.data || !Array.isArray(data.data)) return {};
+
+    const result = {};
+    for (const tpl of data.data) {
+      if (!tpl.priTmplId || !tpl.keywordEnumValueList) continue;
+
+      // 从 content 字段解析字段名前缀（如 {{thing1.DATA}} → thing1）
+      const fieldPrefixes = {};
+      if (tpl.content) {
+        const matches = tpl.content.matchAll(/\{\{(\w+)\.DATA\}\}/g);
+        for (const m of matches) {
+          fieldPrefixes[m[1]] = true;
+        }
+      }
+      const fieldNames = Object.keys(fieldPrefixes);
+
+      // 按 keyword_id 顺序匹配字段名前缀
+      const fields = [];
+      let idx = 0;
+      for (const kw of (tpl.keywordEnumValueList || [])) {
+        fields.push({
+          name: fieldNames[idx] || ('thing' + kw.keyword_id),
+          label: kw.name || '',
+          example: kw.example || '',
+        });
+        idx++;
+      }
+
+      result[tpl.priTmplId] = fields;
+    }
+    return result;
+  } catch (err) {
+    log.warn({ err: err.message }, 'Failed to fetch template fields from WeChat');
+    return {};
+  }
+}
+
+/** 获取模板字段（带内存缓存，10分钟过期） */
+async function _getTemplateFields(priTmplId) {
+  if (!priTmplId) return [];
+  const now = Date.now();
+  if (_fieldCache && now < _cacheExpires) {
+    return _fieldCache[priTmplId] || [];
+  }
+  _fieldCache = await _fetchTemplateFieldsFromWx();
+  _cacheExpires = now + 10 * 60 * 1000;
+  return _fieldCache[priTmplId] || [];
+}
+
+/** 根据字段中文名自动匹配数据源 */
+function _matchSource(label) {
+  const n = (label || '').toLowerCase();
+  // 订单编号/号/ID
+  if (n.includes('订单') && (n.includes('编号') || n.includes('号') || n.includes('id'))) return 'orderId';
+  // 取餐/取货/提货码
+  if (n.includes('取餐') || n.includes('取货') || n.includes('提货') || n.includes('取件')) return 'pickupCode';
+  // 状态
+  if (n.includes('状态') || n.includes('进度')) return 'status';
+  // 门店/店铺/商家
+  if (n.includes('门店') || n.includes('店铺') || n.includes('商家') || n.includes('餐厅')) return 'storeName';
+  // 时间
+  if (n.includes('时间') || n.includes('预约') || n.includes('取餐时间')) return 'pickupTime';
+  // 金额/价格
+  if (n.includes('金额') || n.includes('价格') || n.includes('支付') || n.includes('付款')) return 'paidAmount';
+  // 券名称
+  if ((n.includes('券') || n.includes('优惠')) && (n.includes('名称') || n.includes('类型') || n.includes('种类'))) return 'couponName';
+  // 有效期
+  if (n.includes('有效') || n.includes('过期') || n.includes('到期') || n.includes('期限') || n.includes('日期')) return 'validTo';
+  // 提示/备注
+  if (n.includes('提示') || n.includes('备注') || n.includes('说明')) return 'tip';
+  return '';
 }
 
 const notificationService = {
-
-  // ── 配置 ─────────────────────────────────────
 
   async getConfig() {
     const [rows] = await pool.query(
@@ -49,6 +121,7 @@ const notificationService = {
         [key, val, val]
       );
     }
+    _fieldCache = null; // 清除缓存
     return this.getConfig();
   },
 
@@ -60,54 +133,42 @@ const notificationService = {
       if (!tplKey) return { sent: false, reason: 'unknown_type' };
       const [[row]] = await pool.query('SELECT config_value FROM system_config WHERE config_key = ?', [tplKey]);
       const templateId = row ? row.config_value || '' : '';
-      if (!templateId) {
-        log.warn({ type }, 'Subscribe message NOT sent — template ID not configured');
-        return { sent: false, reason: 'no_template_id' };
-      }
-      if (!openid) {
-        log.warn({ type }, 'Subscribe message NOT sent — no openid');
-        return { sent: false, reason: 'no_openid' };
-      }
+      if (!templateId) return { sent: false, reason: 'no_template_id' };
+      if (!openid) return { sent: false, reason: 'no_openid' };
 
-      // 发送覆盖所有常见模板字段，WeChat 忽略多余的
-      const vals = {
-        thing1: valueMap.orderId || valueMap.couponName || '',
-        thing2: valueMap.status || valueMap.validTo || '',
-        thing3: valueMap.storeName || valueMap.tip || '',
-        thing4: valueMap.pickupCode || '',
-        thing5: valueMap.pickupTime || '',
-        thing6: valueMap.paidAmount || '',
-        thing7: valueMap.orderId || '',
-        thing8: valueMap.storeName || '',
-        thing9: valueMap.pickupCode || '',
-        thing10: valueMap.status || valueMap.storeName || '',
-        thing11: '', thing12: '', thing13: '', thing14: '', thing15: '',
-        character_string1: valueMap.orderId || valueMap.couponName || '',
-        character_string2: valueMap.pickupCode || '',
-        character_string3: valueMap.storeName || '',
-        character_string4: valueMap.pickupTime || '',
-        character_string5: valueMap.status || '',
-        phrase1: valueMap.status || '',
-        phrase2: valueMap.status || '',
-        phrase3: valueMap.storeName || '',
-        phrase4: valueMap.pickupCode || '',
-        phrase5: '',
-        time1: valueMap.pickupTime || '',
-        time2: valueMap.validTo || '',
-        time3: '',
-        date1: valueMap.pickupTime || '',
-        date2: valueMap.validTo || '',
-        date3: '',
-        amount1: valueMap.paidAmount || '',
-        amount2: '',
-        number1: valueMap.pickupCode || valueMap.orderId || '',
-        number2: '',
-      };
+      // 获取模板字段列表
+      const fields = await _getTemplateFields(templateId);
 
-      // 只发送有值的字段
+      // 构建 data：按字段中文名匹配数据源
       const data = {};
-      for (const [k, v] of Object.entries(vals)) {
-        if (v) data[k] = { value: String(v).slice(0, 32) };
+      if (fields.length > 0) {
+        for (const f of fields) {
+          const src = _matchSource(f.label);
+          const val = src ? (valueMap[src] || '') : '';
+          if (val) {
+            data[f.name] = { value: String(val).slice(0, 32) };
+          } else {
+            data[f.name] = { value: f.example || '-' };
+          }
+        }
+      } else {
+        // 兜底：无法获取字段列表时，发全量字段
+        const v = valueMap;
+        const fallback = [
+          ['thing1', v.orderId || v.couponName],
+          ['thing2', v.status || v.validTo],
+          ['thing3', v.storeName || v.tip],
+          ['thing4', v.pickupCode],
+          ['thing5', v.pickupTime],
+          ['thing6', v.paidAmount],
+          ['character_string1', v.orderId || v.couponName],
+          ['character_string2', v.pickupCode],
+          ['phrase1', v.status],
+          ['phrase2', v.storeName || v.tip],
+        ];
+        for (const [k, val] of fallback) {
+          if (val) data[k] = { value: String(val).slice(0, 32) };
+        }
       }
 
       const accessToken = await getAccessToken();
@@ -118,7 +179,13 @@ const notificationService = {
         template_id: templateId,
         page: page || '',
         data,
-        miniprogram_state: await _getMiniprogramState(),
+        miniprogram_state: await (async () => {
+          try {
+            const [[r]] = await pool.query('SELECT config_value FROM system_config WHERE config_key = ?', [STATE_KEY]);
+            if (r && r.config_value) return r.config_value;
+          } catch (_) {}
+          return process.env.NODE_ENV === 'production' ? 'formal' : 'developer';
+        })(),
       };
 
       const { data: resp } = await axios.post(url, body, {
@@ -127,14 +194,14 @@ const notificationService = {
       });
 
       if (resp.errcode === 0) {
-        log.info({ openid, type }, 'Subscribe message sent');
+        log.info({ openid, type, fields: Object.keys(data) }, 'Subscribe message sent');
         return { sent: true };
       }
 
-      log.warn({ openid, type, errcode: resp.errcode, errmsg: resp.errmsg }, 'Subscribe message send failed');
+      log.warn({ openid, type, errcode: resp.errcode, errmsg: resp.errmsg }, 'Send failed');
       return { sent: false, errcode: resp.errcode, errmsg: resp.errmsg };
     } catch (err) {
-      log.error({ err, openid, type }, 'Subscribe message send error');
+      log.error({ err, openid, type }, 'Send error');
       return { sent: false, reason: 'exception' };
     }
   },
