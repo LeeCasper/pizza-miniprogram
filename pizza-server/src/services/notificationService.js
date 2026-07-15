@@ -16,18 +16,20 @@ const log = createLogger('Notification');
 
 // 数据来源 → 中文标签（供管理员参考）
 const SOURCE_LABELS = {
-  orderId: ['订单编号', '订单号', '订单ID'],
+  orderId: ['订单编号', '订单号', '订单ID', '订单商品'],
   status: ['订单状态', '状态', '进度'],
-  storeName: ['门店名称', '门店', '店铺', '商家', '餐厅'],
+  storeName: ['门店名称', '门店', '店铺', '商家', '餐厅', '商家名称'],
   pickupCode: ['取餐码', '取货码', '提货码'],
   pickupTime: ['预约时间', '取餐时间', '预约取餐'],
-  paidAmount: ['支付金额', '付款金额', '实付金额', '金额'],
-  couponName: ['券名称', '优惠券名称', '券类型'],
-  validTo: ['有效期', '到期时间', '截止日期'],
+  paidAmount: ['支付金额', '付款金额', '实付金额', '金额', '订单金额'],
+  couponName: ['券名称', '优惠券名称'],
+  couponType: ['券类型', '优惠券类型'],
+  quantity: ['数量', '优惠券数量'],
+  validTo: ['有效期', '到期时间', '截止日期', '过期时间'],
   tip: ['提示', '备注', '说明'],
 };
 
-/** 解析管理员配置的字段映射："thing1=订单编号\nphrase2=订单状态" → { thing1:'orderId', phrase2:'status' } */
+/** 解析管理员配置的字段映射 → { fieldName: { source, literal } } */
 function _parseFieldMapping(raw) {
   if (!raw || !raw.trim()) return null;
   const map = {};
@@ -38,12 +40,18 @@ function _parseFieldMapping(raw) {
     const fieldName = line.substring(0, idx).trim();
     const label = line.substring(idx + 1).trim();
     if (!fieldName || !label) continue;
-    // 根据中文标签匹配数据来源
+    // 尝试匹配数据来源
+    let matched = false;
     for (const [src, labels] of Object.entries(SOURCE_LABELS)) {
       if (labels.some(l => label === l || label.includes(l) || l.includes(label))) {
-        map[fieldName] = src;
+        map[fieldName] = { source: src, literal: null };
+        matched = true;
         break;
       }
+    }
+    // 未匹配 → 视为字面值（如 number3=1）
+    if (!matched) {
+      map[fieldName] = { source: null, literal: label };
     }
   }
   return Object.keys(map).length > 0 ? map : null;
@@ -107,10 +115,19 @@ const notificationService = {
       // 构建 data
       const data = {};
       if (fieldMap) {
-        // 使用管理员配置的精确字段映射
-        for (const [fieldName, src] of Object.entries(fieldMap)) {
-          const val = valueMap[src] || '';
-          data[fieldName] = { value: String(val).slice(0, 32) };
+        for (const [fieldName, info] of Object.entries(fieldMap)) {
+          let val = '';
+          if (info.source) {
+            val = valueMap[info.source] || '';
+          } else {
+            val = info.literal || '';
+          }
+          // 根据字段类型截断
+          let maxLen = 20;
+          if (fieldName.startsWith('character_string')) maxLen = 32;
+          else if (fieldName.startsWith('phrase')) maxLen = 5;
+          else if (fieldName.startsWith('thing') || fieldName.startsWith('short_thing')) maxLen = 20;
+          data[fieldName] = { value: String(val).slice(0, maxLen) };
         }
       } else {
         // 未配置字段映射 → 发送所有非空值到常用字段名（可能不匹配，需要管理员配置）
@@ -165,6 +182,9 @@ const notificationService = {
       if (!u || !u.openid) return { sent: false };
       return this.send(u.openid, 'coupon', {
         couponName: (couponName||'').slice(0,20),
+        couponType: '生日券',
+        quantity: '1',
+        storeName: '王姐手工披萨',
         validTo: validTo||'',
         tip: '已放入"我的-兑换券"',
       }, '/pages/coupons/coupons');
