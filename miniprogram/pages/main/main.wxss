@@ -1570,3 +1570,32 @@
   transform: translateY(2rpx) scale(0.97);
   opacity: 0.95;
 }
+
+/* 下单后订阅通知提示 */
+.subscribe-hint {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(0,0,0,0.45);
+  display: flex; align-items: center; justify-content: center;
+  visibility: hidden; opacity: 0;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+.subscribe-hint.show { visibility: visible; opacity: 1; }
+.subscribe-hint-card {
+  width: 580rpx; background: #fff; border-radius: 32rpx;
+  padding: 48rpx 40rpx 40rpx;
+  display: flex; flex-direction: column; align-items: center;
+  position: relative;
+}
+.subscribe-hint-close {
+  position: absolute; top: 16rpx; right: 24rpx;
+  font-size: 32rpx; color: #999; padding: 12rpx;
+}
+.subscribe-hint-icon { font-size: 64rpx; margin-bottom: 16rpx; }
+.subscribe-hint-title { font-size: 34rpx; font-weight: 700; color: #333; margin-bottom: 8rpx; }
+.subscribe-hint-desc { font-size: 26rpx; color: #999; margin-bottom: 32rpx; }
+.subscribe-hint-btn {
+  width: 100%; padding: 24rpx 0; background: linear-gradient(180deg, #D4846B, #C0563A);
+  border-radius: 48rpx; text-align: center; color: #fff;
+  font-size: 30rpx; font-weight: 600;
+}
+.subscribe-hint-btn:active { opacity: 0.85; }

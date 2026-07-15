@@ -382,4 +382,17 @@
       </view>
     </view>
   </view>
+
+  <!-- 下单成功订阅提示（必须在点击事件中触发 wx.requestSubscribeMessage） -->
+  <view class="subscribe-hint {{showSubscribeHint ? 'show' : ''}}" catchtap="noop">
+    <view class="subscribe-hint-card">
+      <view class="subscribe-hint-close" catchtap="onCloseSubscribeHint">✕</view>
+      <view class="subscribe-hint-icon">🔔</view>
+      <text class="subscribe-hint-title">开启订单通知</text>
+      <text class="subscribe-hint-desc">接收订单状态变更、取餐提醒等消息</text>
+      <view class="subscribe-hint-btn" bindtap="onSubscribeOrderNotify">
+        <text>订阅通知</text>
+      </view>
+    </view>
+  </view>
 </view>

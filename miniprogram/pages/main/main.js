@@ -65,6 +65,7 @@ Page({
     tierDiscountAmount: 0, tierDiscountText: '0.00', tierName: '',
     totalSavedText: '0.00',
     finalPrice: '0.00',
+    showSubscribeHint: false, // 下单后展示订阅按钮
     // 优惠明细弹窗
     discountPopupOpen: false,
     discountPopupTotal: '0.00',
@@ -428,10 +429,8 @@ Page({
               }
               this.loadProfileData();
               wx.showToast({ title: '订单已保存，请在订单中心完成支付', icon: 'none', duration: 3000 });
-              // 请求订阅订单状态通知
-              setTimeout(function() {
-                require('../../utils/subscribe').askOrderNotify();
-              }, 1500);
+              // 显示订阅按钮（必须在点击事件中触发 wx.requestSubscribeMessage）
+              this.setData({ showSubscribeHint: true });
             } else {
               if (orderPaidAmount > 0 && app.globalData.userInfo) {
                 app.globalData.userInfo.totalSpent = Math.max(0, (app.globalData.userInfo.totalSpent || 0) - orderPaidAmount);
@@ -845,6 +844,25 @@ Page({
   },
   onCloseDiscount() {
     this.setData({ discountPopupOpen: false });
+  },
+
+  // 订阅订单通知（必须在点击事件中直接调用）
+  onSubscribeOrderNotify() {
+    var ids = wx.getStorageSync('_subTplIds') || {};
+    if (!ids.order) {
+      wx.showToast({ title: '暂无可订阅的通知类型', icon: 'none' });
+      return;
+    }
+    wx.requestSubscribeMessage({
+      tmplIds: [ids.order],
+      success: function() { wx.showToast({ title: '订阅成功', icon: 'success' }); },
+      fail: function() { wx.showToast({ title: '已取消', icon: 'none' }); }
+    });
+    this.setData({ showSubscribeHint: false });
+  },
+
+  onCloseSubscribeHint() {
+    this.setData({ showSubscribeHint: false });
   },
 
   // ── 会员订阅（商城 tab） ──────────────────────
