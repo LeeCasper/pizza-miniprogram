@@ -114,7 +114,9 @@ const notificationService = {
         template_id: templateId,
         page: page || '',
         data: templateData,
-        miniprogram_state: 'formal', // formal=正式版 trial=体验版 developer=开发版
+        // 自动匹配环境：生产→formal，其他→developer
+        // 体验版需要手动改这里为 'trial'
+        miniprogram_state: process.env.NODE_ENV === 'production' ? 'formal' : 'developer',
       };
 
       const { data } = await axios.post(url, body, {
