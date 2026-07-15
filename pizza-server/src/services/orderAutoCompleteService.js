@@ -30,7 +30,7 @@ const orderAutoCompleteService = {
         if (result.affectedRows === 0) continue;
 
         const notificationService = require('./notificationService');
-        notificationService.notifyOrderStatus({ user_id: order.user_id, id: order.id, status: 'completed', pickup_code: order.pickup_code, store_name: order.store_name }).catch(() => {});
+        notificationService.notifyOrderStatus({ user_id: order.user_id, id: order.id, status: 'completed', pickup_code: order.pickup_code, store_name: order.store_name, pickup_time: order.pickup_time, paid_amount: order.paid_amount }).catch(() => {});
 
         await auditService.record({
           actorType: 'system',

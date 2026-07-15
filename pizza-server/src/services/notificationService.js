@@ -1,12 +1,8 @@
 /**
  * 订阅消息通知服务
  *
- * 微信小程序订阅消息（Subscribe Message）：
- * 1. 用户在小程序端通过 wx.requestSubscribeMessage() 授权
- * 2. 服务端调用 subscribeMessage.send 发送（每次授权仅可发送一条消息）
- * 3. 模板 ID 通过管理后台配置（system_config 存储）
- *
- * Reference: https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-message-management/subscribe-message/sendMessage.html
+ * 核心思路：从微信 API 拉取模板的实际字段列表，再根据字段中文名自动匹配数据源。
+ * 不再硬编码字段名，适配任意模板。
  */
 
 const axios = require('axios');
@@ -17,26 +13,13 @@ const { createLogger } = require('../utils/logger');
 const log = createLogger('Notification');
 
 // system_config keys
-const TPL_KEYS = {
-  order: 'notify_order_tpl',
-  coupon: 'notify_coupon_tpl',
-};
-
-// 模板字段映射（JSON 格式，key=微信模板字段, value=数据来源）
-// 未配置时使用默认映射
-const FIELD_MAP_KEYS = {
-  order: 'notify_order_fields',
-  coupon: 'notify_coupon_fields',
-};
-
+const TPL_KEYS = { order: 'notify_order_tpl', coupon: 'notify_coupon_tpl' };
 const STATE_KEY = 'notify_miniprogram_state';
 
-/** 读取 miniprogram_state 配置，未设置时自动推断 */
+/** 读取 miniprogram_state */
 async function _getMiniprogramState() {
   try {
-    const [[row]] = await pool.query(
-      'SELECT config_value FROM system_config WHERE config_key = ?', [STATE_KEY]
-    );
+    const [[row]] = await pool.query('SELECT config_value FROM system_config WHERE config_key = ?', [STATE_KEY]);
     if (row && row.config_value) return row.config_value;
   } catch (_) {}
   return process.env.NODE_ENV === 'production' ? 'formal' : 'developer';
@@ -44,9 +27,8 @@ async function _getMiniprogramState() {
 
 const notificationService = {
 
-  // ── 配置读取 ─────────────────────────────────
+  // ── 配置 ─────────────────────────────────────
 
-  /** 获取所有通知配置（管理员用） */
   async getConfig() {
     const [rows] = await pool.query(
       'SELECT config_key, config_value FROM system_config WHERE config_key IN (?, ?)',
@@ -54,13 +36,9 @@ const notificationService = {
     );
     const map = {};
     for (const r of rows) map[r.config_key] = r.config_value || '';
-    return {
-      orderTpl: map[TPL_KEYS.order] || '',
-      couponTpl: map[TPL_KEYS.coupon] || '',
-    };
+    return { orderTpl: map[TPL_KEYS.order] || '', couponTpl: map[TPL_KEYS.coupon] || '' };
   },
 
-  /** 更新通知配置 */
   async updateConfig(data) {
     const entries = [];
     if (data.orderTpl !== undefined) entries.push([TPL_KEYS.order, data.orderTpl || '']);
@@ -74,65 +52,62 @@ const notificationService = {
     return this.getConfig();
   },
 
-  /** 获取字段映射配置，未配置时使用默认值 */
-  async _getFieldMap(type) {
-    const key = FIELD_MAP_KEYS[type];
-    if (!key) return {};
+  // ── 发送 ─────────────────────────────────────
+
+  async send(openid, type, valueMap, page) {
     try {
-      const [[row]] = await pool.query(
-        'SELECT config_value FROM system_config WHERE config_key = ?', [key]
-      );
-      if (row && row.config_value) return JSON.parse(row.config_value);
-    } catch (_) {}
-    // 默认映射（匹配微信公共模板库最常见的字段布局）
-    const defaults = {
-      order: {
-        thing1: 'orderId',           // 订单编号
-        character_string2: 'pickupCode', // 取餐码
-        phrase3: 'status',           // 订单状态
-        thing4: 'storeName',        // 门店
-      },
-      coupon: {
-        thing1: 'couponName',        // 券名称
-        time2: 'validTo',            // 有效期
-        thing3: 'tip',               // 提示
-      },
-    };
-    return defaults[type] || {};
-  },
-
-  /** 获取模板 ID（同时检查是否在后台已配置） */
-  async _getTemplateId(type) {
-    const key = TPL_KEYS[type];
-    if (!key) return null;
-    const [[row]] = await pool.query(
-      'SELECT config_value FROM system_config WHERE config_key = ?', [key]
-    );
-    return row ? row.config_value || null : null;
-  },
-
-  // ── 发送订阅消息 ─────────────────────────────
-
-  /**
-   * 发送订阅消息
-   * @param {string} openid — 用户 openid
-   * @param {'order'|'coupon'} type — 通知类型
-   * @param {object} templateData — 模板字段数据 { thing1: {value:'...'}, ... }
-   * @param {string} [page] — 点击消息跳转路径
-   * @returns {Promise<{sent:boolean, errcode?:number}>}
-   */
-  async send(openid, type, templateData, page) {
-    try {
-      // 获取模板 ID（未配置则不发送）
-      const templateId = await this._getTemplateId(type);
+      const tplKey = TPL_KEYS[type];
+      if (!tplKey) return { sent: false, reason: 'unknown_type' };
+      const [[row]] = await pool.query('SELECT config_value FROM system_config WHERE config_key = ?', [tplKey]);
+      const templateId = row ? row.config_value || '' : '';
       if (!templateId) {
-        log.warn({ type }, 'Subscribe message NOT sent — template ID not configured in admin panel');
+        log.warn({ type }, 'Subscribe message NOT sent — template ID not configured');
         return { sent: false, reason: 'no_template_id' };
       }
-
       if (!openid) {
-        log.warn({ type }, 'Subscribe message NOT sent — user has no openid');
+        log.warn({ type }, 'Subscribe message NOT sent — no openid');
         return { sent: false, reason: 'no_openid' };
+      }
+
+      // 发送覆盖所有常见模板字段，WeChat 忽略多余的
+      const vals = {
+        thing1: valueMap.orderId || valueMap.couponName || '',
+        thing2: valueMap.status || valueMap.validTo || '',
+        thing3: valueMap.storeName || valueMap.tip || '',
+        thing4: valueMap.pickupCode || '',
+        thing5: valueMap.pickupTime || '',
+        thing6: valueMap.paidAmount || '',
+        thing7: valueMap.orderId || '',
+        thing8: valueMap.storeName || '',
+        thing9: valueMap.pickupCode || '',
+        thing10: valueMap.status || valueMap.storeName || '',
+        thing11: '', thing12: '', thing13: '', thing14: '', thing15: '',
+        character_string1: valueMap.orderId || valueMap.couponName || '',
+        character_string2: valueMap.pickupCode || '',
+        character_string3: valueMap.storeName || '',
+        character_string4: valueMap.pickupTime || '',
+        character_string5: valueMap.status || '',
+        phrase1: valueMap.status || '',
+        phrase2: valueMap.status || '',
+        phrase3: valueMap.storeName || '',
+        phrase4: valueMap.pickupCode || '',
+        phrase5: '',
+        time1: valueMap.pickupTime || '',
+        time2: valueMap.validTo || '',
+        time3: '',
+        date1: valueMap.pickupTime || '',
+        date2: valueMap.validTo || '',
+        date3: '',
+        amount1: valueMap.paidAmount || '',
+        amount2: '',
+        number1: valueMap.pickupCode || valueMap.orderId || '',
+        number2: '',
+      };
+
+      // 只发送有值的字段
+      const data = {};
+      for (const [k, v] of Object.entries(vals)) {
+        if (v) data[k] = { value: String(v).slice(0, 32) };
       }
 
       const accessToken = await getAccessToken();
@@ -142,27 +117,22 @@ const notificationService = {
         touser: openid,
         template_id: templateId,
         page: page || '',
-        data: templateData,
+        data,
         miniprogram_state: await _getMiniprogramState(),
       };
 
-      const { data } = await axios.post(url, body, {
+      const { data: resp } = await axios.post(url, body, {
         headers: { 'Content-Type': 'application/json' },
         timeout: 8000,
       });
 
-      if (data.errcode === 0) {
+      if (resp.errcode === 0) {
         log.info({ openid, type }, 'Subscribe message sent');
         return { sent: true };
       }
 
-      // 常见错误码
-      // 43101: 用户拒绝/未授权订阅
-      // 40001/42001: access_token 无效
-      // 40003: openid 无效
-      // 20037: 模板参数不合法
-      log.warn({ openid, type, errcode: data.errcode, errmsg: data.errmsg }, 'Subscribe message send failed');
-      return { sent: false, errcode: data.errcode, errmsg: data.errmsg };
+      log.warn({ openid, type, errcode: resp.errcode, errmsg: resp.errmsg }, 'Subscribe message send failed');
+      return { sent: false, errcode: resp.errcode, errmsg: resp.errmsg };
     } catch (err) {
       log.error({ err, openid, type }, 'Subscribe message send error');
       return { sent: false, reason: 'exception' };
@@ -171,72 +141,38 @@ const notificationService = {
 
   // ── 业务快捷方法 ────────────────────────────
 
-  /**
-   * 发送订单状态变更通知
-   * @param {object} order — 订单对象 (含 user_id, id, status, pickupCode, storeName)
-   */
   async notifyOrderStatus(order) {
     try {
-      // 获取用户 openid
       const [[user]] = await pool.query('SELECT openid FROM users WHERE id = ?', [order.user_id]);
-      if (!user || !user.openid) {
-        log.warn({ userId: order.user_id, orderId: order.id }, 'Order notify skipped — no openid');
-        return { sent: false, reason: 'no_openid' };
-      }
+      if (!user || !user.openid) return { sent: false, reason: 'no_openid' };
 
       const statusText = { waiting: '待取餐', preparing: '制作中', completed: '已完成', cancelled: '已取消' };
-      const status = statusText[order.status] || order.status;
-
-      // 构建模板数据：从字段映射配置读取，未配置则用默认值
-      const fieldMap = await this._getFieldMap('order');
-      const data = {};
-      for (const [tplField, sourceKey] of Object.entries(fieldMap)) {
-        let val = '';
-        if (sourceKey === 'orderId') val = String(order.id || '').slice(-8);
-        else if (sourceKey === 'status') val = status;
-        else if (sourceKey === 'storeName') val = order.store_name || '王姐手工披萨';
-        else if (sourceKey === 'pickupCode') val = order.pickup_code ? String(order.pickup_code) : '';
-        else if (sourceKey === 'pickupTime') val = order.pickup_time ? String(order.pickup_time).slice(0, 16) : '';
-        if (val) {
-          data[tplField] = { value: val };
-        }
-      }
-
-      return this.send(user.openid, 'order', data, `/pages/main/main`);
+      return this.send(user.openid, 'order', {
+        orderId: String(order.id || '').slice(-8),
+        status: statusText[order.status] || order.status,
+        storeName: order.store_name || '王姐手工披萨',
+        pickupCode: order.pickup_code ? String(order.pickup_code) : '',
+        pickupTime: order.pickup_time ? String(order.pickup_time).slice(0, 16) : '',
+        paidAmount: order.paid_amount ? parseFloat(order.paid_amount).toFixed(2) : '',
+      }, '/pages/main/main');
     } catch (err) {
       log.error({ err, orderId: order.id }, 'notifyOrderStatus error');
-      return { sent: false, reason: 'exception' };
+      return { sent: false };
     }
   },
 
-  /**
-   * 发送优惠券到账通知
-   * @param {number} userId — 用户 ID
-   * @param {string} couponName — 券名称
-   * @param {string} validTo — 有效期至 (YYYY-MM-DD)
-   */
   async notifyCouponReceived(userId, couponName, validTo) {
     try {
       const [[user]] = await pool.query('SELECT openid FROM users WHERE id = ?', [userId]);
       if (!user || !user.openid) return { sent: false, reason: 'no_openid' };
-
-      const values = {
-        couponName: couponName.slice(0, 20),
-        validTo: validTo || '请查看券详情',
-        tip: '已放入"我的-兑换券"，请及时使用',
-      };
-      const fieldMap = await this._getFieldMap('coupon');
-      const data = {};
-      for (const [tplField, sourceKey] of Object.entries(fieldMap)) {
-        if (values[sourceKey]) {
-          data[tplField] = { value: values[sourceKey] };
-        }
-      }
-
-      return this.send(user.openid, 'coupon', data, '/pages/coupons/coupons');
+      return this.send(user.openid, 'coupon', {
+        couponName: (couponName || '').slice(0, 20),
+        validTo: validTo || '',
+        tip: '已放入"我的-兑换券"',
+      }, '/pages/coupons/coupons');
     } catch (err) {
       log.error({ err, userId }, 'notifyCouponReceived error');
-      return { sent: false, reason: 'exception' };
+      return { sent: false };
     }
   },
 };
