@@ -349,11 +349,15 @@ export function fetchUpdateContentSettings(key: string, value: string) {
 export interface NotificationSettings {
   orderTpl: string;
   couponTpl: string;
+  orderFields: string;
+  couponFields: string;
 }
 
 export interface NotificationSettingsForm {
   orderTpl?: string;
   couponTpl?: string;
+  orderFields?: string;
+  couponFields?: string;
 }
 
 export function fetchNotificationSettings() {
