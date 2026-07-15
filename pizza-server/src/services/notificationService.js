@@ -152,21 +152,49 @@ const notificationService = {
           }
         }
       } else {
-        // 兜底：无法获取字段列表时，发全量字段
+        // 兜底：API 失败 → 全字段覆盖，确保命中的所有模板字段
         const v = valueMap;
-        const fallback = [
-          ['thing1', v.orderId || v.couponName],
-          ['thing2', v.status || v.validTo],
-          ['thing3', v.storeName || v.tip],
-          ['thing4', v.pickupCode],
-          ['thing5', v.pickupTime],
-          ['thing6', v.paidAmount],
-          ['character_string1', v.orderId || v.couponName],
-          ['character_string2', v.pickupCode],
-          ['phrase1', v.status],
-          ['phrase2', v.storeName || v.tip],
-        ];
-        for (const [k, val] of fallback) {
+        const fb = {};
+        // thing 系
+        fb.thing1  = v.orderId || v.couponName || '';
+        fb.thing2  = v.status || v.validTo || '';
+        fb.thing3  = v.storeName || v.tip || '';
+        fb.thing4  = v.pickupCode || v.orderId || '';
+        fb.thing5  = v.pickupTime || v.status || '';
+        fb.thing6  = v.paidAmount || '';
+        fb.thing7  = v.storeName || '';
+        fb.thing8  = v.orderId || v.couponName || '';
+        fb.thing9  = v.pickupCode || '';
+        fb.thing10 = v.status || v.storeName || '';
+        fb.thing11 = v.tip || v.status || '';
+        fb.thing12 = '';
+        fb.thing13 = '';
+        fb.thing14 = '';
+        fb.thing15 = '';
+        // character_string 系
+        fb.character_string1 = v.orderId || v.couponName || '';
+        fb.character_string2 = v.pickupCode || v.status || '';
+        fb.character_string3 = v.storeName || '';
+        fb.character_string4 = v.pickupTime || '';
+        fb.character_string5 = v.tip || '';
+        // phrase 系
+        fb.phrase1 = v.status || '';
+        fb.phrase2 = v.storeName || v.tip || '';
+        fb.phrase3 = v.pickupCode || '';
+        fb.phrase4 = v.orderId || v.couponName || '';
+        fb.phrase5 = '';
+        // time/date/amount/number 系
+        fb.time1   = v.pickupTime || '';
+        fb.time2   = v.validTo || '';
+        fb.time3   = '';
+        fb.date1   = v.pickupTime || '';
+        fb.date2   = v.validTo || '';
+        fb.date3   = '';
+        fb.amount1 = v.paidAmount || '';
+        fb.amount2 = '';
+        fb.number1 = v.pickupCode || v.orderId || '';
+        fb.number2 = '';
+        for (const [k, val] of Object.entries(fb)) {
           if (val) data[k] = { value: String(val).slice(0, 32) };
         }
       }
