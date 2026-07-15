@@ -208,6 +208,7 @@ const orderService = {
   },
 
   async cancel(orderId, userId) {
+    const [[order]] = await pool.query('SELECT user_id, status, pickup_code, store_name, payment_method FROM orders WHERE id = ?', [orderId]);
     const [result] = await pool.query(
       "UPDATE orders SET status = 'cancelled', updated_at = NOW() WHERE id = ? AND user_id = ? AND status IN ('waiting', 'preparing')",
       [orderId, userId]
@@ -215,14 +216,24 @@ const orderService = {
     if (result.affectedRows === 0) {
       return null;
     }
+    // 通知用户订单已取消
+    if (order) {
+      const notificationService = require('./notificationService');
+      notificationService.notifyOrderStatus({ user_id: order.user_id, id: orderId, status: 'cancelled', pickup_code: order.pickup_code, store_name: order.store_name }).catch(() => {});
+    }
     return this.findById(orderId);
   },
 
   async markPickedUp(orderId, userId) {
+    const [[order]] = await pool.query('SELECT user_id, pickup_code, store_name FROM orders WHERE id = ?', [orderId]);
     const [result] = await pool.query(
       "UPDATE orders SET status = 'completed', updated_at = NOW() WHERE id = ? AND user_id = ? AND status = 'waiting'",
       [orderId, userId]
     );
+    if (result.affectedRows > 0 && order) {
+      const notificationService = require('./notificationService');
+      notificationService.notifyOrderStatus({ user_id: order.user_id, id: orderId, status: 'completed', pickup_code: order.pickup_code, store_name: order.store_name }).catch(() => {});
+    }
     return result.affectedRows > 0;
   },
 

@@ -10,7 +10,7 @@ const AUTO_COMPLETE_MINUTES = 20; // minutes after pickup_time to auto-complete
 const orderAutoCompleteService = {
   async autoCompleteOrders() {
     const [rows] = await pool.query(
-      `SELECT id FROM orders
+      `SELECT id, user_id, pickup_code, store_name FROM orders
        WHERE pickup_time IS NOT NULL
          AND status IN ('waiting', 'preparing')
          AND pickup_time < NOW() - INTERVAL ? MINUTE`,
@@ -28,6 +28,9 @@ const orderAutoCompleteService = {
           [order.id]
         );
         if (result.affectedRows === 0) continue;
+
+        const notificationService = require('./notificationService');
+        notificationService.notifyOrderStatus({ user_id: order.user_id, id: order.id, status: 'completed', pickup_code: order.pickup_code, store_name: order.store_name }).catch(() => {});
 
         await auditService.record({
           actorType: 'system',
