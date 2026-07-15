@@ -299,7 +299,12 @@ const orderService = {
       after: { status },
     });
 
-    return this.findById(orderId);
+    // 发送订阅消息通知
+    const updated = await this.findById(orderId);
+    const notificationService = require('./notificationService');
+    notificationService.notifyOrderStatus({ user_id: order.user_id, id: orderId, status, pickup_code: order.pickup_code, store_name: order.store_name }).catch(() => {});
+
+    return updated;
   },
 
   async getDashboardStats() {

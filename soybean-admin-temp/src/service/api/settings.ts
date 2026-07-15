@@ -343,3 +343,34 @@ export function fetchUpdateContentSettings(key: string, value: string) {
     data: { value },
   });
 }
+
+// ── Notification Settings (订阅消息) ──
+
+export interface NotificationSettings {
+  orderTpl: string;
+  couponTpl: string;
+  orderEnabled: boolean;
+  couponEnabled: boolean;
+}
+
+export interface NotificationSettingsForm {
+  orderTpl?: string;
+  couponTpl?: string;
+  orderEnabled?: boolean;
+  couponEnabled?: boolean;
+}
+
+export function fetchNotificationSettings() {
+  return request<NotificationSettings>({
+    url: '/settings/notification',
+    method: 'GET',
+  });
+}
+
+export function fetchUpdateNotificationSettings(data: NotificationSettingsForm) {
+  return request<null>({
+    url: '/settings/notification',
+    method: 'PUT',
+    data,
+  });
+}

@@ -428,6 +428,10 @@ Page({
               }
               this.loadProfileData();
               wx.showToast({ title: '订单已保存，请在订单中心完成支付', icon: 'none', duration: 3000 });
+              // 请求订阅订单状态通知
+              setTimeout(function() {
+                require('../../utils/subscribe').askOrderNotify();
+              }, 1500);
             } else {
               if (orderPaidAmount > 0 && app.globalData.userInfo) {
                 app.globalData.userInfo.totalSpent = Math.max(0, (app.globalData.userInfo.totalSpent || 0) - orderPaidAmount);

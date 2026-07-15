@@ -155,6 +155,8 @@ router.get('/settings/storage', ctrl.getStorageSettings);
 router.put('/settings/storage', ctrl.updateStorageSettings);
 router.get('/settings/content', ctrl.getContentSettings);
 router.put('/settings/content/:key', ctrl.updateContentSettings);
+router.get('/settings/notification', ctrl.getNotificationSettings);
+router.put('/settings/notification', ctrl.updateNotificationSettings);
 
 // Default avatars
 router.get('/default-avatars', ctrl.listDefaultAvatars);

@@ -15,5 +15,6 @@ router.put('/settings', auth, validate('updateSettings'), controller.updateSetti
 router.get('/balance/history', auth, controller.getBalanceHistory);
 router.post('/balance/recharge', auth, controller.recharge);
 router.delete('/account', auth, controller.deleteAccount);
+router.get('/notification-templates', auth, controller.getNotificationTemplates);
 
 module.exports = router;

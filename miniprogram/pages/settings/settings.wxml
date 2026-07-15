@@ -35,7 +35,19 @@
         </view>
       </view>
 
-      <!-- 组2：清除缓存 -->
+      <!-- 组2：消息通知 -->
+      <view class="settings-group card">
+        <view class="settings-item" bindtap="onSubscribeNotify">
+          <image class="settings-item-icon" src="/images/icon-setting-notify.png" mode="aspectFit"></image>
+          <text class="settings-item-label">消息通知</text>
+          <view class="settings-item-right">
+            <text class="settings-item-hint">订单状态、优惠券</text>
+            <text class="settings-item-arrow">→</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 组3：清除缓存 -->
       <view class="settings-group card">
         <view class="settings-item" bindtap="onClearCache">
           <image class="settings-item-icon" src="/images/icon-setting-cache.png" mode="aspectFit"></image>

@@ -117,6 +117,23 @@ const userController = {
       next(err);
     }
   },
+
+  /** 返回订阅消息模板 ID（供小程序端 wx.requestSubscribeMessage 使用） */
+  async getNotificationTemplates(req, res) {
+    try {
+      const notificationService = require('../services/notificationService');
+      const config = await notificationService.getConfig();
+      return res.json({
+        code: 0,
+        data: {
+          orderTpl: config.orderTpl || '',
+          couponTpl: config.couponTpl || '',
+        },
+      });
+    } catch (err) {
+      return res.status(500).json({ code: 500, message: '获取失败' });
+    }
+  },
 };
 
 module.exports = userController;

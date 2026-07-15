@@ -63,6 +63,11 @@ Page({
     wx.showToast({ title: val ? '已开启通知' : '已关闭通知', icon: 'none', duration: 1200 });
   },
 
+  onSubscribeNotify() {
+    require('../../utils/subscribe').askAllNotify();
+    wx.showToast({ title: '请在弹窗中选择要接收的通知类型', icon: 'none', duration: 2000 });
+  },
+
   onClearCache() {
     wx.showModal({
       title: '清除缓存',

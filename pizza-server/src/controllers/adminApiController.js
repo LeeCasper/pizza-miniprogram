@@ -1876,6 +1876,30 @@ const adminApiController = {
     }
   },
 
+  // ── Notification Settings (订阅消息) ──
+
+  async getNotificationSettings(req, res) {
+    try {
+      const notificationService = require('../services/notificationService');
+      const config = await notificationService.getConfig();
+      return res.json({ code: 0, data: config });
+    } catch (err) {
+      log.error({ err }, 'GetNotificationSettings error');
+      return res.status(500).json({ code: 500, message: 'Failed to get settings' });
+    }
+  },
+
+  async updateNotificationSettings(req, res) {
+    try {
+      const notificationService = require('../services/notificationService');
+      const config = await notificationService.updateConfig(req.body);
+      return res.json({ code: 0, message: 'Saved', data: config });
+    } catch (err) {
+      log.error({ err }, 'UpdateNotificationSettings error');
+      return res.status(500).json({ code: 500, message: 'Failed to save' });
+    }
+  },
+
 };
 
 function safeJson(val, defaultVal) {
