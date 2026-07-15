@@ -1187,16 +1187,12 @@ const adminApiController = {
       }
       await conn.commit();
 
-      // 发送订阅消息通知（同一用户只发一次，微信一次订阅只能发一条）
+      // 发送订阅消息通知
       const couponName = template.name || '优惠券';
       const couponType = template.category === 'redeem' ? '兑换券' : template.discountType === 'percentage' ? '折扣券' : template.discountType === 'fixed_amount' ? '代金券' : '优惠券';
       const validTo = new Date(Date.now() + (template.validDays || 30) * 86400000).toISOString().slice(0, 10);
-      const uniqueUsers = [...new Set(userIds)];
-      let notified = 0;
-      for (const userId of uniqueUsers) {
+      for (const userId of userIds) {
         require('../services/notificationService').notifyCouponReceived(userId, couponName, validTo, couponType).catch(() => {});
-        notified++;
-        if (notified >= 3) break; // 单次最多通知3人，避免超时
       }
 
       return res.json({ code: 0, message: `已成功发放 ${assigned} 张优惠券`, data: { assigned } });
