@@ -419,6 +419,7 @@ Page({
           }
           pay.payOrder(orderData.order.id).then(() => {
             wx.showToast({ title: '支付成功！', icon: 'success' });
+            this.setData({ showSubscribeHint: true });
             console.log('[onCheckout] payOrder resolved, refreshing');
             this.fetchOrders();
             this.loadProfileData();
@@ -429,8 +430,6 @@ Page({
               }
               this.loadProfileData();
               wx.showToast({ title: '订单已保存，请在订单中心完成支付', icon: 'none', duration: 3000 });
-              // 显示订阅按钮（必须在点击事件中触发 wx.requestSubscribeMessage）
-              this.setData({ showSubscribeHint: true });
             } else {
               if (orderPaidAmount > 0 && app.globalData.userInfo) {
                 app.globalData.userInfo.totalSpent = Math.max(0, (app.globalData.userInfo.totalSpent || 0) - orderPaidAmount);
@@ -441,6 +440,7 @@ Page({
           });
         } else {
           wx.showToast({ title: res.message || '支付成功！', icon: 'success' });
+          this.setData({ showSubscribeHint: true });
           this.loadProfileData();
           this.fetchOrders();
         }
