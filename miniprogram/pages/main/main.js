@@ -419,7 +419,7 @@ Page({
           }
           pay.payOrder(orderData.order.id).then(() => {
             wx.showToast({ title: '支付成功！', icon: 'success' });
-            this.setData({ showSubscribeHint: true });
+            if (!wx.getStorageSync('_subscribedOrder')) this.setData({ showSubscribeHint: true });
             console.log('[onCheckout] payOrder resolved, refreshing');
             this.fetchOrders();
             this.loadProfileData();
@@ -440,7 +440,7 @@ Page({
           });
         } else {
           wx.showToast({ title: res.message || '支付成功！', icon: 'success' });
-          this.setData({ showSubscribeHint: true });
+          if (!wx.getStorageSync('_subscribedOrder')) this.setData({ showSubscribeHint: true });
           this.loadProfileData();
           this.fetchOrders();
         }
@@ -855,13 +855,17 @@ Page({
     }
     wx.requestSubscribeMessage({
       tmplIds: [ids.order],
-      success: function() { wx.showToast({ title: '订阅成功', icon: 'success' }); },
+      success: function() {
+        wx.showToast({ title: '订阅成功', icon: 'success' });
+        wx.setStorageSync('_subscribedOrder', true); // 已订阅，后续不弹
+      },
       fail: function() { wx.showToast({ title: '已取消', icon: 'none' }); }
     });
     this.setData({ showSubscribeHint: false });
   },
 
   onCloseSubscribeHint() {
+    wx.setStorageSync('_subscribedOrder', true); // 关闭了也记住，不反复弹
     this.setData({ showSubscribeHint: false });
   },
 
