@@ -16,63 +16,74 @@ const log = createLogger('Notification');
 const TPL_KEYS = { order: 'notify_order_tpl', coupon: 'notify_coupon_tpl' };
 const STATE_KEY = 'notify_miniprogram_state';
 
-// 内存缓存：{ [priTmplId]: [{ name: 'thing1', label: '订单编号' }, ...] }
-let _fieldCache = null;
-let _cacheExpires = 0;
+// DB 持久化字段映射：config_key = notify_fields_<type>，config_value = JSON
+const FIELD_CACHE_KEY = { order: 'notify_fields_order', coupon: 'notify_fields_coupon' };
 
-/** 从 WeChat API 拉取所有模板及其字段 */
-async function _fetchTemplateFieldsFromWx() {
+/** 从 WeChat API 拉取模板字段，存入 DB 持久化 */
+async function _refreshFieldsFromWx(type) {
   try {
+    const tplKey = TPL_KEYS[type];
+    const [[row]] = await pool.query('SELECT config_value FROM system_config WHERE config_key = ?', [tplKey]);
+    const tplId = row ? row.config_value || '' : '';
+    if (!tplId) return null;
+
     const token = await getAccessToken();
     const url = `https://api.weixin.qq.com/wxaapi/newtmpl/gettemplate?access_token=${token}`;
     const { data } = await axios.get(url, { timeout: 8000 });
-    if (!data || !data.data || !Array.isArray(data.data)) return {};
+    if (!data || !data.data || !Array.isArray(data.data)) return null;
 
-    const result = {};
-    for (const tpl of data.data) {
-      if (!tpl.priTmplId || !tpl.keywordEnumValueList) continue;
+    const tpl = data.data.find(t => t.priTmplId === tplId);
+    if (!tpl || !tpl.keywordEnumValueList) return null;
 
-      // 从 content 字段解析字段名前缀（如 {{thing1.DATA}} → thing1）
-      const fieldPrefixes = {};
-      if (tpl.content) {
-        const matches = tpl.content.matchAll(/\{\{(\w+)\.DATA\}\}/g);
-        for (const m of matches) {
-          fieldPrefixes[m[1]] = true;
-        }
-      }
-      const fieldNames = Object.keys(fieldPrefixes);
-
-      // 按 keyword_id 顺序匹配字段名前缀
-      const fields = [];
-      let idx = 0;
-      for (const kw of (tpl.keywordEnumValueList || [])) {
-        fields.push({
-          name: fieldNames[idx] || ('thing' + kw.keyword_id),
-          label: kw.name || '',
-          example: kw.example || '',
-        });
-        idx++;
-      }
-
-      result[tpl.priTmplId] = fields;
+    // 从 content 解析字段名前缀（{{thing1.DATA}} → thing1）
+    const prefixes = [];
+    if (tpl.content) {
+      const matches = tpl.content.matchAll(/\{\{(\w+)\.DATA\}\}/g);
+      for (const m of matches) prefixes.push(m[1]);
     }
-    return result;
+
+    const fields = [];
+    let idx = 0;
+    for (const kw of tpl.keywordEnumValueList) {
+      fields.push({
+        name: prefixes[idx] || ('thing' + kw.keyword_id),
+        label: kw.name || '',
+        source: _matchSource(kw.name || ''),
+      });
+      idx++;
+    }
+
+    // 持久化到 DB
+    const cacheKey = FIELD_CACHE_KEY[type];
+    if (cacheKey) {
+      await pool.query(
+        'INSERT INTO system_config (config_key, config_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE config_value = ?',
+        [cacheKey, JSON.stringify(fields), JSON.stringify(fields)]
+      );
+    }
+    return fields;
   } catch (err) {
-    log.warn({ err: err.message }, 'Failed to fetch template fields from WeChat');
-    return {};
+    log.warn({ err: err.message, type }, 'Failed to refresh template fields from WeChat');
+    return null;
   }
 }
 
-/** 获取模板字段（带内存缓存，10分钟过期） */
-async function _getTemplateFields(priTmplId) {
-  if (!priTmplId) return [];
-  const now = Date.now();
-  if (_fieldCache && now < _cacheExpires) {
-    return _fieldCache[priTmplId] || [];
-  }
-  _fieldCache = await _fetchTemplateFieldsFromWx();
-  _cacheExpires = now + 10 * 60 * 1000;
-  return _fieldCache[priTmplId] || [];
+/** 获取模板字段映射：优先读 DB 缓存，无缓存时调 API 刷新 */
+async function _getTemplateFields(type) {
+  const cacheKey = FIELD_CACHE_KEY[type];
+  if (!cacheKey) return null;
+
+  // 读 DB 缓存
+  try {
+    const [[row]] = await pool.query('SELECT config_value FROM system_config WHERE config_key = ?', [cacheKey]);
+    if (row && row.config_value) {
+      const fields = JSON.parse(row.config_value);
+      if (Array.isArray(fields) && fields.length > 0) return fields;
+    }
+  } catch (_) {}
+
+  // 无缓存 → 从微信 API 刷新
+  return _refreshFieldsFromWx(type);
 }
 
 /** 根据字段中文名自动匹配数据源 */
@@ -121,7 +132,9 @@ const notificationService = {
         [key, val, val]
       );
     }
-    _fieldCache = null; // 清除缓存
+    // 模板 ID 变更后刷新字段映射
+    if (data.orderTpl) _refreshFieldsFromWx('order').catch(() => {});
+    if (data.couponTpl) _refreshFieldsFromWx('coupon').catch(() => {});
     return this.getConfig();
   },
 
@@ -136,15 +149,14 @@ const notificationService = {
       if (!templateId) return { sent: false, reason: 'no_template_id' };
       if (!openid) return { sent: false, reason: 'no_openid' };
 
-      // 获取模板字段列表
-      const fields = await _getTemplateFields(templateId);
+      // 获取模板字段映射（DB 缓存优先，无缓存则调微信 API 刷新）
+      const fields = await _getTemplateFields(type);
 
-      // 构建 data：按字段中文名匹配数据源
+      // 构建 data
       const data = {};
-      if (fields.length > 0) {
+      if (fields && fields.length > 0) {
         for (const f of fields) {
-          const src = _matchSource(f.label);
-          const val = src ? (valueMap[src] || '') : '';
+          const val = f.source ? (valueMap[f.source] || '') : '';
           if (val) {
             data[f.name] = { value: String(val).slice(0, 32) };
           } else {
