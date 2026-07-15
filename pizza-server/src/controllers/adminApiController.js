@@ -1186,6 +1186,14 @@ const adminApiController = {
         assigned++;
       }
       await conn.commit();
+
+      // 发送订阅消息通知
+      const couponName = template.name || '优惠券';
+      const validTo = new Date(Date.now() + (template.validDays || 30) * 86400000).toISOString().slice(0, 10);
+      for (const userId of userIds) {
+        require('../services/notificationService').notifyCouponReceived(userId, couponName, validTo).catch(() => {});
+      }
+
       return res.json({ code: 0, message: `已成功发放 ${assigned} 张优惠券`, data: { assigned } });
     } catch (err) {
       if (conn) await conn.rollback();
