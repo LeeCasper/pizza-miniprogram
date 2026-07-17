@@ -90,9 +90,10 @@
   background: none;
 }
 
-/* 客服按钮：去除 <button> 默认样式 */
-.contact-btn-reset { border: none; background: transparent; padding: 0; margin: 0; line-height: inherit; font-size: inherit; color: inherit; text-align: inherit; border-radius: 0; box-sizing: border-box; }
-.contact-btn-reset::after { display: none; border: none; }
+/* 客服按钮：透明覆盖层（避免 <button> 破坏布局） */
+.contact-btn-wrap { position: relative; }
+.contact-btn-cover { position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0; z-index: 1; padding: 0; margin: 0; }
+.contact-btn-cover::after { display: none; border: none; }
 
 /* 设置页按钮行 */
 .settings-item-btn {

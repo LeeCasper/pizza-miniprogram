@@ -48,11 +48,12 @@
 
         <view class="settings-divider"></view>
 
-        <button class="settings-item settings-item-btn contact-btn-reset" open-type="contact" session-from='{"userId":"{{userId}}","phone":"{{phoneNumber}}","page":"settings"}' show-message-card="{{true}}" send-message-title="王姐手工披萨 · 在线客服" send-message-path="/pages/main/main">
+        <view class="settings-item settings-item-btn contact-btn-wrap">
           <image class="settings-item-icon" src="/images/icon-setting-service.png" mode="aspectFit"></image>
           <text class="settings-item-label">联系客服</text>
           <text class="settings-item-arrow">→</text>
-        </button>
+          <button class="contact-btn-cover" open-type="contact" session-from='{"userId":"{{userId}}","phone":"{{phoneNumber}}","page":"settings"}' show-message-card="{{true}}" send-message-title="王姐手工披萨 · 在线客服" send-message-path="/pages/main/main"></button>
+        </view>
       </view>
 
       <!-- 组3：清除缓存 -->

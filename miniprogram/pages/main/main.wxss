@@ -1236,9 +1236,10 @@
   box-shadow: 0 12rpx 28rpx rgba(120,108,94,0.12), inset 3rpx 3rpx 5rpx rgba(255,255,255,0.95), inset -4rpx -6rpx 14rpx rgba(120,108,94,0.08); }
 .grid-item { display: flex; flex-direction: column; align-items: center; gap: 12rpx; width: 25%; }
 
-/* 客服按钮：去除 <button> 默认样式 */
-.contact-btn-reset { border: none; background: transparent; padding: 0; margin: 0; line-height: inherit; font-size: inherit; color: inherit; text-align: inherit; border-radius: 0; box-sizing: border-box; }
-.contact-btn-reset::after { display: none; border: none; }
+/* 客服按钮：透明覆盖层（避免 <button> 破坏布局） */
+.contact-btn-wrap { position: relative; }
+.contact-btn-cover { position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0; z-index: 1; padding: 0; margin: 0; }
+.contact-btn-cover::after { display: none; border: none; }
 /* 金刚区图标：粘土圆球（实底 + 内顶高光 + 内底暗影 + 外柔影） */
 .grid-icon-wrap { width: 96rpx; height: 96rpx; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; transition: transform 0.15s ease, box-shadow 0.15s ease; }
 .grid-icon-wrap:active { transform: translateY(2rpx) scale(0.94); }

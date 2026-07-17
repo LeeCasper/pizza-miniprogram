@@ -180,10 +180,11 @@
 
   <!-- ═══ 底部操作栏（固定）═ 三按钮：客服 | 加入购物车 | 立即购买 ═══ -->
   <view class="sd-bottom-bar">
-    <button class="sd-service-btn contact-btn-reset" open-type="contact" session-from='{"page":"shop-detail"}' show-message-card="{{true}}" send-message-title="王姐手工披萨 · 在线客服" send-message-path="/pages/main/main">
+    <view class="sd-service-btn contact-btn-wrap">
       <text class="sd-service-icon">🎧</text>
       <text class="sd-service-label">客服</text>
-    </button>
+      <button class="contact-btn-cover" open-type="contact" session-from='{"page":"shop-detail"}' show-message-card="{{true}}" send-message-title="王姐手工披萨 · 在线客服" send-message-path="/pages/main/main"></button>
+    </view>
     <view class="sd-cart-btn" bindtap="onAddToCart">
       <text>加入购物车</text>
     </view>
