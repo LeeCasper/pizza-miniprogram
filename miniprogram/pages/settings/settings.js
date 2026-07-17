@@ -14,6 +14,7 @@ Page({
     drawerType: '',
     drawerTitle: '',
     phoneNumber: '',
+    userId: '',
     editPhone: '',
     editPhoneOpen: false,
   },
@@ -26,10 +27,13 @@ Page({
       cacheSize = kb < 1024 ? kb + ' KB' : (kb / 1024).toFixed(1) + ' MB';
     } catch (e) { /* ignore */ }
 
+    const globalUser = app.globalData.userInfo || {};
+
     this.setData({
       ...getBackBtnTopBar(),
       notificationEnabled: app.globalData.notificationEnabled !== false,
       cacheSize,
+      userId: globalUser.id || '',
     });
 
     // Load settings from API

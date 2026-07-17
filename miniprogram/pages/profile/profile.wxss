@@ -365,6 +365,24 @@
   width: 25%;
 }
 
+/* 客服按钮：去除 <button> 默认样式 */
+.contact-btn-reset {
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  line-height: inherit;
+  font-size: inherit;
+  color: inherit;
+  text-align: inherit;
+  border-radius: 0;
+  box-sizing: border-box;
+}
+.contact-btn-reset::after {
+  display: none;
+  border: none;
+}
+
 .grid-icon-wrap {
   width: 96rpx;
   height: 96rpx;

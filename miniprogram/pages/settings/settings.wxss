@@ -90,6 +90,18 @@
   background: none;
 }
 
+/* 客服按钮：去除 <button> 默认样式 */
+.contact-btn-reset { border: none; background: transparent; padding: 0; margin: 0; line-height: inherit; font-size: inherit; color: inherit; text-align: inherit; border-radius: 0; box-sizing: border-box; }
+.contact-btn-reset::after { display: none; border: none; }
+
+/* 设置页按钮行 */
+.settings-item-btn {
+  width: 100%;
+}
+.settings-item-btn:active {
+  background: rgba(0, 0, 0, 0.04);
+}
+
 /* 分隔线 */
 .settings-divider {
   height: 1rpx;

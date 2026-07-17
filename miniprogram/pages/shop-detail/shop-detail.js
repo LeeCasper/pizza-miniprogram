@@ -194,11 +194,6 @@ Page({
     this.setData({ activeTab: e.currentTarget.dataset.tab });
   },
 
-  // ── 客服 ──
-  onContactService() {
-    wx.showToast({ title: '请联系客服', icon: 'none' });
-  },
-
   // ── 加入购物车 ──
   onAddToCart() {
     const p = this.data.product;

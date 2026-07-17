@@ -172,12 +172,12 @@
         </view>
         <text class="grid-label">我的物流</text>
       </view>
-      <view class="grid-item" bindtap="onMenuItem" data-action="service">
+      <button class="grid-item contact-btn-reset" open-type="contact" session-from='{"userId":"{{userInfo.id}}","phone":"{{userInfo.phone}}","page":"profile"}' show-message-card="{{true}}" send-message-title="王姐手工披萨 · 在线客服" send-message-path="/pages/main/main">
         <view class="grid-icon-wrap grid-icon-gray">
           <image class="grid-icon" src="/images/grid-service.png" mode="aspectFit"></image>
         </view>
         <text class="grid-label">联系客服</text>
-      </view>
+      </button>
       <view class="grid-item" bindtap="onMenuItem" data-action="recharge">
         <view class="grid-icon-wrap grid-icon-blue">
           <image class="grid-icon" src="/images/grid-recharge.png" mode="aspectFit"></image>
